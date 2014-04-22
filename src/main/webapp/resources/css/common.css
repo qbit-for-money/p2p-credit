@@ -1,0 +1,40 @@
+html, body {
+	height: 100%;
+}
+
+.wrapper {
+	min-height: 100%;
+	height: auto !important;
+	height: 100%;
+	margin: 0 auto -80px;
+}
+
+.push {
+	height: 80px;
+}
+
+.footer {
+	margin-top: 20px;
+	height: 60px;
+	text-align: center;
+	line-height: 60px;
+}
+
+span.success {
+	color: #5cb85c;
+}
+
+span.error {
+	color: #d9534f;
+}
+
+div.loader-big {
+	padding: 0px 0px; margin: 0px 0px;
+	background: url('../img/loader-big.gif') no-repeat;
+	width: 32px; height: 32px;
+}
+
+input[readonly], input[ng-readonly] {
+	cursor: text !important;
+	background-color: inherit !important;
+}
