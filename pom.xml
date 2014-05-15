@@ -160,6 +160,12 @@
 			<artifactId>jcaptcha-all</artifactId>
 			<version>1.0-RC-2.0.1</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>com.qbit</groupId>
+			<artifactId>qbit-commons</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 	<properties>
