@@ -7,7 +7,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * P2P properties
@@ -33,20 +32,5 @@ public class Env {
 	@XmlElement
 	public boolean isDemoEnabled() {
 		return Boolean.TRUE.toString().equalsIgnoreCase(properties.getProperty("demo.enabled"));
-	}
-
-	@XmlElement
-	public String getMailBotAddress() {
-		return properties.getProperty("mail.bot.address");
-	}
-	
-	@XmlTransient
-	public String getMailBotPersonal() {
-		return properties.getProperty("mail.bot.personal");
-	}
-
-	@XmlTransient
-	public String getMailHost() {
-		return properties.getProperty("mail.host");
 	}
 }

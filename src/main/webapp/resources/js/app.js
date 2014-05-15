@@ -1,4 +1,10 @@
-angular.module("main", ["ngRoute", "ui.bootstrap", "chieffancypants.loadingBar"]);
+angular.module("common", ["ngResource"]);
+
+angular.module("user", ["ngResource"]);
+
+angular.module("captcha-auth", ["ngResource"]);
+
+angular.module("main", ["ngRoute", "ui.bootstrap", "chieffancypants.loadingBar", "common", "user", "captcha-auth"]);
 
 angular.module("main").config(function($routeProvider) {
 

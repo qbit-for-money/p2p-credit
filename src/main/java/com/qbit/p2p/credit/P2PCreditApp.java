@@ -1,5 +1,10 @@
 package com.qbit.p2p.credit;
 
+import com.qbit.commons.dao.util.DAOExecutor;
+import com.qbit.commons.dao.util.DefaultDAOExecutor;
+import com.qbit.commons.env.CommonsEnv;
+import com.qbit.commons.mail.MailService;
+import com.qbit.commons.user.UserDAO;
 import com.qbit.p2p.credit.env.Env;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -30,10 +35,17 @@ public class P2PCreditApp extends Application {
 	public void init() {
 		DynamicConfiguration configuration = getConfiguration(serviceLocator);
 
+		addBinding(newBinder(CommonsEnv.class).to(CommonsEnv.class).in(Singleton.class), configuration);
 		addBinding(newBinder(Env.class).to(Env.class).in(Singleton.class), configuration);
+		
+		addBinding(newBinder(MailService.class).to(MailService.class).in(Singleton.class), configuration);
 
 		entityManagerFactory = Persistence.createEntityManagerFactory("P2PCreditPU");
 		addBinding(newBinder(entityManagerFactory).to(EntityManagerFactory.class), configuration);
+		
+		addBinding(newBinder(DefaultDAOExecutor.class).to(DAOExecutor.class).in(Singleton.class), configuration);
+		
+		addBinding(newBinder(UserDAO.class).to(UserDAO.class).in(Singleton.class), configuration);
 		
 		configuration.commit();
 	}
