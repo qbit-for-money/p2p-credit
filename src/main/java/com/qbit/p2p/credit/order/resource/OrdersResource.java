@@ -48,7 +48,7 @@ public class OrdersResource {
 	@GET
 	@Path("by-user-type")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<OrderInfo> getByUser(@QueryParam("userType") UserType userType, @QueryParam("offset") int offset, @QueryParam("limit") int limit) {
+	public List<OrderInfo> getByUserType(@QueryParam("userType") UserType userType, @QueryParam("offset") int offset, @QueryParam("limit") int limit) {
 		return orderDAO.findByUserType(userType, offset, limit);
 	}
 	
