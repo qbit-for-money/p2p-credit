@@ -6,6 +6,9 @@ import com.qbit.commons.env.CommonsEnv;
 import com.qbit.commons.mail.MailService;
 import com.qbit.commons.user.UserDAO;
 import com.qbit.p2p.credit.env.Env;
+import com.qbit.p2p.credit.material.dao.MaterialDAO;
+import com.qbit.p2p.credit.order.dao.OrderDAO;
+import com.qbit.p2p.credit.user.dao.UserProfileDAO;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -46,6 +49,9 @@ public class P2PCreditApp extends Application {
 		addBinding(newBinder(DefaultDAOExecutor.class).to(DAOExecutor.class).in(Singleton.class), configuration);
 		
 		addBinding(newBinder(UserDAO.class).to(UserDAO.class).in(Singleton.class), configuration);
+		addBinding(newBinder(UserProfileDAO.class).to(UserProfileDAO.class).in(Singleton.class), configuration);
+		addBinding(newBinder(OrderDAO.class).to(OrderDAO.class).in(Singleton.class), configuration);
+		addBinding(newBinder(MaterialDAO.class).to(MaterialDAO.class).in(Singleton.class), configuration);
 		
 		configuration.commit();
 	}

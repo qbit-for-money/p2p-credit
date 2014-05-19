@@ -30,7 +30,9 @@ import javax.xml.bind.annotation.XmlTransient;
 					+ "o.userPublicKey = u.publicKey AND u.type = :userType"),
 	@NamedQuery(name = "OrderInfo.findByUserAndTimestamp",
 			query = "SELECT o FROM OrderInfo o WHERE o.userPublicKey = :userPublicKey"
-			+ " AND o.creationDate = :creationDate")})
+			+ " AND o.creationDate = :creationDate"),
+	@NamedQuery(name = "OrderInfo.findMedianVolumeOfSuccess",
+			query = "SELECT o FROM OrderInfo o WHERE o.status = com.qbit.p2p.credit.order.model.OrderStatus.SUCCESS")})
 @Access(AccessType.FIELD)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -47,6 +49,8 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 	private Date creationDate;
 
 	private String userPublicKey;
+	
+	private OrderStatus status;
 
 	@Override
 	public String getId() {
@@ -72,6 +76,12 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 	public void setUserPublicKey(String userPublicKey) {
 		this.userPublicKey = userPublicKey;
 	}
-	
-	
+
+	public OrderStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(OrderStatus status) {
+		this.status = status;
+	}
 }
