@@ -1,0 +1,17 @@
+<%@ page pageEncoding="UTF-8" %>
+<form ng-if="user" name="userForm" class="navbar-form navbar-right" ng-controller="UserController">
+	<div class="form-group">
+
+		<div class="input-group" style="width: 20em;">
+			<span class="btn-group navbar-right">
+				<button class="btn btn-default" type="button" ng-click="goToProfile()">
+					{{user.publicKey}}
+				</button>
+				<button class="btn btn-default" type="button" ng-click="logout()">
+					<span class="glyphicon {{logoutButton}}"></span>
+				</button>
+			</span>
+		</div>
+	</div>
+</form>
+

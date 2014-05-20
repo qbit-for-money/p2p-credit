@@ -14,10 +14,10 @@ html, body {
 }
 
 .footer {
-	margin-top: 20px;
-	height: 60px;
+	margin-top: 0px;
+	height: 80px;
 	text-align: center;
-	line-height: 60px;
+	line-height: 25px;
 }
 
 span.success {
@@ -37,4 +37,8 @@ div.loader-big {
 input[readonly], input[ng-readonly] {
 	cursor: text !important;
 	background-color: inherit !important;
+}
+
+.pluso-more {
+	display: none !important;
 }

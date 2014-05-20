@@ -1,6 +1,5 @@
 package com.qbit.p2p.credit.material.resource;
 
-import com.qbit.commons.auth.AuthFilter;
 import com.qbit.p2p.credit.material.dao.MaterialDAO;
 import com.qbit.p2p.credit.material.model.Materials;
 import java.util.List;
@@ -25,7 +24,7 @@ public class MaterialsResource {
 	private MaterialDAO materialDAO;
 	
 	@GET
-	@Path("active")
+	@Path("byOrder")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<Materials> getByOrder(@QueryParam("orderId") String orderId, @QueryParam("offset") int offset, @QueryParam("limit") int limit) {
 		return materialDAO.findByOrder(orderId, offset, limit);
