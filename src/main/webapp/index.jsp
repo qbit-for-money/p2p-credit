@@ -3,6 +3,7 @@
 <html ng-app="main">
 	<head>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="description" content="With this service you can give and take credit">
 
 		<link rel="stylesheet" type="text/css" href="resources/lib/bootstrap/core/css/bootstrap.min.css">
 
@@ -24,7 +25,7 @@
 		</div>
 
 		<div class="footer navbar-default">
-			<div class="pluso" data-background="#ebebeb" data-options="medium,square,line,horizontal,nocounter,theme=07" data-services="vkontakte,odnoklassniki,facebook,twitter,google,moimir"></div>
+			<div class="pluso" data-background="#ebebeb" data-options="medium,square,line,horizontal,nocounter,theme=07" data-services="google,twitter,facebook,vkontakte,odnoklassniki,moimir" data-url="https://www.bitgates.com" data-title="p2p-credit"></div>
 			<p>&copy; Bitgates 2014</p>
 		</div>
 
