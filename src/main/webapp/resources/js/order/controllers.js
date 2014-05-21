@@ -1,11 +1,11 @@
 var orderModule = angular.module("order");
 
-orderModule.controller("OrderInitController", function($scope, $rootScope) {
+orderModule.controller("OrderInitController", function($scope) {
 	$scope.goToCreditOrder = function() {
-		window.location.href = window.context + "#/" + $rootScope.user.publicKey + "/credit";
+		window.location.href = window.context + "#/credit";
 	};
 	
 	$scope.goToBorrowOrder = function() {
-		window.location.href = window.context + "#/" + $rootScope.user.publicKey + "/borrow";
+		window.location.href = window.context + "#/borrow";
 	};
 });

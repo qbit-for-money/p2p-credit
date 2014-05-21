@@ -12,13 +12,13 @@ angular.module("main").config(function($routeProvider) {
 	$routeProvider.when("/", {
 		templateUrl: "resources/html/order/order-init.html",
 		controller: "OrderInitController"
-	}).when("/:id", {
+	}).when("/users/:id", {
 		templateUrl: "resources/html/user/user.html",
 		controller: "CurrencyController"
-	}).when("/:id/credit", {
+	}).when("/credit", {
 		templateUrl: "resources/html/order/credit.html",
 		controller: "CurrencyController"
-	}).when("/:id/borrow", {
+	}).when("/borrow", {
 		templateUrl: "resources/html/order/borrow.html",
 		controller: "CurrencyController"
 	}).otherwise({redirectTo: "/"});

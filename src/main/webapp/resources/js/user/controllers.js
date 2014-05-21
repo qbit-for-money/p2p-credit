@@ -17,7 +17,7 @@ userModule.controller("UserController", function($scope, usersResource) {
 	});
 	
 	$scope.goToProfile = function() {
-		window.location.href = window.context + "#/" + currentUser.publicKey;
+		window.location.href = window.context + "#/users/" + currentUser.publicKey;
 	};
 
 	$scope.logout = function() {
