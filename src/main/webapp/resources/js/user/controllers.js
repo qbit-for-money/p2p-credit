@@ -1,6 +1,6 @@
 var userModule = angular.module("user");
 
-userModule.controller("UserController", function($scope, usersResource) {
+userModule.controller("UserController", function($scope, $rootScope, usersResource) {
 	$scope.keyType = "user";
 	$scope.logoutButton = "";
 	//$scope.linkToProfile = window.context + "webapi/users/current";
@@ -15,9 +15,19 @@ userModule.controller("UserController", function($scope, usersResource) {
 			$scope.logoutButton = "glyphicon-log-out";
 		}
 	});
-	
+
+	$rootScope.isGoogleAuth = function() {
+		return $rootScope.user.publicKey.indexOf("@") !== -1;
+	};
+
 	$scope.goToProfile = function() {
 		window.location.href = window.context + "#/users/" + currentUser.publicKey;
+
+
+	};
+
+	$scope.authWithGoogle = function() {
+		window.location.href = window.context + "webapi/oauth2/authenticate";
 	};
 
 	$scope.logout = function() {

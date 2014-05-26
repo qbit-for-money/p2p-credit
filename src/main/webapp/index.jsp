@@ -12,8 +12,20 @@
 		<link rel="stylesheet" type="text/css" href="resources/css/common.css">
 		<link rel="stylesheet" type="text/css" href="resources/css/auth-dialog.css">
 		<link rel="stylesheet" type="text/css" href="resources/css/order.css">
+		<link rel="stylesheet" type="text/css" href="resources/css/user.css">
+		<script type="text/javascript" src="resources/lib/ckeditor/ckeditor.js"></script>
 	</head>
 	<body>
+		<!--form>
+			<textarea name="editor1" id="editor1" rows="10" cols="80">
+                This is my textarea to be replaced with CKEditor.
+			</textarea>
+			<script>
+				// Replace the <textarea id="editor1"> with a CKEditor
+				// instance, using default configuration.
+				CKEDITOR.replace('editor1');
+			</script>
+		</form-->
 		<div class="container" ng-if="user === null" ng-controller="AuthDialogOpeningController">
 		</div>
 		<div class="wrapper">
@@ -38,9 +50,10 @@
 		<script type="text/javascript" src="resources/lib/angular/angular-touch.min.js"></script>
 		<script type="text/javascript" src="resources/lib/bootstrap/core/js/ui-bootstrap-tpls-0.10.0.min.js"></script>
 		<script type="text/javascript" src="resources/lib/angular/loading-bar.min.js"></script>
+		<script type="text/javascript" src="resources/lib/bootstrap/accordion/bootstrap-collapse.js"></script>
 		<script type="text/javascript">
-			// Global constants
-			window.context = "${context}";
+		    // Global constants
+		    window.context = "${context}";
 		</script>
 		<script type="text/javascript" src="resources/js/app.js"></script>
 
@@ -54,7 +67,12 @@
 
 		<script type="text/javascript" src="resources/js/auth/controllers.js"></script>
 		<script type="text/javascript" src="resources/js/auth/resources.js"></script>
-		
+
 		<script type="text/javascript" src="resources/js/order/controllers.js"></script>
+
+		<script type="text/javascript" src="resources/js/user-profile/resources.js"></script>
+		<script type="text/javascript" src="resources/js/user-profile/controllers.js"></script>
+		<script type="text/javascript" src="resources/js/user-profile/directives.js"></script>
+
 	</body>
 </html>

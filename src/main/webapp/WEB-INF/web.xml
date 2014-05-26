@@ -59,6 +59,16 @@ see implementation details http://jersey.java.net/nonav/documentation/latest/jax
 		<filter-name>auth-filter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
+	
+	<filter>
+		<filter-name>user-filter</filter-name>
+		<filter-class>com.qbit.p2p.credit.commons.filter.UserProfileFilter</filter-class>
+	</filter>
+	
+	<filter-mapping>
+		<filter-name>user-filter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
 
 	<security-constraint>
 		<web-resource-collection>

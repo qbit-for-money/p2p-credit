@@ -1,5 +1,41 @@
+/* Smartphones (portrait) ----------- */
+@media only screen 
+and (max-width : 797px) {
+	.credit img { 
+		height: 100px; 
+		width: 100px;
+	} 
+}
+
+/* Larger screens ----------- */
+@media only screen 
+and (min-width : 798px) {
+	#init-order {
+		padding-top: 25%;
+		padding-bottom: 20px;
+	}
+
+	.credit img { 
+		height: 100%; 
+		width: 50%;
+	} 
+}
+
+#init-order {
+	padding-bottom: 20px;
+}
+
 .button-lg {
 	height: 8em !important;
 	width: 100% !important;
+}
+
+.credit.give {
+	background: url('../img/Ecommerce-Buy-icon.png') no-repeat top left;
+	background-position: 0px 0px; width: 400px; height: 400px;
+}
+
+.credit.take {
+	background: url('../img/Ecommerce-Buy-icon.png') no-repeat top left;
 }
 

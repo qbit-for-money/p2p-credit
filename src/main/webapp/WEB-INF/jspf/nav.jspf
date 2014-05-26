@@ -10,7 +10,7 @@
 				<span class="icon-bar"></span>
 			</button>
 			<a class="navbar-brand" href="#">
-				Bitgates <span class="label label-danger ng-hide" ng-show="env.demoEnabled">demo</span>
+				Bitgates <span class="label label-warning ng-hide" ng-show="env.demoEnabled">demo</span>
 			</a>
 		</div>
 		<!-- Collect the nav links, forms, and other content for toggling -->

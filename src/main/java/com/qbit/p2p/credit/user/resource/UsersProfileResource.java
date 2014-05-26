@@ -2,6 +2,7 @@ package com.qbit.p2p.credit.user.resource;
 
 import com.qbit.commons.auth.AuthFilter;
 import com.qbit.p2p.credit.user.dao.UserProfileDAO;
+import com.qbit.p2p.credit.user.model.UserPrivateProfile;
 import com.qbit.p2p.credit.user.model.UserPublicProfile;
 import com.qbit.p2p.credit.user.model.UserType;
 import java.util.List;
@@ -10,6 +11,7 @@ import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -24,12 +26,11 @@ import javax.ws.rs.core.MediaType;
 @Singleton
 public class UsersProfileResource {
 
-	public static class UserProfile {
+	/*public static class UserProfile {
 
 		private String publicKey;
 		private String firstName;
 		private String lastName;
-		private String login;
 		private String password;
 		private long rating;
 		private UserType type;
@@ -58,14 +59,6 @@ public class UsersProfileResource {
 			this.lastName = lastName;
 		}
 
-		public String getLogin() {
-			return login;
-		}
-
-		public void setLogin(String login) {
-			this.login = login;
-		}
-
 		public String getPassword() {
 			return password;
 		}
@@ -89,7 +82,7 @@ public class UsersProfileResource {
 		public void setType(UserType type) {
 			this.type = type;
 		}
-	}
+	}*/
 
 	@Context
 	private HttpServletRequest request;
@@ -101,7 +94,20 @@ public class UsersProfileResource {
 	@Path("current")
 	@Produces(MediaType.APPLICATION_JSON)
 	public UserPublicProfile current() {
-		return userProfileDAO.find(AuthFilter.getUserId(request));
+		String userId = AuthFilter.getUserId(request);
+		UserPublicProfile user = userProfileDAO.find(userId);
+		if(user == null) {
+			user = userProfileDAO.create(userId);
+		}
+		
+		return user;
+	}
+	
+	@GET
+	@Path("byId")
+	@Produces(MediaType.APPLICATION_JSON)
+	public UserPublicProfile getById(@QueryParam("id") String id) {
+		return userProfileDAO.find(id);
 	}
 
 	@GET
@@ -128,11 +134,28 @@ public class UsersProfileResource {
 		return userProfileDAO.findByOrders(number, isNoMoreThan, offset, limit);
 	}
 
-	@PUT
+	@POST
+	@Path("updatePublicProfile")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public UserPublicProfile create(UserProfile user) {
-		return userProfileDAO.create(user.getPublicKey(), user.getLogin(), 
-				user.getPassword(), user.getFirstName(), user.getLastName(), user.getType());
+	public UserPublicProfile updatePublicProfile(UserPublicProfile userProfile) {
+		System.out.println("!!! UPDATE: " + userProfile);
+		if(userProfile == null) {
+			throw new IllegalArgumentException();
+		}
+		String userId = AuthFilter.getUserId(request);   //rating
+		userProfile.setPublicKey(userId);
+		
+		return userProfileDAO.updateUserPublicProfile(userProfile);
+	}
+	
+	@POST
+	@Path("updatePrivateProfile")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public UserPrivateProfile updatePrivateProfile(UserPrivateProfile userProfile) {
+		String userId = AuthFilter.getUserId(request);
+		userProfile.setPublicKey(userId);
+		return userProfileDAO.updateUserPrivateProfile(userProfile);
 	}
 }

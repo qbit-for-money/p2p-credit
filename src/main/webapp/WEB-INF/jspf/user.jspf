@@ -4,12 +4,19 @@
 
 		<div class="input-group" style="width: 20em;">
 			<span class="btn-group navbar-right">
-				<button class="btn btn-default" type="button" ng-click="goToProfile()">
+				<button class="btn btn-default" type="button" ng-click="goToProfile()" ng-if="isGoogleAuth()">
 					{{user.publicKey}}
 				</button>
-				<button class="btn btn-default" type="button" ng-click="logout()">
+				
+				<button class="btn btn-default" id="user-google" type="button" ng-click="authWithGoogle()"  ng-if="!isGoogleAuth()"  title="Login with Google+">
+					<img src="resources/img/google-logo.png" alt="Google+" ng-if="!isGoogleAuth()"/>
+				</button>
+					
+				
+				<button class="btn btn-default" type="button" ng-click="logout()" title="Logout">
 					<span class="glyphicon {{logoutButton}}"></span>
 				</button>
+				
 			</span>
 		</div>
 	</div>

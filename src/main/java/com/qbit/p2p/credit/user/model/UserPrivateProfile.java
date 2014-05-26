@@ -28,21 +28,23 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class UserPrivateProfile implements Serializable {
 	
-	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@PrimaryKeyJoinColumn
-	private UserInfo user;
+	//@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	//@PrimaryKeyJoinColumn
+	//private UserInfo user;
 
 	@Id
 	private String publicKey;
-	private String password;
+	private String phone;
+	private boolean phoneEnabled;
+	private boolean phoneVisible;
 
-	public UserInfo getUser() {
+	/*public UserInfo getUser() {
 		return user;
 	}
 
 	public void setUser(UserInfo user) {
 		this.user = user;
-	}
+	}*/
 
 	public String getPublicKey() {
 		return publicKey;
@@ -52,11 +54,27 @@ public class UserPrivateProfile implements Serializable {
 		this.publicKey = publicKey;
 	}
 
-	public String getPassword() {
-		return password;
+	public String getPhone() {
+		return phone;
 	}
 
-	public void setPassword(String password) {
-		this.password = password;
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public boolean isPhoneEnabled() {
+		return phoneEnabled;
+	}
+
+	public void setPhoneEnabled(boolean phoneEnabled) {
+		this.phoneEnabled = phoneEnabled;
+	}
+
+	public boolean isPhoneVisible() {
+		return phoneVisible;
+	}
+
+	public void setPhoneVisible(boolean phoneVisible) {
+		this.phoneVisible = phoneVisible;
 	}
 }
