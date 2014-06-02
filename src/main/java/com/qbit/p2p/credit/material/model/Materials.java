@@ -19,8 +19,10 @@ import javax.xml.bind.annotation.XmlTransient;
  */
 @Entity
 @NamedQueries({
-	@NamedQuery(name = "Materials.findByOrder",
-			query = "SELECT m FROM Materials m WHERE m.orderId = :orderId")})
+	@NamedQuery(name = "Materials.findByUser",
+			query = "SELECT m FROM Materials m WHERE m.userId = :userId"),
+	@NamedQuery(name = "Materials.findByUserAndType",
+			query = "SELECT m FROM Materials m WHERE m.userId = :userId AND m.type = :type")})
 @Access(AccessType.FIELD)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -31,7 +33,13 @@ public class Materials implements Serializable {
 	@XmlTransient
 	private String id;
 
-	private String orderId;
+	private String userId;
+	private String title;
+	private String author;
+	private String description;
+	private long physicalSize;
+	private ExternalMaterials externalMaterials;
+	private MaterialType type;
 
 	public String getId() {
 		return id;
@@ -41,11 +49,64 @@ public class Materials implements Serializable {
 		this.id = id;
 	}
 
-	public String getOrderId() {
-		return orderId;
+	public String getUserId() {
+		return userId;
 	}
 
-	public void setOrderId(String orderId) {
-		this.orderId = orderId;
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getAuthor() {
+		return author;
+	}
+
+	public void setAuthor(String author) {
+		this.author = author;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public long getPhysicalSize() {
+		return physicalSize;
+	}
+
+	public void setPhysicalSize(long physicalSize) {
+		this.physicalSize = physicalSize;
+	}
+
+	public ExternalMaterials getExternalMaterials() {
+		return externalMaterials;
+	}
+
+	public void setExternalMaterials(ExternalMaterials externalMaterials) {
+		this.externalMaterials = externalMaterials;
+	}
+
+	public MaterialType getType() {
+		return type;
+	}
+
+	public void setType(MaterialType type) {
+		this.type = type;
+	}
+
+	@Override
+	public String toString() {
+		return "Materials{" + "id=" + id + ", userId=" + userId + ", title=" + title + ", author=" + author + ", description=" + description + ", physicalSize=" + physicalSize + ", externalMaterials=" + externalMaterials + ", type=" + type + '}';
 	}
 }

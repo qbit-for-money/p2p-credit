@@ -33,4 +33,9 @@ public class Env {
 	public boolean isDemoEnabled() {
 		return Boolean.TRUE.toString().equalsIgnoreCase(properties.getProperty("demo.enabled"));
 	}
+	
+	@XmlElement
+	public String getUserPhotoPathFolder() {
+		return properties.getProperty("user.photo.pathFolder");
+	}
 }

@@ -3,7 +3,6 @@ var userModule = angular.module("user");
 userModule.controller("UserController", function($scope, $rootScope, usersResource) {
 	$scope.keyType = "user";
 	$scope.logoutButton = "";
-	//$scope.linkToProfile = window.context + "webapi/users/current";
 	var currentUser = usersResource.current({});
 	currentUser.$promise.then(function() {
 		if (currentUser.publicKey) {
@@ -19,11 +18,13 @@ userModule.controller("UserController", function($scope, $rootScope, usersResour
 	$rootScope.isGoogleAuth = function() {
 		return $rootScope.user.publicKey.indexOf("@") !== -1;
 	};
+	
+	$scope.goToProfiles = function() {
+		window.location.href = window.context;
+	};
 
 	$scope.goToProfile = function() {
 		window.location.href = window.context + "#/users/" + currentUser.publicKey;
-
-
 	};
 
 	$scope.authWithGoogle = function() {

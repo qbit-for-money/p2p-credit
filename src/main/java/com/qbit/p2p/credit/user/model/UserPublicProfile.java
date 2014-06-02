@@ -1,18 +1,13 @@
 package com.qbit.p2p.credit.user.model;
 
-import com.qbit.commons.user.UserInfo;
 import java.io.Serializable;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -33,15 +28,15 @@ import javax.xml.bind.annotation.XmlRootElement;
 	@NamedQuery(name = "UserPublicProfile.findByRatingNoMoreThan",
 			query = "SELECT u FROM UserPublicProfile u WHERE u.rating <= :rating"),
 	@NamedQuery(name = "UserPublicProfile.findByRatingNoLessThan",
-			query = "SELECT u FROM UserPublicProfile u WHERE u.rating >= :rating")})
+			query = "SELECT u FROM UserPublicProfile u WHERE u.rating >= :rating"),
+	@NamedQuery(name = "UserPublicProfile.count",
+			query = "SELECT count(u) FROM UserPublicProfile u")})
 @Access(AccessType.FIELD)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class UserPublicProfile implements Serializable {
 
-	//@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	//@PrimaryKeyJoinColumn
-	//private UserInfo user;
+	private static final int MAX_LENGTH = 37;
 
 	@Id
 	private String publicKey;
@@ -60,14 +55,6 @@ public class UserPublicProfile implements Serializable {
 	private UserType userType;
 	@Lob
 	private String personalPageData;
-
-	/*public UserInfo getUser() {
-		return user;
-	}
-
-	public void setUser(UserInfo user) {
-		this.user = user;
-	}*/
 
 	public String getPublicKey() {
 		return publicKey;
@@ -188,7 +175,14 @@ public class UserPublicProfile implements Serializable {
 	public void setPersonalPageData(String personalPageData) {
 		this.personalPageData = personalPageData;
 	}
-
+	
+	public boolean isValid() {
+		return (firstName == null || firstName.length() <= MAX_LENGTH) 
+				&& (lastName == null || lastName.length() <= MAX_LENGTH)
+				&& (country == null || country.length() <= MAX_LENGTH)
+				&& (city == null || city.length() <= MAX_LENGTH)
+				&& (hobby == null || hobby.length() <= MAX_LENGTH * 2);
+	}
 	@Override
 	public String toString() {
 		return "UserPublicProfile{" + "publicKey=" + publicKey + ", firstName=" + firstName + ", lastName=" + lastName + ", country=" + country + ", countryEnabled=" + countryEnabled + ", city=" + city + ", cityEnabled=" + cityEnabled + ", age=" + age + ", ageEnabled=" + ageEnabled + ", gender=" + gender + ", hobby=" + hobby + ", hobbyEnabled=" + hobbyEnabled + ", rating=" + rating + ", userType=" + userType + ", personalPageData=" + personalPageData + '}';

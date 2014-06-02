@@ -14,7 +14,12 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import javax.ws.rs.WebApplicationException;
 
 /**
  * @author Alexander_Sergeev
@@ -37,12 +42,47 @@ public class UserProfileDAO {
 			entityManager.close();
 		}
 	}
-	
+
 	public UserPrivateProfile findPrivateProfile(String id) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {
 			return DAOUtil.find(entityManagerFactory.createEntityManager(),
 					UserPrivateProfile.class, id, null);
+		} finally {
+			entityManager.close();
+		}
+	}
+
+	public List<UserPublicProfile> findAll(String sortDataField, boolean sortDesc, int offset, int limit) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		try {
+			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+			CriteriaQuery<UserPublicProfile> criteria = builder.createQuery(UserPublicProfile.class);
+
+			Root<UserPublicProfile> user = criteria.from(UserPublicProfile.class);
+			criteria.select(user);
+
+			if (sortDesc && sortDataField != null && !sortDataField.isEmpty()) {
+				criteria.orderBy(builder.desc(user.get(sortDataField)));
+			} else if (!sortDesc && sortDataField != null && !sortDataField.isEmpty()) {
+				criteria.orderBy(builder.asc(user.get(sortDataField)));
+			} 
+			TypedQuery<UserPublicProfile> query = entityManager.createQuery(criteria);
+			query.setFirstResult(offset);
+			query.setMaxResults(limit);
+			List<UserPublicProfile> allUsers = query.getResultList();
+			return allUsers;
+		} finally {
+			entityManager.close();
+		}
+	}
+
+	public Number length() {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		try {
+			Query query = entityManager.createQuery("SELECT count(u) FROM UserPublicProfile u");
+			Number result = (Number) query.getSingleResult();
+			return result;
 		} finally {
 			entityManager.close();
 		}
@@ -104,32 +144,22 @@ public class UserProfileDAO {
 		}
 	}
 
-	/*public UserPublicProfile create(UserPublicProfile userProfile) {
-		if (userProfile == null) {
-			throw new IllegalArgumentException();
-		}
-		return create(userProfile.getPublicKey(), userProfile.getPersonalPageData());
-	}*/
-
 	public UserPublicProfile create(final String publicKey) {
 		return invokeInTransaction(entityManagerFactory, new TrCallable<UserPublicProfile>() {
 
 			@Override
 			public UserPublicProfile call(EntityManager entityManager) {
 				UserInfo user = userDAO.find(publicKey);
-				System.out.println("!!! CURRENT " + user);
 				if (user == null) {
-					return null;
+					throw new WebApplicationException();
 				}
 				UserPublicProfile userPublicProfile = new UserPublicProfile();
 				userPublicProfile.setPublicKey(publicKey);
 				userPublicProfile.setRating(0L);
 				userPublicProfile.setPersonalPageData("DEFAULT");
-				//userPublicProfile.setUser(user);
 
 				UserPrivateProfile userPrivateProfile = new UserPrivateProfile();
 				userPrivateProfile.setPublicKey(publicKey);
-				//userPrivateProfile.setUser(user);
 
 				entityManager.persist(userPublicProfile);
 				entityManager.persist(userPrivateProfile);
@@ -145,15 +175,15 @@ public class UserProfileDAO {
 			throw new IllegalArgumentException();
 		}
 
-		return updateUserPublicProfile(userProfile.getPublicKey(), userProfile.getFirstName(),  userProfile.getLastName(),  userProfile.getCountry(),
-				 userProfile.isCountryEnabled(),  userProfile.getCity(),  userProfile.isCityEnabled(),  userProfile.getAge(),
-				  userProfile.isAgeEnabled(),  userProfile.getGender(),  userProfile.getRating(),  userProfile.getHobby(),  
-				  userProfile.isHobbyEnabled(), userProfile.getPersonalPageData());
+		return updateUserPublicProfile(userProfile.getPublicKey(), userProfile.getFirstName(), userProfile.getLastName(), userProfile.getCountry(),
+				userProfile.isCountryEnabled(), userProfile.getCity(), userProfile.isCityEnabled(), userProfile.getAge(),
+				userProfile.isAgeEnabled(), userProfile.getGender(), userProfile.getRating(), userProfile.getHobby(),
+				userProfile.isHobbyEnabled(), userProfile.getPersonalPageData());
 
 	}
 
 	public UserPublicProfile updateUserPublicProfile(final String publicKey, final String firstName, final String lastName,
-			final String country, final boolean countryEnabled, final String city, final boolean cityEnabled, 
+			final String country, final boolean countryEnabled, final String city, final boolean cityEnabled,
 			final int age, final boolean ageEnabled, final GenderType gender, final long rating,
 			final String hobby, final boolean hobbyEnabled, final String personalPageData) {
 		return invokeInTransaction(entityManagerFactory, new TrCallable<UserPublicProfile>() {
@@ -166,29 +196,33 @@ public class UserProfileDAO {
 					return null;
 				}
 
-				//userPublicProfile.setRating(rating);
+				userPublicProfile.setRating(rating);
 				userPublicProfile.setFirstName(firstName);
 				userPublicProfile.setLastName(lastName);
 				userPublicProfile.setGender(gender);
 				userPublicProfile.setCountry(country);
+				userPublicProfile.setCountryEnabled(countryEnabled);
 				userPublicProfile.setCity(city);
+				userPublicProfile.setCityEnabled(cityEnabled);
 				userPublicProfile.setAge(age);
+				userPublicProfile.setAgeEnabled(ageEnabled);
 				userPublicProfile.setHobby(hobby);
+				userPublicProfile.setHobbyEnabled(hobbyEnabled);
 				userPublicProfile.setPersonalPageData(personalPageData);
 
 				return userPublicProfile;
 			}
 		});
 	}
-	
+
 	public UserPrivateProfile updateUserPrivateProfile(UserPrivateProfile userProfile) {
 		if (userProfile == null) {
 			throw new IllegalArgumentException();
 		}
-		return updateUserPrivateProfile(userProfile.getPublicKey(), userProfile.getPhone(),  userProfile.isPhoneEnabled(),  userProfile.isPhoneVisible());
+		return updateUserPrivateProfile(userProfile.getPublicKey(), userProfile.getPhone(), userProfile.isPhoneEnabled(), userProfile.isPhoneVisible());
 
 	}
-	
+
 	public UserPrivateProfile updateUserPrivateProfile(final String publicKey, final String phone, final boolean phoneEnabled, final boolean phoneVisible) {
 		return invokeInTransaction(entityManagerFactory, new TrCallable<UserPrivateProfile>() {
 

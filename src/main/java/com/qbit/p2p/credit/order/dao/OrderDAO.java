@@ -5,7 +5,6 @@ import static com.qbit.commons.dao.util.DAOUtil.invokeInTransaction;
 import com.qbit.commons.dao.util.TrCallable;
 import com.qbit.commons.user.UserDAO;
 import com.qbit.commons.user.UserInfo;
-import com.qbit.p2p.credit.env.Env;
 import com.qbit.p2p.credit.order.model.OrderInfo;
 import com.qbit.p2p.credit.order.model.OrderStatus;
 import com.qbit.p2p.credit.user.model.UserType;
@@ -24,9 +23,6 @@ import javax.persistence.TypedQuery;
  */
 @Singleton
 public class OrderDAO {
-
-	@Inject
-	private Env env;
 
 	@Inject
 	private EntityManagerFactory entityManagerFactory;

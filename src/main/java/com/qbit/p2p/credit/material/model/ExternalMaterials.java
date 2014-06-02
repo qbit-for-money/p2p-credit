@@ -1,51 +1,24 @@
 package com.qbit.p2p.credit.material.model;
 
 import java.io.Serializable;
-import javax.persistence.Access;
-import javax.persistence.AccessType;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * @author Alexander_Sergeev
  */
-@Entity
-@NamedQueries({
-	@NamedQuery(name = "ExternalMaterials.findByOrder",
-			query = "SELECT m FROM ExternalMaterials m WHERE m.orderId = :orderId")})
-@Access(AccessType.FIELD)
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
 public class ExternalMaterials implements Serializable {
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@XmlTransient
-	private String id;
 
-	private String orderId;
+	private String link;
 
-	public String getId() {
-		return id;
+	public String getLink() {
+		return link;
 	}
 
-	public void setId(String id) {
-		this.id = id;
+	public void setLink(String link) {
+		this.link = link;
 	}
 
-	public String getOrderId() {
-		return orderId;
-	}
-
-	public void setOrderId(String orderId) {
-		this.orderId = orderId;
+	@Override
+	public String toString() {
+		return "ExternalMaterials{" + "link=" + link + '}';
 	}
 }

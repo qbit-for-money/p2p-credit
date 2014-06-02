@@ -10,10 +10,15 @@ angular.module("user-profile", ["ngResource"]);
 
 angular.module("user-edit", ["ngResource"]);
 
-angular.module("main", ["ngRoute", "ui.bootstrap", "chieffancypants.loadingBar", "common", "user", "captcha-auth", "order", "user-profile", "user-edit"]);
+angular.module("users", ["ngResource"]);
+
+angular.module("main", ["ngRoute", "ui.bootstrap", "chieffancypants.loadingBar", "common", "user", "captcha-auth", "order", "user-profile", "user-edit", "users"]);
 
 angular.module("main").config(function($routeProvider) {
 	$routeProvider.when("/", {
+		templateUrl: "resources/html/user/users.html",
+		controller: "UsersController"
+	}).when("/order-init", {
 		templateUrl: "resources/html/order/order-init.html",
 		controller: "OrderInitController"
 	}).when("/users/:id", {

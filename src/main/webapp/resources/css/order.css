@@ -30,12 +30,3 @@ and (min-width : 798px) {
 	width: 100% !important;
 }
 
-.credit.give {
-	background: url('../img/Ecommerce-Buy-icon.png') no-repeat top left;
-	background-position: 0px 0px; width: 400px; height: 400px;
-}
-
-.credit.take {
-	background: url('../img/Ecommerce-Buy-icon.png') no-repeat top left;
-}
-

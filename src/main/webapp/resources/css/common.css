@@ -39,6 +39,16 @@ input[readonly], input[ng-readonly] {
 	background-color: inherit !important;
 }
 
+.modal-dialog {
+	position: absolute;
+	max-width: 345px;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	margin: auto;
+}
+
 .pluso-more {
 	display: none !important;
 }

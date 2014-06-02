@@ -1,47 +1,25 @@
-
-<!--div>Профиль пользователя</div-->
-<!--div class="row" >
+<div class="row" style="margin-bottom: 20px;">
 	<div class="col-xs-offset-0 col-xs-12 col-md-offset-1 col-md-10">
-		<div class="panel panel-default">
-
-			<div class="panel-body">
-
-				<div class="container-fluid">
-
-					<div class="row">user
-					</div>
-				</div>
-			</div>
-		</div>
-
-
-	</div>
-</div-->
-
-
-<div class="row">
-	<div class="col-xs-offset-0 col-xs-12 col-md-offset-1 col-md-10">
-		<div class="panel-group" id="accordion" >
+		<div class="panel-group" id="accordion">
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h4 class="panel-title">
-						<a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">Personal info</a>
+						<a data-toggle="collapse" data-parent="#accordion" href="#collapseOne"><span class="glyphicon glyphicon-user"></span></a>
 					</h4>
 				</div>
-				<div id="collapseOne" class="panel-collapse" style="padding-bottom: 5%">
+				<div id="collapseOne" class="panel-collapse in collapse">
 					<div ng-include src="'resources/html/user/personal-info.html'"></div>
 				</div>
 			</div>
-			<div class="panel panel-default" style="position: initial">
+			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h4 class="panel-title">
-						<a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">Personal page</a>
+						<a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo"><span class="glyphicon glyphicon-th-large"></span></a>
 					</h4>
 				</div>
-				<div id="collapseTwo" class="panel-collapse">
-					<div class="panel-body" style="position: initial">
+				<div id="collapseTwo" class="panel-collapse in collapse">
+					<div class="panel-body">
 						<div id="personalEditable"  contenteditable="{{isCurrentUser}}" ng-blur="savePersonalPage()">
-							
 						</div>
 					</div>
 				</div>

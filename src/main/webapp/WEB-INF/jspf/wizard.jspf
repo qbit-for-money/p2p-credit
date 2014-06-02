@@ -1,9 +1,0 @@
-<%@ page pageEncoding="UTF-8" %>
-<div class="container hide-all" id="wizard-container" ng-if="user" ng-controller="WizardController">
-	<div class="row">
-		<div class="col-md-12">
-			<div class="wizard">
-			</div>
-		</div>
-	</div>
-</div>

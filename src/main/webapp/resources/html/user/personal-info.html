@@ -1,26 +1,31 @@
 <div class="panel-body">
 	<div class="row">
-		<div id="user-header"></div>
-
 		<div class="col-xs-3 col-md-3">
-			<div style="border-color: red; border-radius: 5px;">
-				<div id="user-photo" class="img-thumbnail"></div>
+			<div class="img-thumbnail" style="width: 100%">
+				<img id='user-photo' src="{{userPhotoSrc}}" width="100%"/>
 			</div>
-
+			<!--div>
+				<button class="btn btn-default col-xs-6 col-md-6" ng-if="isCurrentUser" ng-click="changeUserPhoto()"><span class="glyphicon glyphicon-refresh"></span></button>
+				<button class="btn btn-default col-xs-6 col-md-6" ng-if="isCurrentUser" ng-click=""><span class="glyphicon glyphicon-bookmark"></span></button>
+			</div-->
+			<div>
+				<button class="btn btn-default col-xs-12 col-md-12" ng-if="isCurrentUser" ng-click="changeUserPhoto()"><span class="glyphicon glyphicon-refresh"></span></button>
+				<button class="btn btn-default col-xs-12 col-md-12" ng-if="!isCurrentUser" title="Add to bookmark" ng-click=""><span class="glyphicon glyphicon-bookmark"></span></button>
+			</div>
 		</div>
-		<div class="col-xs-9 col-md-9">
+		<div class="col-xs-9 col-md-9" style="padding-bottom: 5%;">
 			<div class="row">
 				<div class="col-xs-9 col-md-10">
-					<h4 ng-if="!edit">{{userProfile.firstName}} {{userProfile.lastName}}</h4>
+					<h4 ng-if="!edit">{{userPropertiesMap['firstName']}} {{userPropertiesMap['lastName']}}</h4>
 					<div class="col-xs-12 col-md-12 " ng-if="edit">
 						<div class="col-xs-6 col-md-6">
-							<input type="text" class="form-control" ng-model="userProfile.firstName" maxlength="20"/>
+							<input type="text" id="firstName" class="form-control" ng-model="userPropertiesMap['firstName']" placeholder="First Name" maxlength="20"/>
 						</div>
 						<div class="col-xs-6 col-md-6">
-							<input type="text" class="form-control col-xs-6 col-md-6" ng-model="userProfile.lastName" maxlength="30"/>
+							<input type="text" id="lastName" class="form-control col-xs-6 col-md-6" ng-model="userPropertiesMap
+								['lastName']" placeholder="Last Name" maxlength="30"/>
 						</div>
 					</div>
-
 
 
 				</div>
@@ -34,22 +39,40 @@
 				<div class="row" ng-if="!edit">
 					<div class="col-xs-12 col-md-12">
 						<div class="progress">
-							<div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="{{userProfile.rating}}" aria-valuemin="0" aria-valuemax="100" ng-style="{width : (userProfile.rating + '%') }">
-								Rating: {{userProfile.rating}}
+							<div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="{{userPropertiesMap['rating']}}" aria-valuemin="0" aria-valuemax="100" ng-style="{width : (userPropertiesMap['rating'] + '%') }">
+								Rating: {{userPropertiesMap['rating']}}
 							</div>
 						</div>
 					</div>
-
-
-
 				</div>
-				<div class="row">
-					<div ng-if="!edit && userProfile.country">
+				<div class="row" ng-if="(!edit && userPropertiesMap['gender']) || edit">
+					<div ng-if="!edit && userPropertiesMap['gender']">
+						<div class="col-xs-2 col-md-2 title">
+							Gender:
+						</div>
+						<div class="col-xs-8 col-md-8">
+							{{userPropertiesMap['gender']}}
+						</div>
+					</div>	
+					<div ng-if="edit">
+						<div class="col-xs-2 col-md-2 title">
+							Gender:
+						</div>
+						<div class="input-group col-xs-9 col-md-9" style="float: left">
+							<select class="form-control btn btn-default dropdown-toggle" data-ng-options="t for t in genderTypes"
+								data-ng-model="userPropertiesMap
+									['gender']">
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="row" ng-if="(!edit && userPropertiesMap['country']) || edit">
+					<div ng-if="!edit && userPropertiesMap['country']">
 						<div class="col-xs-2 col-md-2 title">
 							Country:
 						</div>
 						<div class="col-xs-8 col-md-8">
-							{{userProfile.country}}
+							{{userPropertiesMap['country']}}
 						</div>
 					</div>
 					<div ng-if="edit">
@@ -57,10 +80,11 @@
 							Country:
 						</div>
 						<div class="input-group col-xs-9 col-md-9">
-							<input type="text" ng-model="userProfile.country" class="form-control" />
+							<input type="text" id="country" ng-model="userPropertiesMap
+								['country']" class="form-control" />
 							<span class="input-group-btn">
-								<button class="btn btn-default" type="button" ng-click="logout()">
-									<span class="glyphicon {{}}"></span>
+								<button class="btn btn-default" type="button" ng-click="changeVisible('countryEnabled')">
+									<span class="glyphicon glyphicon-eye-{{userPropertiesMap['countryEnabled']}}"></span>
 								</button>
 							</span>
 
@@ -68,13 +92,13 @@
 					</div>
 
 				</div>
-				<div class="row">
-					<div ng-if="!edit && userProfile.city">
+				<div class="row" ng-if="(!edit && userPropertiesMap['city']) || edit">
+					<div ng-if="!edit && userPropertiesMap['city']">
 						<div class="col-xs-2 col-md-2 title">
 							City:
 						</div>
 						<div class="col-xs-8 col-md-8">
-							{{userProfile.city}}
+							{{userPropertiesMap['city']}}
 						</div>
 					</div>
 					<div ng-if="edit">
@@ -82,23 +106,24 @@
 							City:
 						</div>
 						<div class="input-group col-xs-9 col-md-9">
-							<input type="text" ng-model="userProfile.city" class="form-control" />
+							<input type="text" id="city" ng-model="userPropertiesMap
+								['city']" class="form-control" />
 							<span class="input-group-btn">
-								<button class="btn btn-default" type="button" ng-click="logout()">
-									<span class="glyphicon {{}}"></span>
+								<button class="btn btn-default" type="button" ng-click="changeVisible('cityEnabled')">
+									<span class="glyphicon glyphicon-eye-{{userPropertiesMap['cityEnabled']}}"></span>
 								</button>
 							</span>
 
 						</div>
 					</div>
 				</div>
-				<div class="row">
-					<div ng-if="!edit && userProfile.city">
+				<div class="row" ng-if="(!edit && userPropertiesMap['age']) || edit">
+					<div ng-if="!edit && userPropertiesMap['age']">
 						<div class="col-xs-2 col-md-2 title">
 							Age:
 						</div>
 						<div class="col-xs-8 col-md-8">
-							{{userProfile.age}}
+							{{userPropertiesMap['age']}}
 						</div>
 					</div>	
 					<div ng-if="edit">
@@ -106,23 +131,24 @@
 							Age:
 						</div>
 						<div class="input-group col-xs-9 col-md-9">
-							<input type="number" ng-model="userProfile.age" class="form-control" max="100"/>
+							<input type="text" id="age" ng-model="userPropertiesMap
+								['age']" class="form-control"/>
 							<span class="input-group-btn">
-								<button class="btn btn-default" type="button" ng-click="logout()">
-									<span class="glyphicon {{}}"></span>
+								<button class="btn btn-default" type="button" ng-click="changeVisible('ageEnabled')">
+									<span class="glyphicon glyphicon-eye-{{userPropertiesMap['ageEnabled']}}"></span>
 								</button>
 							</span>
 
 						</div>
 					</div>
 				</div>
-				<div class="row">
-					<div ng-if="!edit && userProfile.hobby">
+				<div class="row" ng-if="(!edit && userPropertiesMap['hobby']) || edit">
+					<div ng-if="!edit && userPropertiesMap['hobby']">
 						<div class="col-xs-2 col-md-2 title">
 							Hobby:
 						</div>
 						<div class="col-xs-8 col-md-8">
-							{{userProfile.hobby}}
+							{{userPropertiesMap['hobby']}}
 						</div>
 					</div>	
 					<div ng-if="edit">
@@ -130,73 +156,19 @@
 							Hobby:
 						</div>
 						<div class="input-group col-xs-9 col-md-9">
-							<input type="text" ng-model="userProfile.hobby" class="form-control" />
+							<input type="text" id="hobby" ng-model="userPropertiesMap
+								['hobby']" class="form-control" />
 							<span class="input-group-btn">
-								<button class="btn btn-default" type="button" ng-click="logout()">
-									<span class="glyphicon {{}}"></span>
+								<button class="btn btn-default" type="button" ng-click="changeVisible('hobbyEnabled')">
+									<span class="glyphicon glyphicon-eye-{{userPropertiesMap['hobbyEnabled']}}"></span>
 								</button>
 							</span>
 
 						</div>
-					</div>
-				</div>
-				<div class="row" ng-if="userProfile.gender">
-					<div class="col-xs-2 col-md-2 title">
-						Gender:
-					</div>
-					<div class="col-xs-8 col-md-8">
-						{{userProfile.gender}}
 					</div>
 				</div>
 			</div>
 		</div>
 
 	</div>
-
-
-
-
-
-
-	<!--div class="bs-example">
-		<div class="panel-group" id="accordion">
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<h4 class="panel-title">
-						<a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">1. What is HTML?</a>
-					</h4>
-				</div>
-				<div id="collapseOne" class="panel-collapse collapse in">
-					<div class="panel-body">
-						<p>HTML stands for HyperText Markup Language. HTML is the main markup language for describing the structure of Web pages. <a href="http://www.tutorialrepublic.com/html-tutorial/" target="_blank">Learn more.</a></p>
-					</div>
-				</div>
-			</div>
-
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<h4 class="panel-title">
-						<a data-toggle="collapse" data-parent="#accordion" href="#collapseThree">3. What is CSS?</a>
-					</h4>
-				</div>
-				<div id="collapseThree" class="panel-collapse collapse">
-					<div class="panel-body">
-						<p>CSS stands for Cascading Style Sheet. CSS allows you to specify various style properties for a given HTML element such as colors, backgrounds, fonts etc. <a href="http://www.tutorialrepublic.com/css-tutorial/" target="_blank">Learn more.</a></p>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div-->
-
-
-
-
-
-
-
-
-
-
-
-
 </div>

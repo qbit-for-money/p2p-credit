@@ -14,17 +14,6 @@
 	border-top-left-radius:            4px;
 }
 
-/*#user-google img:hover {
-	background:#000;
-	opacity:0.8;
-}*/
-
-#user-photo { 
-	background: url('../img/no-image.png') no-repeat top left;
-	width: 200px; height: 250px;
-	background-position: 24px 50px; width: 200px; height: 250px;
-} 
-
 #user-header {
 	background-color: #c0c0c0;
 }
@@ -35,6 +24,47 @@
 
 #user-attributes .title {
 	color: #d58512;
+}
+
+#collapseTwo {
+	height: auto !important;
+}
+
+#user-photo-dialog .row {
+	padding-bottom: 15px;
+}
+
+#no-image {
+	display: block;
+	width: 40%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.browse-button { 
+	cursor: default;
+	float: left;
+	overflow: hidden;
+	position: relative;
+}
+
+.browse-button input[type="file"] { 
+	min-width: 100%; 
+	min-height: 100%; 
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	cursor: pointer;
+	opacity: 0;
+	filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+}
+
+#columntableusers-table:hover {
+	cursor: pointer;
+}
+
+#contenttableusers-table:hover {
+	cursor: pointer;
 }
 
 

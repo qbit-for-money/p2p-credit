@@ -7,6 +7,6 @@ userModule.factory("usersResource", function($resource) {
 	});
 });
 
-userModule.run(function($rootScope, usersResource, userService) {
+userModule.run(function(userService) {
 	userService.get();
 });

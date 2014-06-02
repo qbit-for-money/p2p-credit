@@ -14,16 +14,6 @@ and (min-width : 798px) {
 	}
 }
 
-.modal-dialog {
-	position: absolute;
-	max-width: 345px;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	margin: auto;
-}
-
 .auth-dialog {
 }
 
