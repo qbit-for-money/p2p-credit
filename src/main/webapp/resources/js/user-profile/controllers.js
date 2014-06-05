@@ -1,13 +1,26 @@
 var userProfileModule = angular.module("user-profile");
 
-userProfileModule.controller("UserProfileController", function($scope, $rootScope, $modal, $location, usersProfileResource) {
+userProfileModule.controller("UserProfileController", function($scope, $rootScope, $modal, $location, usersProfileResource, fileReader) {
+	var PHOTO_MIN_HEIGHT = 400;
+	var PHOTO_MIN_WIDTH = 300;
+	var PHOTO_MAX_HEIGHT = 2000;
+	var PHOTO_MAX_WIDTH = 2000;
+
+	var resultX1 = 0;
+	var resultX2 = PHOTO_MIN_WIDTH;
+	var resultY1 = 0;
+	var resultY2 = PHOTO_MIN_HEIGHT;
+
 	$scope.edit = false;
+	$scope.editUserPhoto = false;
 	$scope.userProfile = {};
 	$scope.userPropertiesMap = {};
 	$scope.hasFocus = false;
 	$scope.genderTypes = ["Male", "Female"];
 	var visible = "open";
 	var notVisible = "close";
+
+
 
 	var defaultPersonalData = '<p style="text-align: center;"><img src="resources/img/elephant-logo.png"/></p>';
 
@@ -30,7 +43,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 
 	userProfileResponse.$promise.then(function() {
 
-
 		$scope.userPropertiesMap['firstName'] = userProfileResponse.firstName;
 		$scope.userPropertiesMap['lastName'] = userProfileResponse.lastName;
 		$scope.userPropertiesMap['rating'] = userProfileResponse.rating;
@@ -48,7 +60,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			$scope.userPropertiesMap['cityEnabled'] = notVisible;
 		}
 
-		$scope.userPropertiesMap['age'] = userProfileResponse.age;
+		$scope.userPropertiesMap['birthDate'] = userProfileResponse.birthDate;
 		if (userProfileResponse.ageEnabled === true) {
 			$scope.userPropertiesMap['ageEnabled'] = visible;
 		} else {
@@ -71,12 +83,12 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 
 		$scope.userPropertiesMap['personalPageData'] = userProfileResponse.personalPageData;
 
-		$scope.userPhotoSrc = window.context + "webapi/users-profile/user-photo?userId=" + userProfileResponse.publicKey;
+		$scope.userPhotoSrc = window.context + "webapi/profiles/" + userProfileResponse.publicKey + "/photo";
 
 		$scope.reloadSCEditorInstance();
 
 	});
-
+	
 	$scope.savePersonalPage = function() {
 		var data = CKEDITOR.instances.personalEditable.getData();
 		if (data !== $scope.userPropertiesMap['personalPageData']) {
@@ -88,19 +100,16 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 	$scope.editProfile = function() {
 		if ($scope.edit) {
 			$scope.edit = false;
+			$scope.userPropertiesMap['birthDate'] = angular.element("#birth-date").val();
 			updateProfile();
+			$scope.cancel();			
 		} else {
 			$scope.edit = true;
 
-			angular.element(".user-attributes input").mask("0000");
 			setTimeout(function() {
-				angular.element(this).mask("0000");
-			}, 1000);
-
-			angular.element("#input1").on("focus", function() {
-				alert("asdf")
-				angular.element(this).mask("0000");
-			});
+				var countries = new Array("Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antarctica", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bermuda", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burma", "Burundi", "Cambodia", "Cameroon", "Canada", "Cape Verde", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo, Democratic Republic", "Congo, Republic of the", "Costa Rica", "Cote d'Ivoire", "Croatia", "Cuba", "Cyprus", "Czech Republic", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "East Timor", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Greenland", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hong Kong", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Korea, North", "Korea, South", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Macedonia", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Mongolia", "Morocco", "Monaco", "Mozambique", "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "Norway", "Oman", "Pakistan", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Samoa", "San Marino", " Sao Tome", "Saudi Arabia", "Senegal", "Serbia and Montenegro", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "Spain", "Sri Lanka", "Sudan", "Suriname", "Swaziland", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe");
+				angular.element("#country").jqxInput({source: countries});
+			}, 10);
 		}
 
 	};
@@ -150,7 +159,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			userPublicProfile.cityEnabled = false;
 		}
 
-		userPublicProfile.age = $scope.userPropertiesMap['age'];
+		userPublicProfile.birthDate = $scope.userPropertiesMap['birthDate'];
 
 		if ($scope.userPropertiesMap['ageEnabled'] === visible) {
 			userPublicProfile.ageEnabled = true;
@@ -180,26 +189,42 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 	}
 
 	angular.element(document).on("focus", "#firstName", function() {
-		angular.element(this).mask("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+		angular.element(this).mask("SSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+			{'translation': {
+					S: {pattern: /[A-Za-zА-Яа-я0-9]/}
+				}});
 	});
 	angular.element(document).on("focus", "#lastName", function() {
-		angular.element(this).mask("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+		angular.element(this).mask("SSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+			{'translation': {
+					S: {pattern: /[A-Za-zА-Яа-я0-9]/}
+				}});
 	});
 	angular.element(document).on("focus", "#country", function() {
-		angular.element(this).mask("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+		angular.element(this).mask("SSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+			{'translation': {
+					S: {pattern: /[A-Za-zА-Яа-я0-9\s]/}
+				}});
 	});
 	angular.element(document).on("focus", "#city", function() {
-		angular.element(this).mask("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+		angular.element(this).mask("SSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+			{'translation': {
+					S: {pattern: /[A-Za-zА-Яа-я0-9\s]/}
+				}});
 	});
-	angular.element(document).on("focus", "#age", function() {
-		angular.element(this).mask("00");
+	angular.element(document).on("focus", "#birth-date", function() {
+		angular.element(this).mask("00/00/0000");
 	});
 	angular.element(document).on("focus", "#hobby", function() {
-		angular.element(this).mask("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-			+ "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+		angular.element(this).mask("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS"
+			+ "SSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+			{'translation': {
+					S: {pattern: /[A-Za-zА-Яа-я0-9\s]/}
+				}});
 	});
 
 	$scope.changeUserPhoto = function() {
+		$scope.editUserPhoto = true;
 		var modalInstance = $modal.open({
 			controller: "UserPhotoController",
 			templateUrl: "resources/html/user/change-user-photo-dialog.html",
@@ -214,5 +239,80 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 				ias.update();
 
 			});
+	};
+
+	$scope.getFile = function(file) {
+		$scope.editUserPhoto = true;
+		fileReader.readAsDataUrl(file, $scope)
+			.then(function(result) {
+				$scope.imageSrc = result;
+				var imag = new Image();
+				imag.src = $scope.imageSrc;
+				if ((imag.width > PHOTO_MAX_WIDTH) || (imag.height > PHOTO_MAX_HEIGHT) || (imag.width < PHOTO_MIN_WIDTH) || (imag.height < PHOTO_MIN_HEIGHT)) {
+					$scope.imageSrc = null;
+					$scope.editUserPhoto = false;
+					return;
+				}
+				setTimeout(function() {
+					var elementWidth = angular.element("#user-photo-change").width();
+					var ratio = imag.width / elementWidth;
+					angular.element('#user-photo-change').imgAreaSelect({
+						aspectRatio: '3:4',
+						handles: true,
+						minWidth: elementWidth / ratio,
+						x1: 0, y1: 0, x2: 80, y2: 105,
+						onSelectEnd: function(img, selection) {
+
+							resultX1 = Math.floor(selection.x1 * ratio);
+							resultX2 = Math.floor(selection.x2 * ratio);
+							resultY1 = Math.floor(selection.y1 * ratio);
+							resultY2 = Math.floor(selection.y2 * ratio);
+							resultX2 = (resultX2 - resultX1 > 800) ? (resultX1 + 800) : resultX2;
+							resultY2 = (resultY2 - resultY1 > 800) ? (resultY1 + 800) : resultY2;
+						}
+					});
+				}, 150);
+			});
+	};
+
+	$scope.saveUserPhoto = function() {
+
+		var userPhotoRequest = {};
+		userPhotoRequest.x1 = resultX1;
+		userPhotoRequest.x2 = resultX2;
+		userPhotoRequest.y1 = resultY1;
+		userPhotoRequest.y2 = resultY2;
+
+		var data = $scope.imageSrc.replace(/^data:image\/(png|jpg|jpeg);base64,/, "");
+		userPhotoRequest.imageString = data;
+
+		var userPhotoResponse = usersProfileResource.setUserPhoto({}, userPhotoRequest);
+
+		userPhotoResponse.$promise.then(function() {
+			setTimeout(function() {
+				location.reload();
+			}, 100);
+		});
+	};
+
+	$scope.cancel = function() {
+		var ias = angular.element('#user-photo-change').imgAreaSelect({instance: true});
+		ias.setOptions({hide: true});
+		ias.update();
+		$scope.imageSrc = null;
+		$scope.editUserPhoto = false;
+	};
+
+	$scope.deleteUserPhoto = function() {
+		var userPhotoRequest = {};
+		userPhotoRequest.imageString = "";
+
+		var userPhotoResponse = usersProfileResource.setUserPhoto({}, userPhotoRequest);
+
+		userPhotoResponse.$promise.then(function() {
+			setTimeout(function() {
+				location.reload();
+			}, 100);
+		});
 	};
 });

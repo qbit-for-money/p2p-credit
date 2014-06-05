@@ -63,6 +63,10 @@ see implementation details http://jersey.java.net/nonav/documentation/latest/jax
 	<filter>
 		<filter-name>user-filter</filter-name>
 		<filter-class>com.qbit.p2p.credit.commons.filter.UserProfileFilter</filter-class>
+		<init-param>
+			<param-name>context-path</param-name>
+			<param-value>/p2p-credit</param-value>
+		</init-param>
 	</filter>
 	
 	<filter-mapping>

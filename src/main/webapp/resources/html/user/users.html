@@ -1,10 +1,45 @@
-<div class="row">
-	<div class="col-xs-offset-0 col-xs-12 col-md-offset-1 col-md-10">	
+<div class="row" id="users">
+	<div class="col-xs-offset-0 col-xs-12 col-md-12">	
 		<div class="container-fluid">
+			<div class="row" style="padding-bottom: 15px;">
+				<div class="input-group col-xs-5 col-md-4">
+					<div class="input-group-btn" ng-if="filterType === 'Rating'"> 
+						<a  class="btn btn-default dropdown-toggle btn-select" 
+						    data-toggle="dropdown" data-placement="bottom" 
+						     href="#">{{directionType}} <span class="caret"></span>
+						</a>
+
+						<ul class="dropdown-menu">
+							<li data-ng-repeat="direction in directions" 
+							    data-ng-click="selectDirectionType(direction)">
+								<a class="currency-list-item">
+									<div class="text-center currency-list-label">{{direction}}</div>
+								</a>
+							</li>
+						</ul>
+					</div>
+					<input type="text" class="form-control" placeholder="Filter" ng-model="filterParam" ng-change="reloadDataTable()"/>
+					<div class="input-group-btn"> 
+						<a  class="btn btn-default dropdown-toggle btn-select" 
+						    data-toggle="dropdown" data-placement="bottom" 
+						    title="Select filter field" href="#">{{filterType}} <span class="caret"></span>
+						</a>
+
+						<ul class="dropdown-menu">
+							<li data-ng-repeat="filter in filters" 
+							    data-ng-click="selectFilterType(filter)">
+								<a class="currency-list-item">
+									<div class="text-center currency-list-label">{{filter}}</div>
+								</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
 			<div class="row">
-				<div class="hidden-xs col-md-1"></div>
-				<div id="users-table" class="col-xs-12 col-md-10"></div>
-				<div class="hidden-xs col-md-1"></div>
+
+				<div id="users-table" class="col-xs-11 col-md-11"></div>
+
 			</div>
 
 		</div>

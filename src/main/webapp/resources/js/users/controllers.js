@@ -2,6 +2,33 @@ var usersModule = angular.module("users");
 
 usersModule.controller("UsersController", function($scope, $rootScope) {
 
+	$scope.filters = ["Public Key", "First Name", "Last Name", "Country", "City", "Rating"];
+	$scope.filtersMap = {};
+	$scope.filtersMap["Public Key"] = "publicKey";
+	$scope.filtersMap["First Name"] = "firstName";
+	$scope.filtersMap["Last Name"] = "lastName";
+	$scope.filtersMap["Country"] = "country";
+	$scope.filtersMap["City"] = "city";
+	$scope.filtersMap["Rating"] = "rating";
+	$scope.filterType = "Public Key";
+	$scope.filterParam = "";
+	
+	$scope.directions = ["No greater than", "No less than"];
+	$scope.directionType = "No greater than";
+	
+	$scope.selectFilterType = function(filterType) {
+		$scope.filterType = filterType;
+		if(filterType === "Rating") {
+			$scope.filterParam = 0;
+		} else {
+			$scope.filterParam = "";
+		}
+		$scope.reloadDataTable();
+	};
+	$scope.selectDirectionType = function(directionType) {
+		$scope.directionType = directionType;
+		$scope.reloadDataTable();
+	};
 	var source =
 		{
 			dataType: "json",
@@ -9,14 +36,23 @@ usersModule.controller("UsersController", function($scope, $rootScope) {
 				{name: "publicKey", type: "string"},
 				{name: "firstName", type: "string"},
 				{name: "lastName", type: "string"},
+				{name: "country", type: "string"},
+				{name: "city", type: "string"},
 				{name: "rating", type: "string"}
 			],
 			root: "users",
-			url: window.context + "webapi/users-profile/users?"
+			url: window.context + "webapi/profiles/withFilter"
 		};
-	var dataAdapter = new $.jqx.dataAdapter(source,
-		{
+		var adapterFields = {
 			formatData: function(data) {
+
+				data.filter = $scope.filterParam;
+				data.filterdatafield = $scope.filtersMap[$scope.filterType];
+				if($scope.directionType === "No greater than") {
+					data.isLess = true;
+				} else {
+					data.isLess = false;
+				}
 
 				if (source.totalRecords) {
 					data.$skip = data.pagenum * data.pagesize;
@@ -35,30 +71,33 @@ usersModule.controller("UsersController", function($scope, $rootScope) {
 			loadError: function(xhr, status, error) {
 				console.log(error.toString());
 			}
-		}
-	);
-
-
-
-
-	angular.element("#users-table").jqxDataTable(
-		{
-			//width: 850,
-			theme: "bootstrap",
-			pageable: true,
-			pagerButtonsCount: 10,
-			serverProcessing: true,
-			source: dataAdapter,
-			altRows: true,
-			sortable: true,
-			columnsResize: true,
-			columns: [
-				{text: "Public Key", dataField: "publicKey", width: 300},
-				{text: "First Name", dataField: "firstName", width: 250},
-				{text: "Last Name", dataField: "lastName", width: 250},
-				{text: "Rating", dataField: "rating", width: 50}
-			]
-		});
+		};
+	
+	$scope.reloadDataTable = function() {
+		dataAdapter = new $.jqx.dataAdapter(source, adapterFields);
+		angular.element("#users-table").jqxDataTable(
+			{
+				width: '100%',
+				theme: "bootstrap",
+				pageable: true,
+				pagerButtonsCount: 10,
+				serverProcessing: true,
+				source: dataAdapter,
+				altRows: true,
+				sortable: true,
+				columnsResize: true,
+				columns: [
+					{text: "Public Key", dataField: "publicKey"},
+					{text: "First Name", dataField: "firstName"},
+					{text: "Last Name", dataField: "lastName"},
+					{text: "Country", dataField: "country"},
+					{text: "City", dataField: "city"},
+					{text: "Rating", dataField: "rating"}
+				]
+			});
+	};
+	
+	$scope.reloadDataTable();
 
 	var click = new Date();
 	var lastClick = new Date();

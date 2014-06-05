@@ -26,7 +26,7 @@
 	color: #d58512;
 }
 
-#collapseTwo {
+#collapseOne, #collapseTwo {
 	height: auto !important;
 }
 
@@ -67,4 +67,96 @@
 	cursor: pointer;
 }
 
+#country {
+	padding-left: 12px;
+	font-size: 14px;
+	color: #555;
+}
+
+#country-span {
+	padding-top: 3px;
+	padding-bottom: 4px;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/*#users-table {
+	position: relative !important;
+	width: 100%;
+	height: 100% !important;
+	margin-bottom: 60px;
+	
+	
+}*/
+
+#users .container-fluid {
+	//margin-left: -43%;
+}
+
+.jqx-icon-arrow-first, .jqx-icon-arrow-left, .jqx-icon-arrow-right, .jqx-icon-arrow-last {
+	padding-top: 27px;
+	position: relative !important;
+}
+
+.jqx-rc-all {
+	margin-top: -7px !important;
+	//margin-top: -7px !important;
+	//width: 60px;
+	//height: 40px;
+	//padding-bottom: 5px;
+	//position: relative !important;
+}
+
+.jqx-grid-pager-number {
+	margin-top: -7px !important;
+	//padding: 8px 8px;
+	//position: relative !important;
+	//padding-top: 30px;
+	//margin-top: 60px !important;
+	//min-width: 60px;
+	//height: 40px;
+	//padding-bottom: 5px;
+}
+
+#country {
+	margin-top: 0 !important;
+}
+
+#users option {
+	padding-bottom: 5px;
+}
+
+/*
+
+#pagerusers-table {
+	top: 0 !important;
+	padding-top: 0 !important;
+	min-height: 160px;
+	position: relative !important;
+	padding-bottom: 60px;
+	
+}*/
+
+/*#users-table {
+	position: relative;
+	//padding-bottom: 100px;
+	height: 100% !important;
+}*/
+
+/*#wrapperusers-table {
+	min-height: 200px;
+	position: relative !important;
+	padding-bottom: 60px;
+}
+
+#contentusers-table {
+	padding-bottom: 20px;
+	margin-bottom: 60px;
+	padding-bottom: 60px;
+	//position: relative !important;
+}
+
+#horizontalScrollBarusers-table {
+	top:-60px;
+	//position: relative !important;
+}*/
 

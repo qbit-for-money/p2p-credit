@@ -33,3 +33,23 @@ userProfileModule.directive("ngFileSelect", function() {
 	};
 });
 
+userProfileModule.directive('dateTimePicker', function() {
+	return {
+		scope: {
+			ngModel: '='
+		},
+		link: function(scope, element, attrs) {
+			var endDate = new Date();
+			endDate.setYear(1900 + endDate.getYear() - 5);
+			element.datepicker({
+				format: "dd/mm/yyyy",
+				showMeridian: false,
+				autoclose: true,
+				todayBtn: true,
+				todayHighlight: true
+			});
+			//element.datepicker('setEndDate', '31/12/2012');
+		}
+	};
+});
+

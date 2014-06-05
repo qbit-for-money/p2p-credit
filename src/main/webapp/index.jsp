@@ -6,6 +6,7 @@
 		<meta name="description" content="With this service you can give and take credit">
 
 		<link rel="stylesheet" type="text/css" href="resources/lib/bootstrap/core/css/bootstrap.min.css">
+		<link rel="stylesheet" href="resources/lib/bootstrap/datepicker/css/datepicker.css" type="text/css" />
 
 		<link rel="stylesheet" type="text/css" href="resources/lib/angular/loading-bar.min.css">
 		<link rel="stylesheet" type="text/css" href="resources/lib/imgareaselect/css/imgareaselect-animated.css" />
@@ -43,9 +44,10 @@
 		<script type="text/javascript" src="resources/lib/angular/angular-route.min.js"></script>
 		<script type="text/javascript" src="resources/lib/angular/angular-resource.min.js"></script>
 		<script type="text/javascript" src="resources/lib/angular/angular-touch.min.js"></script>
-		<script type="text/javascript" src="resources/lib/bootstrap/core/js/ui-bootstrap-tpls-0.10.0.min.js"></script>
 		<script type="text/javascript" src="resources/lib/angular/loading-bar.min.js"></script>
+		<script type="text/javascript" src="resources/lib/bootstrap/core/js/ui-bootstrap-tpls-0.10.0.min.js"></script>
 		<script type="text/javascript" src="resources/lib/bootstrap/accordion/bootstrap-collapse.js"></script>
+		<script type="text/javascript" src="resources/lib/bootstrap/datepicker/js/bootstrap-datepicker.js"></script> 
 		<script type="text/javascript" src="resources/lib/imgareaselect/scripts/jquery.imgareaselect.pack.js"></script>
 
 		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxcore.js"></script>
@@ -58,12 +60,11 @@
 		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxdropdownlist.js"></script> 
 		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxtooltip.js"></script> 
 		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxinput.js"></script> 
-		<!--script type="text/javascript" src="resources/lib/jqwidgets/scripts/demos.js"></script-->
-
+		
 		<script type="text/javascript">
 			// Global constants
 			window.context = "${context}";
-			
+
 		</script>
 		<script type="text/javascript" src="resources/js/app.js"></script>
 
@@ -84,8 +85,6 @@
 		<script type="text/javascript" src="resources/js/user-profile/resources.js"></script>
 		<script type="text/javascript" src="resources/js/user-profile/controllers.js"></script>
 		<script type="text/javascript" src="resources/js/user-profile/directives.js"></script>
-
-		<script type="text/javascript" src="resources/js/user-photo/controllers.js"></script>
 
 		<script type="text/javascript" src="resources/js/users/controllers.js"></script>
 	</body>

@@ -9,6 +9,7 @@ import com.qbit.p2p.credit.user.model.GenderType;
 import com.qbit.p2p.credit.user.model.UserPrivateProfile;
 import com.qbit.p2p.credit.user.model.UserPublicProfile;
 import com.qbit.p2p.credit.user.model.UserType;
+import java.util.Date;
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -18,7 +19,11 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.ParameterExpression;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.EntityType;
 import javax.ws.rs.WebApplicationException;
 
 /**
@@ -66,7 +71,7 @@ public class UserProfileDAO {
 				criteria.orderBy(builder.desc(user.get(sortDataField)));
 			} else if (!sortDesc && sortDataField != null && !sortDataField.isEmpty()) {
 				criteria.orderBy(builder.asc(user.get(sortDataField)));
-			} 
+			}
 			TypedQuery<UserPublicProfile> query = entityManager.createQuery(criteria);
 			query.setFirstResult(offset);
 			query.setMaxResults(limit);
@@ -78,11 +83,125 @@ public class UserProfileDAO {
 	}
 
 	public Number length() {
+		return length(null, null);
+	}
+
+	public Number length(String filterDataField, String query) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {
-			Query query = entityManager.createQuery("SELECT count(u) FROM UserPublicProfile u");
-			Number result = (Number) query.getSingleResult();
-			return result;
+			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+			CriteriaQuery<Long> criteria = builder.createQuery(Long.class);
+			EntityType<UserPublicProfile> type = entityManager.getMetamodel().entity(UserPublicProfile.class);
+
+			Root<UserPublicProfile> user = criteria.from(UserPublicProfile.class);
+			criteria.select(builder.count(user));
+			if (filterDataField != null && query != null) {
+				criteria.where(
+						builder.or(
+								builder.like(
+										builder.lower(
+												user.get(
+														type.getDeclaredSingularAttribute(filterDataField, String.class)
+												)
+										), "%" + query.toLowerCase() + "%"
+								)
+						)
+				);
+			}
+
+			return entityManager.createQuery(criteria).getSingleResult();
+		} finally {
+			entityManager.close();
+		}
+	}
+	
+	public Number lengthWithFilterByRating(long rating, boolean isNoMoreThan) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		try {
+			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+			CriteriaQuery<Long> criteria = builder.createQuery(Long.class);
+
+			Root<UserPublicProfile> user = criteria.from(UserPublicProfile.class);
+			Expression<Long> ratingExpression = user.get("rating");
+			Predicate predicate;
+			if(isNoMoreThan) {
+				predicate = builder.le(ratingExpression, rating);
+			} else {
+				predicate = builder.ge(ratingExpression, rating);
+			}
+			criteria.select(builder.count(user)).where(predicate);
+			
+			return entityManager.createQuery(criteria).getSingleResult();
+		} finally {
+			entityManager.close();
+		}
+	}
+
+	public List<UserPublicProfile> findWithFilter(String filterDataField, String queryText, String sortDataField, boolean sortDesc, int offset, int limit) {
+
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		try {
+			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+			CriteriaQuery<UserPublicProfile> criteria = builder.createQuery(UserPublicProfile.class);
+			EntityType<UserPublicProfile> type = entityManager.getMetamodel().entity(UserPublicProfile.class);
+
+			Root<UserPublicProfile> user = criteria.from(UserPublicProfile.class);
+			criteria.select(user);
+			if (filterDataField != null && queryText != null) {
+				criteria.where(
+						builder.or(
+								builder.like(
+										builder.lower(
+												user.get(
+														type.getDeclaredSingularAttribute(filterDataField, String.class)
+												)
+										), "%" + queryText.toLowerCase() + "%"
+								)
+						)
+				);
+			}
+
+			if (sortDesc && sortDataField != null && !sortDataField.isEmpty()) {
+				criteria.orderBy(builder.desc(user.get(sortDataField)));
+			} else if (!sortDesc && sortDataField != null && !sortDataField.isEmpty()) {
+				criteria.orderBy(builder.asc(user.get(sortDataField)));
+			}
+			TypedQuery<UserPublicProfile> query = entityManager.createQuery(criteria);
+			query.setFirstResult(offset);
+			query.setMaxResults(limit);
+			List<UserPublicProfile> users = query.getResultList();
+			return users;
+		} finally {
+			entityManager.close();
+		}
+	}
+	
+		public List<UserPublicProfile> findByRating(long rating, boolean isNoMoreThan, String sortDataField, boolean sortDesc, int offset, int limit) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		try {
+			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+			CriteriaQuery<UserPublicProfile> criteria = builder.createQuery(UserPublicProfile.class);
+
+			Root<UserPublicProfile> user = criteria.from(UserPublicProfile.class);
+			Expression<Long> ratingExpression = user.get("rating");
+			Predicate predicate;
+			if(isNoMoreThan) {
+				predicate = builder.le(ratingExpression, rating);
+			} else {
+				predicate = builder.ge(ratingExpression, rating);
+			}
+			criteria.select(user).where(predicate);
+			
+			if (sortDesc && sortDataField != null && !sortDataField.isEmpty()) {
+				criteria.orderBy(builder.desc(user.get(sortDataField)));
+			} else if (!sortDesc && sortDataField != null && !sortDataField.isEmpty()) {
+				criteria.orderBy(builder.asc(user.get(sortDataField)));
+			}
+			TypedQuery<UserPublicProfile> query = entityManager.createQuery(criteria);
+			query.setFirstResult(offset);
+			query.setMaxResults(limit);
+			List<UserPublicProfile> users = query.getResultList();
+			return users;
 		} finally {
 			entityManager.close();
 		}
@@ -124,26 +243,6 @@ public class UserProfileDAO {
 		}
 	}
 
-	public List<UserPublicProfile> findByRating(long rating, boolean isNoMoreThan, int offset, int limit) {
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		try {
-			String queryName;
-			if (isNoMoreThan) {
-				queryName = "UserPublicProfile.findByRatingNoMoreThan";
-			} else {
-				queryName = "UserPublicProfile.findByRatingNoLessThan";
-			}
-			TypedQuery<UserPublicProfile> query = entityManager.createNamedQuery(queryName, UserPublicProfile.class);
-
-			query.setParameter("rating", rating);
-			query.setFirstResult(offset);
-			query.setMaxResults(limit);
-			return query.getResultList();
-		} finally {
-			entityManager.close();
-		}
-	}
-
 	public UserPublicProfile create(final String publicKey) {
 		return invokeInTransaction(entityManagerFactory, new TrCallable<UserPublicProfile>() {
 
@@ -158,13 +257,29 @@ public class UserProfileDAO {
 				userPublicProfile.setRating(0L);
 				userPublicProfile.setPersonalPageData("DEFAULT");
 
+				entityManager.persist(userPublicProfile);
+
+				return userPublicProfile;
+			}
+		}
+		);
+	}
+
+	public UserPrivateProfile createUserPrivateProfile(final String publicKey) {
+		return invokeInTransaction(entityManagerFactory, new TrCallable<UserPrivateProfile>() {
+
+			@Override
+			public UserPrivateProfile call(EntityManager entityManager) {
+				UserInfo user = userDAO.find(publicKey);
+				if (user == null) {
+					throw new WebApplicationException();
+				}
 				UserPrivateProfile userPrivateProfile = new UserPrivateProfile();
 				userPrivateProfile.setPublicKey(publicKey);
 
-				entityManager.persist(userPublicProfile);
 				entityManager.persist(userPrivateProfile);
 
-				return userPublicProfile;
+				return userPrivateProfile;
 			}
 		}
 		);
@@ -176,7 +291,7 @@ public class UserProfileDAO {
 		}
 
 		return updateUserPublicProfile(userProfile.getPublicKey(), userProfile.getFirstName(), userProfile.getLastName(), userProfile.getCountry(),
-				userProfile.isCountryEnabled(), userProfile.getCity(), userProfile.isCityEnabled(), userProfile.getAge(),
+				userProfile.isCountryEnabled(), userProfile.getCity(), userProfile.isCityEnabled(), userProfile.getBirthDate(),
 				userProfile.isAgeEnabled(), userProfile.getGender(), userProfile.getRating(), userProfile.getHobby(),
 				userProfile.isHobbyEnabled(), userProfile.getPersonalPageData());
 
@@ -184,7 +299,7 @@ public class UserProfileDAO {
 
 	public UserPublicProfile updateUserPublicProfile(final String publicKey, final String firstName, final String lastName,
 			final String country, final boolean countryEnabled, final String city, final boolean cityEnabled,
-			final int age, final boolean ageEnabled, final GenderType gender, final long rating,
+			final Date birthDate, final boolean ageEnabled, final GenderType gender, final long rating,
 			final String hobby, final boolean hobbyEnabled, final String personalPageData) {
 		return invokeInTransaction(entityManagerFactory, new TrCallable<UserPublicProfile>() {
 
@@ -204,7 +319,7 @@ public class UserProfileDAO {
 				userPublicProfile.setCountryEnabled(countryEnabled);
 				userPublicProfile.setCity(city);
 				userPublicProfile.setCityEnabled(cityEnabled);
-				userPublicProfile.setAge(age);
+				userPublicProfile.setBirthDate(birthDate);
 				userPublicProfile.setAgeEnabled(ageEnabled);
 				userPublicProfile.setHobby(hobby);
 				userPublicProfile.setHobbyEnabled(hobbyEnabled);

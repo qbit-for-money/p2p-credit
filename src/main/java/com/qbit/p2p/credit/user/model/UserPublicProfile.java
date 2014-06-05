@@ -1,6 +1,7 @@
 package com.qbit.p2p.credit.user.model;
 
 import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Entity;
@@ -8,17 +9,19 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * @author Alexander_Sergeev
  */
 @Entity
 @NamedQueries({
-	@NamedQuery(name = "UserPublicProfile.findByType",
-			query = "SELECT u FROM UserPublicProfile u WHERE u.userType = :type"),
 	@NamedQuery(name = "UserPublicProfile.findByOrdersNoMoreThan",
 			query = "SELECT u FROM UserPublicProfile u WHERE "
 			+ "(SELECT count(o) FROM OrderInfo o WHERE o.userPublicKey = u.publicKey) <= :number"),
@@ -46,13 +49,15 @@ public class UserPublicProfile implements Serializable {
 	private boolean countryEnabled;
 	private String city;
 	private boolean cityEnabled;
-	private int age;
+	@XmlElement(name = "birthDate")
+	@XmlJavaTypeAdapter(DateAdapter.class)
+	@Temporal(TemporalType.DATE)
+	private Date birthDate;
 	private boolean ageEnabled;
 	private GenderType gender;
 	private String hobby;
 	private boolean hobbyEnabled;
 	private long rating;
-	private UserType userType;
 	@Lob
 	private String personalPageData;
 
@@ -112,13 +117,14 @@ public class UserPublicProfile implements Serializable {
 		this.hobby = hobby;
 	}
 
-	public int getAge() {
-		return age;
+	public Date getBirthDate() {
+		return birthDate;
 	}
 
-	public void setAge(int age) {
-		this.age = age;
+	public void setBirthDate(Date birthDate) {
+		this.birthDate = birthDate;
 	}
+
 
 	public GenderType getGender() {
 		return gender;
@@ -126,14 +132,6 @@ public class UserPublicProfile implements Serializable {
 
 	public void setGender(GenderType gender) {
 		this.gender = gender;
-	}
-
-	public UserType getUserType() {
-		return userType;
-	}
-
-	public void setUserType(UserType userType) {
-		this.userType = userType;
 	}
 
 	public boolean isCountryEnabled() {
@@ -183,8 +181,9 @@ public class UserPublicProfile implements Serializable {
 				&& (city == null || city.length() <= MAX_LENGTH)
 				&& (hobby == null || hobby.length() <= MAX_LENGTH * 2);
 	}
+
 	@Override
 	public String toString() {
-		return "UserPublicProfile{" + "publicKey=" + publicKey + ", firstName=" + firstName + ", lastName=" + lastName + ", country=" + country + ", countryEnabled=" + countryEnabled + ", city=" + city + ", cityEnabled=" + cityEnabled + ", age=" + age + ", ageEnabled=" + ageEnabled + ", gender=" + gender + ", hobby=" + hobby + ", hobbyEnabled=" + hobbyEnabled + ", rating=" + rating + ", userType=" + userType + ", personalPageData=" + personalPageData + '}';
+		return "UserPublicProfile{" + "publicKey=" + publicKey + ", firstName=" + firstName + ", lastName=" + lastName + ", country=" + country + ", countryEnabled=" + countryEnabled + ", city=" + city + ", cityEnabled=" + cityEnabled + ", birthDate=" + birthDate + ", ageEnabled=" + ageEnabled + ", gender=" + gender + ", hobby=" + hobby + ", hobbyEnabled=" + hobbyEnabled + ", rating=" + rating + ", personalPageData=" + personalPageData + '}';
 	}
 }

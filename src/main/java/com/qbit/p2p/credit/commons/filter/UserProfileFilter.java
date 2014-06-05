@@ -15,9 +15,12 @@ import javax.servlet.http.HttpServletResponse;
  * @author Alexander_Sergeev
  */
 public class UserProfileFilter implements Filter {
+	
+	private FilterConfig filterConfig;
 
 	@Override
 	public void init(FilterConfig fc) throws ServletException {
+		filterConfig = fc;
 	}
 
 	@Override
@@ -26,12 +29,17 @@ public class UserProfileFilter implements Filter {
 		HttpServletRequest httpRequest = (HttpServletRequest) servletRequest;
 
 		String userId = (String) httpRequest.getSession().getAttribute(USER_ID_KEY);
+		
+		String contextPath = ((HttpServletRequest) servletRequest).getContextPath();
 
-		if ("/users-profile/current".equals(httpRequest.getPathInfo())) {
-			if (!userId.contains("@")) {
-				((HttpServletResponse) servletResponse).sendRedirect("/p2p-credit");
+		boolean isRequestToCurrentProfile = "/users-profile/current".equals(httpRequest.getPathInfo());
+		boolean userIdIsMail = ((userId != null) && userId.contains("@"));
+
+		if (isRequestToCurrentProfile && !userIdIsMail) {
+			if (contextPath.startsWith(filterConfig.getInitParameter("context-path"))) {
+				((HttpServletResponse) servletResponse).sendRedirect(contextPath);
 			} else {
-				filterChain.doFilter(servletRequest, servletResponse);
+				((HttpServletResponse) servletResponse).sendRedirect("/");
 			}
 		} else {
 			filterChain.doFilter(servletRequest, servletResponse);

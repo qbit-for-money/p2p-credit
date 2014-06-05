@@ -25,9 +25,6 @@ import javax.xml.bind.annotation.XmlTransient;
 @NamedQueries({
 	@NamedQuery(name = "OrderInfo.findByUser",
 			query = "SELECT o FROM OrderInfo o WHERE o.userPublicKey = :userPublicKey"),
-	@NamedQuery(name = "OrderInfo.findByUserType",
-			query = "SELECT o FROM OrderInfo o, UserPublicProfile u WHERE "
-					+ "o.userPublicKey = u.publicKey AND u.userType = :userType"),
 	@NamedQuery(name = "OrderInfo.findByUserAndTimestamp",
 			query = "SELECT o FROM OrderInfo o WHERE o.userPublicKey = :userPublicKey"
 			+ " AND o.creationDate = :creationDate"),

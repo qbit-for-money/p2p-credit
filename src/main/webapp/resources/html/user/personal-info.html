@@ -1,174 +1,188 @@
 <div class="panel-body">
-	<div class="row">
-		<div class="col-xs-3 col-md-3">
-			<div class="img-thumbnail" style="width: 100%">
-				<img id='user-photo' src="{{userPhotoSrc}}" width="100%"/>
-			</div>
-			<!--div>
-				<button class="btn btn-default col-xs-6 col-md-6" ng-if="isCurrentUser" ng-click="changeUserPhoto()"><span class="glyphicon glyphicon-refresh"></span></button>
-				<button class="btn btn-default col-xs-6 col-md-6" ng-if="isCurrentUser" ng-click=""><span class="glyphicon glyphicon-bookmark"></span></button>
-			</div-->
-			<div>
-				<button class="btn btn-default col-xs-12 col-md-12" ng-if="isCurrentUser" ng-click="changeUserPhoto()"><span class="glyphicon glyphicon-refresh"></span></button>
-				<button class="btn btn-default col-xs-12 col-md-12" ng-if="!isCurrentUser" title="Add to bookmark" ng-click=""><span class="glyphicon glyphicon-bookmark"></span></button>
-			</div>
-		</div>
-		<div class="col-xs-9 col-md-9" style="padding-bottom: 5%;">
-			<div class="row">
-				<div class="col-xs-9 col-md-10">
-					<h4 ng-if="!edit">{{userPropertiesMap['firstName']}} {{userPropertiesMap['lastName']}}</h4>
-					<div class="col-xs-12 col-md-12 " ng-if="edit">
-						<div class="col-xs-6 col-md-6">
-							<input type="text" id="firstName" class="form-control" ng-model="userPropertiesMap['firstName']" placeholder="First Name" maxlength="20"/>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-xs-4 col-md-3">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-xs-12 col-md-12">
+							<div class="img-thumbnail" style="min-width: 150px;" >
+								<img id='user-photo' src="{{userPhotoSrc}}" width="100%" ng-if="!editUserPhoto"/>
+								<img id="user-photo-change" ng-hide="!imageSrc" width="100%" ng-src="{{imageSrc}}" />
+							</div>
 						</div>
-						<div class="col-xs-6 col-md-6">
-							<input type="text" id="lastName" class="form-control col-xs-6 col-md-6" ng-model="userPropertiesMap
+						<div class="col-xs-12 col-md-12" style="min-width: 180px; padding-bottom: 10px;">
+							<div class="browse-button btn btn-default col-xs-6 col-md-6" ng-if="isCurrentUser && !editUserPhoto && edit">
+								<span class="glyphicon glyphicon-refresh"></span>
+								<input type="file" name="file" ng-file-select="onFileSelect($files)" >
+							</div>
+							<button class="btn btn-default col-xs-6 col-md-6" ng-if="isCurrentUser && !editUserPhoto && edit" style="float: right" ng-click="deleteUserPhoto()"><span class="glyphicon glyphicon-remove-circle"></span></button>
+							<button class="btn btn-default col-xs-6 col-md-6" ng-if="editUserPhoto" ng-click="saveUserPhoto()"><span class="glyphicon glyphicon-ok"></span></button>
+							<button class="btn btn-default col-xs-6 col-md-6" ng-if="editUserPhoto" style="float: right" ng-click="cancel()"><span class="glyphicon glyphicon-remove"></span></button>
+							<!--button class="btn btn-default col-xs-12 col-md-12" ng-if="!isCurrentUser" title="Add to bookmark" ng-click=""><span class="glyphicon glyphicon-bookmark"></span></button-->
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-xs-12 col-md-9" style="padding-bottom: 5%;">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-xs-6 col-md-10 " ng-if="!edit">
+							<h4>{{userPropertiesMap['firstName']}} {{userPropertiesMap['lastName']}}</h4>
+						</div>
+
+						<div class="col-xs-4 col-md-5" ng-if="edit">
+							<input type="text" id="firstName" class="form-control" ng-model="userPropertiesMap
+								['firstName']" placeholder="First Name" maxlength="20"/>
+						</div>
+						<div class="col-xs-4 col-md-5" ng-if="edit">
+							<input type="text" id="lastName" class="form-control" ng-model="userPropertiesMap
 								['lastName']" placeholder="Last Name" maxlength="30"/>
 						</div>
+
+						<div class="col-xs-3 col-md-1 navbar-right" style="float: right;" ng-if="isCurrentUser">
+							<button class="btn btn-default navbar-right" ng-click="editProfile()"><span class="glyphicon glyphicon-edit"></span></button>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-12 col-md-12"><hr></div>
 					</div>
 
 
-				</div>
-				<div class="col-xs-3 col-md-2" ng-if="isCurrentUser">
-					<button class="btn btn-default navbar-right" ng-click="editProfile()"><span class="glyphicon glyphicon-edit"></span></button>
-				</div>
-			</div><hr>
+					<div id="user-attributes" class="row">
+						<div class="container-fluid">
+							<div class="col-xs-12 col-md-12">
+								<div class="row" ng-if="!edit">
+									<div class="col-xs-12 col-md-12">
+										<div class="progress">
+											<div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="{{userPropertiesMap['rating']}}" aria-valuemin="0" aria-valuemax="100" ng-style="{width : (userPropertiesMap['rating'] + '%') }">
+												Rating: {{userPropertiesMap['rating']}}
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="row" ng-if="(!edit && userPropertiesMap['gender']) || edit">
 
-			<div id="user-attributes">
+									<div class="col-xs-4 col-md-2 title" ng-if="!edit && userPropertiesMap['gender']">
+										Gender:
+									</div>
+									<div class="col-xs-7 col-md-8" ng-if="!edit && userPropertiesMap['gender']">
+										{{userPropertiesMap['gender']}}
+									</div>
 
-				<div class="row" ng-if="!edit">
-					<div class="col-xs-12 col-md-12">
-						<div class="progress">
-							<div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="{{userPropertiesMap['rating']}}" aria-valuemin="0" aria-valuemax="100" ng-style="{width : (userPropertiesMap['rating'] + '%') }">
-								Rating: {{userPropertiesMap['rating']}}
+									<div class="col-xs-4 col-md-2 title" ng-if="edit">
+										Gender:
+									</div>
+									<div class="input-group col-xs-7 col-md-9" style="float: left" ng-if="edit">
+										<select class="form-control btn btn-default dropdown-toggle" data-ng-options="t for t in genderTypes"
+											data-ng-model="userPropertiesMap
+												['gender']">
+										</select>
+									</div>
+
+								</div>
+								<div class="row" ng-if="(!edit && userPropertiesMap['country']) || edit">
+
+									<div class="col-xs-4 col-md-2 title" ng-if="!edit && userPropertiesMap['country']">
+										Country:
+									</div>
+									<div class="col-xs-7 col-md-8" ng-if="!edit && userPropertiesMap['country']">
+										{{userPropertiesMap['country']}}
+									</div>
+
+
+									<div class="col-xs-4 col-md-2 title" ng-if="edit">
+										Country:
+									</div>
+									<div class="input-group col-xs-7 col-md-9" ng-if="edit">
+										<input type="text" id="country" ng-model="userPropertiesMap
+											['country']" class="form-control" style="margin-top: 0;"/>
+										<span class="input-group-btn">
+											<button class="btn btn-default" type="button" ng-click="changeVisible('countryEnabled')">
+												<span id="country-span" class="glyphicon glyphicon-eye-{{userPropertiesMap['countryEnabled']}}"></span>
+											</button>
+										</span>
+
+									</div>
+
+
+								</div>
+								<div class="row" ng-if="(!edit && userPropertiesMap['city']) || edit">
+
+									<div class="col-xs-4 col-md-2 title" ng-if="!edit && userPropertiesMap['city']">
+										City:
+									</div>
+									<div class="col-xs-7 col-md-8" ng-if="!edit && userPropertiesMap['city']">
+										{{userPropertiesMap['city']}}
+									</div>
+
+									<div class="col-xs-4 col-md-2 title" ng-if="edit">
+										City:
+									</div>
+									<div class="input-group col-xs-7 col-md-9" ng-if="edit">
+										<input type="text" id="city" ng-model="userPropertiesMap
+											['city']" class="form-control" />
+										<span class="input-group-btn">
+											<button class="btn btn-default" type="button" ng-click="changeVisible('cityEnabled')">
+												<span class="glyphicon glyphicon-eye-{{userPropertiesMap['cityEnabled']}}"></span>
+											</button>
+										</span>
+
+									</div>
+
+								</div>
+								<div class="row" ng-if="(!edit && userPropertiesMap['birthDate']) || edit">
+
+									<div class="col-xs-4 col-md-2 title" ng-if="!edit && userPropertiesMap['birthDate']">
+										Birth Date:
+									</div>
+									<div class="col-xs-7 col-md-8" ng-if="!edit && userPropertiesMap['birthDate']">
+										{{userPropertiesMap['birthDate']}}
+									</div>
+
+									<div class="col-xs-4 col-md-2 title" ng-if="edit">
+										Birth Date:
+									</div>
+									<div class="input-group col-xs-7 col-md-9" ng-if="edit">
+										<input type="text" id="birth-date" ng-model="userPropertiesMap
+											['birthDate']" class="form-control" date-time-picker/>
+										<span class="input-group-btn">
+											<button class="btn btn-default" type="button" ng-click="changeVisible('ageEnabled')">
+												<span class="glyphicon glyphicon-eye-{{userPropertiesMap['ageEnabled']}}"></span>
+											</button>
+										</span>
+
+									</div>
+
+								</div>
+								<div class="row" ng-if="(!edit && userPropertiesMap['hobby']) || edit">
+
+									<div class="col-xs-4 col-md-2 title" ng-if="!edit && userPropertiesMap['hobby']">
+										Hobby:
+									</div>
+									<div class="col-xs-7 col-md-8" ng-if="!edit && userPropertiesMap['hobby']">
+										{{userPropertiesMap['hobby']}}
+									</div>
+
+									<div class="col-xs-4 col-md-2 title" ng-if="edit">
+										Hobby:
+									</div>
+									<div class="input-group col-xs-7 col-md-9" ng-if="edit">
+										<input type="text" id="hobby" ng-model="userPropertiesMap
+											['hobby']" class="form-control" />
+										<span class="input-group-btn">
+											<button class="btn btn-default" type="button" ng-click="changeVisible('hobbyEnabled')">
+												<span class="glyphicon glyphicon-eye-{{userPropertiesMap['hobbyEnabled']}}"></span>
+											</button>
+										</span>
+
+									</div>
+
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-				<div class="row" ng-if="(!edit && userPropertiesMap['gender']) || edit">
-					<div ng-if="!edit && userPropertiesMap['gender']">
-						<div class="col-xs-2 col-md-2 title">
-							Gender:
-						</div>
-						<div class="col-xs-8 col-md-8">
-							{{userPropertiesMap['gender']}}
-						</div>
-					</div>	
-					<div ng-if="edit">
-						<div class="col-xs-2 col-md-2 title">
-							Gender:
-						</div>
-						<div class="input-group col-xs-9 col-md-9" style="float: left">
-							<select class="form-control btn btn-default dropdown-toggle" data-ng-options="t for t in genderTypes"
-								data-ng-model="userPropertiesMap
-									['gender']">
-							</select>
-						</div>
-					</div>
-				</div>
-				<div class="row" ng-if="(!edit && userPropertiesMap['country']) || edit">
-					<div ng-if="!edit && userPropertiesMap['country']">
-						<div class="col-xs-2 col-md-2 title">
-							Country:
-						</div>
-						<div class="col-xs-8 col-md-8">
-							{{userPropertiesMap['country']}}
-						</div>
-					</div>
-					<div ng-if="edit">
-						<div class="col-xs-2 col-md-2 title">
-							Country:
-						</div>
-						<div class="input-group col-xs-9 col-md-9">
-							<input type="text" id="country" ng-model="userPropertiesMap
-								['country']" class="form-control" />
-							<span class="input-group-btn">
-								<button class="btn btn-default" type="button" ng-click="changeVisible('countryEnabled')">
-									<span class="glyphicon glyphicon-eye-{{userPropertiesMap['countryEnabled']}}"></span>
-								</button>
-							</span>
-
-						</div>
-					</div>
-
-				</div>
-				<div class="row" ng-if="(!edit && userPropertiesMap['city']) || edit">
-					<div ng-if="!edit && userPropertiesMap['city']">
-						<div class="col-xs-2 col-md-2 title">
-							City:
-						</div>
-						<div class="col-xs-8 col-md-8">
-							{{userPropertiesMap['city']}}
-						</div>
-					</div>
-					<div ng-if="edit">
-						<div class="col-xs-2 col-md-2 title">
-							City:
-						</div>
-						<div class="input-group col-xs-9 col-md-9">
-							<input type="text" id="city" ng-model="userPropertiesMap
-								['city']" class="form-control" />
-							<span class="input-group-btn">
-								<button class="btn btn-default" type="button" ng-click="changeVisible('cityEnabled')">
-									<span class="glyphicon glyphicon-eye-{{userPropertiesMap['cityEnabled']}}"></span>
-								</button>
-							</span>
-
-						</div>
-					</div>
-				</div>
-				<div class="row" ng-if="(!edit && userPropertiesMap['age']) || edit">
-					<div ng-if="!edit && userPropertiesMap['age']">
-						<div class="col-xs-2 col-md-2 title">
-							Age:
-						</div>
-						<div class="col-xs-8 col-md-8">
-							{{userPropertiesMap['age']}}
-						</div>
-					</div>	
-					<div ng-if="edit">
-						<div class="col-xs-2 col-md-2 title">
-							Age:
-						</div>
-						<div class="input-group col-xs-9 col-md-9">
-							<input type="text" id="age" ng-model="userPropertiesMap
-								['age']" class="form-control"/>
-							<span class="input-group-btn">
-								<button class="btn btn-default" type="button" ng-click="changeVisible('ageEnabled')">
-									<span class="glyphicon glyphicon-eye-{{userPropertiesMap['ageEnabled']}}"></span>
-								</button>
-							</span>
-
-						</div>
-					</div>
-				</div>
-				<div class="row" ng-if="(!edit && userPropertiesMap['hobby']) || edit">
-					<div ng-if="!edit && userPropertiesMap['hobby']">
-						<div class="col-xs-2 col-md-2 title">
-							Hobby:
-						</div>
-						<div class="col-xs-8 col-md-8">
-							{{userPropertiesMap['hobby']}}
-						</div>
-					</div>	
-					<div ng-if="edit">
-						<div class="col-xs-2 col-md-2 title">
-							Hobby:
-						</div>
-						<div class="input-group col-xs-9 col-md-9">
-							<input type="text" id="hobby" ng-model="userPropertiesMap
-								['hobby']" class="form-control" />
-							<span class="input-group-btn">
-								<button class="btn btn-default" type="button" ng-click="changeVisible('hobbyEnabled')">
-									<span class="glyphicon glyphicon-eye-{{userPropertiesMap['hobbyEnabled']}}"></span>
-								</button>
-							</span>
-
-						</div>
-					</div>
-				</div>
 			</div>
 		</div>
-
 	</div>
 </div>
