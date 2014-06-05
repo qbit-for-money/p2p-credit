@@ -1,7 +1,8 @@
 var usersModule = angular.module("users");
 
 usersModule.controller("UsersController", function($scope, $rootScope) {
-
+	
+	$scope.dataLength;
 	$scope.filters = ["Public Key", "First Name", "Last Name", "Country", "City", "Rating"];
 	$scope.filtersMap = {};
 	$scope.filtersMap["Public Key"] = "publicKey";
@@ -12,13 +13,13 @@ usersModule.controller("UsersController", function($scope, $rootScope) {
 	$scope.filtersMap["Rating"] = "rating";
 	$scope.filterType = "Public Key";
 	$scope.filterParam = "";
-	
+
 	$scope.directions = ["No greater than", "No less than"];
 	$scope.directionType = "No greater than";
-	
+
 	$scope.selectFilterType = function(filterType) {
 		$scope.filterType = filterType;
-		if(filterType === "Rating") {
+		if (filterType === "Rating") {
 			$scope.filterParam = 0;
 		} else {
 			$scope.filterParam = "";
@@ -43,38 +44,31 @@ usersModule.controller("UsersController", function($scope, $rootScope) {
 			root: "users",
 			url: window.context + "webapi/profiles/withFilter"
 		};
-		var adapterFields = {
-			formatData: function(data) {
+	var adapterFields = {
+		formatData: function(data) {
 
-				data.filter = $scope.filterParam;
-				data.filterdatafield = $scope.filtersMap[$scope.filterType];
-				if($scope.directionType === "No greater than") {
-					data.isLess = true;
-				} else {
-					data.isLess = false;
-				}
-
-				if (source.totalRecords) {
-					data.$skip = data.pagenum * data.pagesize;
-					data.$top = data.pagesize;
-					if (data.sortdatafield && data.sortorder) {
-						data.$orderby = data.sortdatafield + " " + data.sortorder;
-					}
-				}
-				return data;
-			},
-			downloadComplete: function(data, status, xhr) {
-				if (!source.totalRecords) {
-					source.totalRecords = data.length;
-				}
-			},
-			loadError: function(xhr, status, error) {
-				console.log(error.toString());
+			data.filter = $scope.filterParam;
+			data.filterdatafield = $scope.filtersMap[$scope.filterType];
+			if ($scope.directionType === "No greater than") {
+				data.isLess = true;
+			} else {
+				data.isLess = false;
 			}
-		};
-	
+			return data;
+		},
+		downloadComplete: function(data, status, xhr) {
+			$scope.dataLength = data.length;
+			source.totalRecords = data.length;
+		},
+		loadError: function(xhr, status, error) {
+			console.log(error.toString());
+		}
+	};
+
 	$scope.reloadDataTable = function() {
-		dataAdapter = new $.jqx.dataAdapter(source, adapterFields);
+		angular.element("#users-table").jqxDataTable('clear');
+		source.totalRecords = undefined;
+		var dataAdapter = new $.jqx.dataAdapter(source, adapterFields);
 		angular.element("#users-table").jqxDataTable(
 			{
 				width: '100%',
@@ -96,7 +90,7 @@ usersModule.controller("UsersController", function($scope, $rootScope) {
 				]
 			});
 	};
-	
+
 	$scope.reloadDataTable();
 
 	var click = new Date();

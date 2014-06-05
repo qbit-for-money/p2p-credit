@@ -129,8 +129,8 @@ public class UserProfileDAO {
 			} else {
 				predicate = builder.ge(ratingExpression, rating);
 			}
-			criteria.select(builder.count(user)).where(predicate);
-			
+			criteria.select(builder.count(user));
+			criteria.where(predicate);		
 			return entityManager.createQuery(criteria).getSingleResult();
 		} finally {
 			entityManager.close();

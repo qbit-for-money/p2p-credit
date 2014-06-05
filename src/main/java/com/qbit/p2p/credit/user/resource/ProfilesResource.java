@@ -236,6 +236,9 @@ public class ProfilesResource {
 		}
 		List<UserPublicProfile> users = null;
 		if (filterDataField.equals("rating")) {
+			if(filter == null || filter.isEmpty()) {
+				return new UsersPublicProfilesWrapper();
+			}
 			long rating = Long.parseLong(filter);
 			users = userProfileDAO.findByRating(rating, isLess, sortDataField, sortDesc, pagenum * limit, limit);
 			return new UsersPublicProfilesWrapper(users, userProfileDAO.lengthWithFilterByRating(rating, isLess));
