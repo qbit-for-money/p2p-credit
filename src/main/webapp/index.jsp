@@ -80,6 +80,7 @@
 		<script type="text/javascript" src="resources/js/auth/resources.js"></script>
 
 		<script type="text/javascript" src="resources/js/order/controllers.js"></script>
+		<script type="text/javascript" src="resources/js/orders/controllers.js"></script>
 
 		<script type="text/javascript" src="resources/lib/imgareaselect/scripts/upload.js"></script>
 		<script type="text/javascript" src="resources/js/user-profile/resources.js"></script>
@@ -87,5 +88,7 @@
 		<script type="text/javascript" src="resources/js/user-profile/directives.js"></script>
 
 		<script type="text/javascript" src="resources/js/users/controllers.js"></script>
+		
+		<script type="text/javascript" src="resources/js/navbar/controllers.js"></script>
 	</body>
 </html>

@@ -12,7 +12,9 @@ angular.module("user-edit", ["ngResource"]);
 
 angular.module("users", ["ngResource"]);
 
-angular.module("main", ["ngRoute", "ui.bootstrap", "chieffancypants.loadingBar", "common", "user", "captcha-auth", "order", "user-profile", "user-edit", "users"]);
+angular.module("navbar", ["ngResource"]);
+
+angular.module("main", ["ngRoute", "ui.bootstrap", "chieffancypants.loadingBar", "common", "user", "captcha-auth", "order", "user-profile", "user-edit", "users", "navbar"]);
 
 angular.module("main").config(function($routeProvider) {
 	$routeProvider.when("/", {
@@ -21,6 +23,9 @@ angular.module("main").config(function($routeProvider) {
 	}).when("/order-init", {
 		templateUrl: "resources/html/order/order-init.html",
 		controller: "OrderInitController"
+	}).when("/orders", {
+		templateUrl: "resources/html/order/orders.html",
+		controller: "OrdersController"
 	}).when("/users/:id", {
 		templateUrl: "resources/html/user/user.html",
 		controller: "UserProfileController"

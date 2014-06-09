@@ -3,22 +3,6 @@
 		<div class="container-fluid">
 			<div class="row" style="padding-bottom: 15px;">
 				<div class="input-group col-xs-10 col-md-4">
-					<div class="input-group-btn" ng-if="filterType === 'Rating'"> 
-						<a  class="btn btn-default dropdown-toggle btn-select" 
-						    data-toggle="dropdown" data-placement="bottom" 
-						    href="#">{{directionType}} <span class="caret"></span>
-						</a>
-
-						<ul class="dropdown-menu">
-							<li data-ng-repeat="direction in directions" 
-							    data-ng-click="selectDirectionType(direction)">
-								<a class="currency-list-item">
-									<div class="text-center currency-list-label">{{direction}}</div>
-								</a>
-							</li>
-						</ul>
-					</div>
-					<input type="text" class="form-control" placeholder="Filter" ng-model="filterParam" ng-change="reloadDataTable()"/>
 					<div class="input-group-btn"> 
 						<a  class="btn btn-default dropdown-toggle btn-select" 
 						    data-toggle="dropdown" data-placement="bottom" 
@@ -33,6 +17,26 @@
 								</a>
 							</li>
 						</ul>
+						
+					</div>
+					<div class="input-group-btn" ng-if="filterType === 'Rating'"> 
+						<a  class="btn btn-default dropdown-toggle btn-select" style="border-radius: 0; margin-right: -2px"
+						    data-toggle="dropdown" data-placement="bottom" 
+						    href="#">{{directionType}} <span class="caret"></span>
+						</a>
+
+						<ul class="dropdown-menu">
+							<li data-ng-repeat="direction in directions" 
+							    data-ng-click="selectDirectionType(direction)">
+								<a class="currency-list-item">
+									<div class="text-center currency-list-label">{{direction}}</div>
+								</a>
+							</li>
+						</ul>
+					</div>
+					<input type="text" class="form-control" placeholder="Filter" ng-model="filterParam"/>
+					<div class="input-group-btn"> 
+						<button class="btn btn-default" ng-click="reloadDataTable()"><span class="glyphicon glyphicon-search"></span></button>
 					</div>
 				</div>
 			</div>

@@ -28,7 +28,6 @@ usersModule.controller("UsersController", function($scope, $rootScope) {
 	};
 	$scope.selectDirectionType = function(directionType) {
 		$scope.directionType = directionType;
-		$scope.reloadDataTable();
 	};
 	var source =
 		{
