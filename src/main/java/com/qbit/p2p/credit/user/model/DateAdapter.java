@@ -11,25 +11,25 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
  */
 public class DateAdapter extends XmlAdapter<String, Date> {
 
-        private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
-        @Override
-        public String marshal(Date v) {
-		if(v == null) {
+	@Override
+	public String marshal(Date v) {
+		if (v == null) {
 			return null;
 		}
-            return dateFormat.format(v);
-        }
+		return dateFormat.format(v);
+	}
 
-        @Override
-        public Date unmarshal(String v) {
-		if(v == null) {
+	@Override
+	public Date unmarshal(String v) {
+		if (v == null) {
 			return null;
 		}
-            try {
-                return dateFormat.parse(v);
-            } catch (ParseException e) {
-                throw new WebApplicationException();
-            }
-        }
-    }
+		try {
+			return dateFormat.parse(v);
+		} catch (ParseException e) {
+			throw new WebApplicationException();
+		}
+	}
+}

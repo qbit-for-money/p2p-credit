@@ -69,16 +69,15 @@
 										{{userPropertiesMap['gender']}}
 									</div>
 
-									<div class="col-xs-4 col-md-2 title" ng-if="edit">
+									<div class="col-xs-4 col-md-2 title-edit" ng-if="edit">
 										Gender:
 									</div>
-									<div class="input-group col-xs-7 col-md-9" style="float: left" ng-if="edit">
-										<select class="form-control btn btn-default dropdown-toggle" data-ng-options="t for t in genderTypes"
+									<div class="col-xs-7 col-md-9 input-group round-border" style="float: left" ng-if="edit">
+										<select class="form-control btn btn-default dropdown-toggle custom" data-ng-options="t for t in genderTypes"
 											data-ng-model="userPropertiesMap
 												['gender']">
 										</select>
 									</div>
-
 								</div>
 								<div class="row" ng-if="(!edit && userPropertiesMap['country']) || edit">
 
@@ -90,7 +89,7 @@
 									</div>
 
 
-									<div class="col-xs-4 col-md-2 title" ng-if="edit">
+									<div class="col-xs-4 col-md-2 title-edit" ng-if="edit">
 										Country:
 									</div>
 									<div class="input-group col-xs-7 col-md-9" ng-if="edit">
@@ -115,7 +114,7 @@
 										{{userPropertiesMap['city']}}
 									</div>
 
-									<div class="col-xs-4 col-md-2 title" ng-if="edit">
+									<div class="col-xs-4 col-md-2 title-edit" ng-if="edit">
 										City:
 									</div>
 									<div class="input-group col-xs-7 col-md-9" ng-if="edit">
@@ -139,7 +138,7 @@
 										{{userPropertiesMap['birthDate']}}
 									</div>
 
-									<div class="col-xs-4 col-md-2 title" ng-if="edit">
+									<div class="col-xs-4 col-md-2 title-edit" ng-if="edit">
 										Birth Date:
 									</div>
 									<div class="input-group col-xs-7 col-md-9" ng-if="edit">
@@ -163,7 +162,7 @@
 										{{userPropertiesMap['hobby']}}
 									</div>
 
-									<div class="col-xs-4 col-md-2 title" ng-if="edit">
+									<div class="col-xs-4 col-md-2 title-edit" ng-if="edit">
 										Hobby:
 									</div>
 									<div class="input-group col-xs-7 col-md-9" ng-if="edit">

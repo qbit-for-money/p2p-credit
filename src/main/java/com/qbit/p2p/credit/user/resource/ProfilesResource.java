@@ -8,6 +8,7 @@ import com.qbit.p2p.credit.material.dao.MaterialDAO;
 import com.qbit.p2p.credit.material.model.MaterialType;
 import com.qbit.p2p.credit.material.model.Materials;
 import com.qbit.p2p.credit.user.dao.UserProfileDAO;
+import com.qbit.p2p.credit.user.model.Point2;
 import com.qbit.p2p.credit.user.model.UserPrivateProfile;
 import com.qbit.p2p.credit.user.model.UserPublicProfile;
 import java.awt.image.BufferedImage;
@@ -15,9 +16,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.sql.Date;
 import java.util.List;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -54,43 +53,24 @@ public class ProfilesResource {
 		public static final int MIN_WIDTH = 100;
 		public static final int MIN_HEIGHT = 100;
 
-		private int x1;
-		private int x2;
-		private int y1;
-		private int y2;
-
+		private Point2 startPoint;
+		private Point2 endPoint;
 		private String imageString;
 
-		public int getX1() {
-			return x1;
+		public Point2 getStartPoint() {
+			return startPoint;
 		}
 
-		public void setX1(int x1) {
-			this.x1 = x1;
+		public void setStartPoint(Point2 startPoint) {
+			this.startPoint = startPoint;
 		}
 
-		public int getX2() {
-			return x2;
+		public Point2 getEndPoint() {
+			return endPoint;
 		}
 
-		public void setX2(int x2) {
-			this.x2 = x2;
-		}
-
-		public int getY1() {
-			return y1;
-		}
-
-		public void setY1(int y1) {
-			this.y1 = y1;
-		}
-
-		public int getY2() {
-			return y2;
-		}
-
-		public void setY2(int y2) {
-			this.y2 = y2;
+		public void setEndPoint(Point2 endPoint) {
+			this.endPoint = endPoint;
 		}
 
 		public String getImageString() {
@@ -104,18 +84,18 @@ public class ProfilesResource {
 		public boolean isValid() {
 			return imageString != null && ((imageString.isEmpty())
 					|| ((imageString.length() < MAX_STRING_LENGTH)
-					&& (x1 >= 0) && (x2 > 0)
-					&& (x2 - x1 < MAX_WIDTH)
-					&& (x2 - x1 > MIN_WIDTH)
-					&& (y1 >= 0) && (y2 > 0)
-					&& (y2 - y1 < MAX_HEIGHT)
-					&& (y2 - y1 > MIN_HEIGHT)));
+					&& (startPoint.getX() >= 0) && (endPoint.getX() > 0)
+					&& (endPoint.getX() - startPoint.getX() < MAX_WIDTH)
+					&& (endPoint.getX() - startPoint.getX() > MIN_WIDTH)
+					&& (startPoint.getY() >= 0) && (endPoint.getY() > 0)
+					&& (endPoint.getY() - startPoint.getY() < MAX_HEIGHT)
+					&& (endPoint.getY() - startPoint.getY() > MIN_HEIGHT)));
 
 		}
 
 		@Override
 		public String toString() {
-			return "UserPhotoRequest{" + "x1=" + x1 + ", x2=" + x2 + ", y1=" + y1 + ", y2=" + y2 + ", imageString=" + imageString + '}';
+			return "UserPhotoRequest{" + "startPoint=" + startPoint + ", endPoint=" + endPoint + ", imageString=" + imageString + '}';
 		}
 	}
 
@@ -126,12 +106,12 @@ public class ProfilesResource {
 		@XmlList
 		private List<UserPublicProfile> users;
 		@XmlElement
-		Number length;
+		long length;
 
 		public UsersPublicProfilesWrapper() {
 		}
 
-		public UsersPublicProfilesWrapper(List<UserPublicProfile> users, Number length) {
+		public UsersPublicProfilesWrapper(List<UserPublicProfile> users, long length) {
 			this.users = users;
 			this.length = length;
 		}
@@ -146,19 +126,19 @@ public class ProfilesResource {
 	}
 
 	@Inject
-	Env env;
+	private Env env;
 
 	@Context
 	private HttpServletRequest request;
 
 	@Inject
-	UserProfileDAO userProfileDAO;
+	private UserProfileDAO userProfileDAO;
 
 	@Inject
-	UserDAO userDAO;
+	private UserDAO userDAO;
 
 	@Inject
-	MaterialDAO materialDAO;
+	private MaterialDAO materialDAO;
 
 	@GET
 	@Path("current")
@@ -237,7 +217,9 @@ public class ProfilesResource {
 		List<UserPublicProfile> users = null;
 		if (filterDataField.equals("rating")) {
 			if(filter == null || filter.isEmpty()) {
-				return new UsersPublicProfilesWrapper();
+				UsersPublicProfilesWrapper emptyUsers = new UsersPublicProfilesWrapper();
+				emptyUsers.length = 0;
+				return emptyUsers;
 			}
 			long rating = Long.parseLong(filter);
 			users = userProfileDAO.findByRating(rating, isLess, sortDataField, sortDesc, pagenum * limit, limit);
@@ -342,8 +324,8 @@ public class ProfilesResource {
 
 			arrayInputStream = new ByteArrayInputStream(imageByte);
 			BufferedImage bufferedImage = ImageIO.read(arrayInputStream);
-			destBufferedImage = bufferedImage.getSubimage(userPhoto.getX1(), userPhoto.getY1(),
-					userPhoto.getX2() - userPhoto.getX1(), userPhoto.getY2() - userPhoto.getY1());
+			destBufferedImage = bufferedImage.getSubimage(userPhoto.getStartPoint().getX(), userPhoto.getStartPoint().getY(),
+					userPhoto.getEndPoint().getX() - userPhoto.getStartPoint().getX(), userPhoto.getEndPoint().getY() - userPhoto.getStartPoint().getY());
 			if (destBufferedImage.getHeight() > UserPhotoRequest.MAX_HEIGHT || destBufferedImage.getWidth() > UserPhotoRequest.MAX_WIDTH) {
 				throw new IOException();
 			}

@@ -278,10 +278,14 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 	$scope.saveUserPhoto = function() {
 
 		var userPhotoRequest = {};
-		userPhotoRequest.x1 = resultX1;
-		userPhotoRequest.x2 = resultX2;
-		userPhotoRequest.y1 = resultY1;
-		userPhotoRequest.y2 = resultY2;
+		userPhotoRequest.startPoint = {};
+		userPhotoRequest.endPoint = {};
+		userPhotoRequest.startPoint.x = resultX1;
+		userPhotoRequest.endPoint.x = resultX2;
+		userPhotoRequest.startPoint.y = resultY1;
+		userPhotoRequest.endPoint.y = resultY2;
+		
+		//console.log(JSON.stringify(userPhotoRequest));
 
 		var data = $scope.imageSrc.replace(/^data:image\/(png|jpg|jpeg);base64,/, "");
 		userPhotoRequest.imageString = data;

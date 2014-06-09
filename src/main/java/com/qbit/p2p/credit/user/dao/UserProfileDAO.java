@@ -15,12 +15,10 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.EntityType;
@@ -36,7 +34,7 @@ public class UserProfileDAO {
 	private EntityManagerFactory entityManagerFactory;
 
 	@Inject
-	UserDAO userDAO;
+	private UserDAO userDAO;
 
 	public UserPublicProfile find(String id) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
@@ -82,11 +80,11 @@ public class UserProfileDAO {
 		}
 	}
 
-	public Number length() {
+	public long length() {
 		return length(null, null);
 	}
 
-	public Number length(String filterDataField, String query) {
+	public long length(String filterDataField, String query) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {
 			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
@@ -115,7 +113,7 @@ public class UserProfileDAO {
 		}
 	}
 	
-	public Number lengthWithFilterByRating(long rating, boolean isNoMoreThan) {
+	public long lengthWithFilterByRating(long rating, boolean isNoMoreThan) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {
 			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
