@@ -54,12 +54,21 @@
 		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxdata.js"></script>
 		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxbuttons.js"></script>
 		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxscrollbar.js"></script>
-		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxdatatable.js"></script>
+		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxgrid.js"></script>
+		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxgrid.selection.js"></script>
+		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxgrid.pager.js"></script>
+		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxgrid.sort.js"></script>
+		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxgrid.filter.js"></script>
+		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxcheckbox.js"></script>
+		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxtabs.js"></script>
+		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxmenu.js"></script>
 		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxchart.js"></script>
 		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxlistbox.js"></script> 
 		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxdropdownlist.js"></script> 
 		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxtooltip.js"></script> 
 		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxinput.js"></script> 
+		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxmaskedinput.js"></script> 
+		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxslider.js"></script> 
 		
 		<script type="text/javascript">
 			// Global constants
@@ -80,12 +89,13 @@
 		<script type="text/javascript" src="resources/js/auth/resources.js"></script>
 
 		<script type="text/javascript" src="resources/js/order/controllers.js"></script>
-		<script type="text/javascript" src="resources/js/orders/controllers.js"></script>
+		<script type="text/javascript" src="resources/js/orders-table/controllers.js"></script>
 
 		<script type="text/javascript" src="resources/lib/imgareaselect/scripts/upload.js"></script>
 		<script type="text/javascript" src="resources/js/user-profile/resources.js"></script>
 		<script type="text/javascript" src="resources/js/user-profile/controllers.js"></script>
 		<script type="text/javascript" src="resources/js/user-profile/directives.js"></script>
+		<script type="text/javascript" src="resources/js/user-orders-table/controllers.js"></script>
 
 		<script type="text/javascript" src="resources/js/users/controllers.js"></script>
 		

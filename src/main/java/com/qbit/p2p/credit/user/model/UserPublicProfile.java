@@ -1,7 +1,9 @@
 package com.qbit.p2p.credit.user.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Entity;
@@ -21,7 +23,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * @author Alexander_Sergeev
  */
 @Entity
-@NamedQueries({
+/*@NamedQueries({
 	@NamedQuery(name = "UserPublicProfile.findByOrdersNoMoreThan",
 			query = "SELECT u FROM UserPublicProfile u WHERE "
 			+ "(SELECT count(o) FROM OrderInfo o WHERE o.userPublicKey = u.publicKey) <= :number"),
@@ -33,7 +35,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 	@NamedQuery(name = "UserPublicProfile.findByRatingNoLessThan",
 			query = "SELECT u FROM UserPublicProfile u WHERE u.rating >= :rating"),
 	@NamedQuery(name = "UserPublicProfile.count",
-			query = "SELECT count(u) FROM UserPublicProfile u")})
+			query = "SELECT count(u) FROM UserPublicProfile u")})*/
 @Access(AccessType.FIELD)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -43,23 +45,18 @@ public class UserPublicProfile implements Serializable {
 
 	@Id
 	private String publicKey;
-	private String firstName;
-	private String lastName;
-	private String country;
-	private boolean countryEnabled;
-	private String city;
-	private boolean cityEnabled;
-	@XmlElement(name = "birthDate")
-	@XmlJavaTypeAdapter(DateAdapter.class)
-	@Temporal(TemporalType.DATE)
-	private Date birthDate;
-	private boolean ageEnabled;
-	private GenderType gender;
-	private String hobby;
-	private boolean hobbyEnabled;
-	private long rating;
+	private String name;
+	private String mail;
+	private boolean mailEnabled;
+	private String phone;
+	private boolean phoneEnabled;
+	private List<String> languages;
+	private boolean languagesEnabled;
+	private List<UserCurrency> currencies;
+	private boolean currenciesEnabled;
 	@Lob
-	private String personalPageData;
+	private String personalData;
+	private boolean personalDataEnabled;
 
 	public String getPublicKey() {
 		return publicKey;
@@ -69,110 +66,99 @@ public class UserPublicProfile implements Serializable {
 		this.publicKey = publicKey;
 	}
 
-	public String getFirstName() {
-		return firstName;
+	public String getName() {
+		return name;
 	}
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public String getLastName() {
-		return lastName;
+	public String getMail() {
+		return mail;
 	}
 
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
+	public void setMail(String mail) {
+		this.mail = mail;
 	}
 
-	public long getRating() {
-		return rating;
+	public boolean isMailEnabled() {
+		return mailEnabled;
 	}
 
-	public void setRating(long rating) {
-		this.rating = rating;
+	public void setMailEnabled(boolean mailEnabled) {
+		this.mailEnabled = mailEnabled;
 	}
 
-	public String getCountry() {
-		return country;
+	public String getPhone() {
+		return phone;
 	}
 
-	public void setCountry(String country) {
-		this.country = country;
+	public void setPhone(String phone) {
+		this.phone = phone;
 	}
 
-	public String getCity() {
-		return city;
+	public boolean isPhoneEnabled() {
+		return phoneEnabled;
 	}
 
-	public void setCity(String city) {
-		this.city = city;
+	public void setPhoneEnabled(boolean phoneEnabled) {
+		this.phoneEnabled = phoneEnabled;
 	}
 
-	public String getHobby() {
-		return hobby;
+	public List<String> getLanguages() {
+		return languages;
 	}
 
-	public void setHobby(String hobby) {
-		this.hobby = hobby;
+	public void setLanguages(List<String> languages) {
+		this.languages = languages;
 	}
 
-	public Date getBirthDate() {
-		return birthDate;
+	public List<UserCurrency> getCurrencies() {
+		return currencies;
 	}
 
-	public void setBirthDate(Date birthDate) {
-		this.birthDate = birthDate;
+	public void setCurrencies(List<UserCurrency> currencies) {
+		this.currencies = currencies;
 	}
 
-
-	public GenderType getGender() {
-		return gender;
+	public String getPersonalData() {
+		return personalData;
 	}
 
-	public void setGender(GenderType gender) {
-		this.gender = gender;
+	public void setPersonalData(String personalData) {
+		this.personalData = personalData;
 	}
 
-	public boolean isCountryEnabled() {
-		return countryEnabled;
+	public boolean isPersonalDataEnabled() {
+		return personalDataEnabled;
 	}
 
-	public void setCountryEnabled(boolean countryEnabled) {
-		this.countryEnabled = countryEnabled;
+	public void setPersonalDataEnabled(boolean personalDataEnabled) {
+		this.personalDataEnabled = personalDataEnabled;
 	}
 
-	public boolean isCityEnabled() {
-		return cityEnabled;
+	public boolean isLanguagesEnabled() {
+		return languagesEnabled;
 	}
 
-	public void setCityEnabled(boolean cityEnabled) {
-		this.cityEnabled = cityEnabled;
+	public void setLanguagesEnabled(boolean languagesEnabled) {
+		this.languagesEnabled = languagesEnabled;
 	}
 
-	public boolean isAgeEnabled() {
-		return ageEnabled;
+	public boolean isCurrenciesEnabled() {
+		return currenciesEnabled;
 	}
 
-	public void setAgeEnabled(boolean ageEnabled) {
-		this.ageEnabled = ageEnabled;
+	public void setCurrenciesEnabled(boolean currenciesEnabled) {
+		this.currenciesEnabled = currenciesEnabled;
 	}
-
-	public boolean isHobbyEnabled() {
-		return hobbyEnabled;
+	
+	public boolean isValid() {
+		return true;
 	}
-
-	public void setHobbyEnabled(boolean hobbyEnabled) {
-		this.hobbyEnabled = hobbyEnabled;
-	}
-
-	public String getPersonalPageData() {
-		return personalPageData;
-	}
-
-	public void setPersonalPageData(String personalPageData) {
-		this.personalPageData = personalPageData;
-	}
+	
+	/*
 	
 	public boolean isValid() {
 		return (firstName == null || firstName.length() <= MAX_LENGTH) 
@@ -180,10 +166,5 @@ public class UserPublicProfile implements Serializable {
 				&& (country == null || country.length() <= MAX_LENGTH)
 				&& (city == null || city.length() <= MAX_LENGTH)
 				&& (hobby == null || hobby.length() <= MAX_LENGTH * 2);
-	}
-
-	@Override
-	public String toString() {
-		return "UserPublicProfile{" + "publicKey=" + publicKey + ", firstName=" + firstName + ", lastName=" + lastName + ", country=" + country + ", countryEnabled=" + countryEnabled + ", city=" + city + ", cityEnabled=" + cityEnabled + ", birthDate=" + birthDate + ", ageEnabled=" + ageEnabled + ", gender=" + gender + ", hobby=" + hobby + ", hobbyEnabled=" + hobbyEnabled + ", rating=" + rating + ", personalPageData=" + personalPageData + '}';
-	}
+	}*/
 }

@@ -48,7 +48,6 @@ userProfileModule.directive('dateTimePicker', function() {
 				todayBtn: true,
 				todayHighlight: true
 			});
-			//element.datepicker('setEndDate', '31/12/2012');
 		}
 	};
 });

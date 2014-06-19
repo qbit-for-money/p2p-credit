@@ -91,70 +91,31 @@ select.custom {
 	opacity:0.8;
 }
 
-#country {
-	padding-left: 12px;
-	font-size: 14px;
+.input-jqx {
+	padding-left: 12px !important;
+	font-size: 14px !important;
+	color: #555;
+	margin-top: 0 !important;
+}
+
+.masked-input-jqx {
+	padding-left: 12px !important;
+	width: calc(100% - 12px) !important;
+	padding-top: 4px !important;
+	padding-bottom: 3px !important;
+	font-size: 14px !important;
 	color: #555;
 }
 
-#country-span {
+.span-jqx {
 	padding-top: 3px;
 	padding-bottom: 4px;
 }
 
-.jqx-icon-arrow-first, .jqx-icon-arrow-left, .jqx-icon-arrow-right, .jqx-icon-arrow-last {
-	padding-top: 27px;
-	position: relative !important;
+.invisible {
+	display: none;
 }
 
-.jqx-rc-all {
-	margin-top: -7px !important;
+#priceSlider {
+	width: 100% !important;
 }
-
-.jqx-grid-pager-number {
-	margin-top: -7px !important;
-}
-
-#country {
-	margin-top: 0 !important;
-}
-
-#users option {
-	padding-bottom: 5px;
-}
-
-/*
-
-#pagerusers-table {
-	top: 0 !important;
-	padding-top: 0 !important;
-	min-height: 160px;
-	position: relative !important;
-	padding-bottom: 60px;
-	
-}*/
-
-/*#users-table {
-	position: relative;
-	//padding-bottom: 100px;
-	height: 100% !important;
-}*/
-
-/*#wrapperusers-table {
-	min-height: 200px;
-	position: relative !important;
-	padding-bottom: 60px;
-}
-
-#contentusers-table {
-	padding-bottom: 20px;
-	margin-bottom: 60px;
-	padding-bottom: 60px;
-	//position: relative !important;
-}
-
-#horizontalScrollBarusers-table {
-	top:-60px;
-	//position: relative !important;
-}*/
-

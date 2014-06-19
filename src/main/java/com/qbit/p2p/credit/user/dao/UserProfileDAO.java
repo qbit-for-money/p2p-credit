@@ -5,7 +5,7 @@ import static com.qbit.commons.dao.util.DAOUtil.invokeInTransaction;
 import com.qbit.commons.dao.util.TrCallable;
 import com.qbit.commons.user.UserDAO;
 import com.qbit.commons.user.UserInfo;
-import com.qbit.p2p.credit.user.model.GenderType;
+import com.qbit.p2p.credit.user.model.UserCurrency;
 import com.qbit.p2p.credit.user.model.UserPrivateProfile;
 import com.qbit.p2p.credit.user.model.UserPublicProfile;
 import com.qbit.p2p.credit.user.model.UserType;
@@ -40,7 +40,7 @@ public class UserProfileDAO {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {
 			return DAOUtil.find(entityManagerFactory.createEntityManager(),
-					UserPublicProfile.class, id, null);
+				UserPublicProfile.class, id, null);
 		} finally {
 			entityManager.close();
 		}
@@ -50,7 +50,7 @@ public class UserProfileDAO {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {
 			return DAOUtil.find(entityManagerFactory.createEntityManager(),
-					UserPrivateProfile.class, id, null);
+				UserPrivateProfile.class, id, null);
 		} finally {
 			entityManager.close();
 		}
@@ -95,15 +95,15 @@ public class UserProfileDAO {
 			criteria.select(builder.count(user));
 			if (filterDataField != null && query != null) {
 				criteria.where(
-						builder.or(
-								builder.like(
-										builder.lower(
-												user.get(
-														type.getDeclaredSingularAttribute(filterDataField, String.class)
-												)
-										), "%" + query.toLowerCase() + "%"
+					builder.or(
+						builder.like(
+							builder.lower(
+								user.get(
+									type.getDeclaredSingularAttribute(filterDataField, String.class)
 								)
+							), "%" + query.toLowerCase() + "%"
 						)
+					)
 				);
 			}
 
@@ -112,7 +112,7 @@ public class UserProfileDAO {
 			entityManager.close();
 		}
 	}
-	
+
 	public long lengthWithFilterByRating(long rating, boolean isNoMoreThan) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {
@@ -122,13 +122,13 @@ public class UserProfileDAO {
 			Root<UserPublicProfile> user = criteria.from(UserPublicProfile.class);
 			Expression<Long> ratingExpression = user.get("rating");
 			Predicate predicate;
-			if(isNoMoreThan) {
+			if (isNoMoreThan) {
 				predicate = builder.le(ratingExpression, rating);
 			} else {
 				predicate = builder.ge(ratingExpression, rating);
 			}
 			criteria.select(builder.count(user));
-			criteria.where(predicate);		
+			criteria.where(predicate);
 			return entityManager.createQuery(criteria).getSingleResult();
 		} finally {
 			entityManager.close();
@@ -147,15 +147,15 @@ public class UserProfileDAO {
 			criteria.select(user);
 			if (filterDataField != null && queryText != null) {
 				criteria.where(
-						builder.or(
-								builder.like(
-										builder.lower(
-												user.get(
-														type.getDeclaredSingularAttribute(filterDataField, String.class)
-												)
-										), "%" + queryText.toLowerCase() + "%"
+					builder.or(
+						builder.like(
+							builder.lower(
+								user.get(
+									type.getDeclaredSingularAttribute(filterDataField, String.class)
 								)
+							), "%" + queryText.toLowerCase() + "%"
 						)
+					)
 				);
 			}
 
@@ -173,8 +173,8 @@ public class UserProfileDAO {
 			entityManager.close();
 		}
 	}
-	
-		public List<UserPublicProfile> findByRating(long rating, boolean isNoMoreThan, String sortDataField, boolean sortDesc, int offset, int limit) {
+
+	public List<UserPublicProfile> findByRating(long rating, boolean isNoMoreThan, String sortDataField, boolean sortDesc, int offset, int limit) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {
 			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
@@ -183,13 +183,13 @@ public class UserProfileDAO {
 			Root<UserPublicProfile> user = criteria.from(UserPublicProfile.class);
 			Expression<Long> ratingExpression = user.get("rating");
 			Predicate predicate;
-			if(isNoMoreThan) {
+			if (isNoMoreThan) {
 				predicate = builder.le(ratingExpression, rating);
 			} else {
 				predicate = builder.ge(ratingExpression, rating);
 			}
 			criteria.select(user).where(predicate);
-			
+
 			if (sortDesc && sortDataField != null && !sortDataField.isEmpty()) {
 				criteria.orderBy(builder.desc(user.get(sortDataField)));
 			} else if (!sortDesc && sortDataField != null && !sortDataField.isEmpty()) {
@@ -252,8 +252,7 @@ public class UserProfileDAO {
 				}
 				UserPublicProfile userPublicProfile = new UserPublicProfile();
 				userPublicProfile.setPublicKey(publicKey);
-				userPublicProfile.setRating(0L);
-				userPublicProfile.setPersonalPageData("DEFAULT");
+				userPublicProfile.setPersonalData("DEFAULT");
 
 				entityManager.persist(userPublicProfile);
 
@@ -288,40 +287,38 @@ public class UserProfileDAO {
 			throw new IllegalArgumentException();
 		}
 
-		return updateUserPublicProfile(userProfile.getPublicKey(), userProfile.getFirstName(), userProfile.getLastName(), userProfile.getCountry(),
-				userProfile.isCountryEnabled(), userProfile.getCity(), userProfile.isCityEnabled(), userProfile.getBirthDate(),
-				userProfile.isAgeEnabled(), userProfile.getGender(), userProfile.getRating(), userProfile.getHobby(),
-				userProfile.isHobbyEnabled(), userProfile.getPersonalPageData());
+		return updateUserPublicProfile(userProfile.getPublicKey(), userProfile.getName(), userProfile.getMail(),
+			userProfile.isMailEnabled(), userProfile.getPhone(), userProfile.isPhoneEnabled(), userProfile.getLanguages(),
+			userProfile.isLanguagesEnabled(), userProfile.getCurrencies(), userProfile.isCurrenciesEnabled(),
+			userProfile.getPersonalData(), userProfile.isPersonalDataEnabled());
 
 	}
 
-	public UserPublicProfile updateUserPublicProfile(final String publicKey, final String firstName, final String lastName,
-			final String country, final boolean countryEnabled, final String city, final boolean cityEnabled,
-			final Date birthDate, final boolean ageEnabled, final GenderType gender, final long rating,
-			final String hobby, final boolean hobbyEnabled, final String personalPageData) {
+	public UserPublicProfile updateUserPublicProfile(final String publicKey, final String name, final String mail,
+		final boolean mailEnabled, final String phone, final boolean phoneEnabled,
+		final List<String> languages, final boolean languagesEnabled, final List<UserCurrency> currencies,
+		final boolean currenciesEnabled, final String personalData, final boolean personalDataEnabled) {
 		return invokeInTransaction(entityManagerFactory, new TrCallable<UserPublicProfile>() {
 
 			@Override
 			public UserPublicProfile
-					call(EntityManager entityManager) {
+				call(EntityManager entityManager) {
 				UserPublicProfile userPublicProfile = entityManager.find(UserPublicProfile.class, publicKey);
 				if (userPublicProfile == null) {
 					return null;
 				}
 
-				userPublicProfile.setRating(rating);
-				userPublicProfile.setFirstName(firstName);
-				userPublicProfile.setLastName(lastName);
-				userPublicProfile.setGender(gender);
-				userPublicProfile.setCountry(country);
-				userPublicProfile.setCountryEnabled(countryEnabled);
-				userPublicProfile.setCity(city);
-				userPublicProfile.setCityEnabled(cityEnabled);
-				userPublicProfile.setBirthDate(birthDate);
-				userPublicProfile.setAgeEnabled(ageEnabled);
-				userPublicProfile.setHobby(hobby);
-				userPublicProfile.setHobbyEnabled(hobbyEnabled);
-				userPublicProfile.setPersonalPageData(personalPageData);
+				userPublicProfile.setName(name);
+				userPublicProfile.setMail(mail);
+				userPublicProfile.setMailEnabled(mailEnabled);
+				userPublicProfile.setPhone(phone);
+				userPublicProfile.setPhoneEnabled(phoneEnabled);
+				userPublicProfile.setLanguages(languages);
+				userPublicProfile.setLanguagesEnabled(languagesEnabled);
+				userPublicProfile.setCurrencies(currencies);
+				userPublicProfile.setCurrenciesEnabled(currenciesEnabled);
+				userPublicProfile.setPersonalData(personalData);
+				userPublicProfile.setPersonalDataEnabled(personalDataEnabled);
 
 				return userPublicProfile;
 			}
@@ -341,7 +338,7 @@ public class UserProfileDAO {
 
 			@Override
 			public UserPrivateProfile
-					call(EntityManager entityManager) {
+				call(EntityManager entityManager) {
 				UserPrivateProfile userPrivateProfile = entityManager.find(UserPrivateProfile.class, publicKey);
 				if (userPrivateProfile == null) {
 					return null;

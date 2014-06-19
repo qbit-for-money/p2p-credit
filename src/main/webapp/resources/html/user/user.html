@@ -11,17 +11,37 @@
 					<div ng-include src="'resources/html/user/personal-info.html'"></div>
 				</div>
 			</div>
-			<div class="panel panel-default">
+			<div class="panel panel-default" ng-if="(!isCurrentUser && !userPropertiesMap['personalData']) || isCurrentUser">
 				<div class="panel-heading">
 					<h4 class="panel-title">
-						<a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo"><span class="glyphicon glyphicon-th-large"></span></a>
+						<a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" ng-click="initSCEditor()"><span class="glyphicon glyphicon-th-large"></span></a>
 					</h4>
 				</div>
-				<div id="collapseTwo" class="panel-collapse in collapse">
+				<div id="collapseTwo" class="panel-collapse collapse">
 					<div class="panel-body">
 						<div id="personalEditable"  contenteditable="{{isCurrentUser}}" ng-blur="savePersonalPage()">
 						</div>
 					</div>
+				</div>
+			</div>
+			<div class="panel panel-default" ng-if="isCurrentUser">
+				<div class="panel-heading">
+					<h4 class="panel-title">
+						<a data-toggle="collapse" data-parent="#accordion" href="#collapseThree"><span class="glyphicon glyphicon-th-list"></span></a>
+					</h4>
+				</div>
+				<div id="collapseThree" class="panel-collapse collapse">
+					<div ng-include src="'resources/html/user/personal-orders-table.html'"></div>
+				</div>
+			</div>
+			<div class="panel panel-default" ng-if="isCurrentUser">
+				<div class="panel-heading">
+					<h4 class="panel-title">
+						<a data-toggle="collapse" data-parent="#accordion" href="#collapseFour"><span class="glyphicon glyphicon-shopping-cart"></span></a>
+					</h4>
+				</div>
+				<div id="collapseFour" class="panel-collapse in collapse">
+					<div ng-include src="'resources/html/user/orders-table.html'"></div>
 				</div>
 			</div>
 		</div>

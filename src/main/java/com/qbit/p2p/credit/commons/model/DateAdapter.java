@@ -1,4 +1,4 @@
-package com.qbit.p2p.credit.user.model;
+package com.qbit.p2p.credit.commons.model;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
