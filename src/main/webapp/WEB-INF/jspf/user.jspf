@@ -1,18 +1,22 @@
 <%@ page pageEncoding="UTF-8" %>
-<form ng-if="user" name="userForm" class="navbar-form navbar-right" ng-controller="UserController">
+<form name="userForm" id="user-form" class="navbar-form navbar-right invisible" ng-controller="UserController">
 	<div class="form-group">
 		<div class="input-group">
 			<span class="btn-group navbar-right">
-				<button class="btn btn-default" type="button" ng-click="goToProfile()" ng-if="isGoogleAuth()">
+				<button class="btn btn-default" type="button" ng-click="goToProfile()" ng-if="isGoogleAuth() && user">
 					{{user.publicKey}}
 				</button>
 				
-				<button class="btn btn-default" id="user-google" type="button" ng-click="authWithGoogle()"  ng-if="!isGoogleAuth()"  title="Login with Google+">
+				<button class="btn btn-default" id="user-google" type="button" ng-click="authWithGoogle()"  ng-if="!isGoogleAuth() && user"  title="Login with Google+">
 					<img src="resources/img/google-logo.png" alt="Google+" ng-if="!isGoogleAuth()"/>
 				</button>
 				
-				<button class="btn btn-default" type="button" ng-click="logout()" title="Logout">
+				<button class="btn btn-default" type="button" ng-click="logout()" title="Logout"  ng-if="user">
 					<span class="glyphicon {{logoutButton}}"></span>
+				</button>
+				
+				<button class="btn btn-default" type="button" ng-click="openAuthDialog()" title="Auth"  ng-if="!user">
+					<span class="glyphicon glyphicon-log-in"></span>
 				</button>
 				
 			</span>

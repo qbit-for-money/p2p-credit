@@ -1,24 +1,75 @@
-<div class="row" id="init-order">
-	<div class="col-xs-offset-0 col-xs-12 col-md-offset-1 col-md-10">	
-		<div class="container-fluid">
-			<div class="row">
-				
-				
-				<div class="hidden-xs col-md-1"></div>
-				<div class="col-xs-6 col-md-4">
-					<button class="btn btn-success btn-lg center-block button-lg credit" type="button" ng-click="goToCreditOrder()" title="Give">
-						<img src="resources/img/ecommerce-give-icon.png" alt="Give"/>
-					</button>
+<div class="row" style="margin-bottom: 20px;">
+	<div class="col-xs-offset-0 col-xs-12 col-md-offset-1 col-md-10">
+		<div class="panel-group" id="accordion">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">
+						<a data-toggle="collapse" data-parent="#accordion" href="#collapseOne"><span class="glyphicon glyphicon-th-list"></span></a>
+					</h4>
 				</div>
-				<div class="hidden-xs col-md-2"></div>
-				<div class="col-xs-6 col-md-4">
-					<button class="btn btn-danger btn-lg center-block button-lg credit" type="button" ng-click="goToBorrowOrder()" title="Take">
-						<img src="resources/img/ecommerce-take-icon.png" alt="Take"/>
-					</button>
+				<div id="collapseOne" class="panel-collapse in collapse">
+					<div ng-include src="'resources/html/order/last-orders-table.html'"></div>
 				</div>
-				<div class="hidden-xs col-md-1"></div>
 			</div>
-
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">
+						<a data-toggle="collapse" data-parent="#accordion" href="#order-buttons-container"><span class="glyphicon glyphicon-shopping-cart"></span></a>
+					</h4>
+				</div>
+				<div id="order-buttons-container" class="panel-collapse in collapse">
+					<div class="panel-body">
+						<div class="container-fluid">
+							<div class="row">
+								<div class="hidden-xs col-md-1"></div>
+								<div class="col-xs-6 col-md-4">
+									<button class="btn btn-success btn-lg center-block button-lg credit" type="button" ng-click="goToCreditOrder()" title="Give">
+										<img src="resources/img/ecommerce-give-icon.png" alt="Give"/>
+									</button>
+								</div>
+								<div class="hidden-xs col-md-2"></div>
+								<div class="col-xs-6 col-md-4">
+									<button class="btn btn-danger btn-lg center-block button-lg credit" type="button" ng-click="goToBorrowOrder()" title="Take">
+										<img src="resources/img/ecommerce-take-icon.png" alt="Take"/>
+									</button>
+								</div>
+								<div class="hidden-xs col-md-1"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">
+						<a data-toggle="collapse" data-parent="#accordion" href="#collapseThree"><span class="glyphicon glyphicon-facetime-video"></span></a>
+					</h4>
+				</div>
+				<div id="collapseThree" class="panel-collapse in collapse">
+					<p style="text-align:center" id="video-container" class="h_iframe">
+						<img class="ratio" src="http://placehold.it/16x9"/>
+						<iframe width="100%" height="100%" src="//www.youtube.com/embed/qUJYqhKZrwA?autoplay=0&showinfo=0&controls=0" frameborder="0" allowfullscreen></iframe>
+					</p>
+				</div>
+			</div>
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">
+						<a data-toggle="collapse" data-parent="#accordion" href="#collapseFour"><span class="glyphicon glyphicon-picture"></span></a>
+					</h4>
+				</div>
+				<div id="collapseFour" class="panel-collapse in collapse">
+					<p style="text-align:center">&nbsp;</p>
+					<p style="text-align:center">
+						<img alt="" src="http://i952.photobucket.com/albums/ae3/speedinstock/Ultra%20racing/strut-bar-before.gif" style="width: 25%;">
+						&nbsp; &nbsp; &nbsp;
+						<img alt="" src="http://i952.photobucket.com/albums/ae3/speedinstock/Ultra%20racing/strut-bar-after.gif" style="width: 25%;">
+						&nbsp; &nbsp; &nbsp;
+						<img alt="" src="http://i952.photobucket.com/albums/ae3/speedinstock/Ultra%20racing/strut-bar-corner-before.gif" style="width: 25%;">
+					</p>
+					<p style="text-align:center">&nbsp;</p>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>

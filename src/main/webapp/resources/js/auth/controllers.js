@@ -1,15 +1,11 @@
 var authModule = angular.module("captcha-auth");
 
-authModule.controller("AuthDialogOpeningController", function($modal) {
-	$modal.open({
-		controller: "AuthDialogController",
-		templateUrl: "resources/html/auth/dialog.html",
-		windowClass: "auth-dialog",
-		backdrop: "static", keyboard: false, backdropClick: false, dialogFade: false
-	});
+authModule.controller("AuthDialogOpeningController", function(authService) {
+	authService.openAuthDialog(true);
 });
 
-authModule.controller("AuthDialogController", function($scope, captchaAuthResource) {
+authModule.controller("AuthDialogController", function($scope, captchaAuthResource, isNotCaptcha) {
+	$scope.isNotCaptcha = isNotCaptcha;
 	var timestamp = new Date().getTime();
 	$scope.auth = "google";
 	$scope.model = {};

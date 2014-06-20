@@ -42,6 +42,10 @@ see implementation details http://jersey.java.net/nonav/documentation/latest/jax
 			<param-value>/users</param-value>
 		</init-param>
 		<init-param>
+			<param-name>auth-last-orders</param-name>
+			<param-value>/orders/last</param-value>
+		</init-param>
+		<init-param>
 			<param-name>auth-oauth2</param-name>
 			<param-value>/oauth2</param-value>
 		</init-param>

@@ -22,11 +22,11 @@
 		<script type="text/javascript" src="resources/lib/ckeditor/ckeditor.js"></script>
 	</head>
 	<body class="default">
-		<div class="container" ng-if="user === null" ng-controller="AuthDialogOpeningController">
-		</div>
+		<!--div class="container" ng-if="user === null" ng-controller="AuthDialogOpeningController">
+		</div-->
 		<div class="wrapper">
 			<%@ include file="WEB-INF/jspf/nav.jspf" %>
-			<div class="container" ng-if="user">
+			<div class="container">
 				<div ng-view></div>
 			</div>
 			<div class="push"></div>
@@ -87,17 +87,17 @@
 
 		<script type="text/javascript" src="resources/js/auth/controllers.js"></script>
 		<script type="text/javascript" src="resources/js/auth/resources.js"></script>
+		<script type="text/javascript" src="resources/js/auth/services.js"></script>
 
 		<script type="text/javascript" src="resources/js/order/controllers.js"></script>
 		<script type="text/javascript" src="resources/js/orders-table/controllers.js"></script>
+		<script type="text/javascript" src="resources/js/last-orders-table/controllers.js"></script>
 
 		<script type="text/javascript" src="resources/lib/imgareaselect/scripts/upload.js"></script>
 		<script type="text/javascript" src="resources/js/user-profile/resources.js"></script>
 		<script type="text/javascript" src="resources/js/user-profile/controllers.js"></script>
 		<script type="text/javascript" src="resources/js/user-profile/directives.js"></script>
 		<script type="text/javascript" src="resources/js/user-orders-table/controllers.js"></script>
-
-		<script type="text/javascript" src="resources/js/users/controllers.js"></script>
 		
 		<script type="text/javascript" src="resources/js/navbar/controllers.js"></script>
 	</body>

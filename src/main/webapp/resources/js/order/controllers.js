@@ -1,20 +1,20 @@
 var orderModule = angular.module("order");
 
-orderModule.controller("OrderInitController", function($scope, usersResource) {
-
-	var userResponse = usersResource.current({});
-	
-	userResponse.$promise.then(function() {
-		if (userResponse.publicKey.indexOf("@") === -1) {
-			window.location.href = window.context + "#/users";
-		}
-	});
+orderModule.controller("OrderInitController", function($scope, $rootScope, usersResource, authService) {
 
 	$scope.goToCreditOrder = function() {
-		window.location.href = window.context + "#/credit";
+		if(!$rootScope.user || ($rootScope.user.publicKey.indexOf("@") === -1)) {
+			authService.openAuthDialog(false, true);
+		} else {
+			window.location.href = window.context + "#/credit";
+		}
 	};
 
 	$scope.goToBorrowOrder = function() {
-		window.location.href = window.context + "#/borrow";
+		if(!$rootScope.user || ($rootScope.user.publicKey.indexOf("@") === -1)) {
+			authService.openAuthDialog(false, true);
+		} else {
+			window.location.href = window.context + "#/borrow";
+		}
 	};
 });

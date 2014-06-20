@@ -267,8 +267,23 @@ public class OrdersResource {
 	@GET
 	@Path("by-user-type")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<OrderInfo> getByUserType(@QueryParam("userType") UserType userType, @QueryParam("offset") int offset, @QueryParam("limit") int limit) {
+	public List<OrderInfo> getByOrderType(@QueryParam("userType") UserType userType, @QueryParam("offset") int offset, @QueryParam("limit") int limit) {
 		return orderDAO.findByUserType(userType, offset, limit);
+	}
+	
+	@POST
+	@Path("last")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public OrdersWrapper getLast(OrdersRequest ordersRequest) {
+		boolean sortDesc = false;
+		if (ordersRequest.getSortOrder() != null && ordersRequest.getSortOrder().equals("desc")) {
+			sortDesc = true;
+		}
+		List<OrderInfo> orders;
+		orders = orderDAO.findWithFilter(null, ordersRequest.getFilterValue0(), ordersRequest.getFilterDatafield0(),
+			ordersRequest.getFilterValue1(), ordersRequest.getFilterDatafield1(), ordersRequest.getSortDataField(), sortDesc, 0, 4);
+		return new OrdersWrapper(orders, 4);
 	}
 
 	@POST

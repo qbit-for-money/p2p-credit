@@ -3,14 +3,12 @@ package com.qbit.p2p.credit.user.resource;
 import com.qbit.commons.auth.AuthFilter;
 import com.qbit.commons.auth.EncryptionUtil;
 import com.qbit.commons.user.UserDAO;
-import com.qbit.p2p.credit.commons.model.Currency;
 import com.qbit.p2p.credit.env.Env;
 import com.qbit.p2p.credit.material.dao.MaterialDAO;
 import com.qbit.p2p.credit.material.model.MaterialType;
 import com.qbit.p2p.credit.material.model.Materials;
 import com.qbit.p2p.credit.user.dao.UserProfileDAO;
 import com.qbit.p2p.credit.user.model.Point2;
-import com.qbit.p2p.credit.user.model.UserCurrency;
 import com.qbit.p2p.credit.user.model.UserPrivateProfile;
 import com.qbit.p2p.credit.user.model.UserPublicProfile;
 import java.awt.image.BufferedImage;
@@ -18,8 +16,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -418,7 +415,6 @@ public class ProfilesResource {
 		}
 		String userId = AuthFilter.getUserId(request);
 		userProfile.setPublicKey(userId);
-
 		return userProfileDAO.updateUserPublicProfile(userProfile);
 	}
 
@@ -432,7 +428,7 @@ public class ProfilesResource {
 		return userProfileDAO.updateUserPrivateProfile(userProfile);
 	}
 
-	@POST
+	@PUT
 	@Path("current/photo")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)

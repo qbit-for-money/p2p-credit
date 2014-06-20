@@ -3,11 +3,13 @@ package com.qbit.p2p.credit.user.model;
 import com.qbit.p2p.credit.commons.model.Currency;
 import com.qbit.p2p.credit.money.model.serialization.CurrencyAdapter;
 import java.io.Serializable;
+import javax.persistence.Embeddable;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * @author Alexander_Sergeev
  */
+@Embeddable
 public class UserCurrency implements Serializable {
 	@XmlJavaTypeAdapter(CurrencyAdapter.class)
 	private Currency currency;

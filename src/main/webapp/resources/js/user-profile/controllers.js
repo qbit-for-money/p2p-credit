@@ -84,8 +84,11 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 
 	$scope.initSCEditor = function() {
 		if (!scEditorInitialized) {
-			CKEDITOR.disableAutoInline = true;
-			CKEDITOR.inline("personalEditable");
+			if ($scope.isCurrentUser) {
+				CKEDITOR.disableAutoInline = true;
+				CKEDITOR.inline("personalEditable");
+			}
+
 			$scope.reloadSCEditorInstance();
 			scEditorInitialized = true;
 		}
@@ -133,7 +136,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		$scope.currencies = currenciesStr;
 
 		var currencies = currenciesStr.split(/\s*,\s*/);
-		
+
 		if (!currencies) {
 			$scope.userPropertiesMap['currencies'] = null;
 		} else {
@@ -254,12 +257,12 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		currency.currency.id = $scope.currency.id;
 		currency.startValue = $scope.currency.startValue;
 		currency.endValue = $scope.currency.endValue;
-		
+
 		$scope.userPropertiesMap['currencies'].push(currency);
 	}
 	$scope.reloadSCEditorInstance = function() {
-		if (($scope.userPropertiesMap['personalData'] === "DEFAULT")
-				|| ($scope.userPropertiesMap['personalData'].indexOf("<p>DEFAULT</p>") === 0)) {
+		if ($scope.userPropertiesMap['personalData'] && (($scope.userPropertiesMap['personalData'] === "DEFAULT")
+				|| ($scope.userPropertiesMap['personalData'].indexOf("<p>DEFAULT</p>") === 0))) {
 			if ($scope.isCurrentUser) {
 				CKEDITOR.instances.personalEditable.setData(defaultPersonalData);
 			} else {

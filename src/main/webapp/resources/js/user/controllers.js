@@ -1,6 +1,6 @@
 var userModule = angular.module("user");
 
-userModule.controller("UserController", function($scope, $rootScope, usersResource) {
+userModule.controller("UserController", function($scope, $rootScope, usersResource, authService) {
 	$scope.keyType = "user";
 	$scope.logoutButton = "";
 	var currentUser = usersResource.current({});
@@ -12,14 +12,17 @@ userModule.controller("UserController", function($scope, $rootScope, usersResour
 				$scope.keyType = "user";
 			}
 			$scope.logoutButton = "glyphicon-log-out";
+		} else {
+			$scope.keyType = "user";
 		}
 	});
+	angular.element("#user-form").removeClass("invisible");
 
 	$rootScope.isGoogleAuth = function() {
-		return $rootScope.user.publicKey.indexOf("@") !== -1;
+		return $rootScope.user && ($rootScope.user.publicKey.indexOf("@") !== -1);
 	};
 	
-	$scope.goToProfiles = function() {
+	$scope.goToOrderInit = function() {
 		window.location.href = window.context;
 	};
 
@@ -30,11 +33,15 @@ userModule.controller("UserController", function($scope, $rootScope, usersResour
 	$scope.authWithGoogle = function() {
 		window.location.href = window.context + "webapi/oauth2/authenticate";
 	};
+	
+	$scope.openAuthDialog = function() {
+		authService.openAuthDialog(false);
+	};
 
 	$scope.logout = function() {
 		var logoutResponse = usersResource.logout({});
 		logoutResponse.$promise.then(function() {
-			location.reload();
+			$scope.goToOrderInit();
 		});
 	};
 });

@@ -17,9 +17,8 @@
 		<div class="collapse navbar-collapse" collapse="isNavbarCollapsed">
 
 			<ul class="nav navbar-nav">
-				<li ng-class="{ active: isActive('/')}" title="Profiles"><a href="#"><span class="glyphicon glyphicon-user"></span></a></li>
-				<li ng-class="{ active: isActive('/orders')}" title="Orders"><a href="#/orders" ng-cl><span class="glyphicon glyphicon-list-alt"></span></a></li>
-				<li ng-class="{ active: isActive('/order-init')}" title="Create order" ng-if="isGoogleAuth()"><a href="#/order-init" ng-cl><span class="glyphicon glyphicon-shopping-cart"></span></a></li>
+				<li ng-class="{ active: isActive('/')}" title="Create order"><a href="#"><span class="glyphicon glyphicon-shopping-cart"></span></a></li>
+				<!--li ng-class="{ active: isActive('/order-init')}" title="Create order" ng-if="isGoogleAuth()"><a href="#/order-init" ng-cl><span class="glyphicon glyphicon-shopping-cart"></span></a></li-->
 			</ul>
 
 			<%@ include file="user.jspf" %>

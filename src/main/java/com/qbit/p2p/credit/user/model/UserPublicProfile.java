@@ -167,4 +167,9 @@ public class UserPublicProfile implements Serializable {
 				&& (city == null || city.length() <= MAX_LENGTH)
 				&& (hobby == null || hobby.length() <= MAX_LENGTH * 2);
 	}*/
+
+	@Override
+	public String toString() {
+		return "UserPublicProfile{" + "publicKey=" + publicKey + ", name=" + name + ", mail=" + mail + ", mailEnabled=" + mailEnabled + ", phone=" + phone + ", phoneEnabled=" + phoneEnabled + ", languages=" + languages + ", languagesEnabled=" + languagesEnabled + ", currencies=" + currencies + ", currenciesEnabled=" + currenciesEnabled + ", personalData=" + personalData + ", personalDataEnabled=" + personalDataEnabled + '}';
+	}
 }
