@@ -27,6 +27,14 @@
 	color: #d58512;
 }
 
+#user-links .row {
+	padding-bottom: 7px;
+}
+
+#user-links .title {
+	color: #d58512;
+}
+
 #collapseOne, #collapseTwo {
 	height: auto !important;
 }
@@ -118,4 +126,14 @@ select.custom {
 
 #priceSlider {
 	width: 100% !important;
+}
+
+.link-item {
+	overflow: hidden;
+	line-height: 40px;
+	white-space: nowrap;
+}
+
+.title-item {
+	color: #7bbdd9;
 }

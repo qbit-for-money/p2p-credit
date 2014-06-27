@@ -1,0 +1,114 @@
+<div class="row">
+	<div class="col-xs-3 col-md-3" style="margin-bottom: -26px; margin-top: 17px;">{{title}}</div>
+	<div class="col-xs-9 col-md-9">
+		<div class="navbar-right">
+			<button class="btn btn-default" style="margin-bottom: -17px; margin-top: 15px;" type="button" ng-hide="!current" ng-click="editItems()">
+				<span class="glyphicon glyphicon-edit"></span>
+			</button>
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-xs-12 col-md-12"><hr></div>
+</div>
+
+<div id="user-links" class="row">
+
+	<div class="container-fluid">
+		<div class="row" ng-hide="type !== 'video'">
+			<div class="col-xs-7 col-md-6" ng-repeat="linkItem in links">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-xs-11 col-md-11" ng-hide="!(type === 'video' && !linkItem.title && (!linkItem.edited || (linkItem.edited === false)))">
+							<div class="container-fluid">
+								<div class="row">
+									<div class="col-xs-9 col-md-10" title="{{linkItem.title}}">
+										<embed width="100%" height="70%" embed-src="{{linkItem.link}}">
+									</div>
+									<div class="col-xs-3 col-md-2" ng-hide="edited !== true">
+										<button class="btn btn-default" type="button" ng-click="removeLink(linkItem.id)">
+											<span class="glyphicon glyphicon-remove"></span>
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row" ng-repeat="linkItem in links" ng-hide="type === 'video'">
+		<div class="col-xs-8 col-md-8" ng-hide="!(type === 'social-link' && linkItem.title && (!linkItem.edited || (linkItem.edited === false)))">
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-xs-12 col-md-12 link-item"><a href="{{linkItem.link}}">{{linkItem.title}}</a></div>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-xs-8 col-md-8" ng-hide="!(((type === 'social-link') || (type === 'name')) && !linkItem.title && (!linkItem.edited || (linkItem.edited === false)))">
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-xs-12 col-md-12 link-item"><a href="{{linkItem.link}}">{{linkItem.link}}</a></div>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-xs-8 col-md-8" ng-hide="!(type === 'phone' && linkItem.title && (!linkItem.edited || (linkItem.edited === false)))">
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-xs-6 col-md-6 link-item title-item">{{linkItem.title}}</div><div class="col-xs-6 col-md-6">{{linkItem.link}}</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-xs-8 col-md-8" ng-hide="!(type === 'phone' && !linkItem.title && (!linkItem.edited || (linkItem.edited === false)))">
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-xs-6 col-md-6"></div><div class="col-xs-6 col-md-6 link-item">{{linkItem.link}}</div>
+				</div>
+			</div>
+		</div>
+
+
+		<div class="col-xs-4 col-md-4"  ng-hide="!((linkItem.edited === true) && (edited === true) && (type !== 'name'))">
+			<input type="text"  class="form-control" placeholder="Title" ng-model="linkItem.title"/>
+		</div>
+		<div class="col-xs-4 col-md-4"  ng-hide="!((linkItem.edited === true) && (edited === true) && (type !== 'name'))">
+			<input type="text" id="{{linkItem.id}}"  class="form-control" ng-class="{'masked-input-jqx': ('phone' === type)}" placeholder="{{itemPlaceholder}}" ng-model="linkItem.link"/>
+		</div>
+		<div class="col-xs-8 col-md-8"  ng-hide="!((linkItem.edited === true) && (edited === true) && (type === 'name'))">
+			<input type="text" id="{{linkItem.id}}"  class="form-control" placeholder="{{itemPlaceholder}}" ng-model="linkItem.link"/>
+		</div>
+		<div class="col-xs-4 col-md-4" ng-hide="type !== 'name'"></div>
+
+		<div class="col-xs-3 col-md-3" ng-hide="edited === false">
+			<div class="navbar-right">
+				<button class="btn btn-default" type="button" ng-click="editLink(linkItem.id)" ng-hide="type === 'video'">
+					<span class="glyphicon glyphicon-pencil"></span>
+				</button>
+				<button class="btn btn-default" type="button" ng-click="removeLink(linkItem.id)" ng-hide="type === 'video'">
+					<span class="glyphicon glyphicon-remove"></span>
+				</button>
+			</div>
+
+		</div>
+	</div>
+
+	<div class="row" ng-hide="edited === false || links.length > 5">
+		<div class="col-xs-4 col-md-4" ng-hide="(type === 'video') || (type === 'name')">
+			<input type="text"  class="form-control" placeholder="Title" ng-model="newLink.title" />
+		</div>
+		<div class="col-xs-4 col-md-4">
+			<input type="text" id="input-{{type}}"  class="form-control" ng-class="{'masked-input-jqx': ('phone' === type)}" placeholder="{{itemPlaceholder}}" ng-model="newLink.link"/>
+		</div>
+		<div class="col-xs-4 col-md-4" ng-hide="(type !== 'video') && (type !== 'name')"></div>
+		<div class="col-xs-3 col-md-3">
+			<div class="navbar-right">
+				<button class="btn btn-default" type="button" ng-click="addLink()">
+					<span class="glyphicon glyphicon-plus"></span>
+				</button>
+			</div>
+		</div>
+	</div>
+</div>

@@ -3,12 +3,23 @@ package com.qbit.p2p.credit.user.resource;
 import com.qbit.commons.auth.AuthFilter;
 import com.qbit.commons.auth.EncryptionUtil;
 import com.qbit.commons.user.UserDAO;
+import com.qbit.p2p.credit.commons.model.Currency;
 import com.qbit.p2p.credit.env.Env;
 import com.qbit.p2p.credit.material.dao.MaterialDAO;
 import com.qbit.p2p.credit.material.model.MaterialType;
 import com.qbit.p2p.credit.material.model.Materials;
+import com.qbit.p2p.credit.order.dao.OrderDAO;
+import com.qbit.p2p.credit.order.model.FilterCriteriaValue;
+import com.qbit.p2p.credit.order.model.FilterOperator;
+import com.qbit.p2p.credit.order.model.OrderInfo;
+import com.qbit.p2p.credit.order.model.OrderStatus;
+import com.qbit.p2p.credit.order.model.OrdersData;
+import com.qbit.p2p.credit.order.resource.OrdersResource;
 import com.qbit.p2p.credit.user.dao.UserProfileDAO;
+import com.qbit.p2p.credit.user.model.DataLink;
 import com.qbit.p2p.credit.user.model.Point2;
+import com.qbit.p2p.credit.user.model.Statistic;
+import com.qbit.p2p.credit.user.model.UserCurrency;
 import com.qbit.p2p.credit.user.model.UserPrivateProfile;
 import com.qbit.p2p.credit.user.model.UserPublicProfile;
 import java.awt.image.BufferedImage;
@@ -16,7 +27,12 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -128,185 +144,6 @@ public class ProfilesResource {
 		}
 	}
 
-	@XmlRootElement
-	@XmlAccessorType(XmlAccessType.FIELD)
-	public static class UserProfileRequest {
-
-		@XmlElement(name = "publicKeyoperator")
-		private String publicKeyOperator;
-		@XmlElement(name = "filtervalue0")
-		private String filterValue0;
-		@XmlElement(name = "filtervalue1")
-		private String filterValue1;
-		@XmlElement(name = "filtervalue2")
-		private String filterValue2;
-		@XmlElement(name = "filtercondition0")
-		private String filterCondition0;
-		@XmlElement(name = "filtercondition1")
-		private String filterCondition1;
-		private String filteroperator0;
-		@XmlElement(name = "filterdatafield0")
-		private String filterDatafield0;
-		@XmlElement(name = "filterdatafield1")
-		private String filterDatafield1;
-
-		private String filter;
-		@XmlElement(name = "sortorder")
-		private String sortOrder;
-		private int filterscount;
-		@XmlElement(name = "pagenum")
-		private int pageNumber;
-		@XmlElement(name = "pagesize")
-		private int pageSize;
-		private int recordstartindex;
-		private int recordendindex;
-		@XmlElement(name = "sortdatafield")
-		private String sortDataField;
-		@XmlElement(name = "filterscount")
-		private String filtersCount;
-
-		public String getFilteroperator0() {
-			return filteroperator0;
-		}
-
-		public void setFilteroperator0(String filteroperator0) {
-			this.filteroperator0 = filteroperator0;
-		}
-
-		public int getFilterscount() {
-			return filterscount;
-		}
-
-		public void setFilterscount(int filterscount) {
-			this.filterscount = filterscount;
-		}
-
-		public int getPageSize() {
-			return pageSize;
-		}
-
-		public void setPageSize(int pageSize) {
-			this.pageSize = pageSize;
-		}
-
-		public int getRecordstartindex() {
-			return recordstartindex;
-		}
-
-		public void setRecordstartindex(int recordstartindex) {
-			this.recordstartindex = recordstartindex;
-		}
-
-		public int getRecordendindex() {
-			return recordendindex;
-		}
-
-		public void setRecordendindex(int recordendindex) {
-			this.recordendindex = recordendindex;
-		}
-
-		public String getFilter() {
-			return filter;
-		}
-
-		public void setFilter(String filter) {
-			this.filter = filter;
-		}
-
-		public String getPublicKeyOperator() {
-			return publicKeyOperator;
-		}
-
-		public void setPublicKeyOperator(String publicKeyOperator) {
-			this.publicKeyOperator = publicKeyOperator;
-		}
-
-		public String getFilterValue0() {
-			return filterValue0;
-		}
-
-		public void setFilterValue0(String filterValue0) {
-			this.filterValue0 = filterValue0;
-		}
-
-		public String getFilterCondition0() {
-			return filterCondition0;
-		}
-
-		public void setFilterCondition0(String filterCondition0) {
-			this.filterCondition0 = filterCondition0;
-		}
-
-		public String getFilterCondition1() {
-			return filterCondition1;
-		}
-
-		public void setFilterCondition1(String filterCondition1) {
-			this.filterCondition1 = filterCondition1;
-		}
-
-		public String getFilterDatafield0() {
-			return filterDatafield0;
-		}
-
-		public void setFilterDatafield0(String filterDatafield0) {
-			this.filterDatafield0 = filterDatafield0;
-		}
-
-		public String getFilterDatafield1() {
-			return filterDatafield1;
-		}
-
-		public void setFilterDatafield1(String filterDatafield1) {
-			this.filterDatafield1 = filterDatafield1;
-		}
-
-		public String getFilterValue1() {
-			return filterValue1;
-		}
-
-		public void setFilterValue1(String filterValue1) {
-			this.filterValue1 = filterValue1;
-		}
-
-		public String getSortOrder() {
-			return sortOrder;
-		}
-
-		public void setSortOrder(String sortOrder) {
-			this.sortOrder = sortOrder;
-		}
-
-		public int getPageNumber() {
-			return pageNumber;
-		}
-
-		public void setPageNumber(int pageNumber) {
-			this.pageNumber = pageNumber;
-		}
-
-		public String getSortDataField() {
-			return sortDataField;
-		}
-
-		public void setSortDataField(String sortDataField) {
-			this.sortDataField = sortDataField;
-		}
-
-		public String getFiltersCount() {
-			return filtersCount;
-		}
-
-		public void setFiltersCount(String filtersCount) {
-			this.filtersCount = filtersCount;
-		}
-
-		@Override
-		public String toString() {
-			return "UserProfileRequest{" + "publicKeyOperator=" + publicKeyOperator + ", filterValue0=" + filterValue0 + ", filterCondition0=" + filterCondition0 + ", filterCondition1=" + filterCondition1 + ", filteroperator0=" + filteroperator0 + ", filterDatafield0=" + filterDatafield0 + ", filterDatafield1=" + filterDatafield1 + ", filterValue1=" + filterValue1 + ", filter=" + filter + ", sortOrder=" + sortOrder + ", filterscount=" + filterscount + ", pageNumber=" + pageNumber + ", pageSize=" + pageSize + ", recordstartindex=" + recordstartindex + ", recordendindex=" + recordendindex + ", sortDataField=" + sortDataField + ", filtersCount=" + filtersCount + '}';
-		}
-	}
-
 	@Inject
 	private Env env;
 
@@ -315,6 +152,9 @@ public class ProfilesResource {
 
 	@Inject
 	private UserProfileDAO userProfileDAO;
+	
+	@Inject
+	private OrderDAO orderDAO;
 
 	@Inject
 	private UserDAO userDAO;
@@ -333,6 +173,8 @@ public class ProfilesResource {
 		UserPublicProfile profile = userProfileDAO.find(userId);
 		if (profile == null) {
 			profile = userProfileDAO.create(userId);
+			profile.setStatistic(getStatistic(userId));
+			return userProfileDAO.updateUserPublicProfile(profile);
 		}
 		return profile;
 	}
@@ -383,26 +225,12 @@ public class ProfilesResource {
 		return new UsersPublicProfilesWrapper(userProfileDAO.findAll(sortDataField, sortDesc, pagenum * limit, limit), userProfileDAO.length());
 	}
 
-	@POST
-	@Path("withFilter")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public UsersPublicProfilesWrapper getWithFilter(UserProfileRequest profile) {
-		boolean sortDesc = false;
-		if (profile.getSortOrder() != null && profile.getSortOrder().equals("desc")) {
-			sortDesc = true;
-		}
-		List<UserPublicProfile> users = null;
-		users = userProfileDAO.findWithFilter(profile.getFilterDatafield0(), profile.getFilter(), profile.getSortDataField(), sortDesc, profile.getPageNumber() * profile.getPageSize(), profile.getPageSize());
-		return new UsersPublicProfilesWrapper(users, userProfileDAO.length(profile.getFilterDatafield0(), profile.getFilter()));
-	}
-
 	@GET
-	@Path("byOrders")
+	@Path("byOrder")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<UserPublicProfile> getByOrders(@QueryParam("number") long number, @QueryParam("isNoMoreThan") boolean isNoMoreThan,
+	public List<UserPublicProfile> getByOrder(@QueryParam("id") String id,
 		@QueryParam("offset") int offset, @QueryParam("limit") int limit) {
-		return userProfileDAO.findByOrders(number, isNoMoreThan, offset, limit);
+		return userProfileDAO.findByOrder(id, offset, limit);
 	}
 
 	@POST
@@ -415,7 +243,105 @@ public class ProfilesResource {
 		}
 		String userId = AuthFilter.getUserId(request);
 		userProfile.setPublicKey(userId);
+		userProfile.setStatistic(getStatistic(userId));
 		return userProfileDAO.updateUserPublicProfile(userProfile);
+	}
+	
+	private Statistic getStatistic(String publicKey) {
+		Statistic statistic = new Statistic();
+		long openessRating = 0;
+		long transactionsRating = 0;
+		long allOrders = 0;
+		long allTransactions = 0;
+		long allSuccessTransactions = 0;
+		long allUsersTransactions = 0;
+		long allUsersSuccessTransactions = 0;
+		UserPublicProfile user = userProfileDAO.find(publicKey);
+		if(user == null) {
+			return null;
+		}
+		if(user.isPassportEnabled()) {
+			openessRating = openessRating + 5;
+		}
+		if(user.isPersonalDataEnabled()) {
+			openessRating = openessRating + 5;
+		}
+		if(user.isMailEnabled() && (user.getMail() != null) && !user.getMail().isEmpty()) {
+			openessRating = openessRating + 5;
+		}
+		if(user.isPhoneEnabled() && (user.getPhone() != null) && !user.getPhone().isEmpty()) {
+			openessRating = openessRating + 5;
+		}
+		if((user.getBkiData() != null) && !user.getBkiData().isEmpty()) {
+			openessRating = openessRating + 5;
+		}
+		if(user.getVideos() != null) {
+			openessRating = openessRating + user.getVideos().size() * 2;
+		}
+		if(user.getPhones()!= null) {
+			openessRating = openessRating + user.getPhones().size() * 3;
+		}
+		if(user.getSocialLinks()!= null) {
+			openessRating = openessRating + user.getSocialLinks().size() * 3;
+		}
+		if(user.getNamesLinks()!= null) {
+			openessRating = openessRating + user.getNamesLinks().size() * 3;
+		}
+		statistic.setOpennessRating(openessRating);
+		FilterCriteriaValue filter = new FilterCriteriaValue();
+		FilterCriteriaValue.FilterItem filterItem = new FilterCriteriaValue.FilterItem();
+		filterItem.setFilterDataField("status");
+		filterItem.setFilterValue("SUCCESS");
+		filterItem.setFilterOperator(FilterOperator.AND);
+		filterItem.setFilterCondition("EQUAL");
+		filter.setFilterItems(Arrays.asList(filterItem));
+		OrdersData successData = orderDAO.findWithFilter(publicKey, filter, null, true);
+		
+		filterItem.setFilterValue("NOT_SUCCESS");
+		filter.setFilterItems(Arrays.asList(filterItem));
+		OrdersData notSuccessData = orderDAO.findWithFilter(publicKey, filter, null, true);
+		if((successData != null) && (notSuccessData != null)) {
+			transactionsRating = successData.getLength() - notSuccessData.getLength();
+			
+		}
+		statistic.setTransactionsRating(transactionsRating);
+		OrdersData allOrdersData = orderDAO.findWithFilter(publicKey, null, null, true);
+		if(allOrdersData != null) {
+			allOrders = allOrdersData.getLength();
+		}
+		statistic.setOrdersSumValue(allOrders);
+		filterItem.setFilterCondition("NOT_EQUAL");
+		filterItem.setFilterValue("OPENED");
+		filter.setFilterItems(Arrays.asList(filterItem));
+		OrdersData allTransactionsData = orderDAO.findWithFilter(publicKey, filter, null, true);
+		if(allOrdersData != null) {
+			allTransactions = allTransactionsData.getLength();
+		}
+		statistic.setTransactionsSum(allTransactions);
+		
+		OrdersData allUsersTransactionsData = orderDAO.findWithFilter(null, filter, null, true);
+		if(allUsersTransactionsData != null) {
+			allUsersTransactions = allUsersTransactionsData.getLength();
+		}
+		statistic.setAllTransactionsSum(allUsersTransactions);
+		
+		filterItem.setFilterCondition("EQUAL");
+		filterItem.setFilterValue("SUCCESS");
+		filter.setFilterItems(Arrays.asList(filterItem));
+		OrdersData allSuccessTransactionsData = orderDAO.findWithFilter(publicKey, filter, null, true);
+		if(allOrdersData != null) {
+			allSuccessTransactions = allSuccessTransactionsData.getLength();
+		}
+		statistic.setSuccessTransactionsSum(allSuccessTransactions);
+		
+		OrdersData allUsersSuccessTransactionsData = orderDAO.findWithFilter(null, filter, null, true);
+		if(allUsersSuccessTransactionsData != null) {
+			allUsersSuccessTransactions = allUsersSuccessTransactionsData.getLength();
+		}
+		statistic.setAllSuccessTransactionsSum(allUsersSuccessTransactions);
+		
+		return statistic;
+
 	}
 
 	@POST
@@ -523,5 +449,63 @@ public class ProfilesResource {
 			Logger.getLogger(ProfilesResource.class.getName()).log(Level.SEVERE, null, ex);
 		}
 		return outputStream.toByteArray();
+	}
+
+	@GET
+	@Path("random")
+	public void random() {
+		Random rand = new Random();
+		char[] symbols = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n'};
+		for (int i = 0; i < 1000; i++) {
+
+			String publicKey = "";
+			for (int j = 0; j < 5; j++) {
+				publicKey = publicKey + symbols[rand.nextInt(14)];
+			}
+			userDAO.create(publicKey + i + "@mail.ru");
+			UserPublicProfile user = userProfileDAO.create(publicKey + i + "@mail.ru");
+
+			publicKey = "";
+			for (int j = 0; j < 5; j++) {
+				publicKey = publicKey + symbols[rand.nextInt(14)];
+			}
+			user.setName(publicKey);
+			publicKey = "";
+			for (int j = 0; j < 5; j++) {
+				publicKey = publicKey + symbols[rand.nextInt(14)];
+			}
+			user.setMail(publicKey + i + "@mail.ru");
+			user.setMailEnabled(true);
+			user.setLanguages(Arrays.asList("Russian, English"));
+			user.setLanguagesEnabled(true);
+			Currency c1 = Currency.BITCOIN;//new Currency(Currency.BITCOIN, 10, 500);
+			Currency c2 = Currency.LITECOIN;//new Currency(Currency.LITECOIN, 10, 500);
+			List<Currency> c = new ArrayList<>();
+			Collections.addAll(c, c1, c2);
+
+			user.setCurrencies(c);
+			user.setCurrenciesEnabled(true);
+
+			userProfileDAO.updateUserPublicProfile(user);
+
+			OrderInfo order = new OrderInfo();
+			order.setUserPublicKey(user.getPublicKey());
+			order.setCreationDate(new Date());
+			order.setEndDate(new Date());
+			order.setReward(String.valueOf(rand.nextInt(1000)));
+			order.setStatus(OrderStatus.OPENED);
+			if ((user.getName() != null) && !user.getName().isEmpty()) {
+				order.setUserName(user.getName());
+			}
+
+			//Collections.addAll(c, c1, c2);
+			order.setCurrency(Currency.BITCOIN);
+
+			List<String> l = new ArrayList<>();
+			Collections.addAll(l, "Russian", "English");
+			order.setLanguages(l);
+
+			orderDAO.create(order);
+		}
 	}
 }

@@ -14,7 +14,7 @@
 			<div class="panel panel-default" ng-if="(!isCurrentUser && userPropertiesMap['personalDataEnabled'] === 'open') || isCurrentUser">
 				<div class="panel-heading">
 					<h4 class="panel-title">
-						<a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" ng-click="initSCEditor()"><span class="glyphicon glyphicon-th-large"></span></a>
+						<a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" ng-click="initSCEditor('personalEditable', reloadSCEditorInstance)"><span class="glyphicon glyphicon-th-large"></span></a>
 					</h4>
 				</div>
 				<div id="collapseTwo" class="panel-collapse collapse">
@@ -24,23 +24,39 @@
 					</div>
 				</div>
 			</div>
-			<div class="panel panel-default" ng-if="isCurrentUser">
+			<div class="panel panel-default" ng-if="isCurrentUser && userType">
 				<div class="panel-heading">
 					<h4 class="panel-title">
 						<a data-toggle="collapse" data-parent="#accordion" href="#collapseThree"><span class="glyphicon glyphicon-th-list"></span></a>
 					</h4>
+					<button class="btn btn-danger create-order-button" type="button" ng-if="userType === 'BORROWER'" ng-click="goToBorrowOrder()" title="Take">
+						Create order
+					</button>
+					<button class="btn btn-success create-order-button" type="button" ng-if="userType === 'CREDITOR'" ng-click="goToCreditOrder()" title="Give">
+						Create order
+					</button>
 				</div>
-				<div id="collapseThree" class="panel-collapse collapse">
+				<div id="collapseThree" class="panel-collapse in collapse">
+					<div ng-include src="'resources/html/user/create-order.html'"></div>
+				</div>
+			</div>
+			<div class="panel panel-default" ng-if="isCurrentUser">
+				<div class="panel-heading">
+					<h4 class="panel-title">
+						<a data-toggle="collapse" data-parent="#accordion" href="#collapseFour"><span class="glyphicon glyphicon-th-list"></span></a>
+					</h4>
+				</div>
+				<div id="collapseFour" class="panel-collapse collapse">
 					<div ng-include src="'resources/html/user/personal-orders-table.html'"></div>
 				</div>
 			</div>
 			<div class="panel panel-default" ng-if="isCurrentUser">
 				<div class="panel-heading">
 					<h4 class="panel-title">
-						<a data-toggle="collapse" data-parent="#accordion" href="#collapseFour"><span class="glyphicon glyphicon-shopping-cart"></span></a>
+						<a data-toggle="collapse" data-parent="#accordion" href="#collapseFive"><span class="glyphicon glyphicon-shopping-cart"></span></a>
 					</h4>
 				</div>
-				<div id="collapseFour" class="panel-collapse in collapse">
+				<div id="collapseFive" class="panel-collapse in collapse">
 					<div ng-include src="'resources/html/user/orders-table.html'"></div>
 				</div>
 			</div>

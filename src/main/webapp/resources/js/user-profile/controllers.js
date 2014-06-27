@@ -1,6 +1,6 @@
 var userProfileModule = angular.module("user-profile");
 
-userProfileModule.controller("UserProfileController", function($scope, $rootScope, $modal, $location, usersProfileResource, currencyResource, fileReader) {
+userProfileModule.controller("UserProfileController", function($scope, $rootScope, $modal, $location, usersResource, usersProfileResource, currencyResource, fileReader, $timeout) {
 	var PHOTO_MIN_HEIGHT = 400;
 	var PHOTO_MIN_WIDTH = 300;
 	var PHOTO_MAX_HEIGHT = 2000;
@@ -10,29 +10,43 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 	var resultY1 = 0;
 	var resultY2 = PHOTO_MIN_HEIGHT;
 	$scope.edit = false;
+	$scope.editedPassport = false;
 	$scope.editUserPhoto = false;
 	$scope.userProfile = {};
 	$scope.userPropertiesMap = {};
 	$scope.hasFocus = false;
+	$scope.isCurrentUser = false;
+
+
+
+
 	var currenciesMap = {};
-	var scEditorInitialized = false;
+	$scope.scEditor = {};
+	$scope.scEditor.dataInitialized = false;
+	$scope.scEditor.BKIInitialized = false;
+
 	var visible = "open";
 	var notVisible = "close";
 	var defaultPersonalData = '<p style="text-align: center;"><img src="resources/img/elephant-logo.png"/></p>';
 	var userPublicKeyFromPath = $location.$$path.replace("/users/", "");
 	var userProfileResponse;
-	if (userPublicKeyFromPath === $rootScope.user.publicKey) {
-		if ($rootScope.user.publicKey.indexOf("@") === -1) {
-			window.location.href = window.context;
+	var currentUser = usersResource.current({});
+	currentUser.$promise.then(function() {
+		if (currentUser.publicKey && userPublicKeyFromPath === currentUser.publicKey) {
+			if (currentUser.publicKey.indexOf("@") === -1) {
+				window.location.href = window.context;
+			} else {
+				$scope.isCurrentUser = true;
+				$scope.userPropertiesMap['isCurrentUser'] = true;
+				userProfileResponse = usersProfileResource.current({});
+			}
 		} else {
-			$scope.isCurrentUser = true;
-			userProfileResponse = usersProfileResource.current({});
+			$scope.isCurrentUser = false;
+			$scope.userPropertiesMap['isCurrentUser'] = false;
+			userProfileResponse = usersProfileResource.getById({'id': userPublicKeyFromPath});
 		}
-	} else {
-		$scope.isCurrentUser = false;
-		userProfileResponse = usersProfileResource.getById({'id': userPublicKeyFromPath});
-	}
-	reloadData();
+		reloadData();
+	});
 
 	function reloadData() {
 		$scope.currency = undefined;
@@ -53,19 +67,41 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 				$scope.userPropertiesMap['languages'] = languages;
 			}
 			$scope.userPropertiesMap['currenciesEnabled'] = (userProfileResponse.currenciesEnabled === true) ? visible : notVisible;
-			$scope.userPropertiesMap['currencies'] = userProfileResponse.currencies;
 			$scope.currencies = undefined;
 			if (userProfileResponse.currencies) {
 				var currencies = "";
 				for (var i = 0; i < userProfileResponse.currencies.length; i++) {
-					currencies += (userProfileResponse.currencies[i].currency.code + ", ");
+					currencies += (userProfileResponse.currencies[i].code + ", ");
 				}
 				currencies = currencies.substring(0, currencies.length - 2);
 				$scope.currencies = currencies;
+				if (userProfileResponse.currencies) {
+					$scope.userPropertiesMap['currencies'] = userProfileResponse.currencies;
+				} else {
+					$scope.userPropertiesMap['currencies'] = [];
+				}
+
 			}
+			$scope.userPropertiesMap['passportEnabled'] = userProfileResponse.passportEnabled;
+			$scope.userPropertiesMap['phones'] = (userProfileResponse.phones) ? userProfileResponse.phones : [];
+			$scope.userPropertiesMap['videos'] = (userProfileResponse.videos) ? userProfileResponse.videos : [];
+			$scope.userPropertiesMap['names'] = (userProfileResponse.namesLinks) ? userProfileResponse.namesLinks : [];
+			$scope.userPropertiesMap['socialLinks'] = (userProfileResponse.socialLinks) ? userProfileResponse.socialLinks : [];
+			if (userProfileResponse.statistic) {
+				$scope.ratingOpenness = userProfileResponse.statistic.opennessRating;
+				$scope.ratingTransactions = userProfileResponse.statistic.transactionsRating;
+				$scope.ordersSumValue = userProfileResponse.statistic.ordersSumValue;
+				$scope.transactionsSum = userProfileResponse.statistic.transactionsSum;
+				$scope.successTransactionsSum = userProfileResponse.statistic.successTransactionsSum;
+				$scope.allTransactionsSum = userProfileResponse.statistic.allTransactionsSum;
+				$scope.allSuccessTransactionsSum = userProfileResponse.statistic.allSuccessTransactionsSum;
+
+			}
+
 			$scope.userPropertiesMap['personalData'] = userProfileResponse.personalData;
 			$scope.userPropertiesMap['personalDataEnabled'] = (userProfileResponse.personalDataEnabled === true) ? visible : notVisible;
 			$scope.userPhotoSrc = window.context + "webapi/profiles/" + userProfileResponse.publicKey + "/photo";
+			$scope.initBKISCEditor(reloadBKIscEditor);
 
 			var currenciesResponse = currencyResource.findAll();
 
@@ -82,23 +118,44 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		});
 	}
 
-	$scope.initSCEditor = function() {
-		if (!scEditorInitialized) {
+	$scope.initDataSCEditor = function(id, reload) {
+		if (!$scope.scEditor.dataInitialized) {
 			if ($scope.isCurrentUser) {
 				CKEDITOR.disableAutoInline = true;
-				CKEDITOR.inline("personalEditable");
+				CKEDITOR.inline(id);
 			}
 
-			$scope.reloadSCEditorInstance();
-			scEditorInitialized = true;
+			reload();
+			$scope.scEditor.dataInitialized = true;
 		}
 	};
+	$scope.initBKISCEditor = function(reload) {
+
+		if ($scope.scEditor.BKIInitialized === false) {
+			if ($scope.isCurrentUser) {
+				$timeout(function() {
+					CKEDITOR.disableAutoInline = true;
+					CKEDITOR.inline("bkiEditable");
+				}, 500);
+
+			}
+
+			reload();
+			$scope.scEditor.BKIInitialized = true;
+		}
+	};
+
+	function reloadBKIscEditor() {
+		//
+	}
+
+
 
 	$scope.savePersonalPage = function() {
 		var data = CKEDITOR.instances.personalEditable.getData();
 		if (data !== $scope.userPropertiesMap['personalData']) {
 			$scope.userPropertiesMap['personalData'] = data;
-			updateProfile();
+			$scope.updateProfile();
 		}
 	};
 
@@ -111,13 +168,17 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		} else {
 			startEditing();
 		}
+		disableEditButton();
+	};
+	
+	function disableEditButton() {
 		$scope.disabledEditButton = true;
-		setTimeout(function() {
+		$timeout(function() {
 			$scope.$apply(function() {
 				$scope.disabledEditButton = false;
 			});
 		}, 500);
-	};
+	}
 
 	function endEditing() {
 		$scope.edit = false;
@@ -139,15 +200,15 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 
 		if (!currencies) {
 			$scope.userPropertiesMap['currencies'] = null;
-		} else {
+		} else if ($scope.userPropertiesMap['currencies']) {
 			for (var i = 0; i < $scope.userPropertiesMap['currencies'].length; i++) {
-				if (currencies.indexOf($scope.userPropertiesMap['currencies'][i].currency.code) === -1) {
+				if (currencies.indexOf($scope.userPropertiesMap['currencies'][i].code) === -1) {
 					$scope.userPropertiesMap['currencies'].splice(i, 1);
 					i--;
 				}
 			}
 		}
-		updateProfile();
+		$scope.updateProfile();
 		$scope.cancel();
 	}
 
@@ -159,8 +220,8 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		if ($scope.currencies) {
 			$scope.currencies += ", ";
 		}
-		setTimeout(function() {
-			var languages = new Array("English", "Russian");
+		$timeout(function() {
+			var languages = new Array("English", "Russian", "Arabic");
 
 			angular.element("#languages").jqxInput({
 				source: function(query, response) {
@@ -183,16 +244,8 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 				allCurrencies.push(key);
 			}
 
-			angular.element("#phone").jqxMaskedInput({mask: '(###)###-####'});
-			angular.element("#priceSlider").on('change', function(event) {
-				if (!$scope.currency) {
-					return;
-				}
-				$scope.$apply(function() {
-					$scope.currency.startValue = event.args.value.rangeStart;
-					$scope.currency.endValue = event.args.value.rangeEnd;
-				});
-			});
+			angular.element("#phone").jqxMaskedInput({mask: '+## (###)###-##-##'});
+			angular.element("#phone").jqxMaskedInput('inputValue', "07");
 
 			angular.element("#currencies").jqxInput({
 				source: function(query, response) {
@@ -212,7 +265,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 						$scope.userPropertiesMap['currencies'] = [];
 					}
 					for (var i = 0; i < $scope.userPropertiesMap['currencies'].length; i++) {
-						if ($scope.userPropertiesMap['currencies'][i].currency.code === itemValue) {
+						if ($scope.userPropertiesMap['currencies'][i].code === itemValue) {
 							terms.push("");
 							var value = terms.join(", ");
 							return value;
@@ -227,14 +280,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 
 						$scope.currency.code = itemValue;
 						$scope.currency.id = currenciesMap[itemValue].id;
-						$scope.currency.startValue = 0;
-						$scope.currency.endValue = 0;
 					});
-					//angular.element("#priceSlider").jqxSlider({min: 0, max: currenciesMap[itemValue].max, step: currenciesMap[itemValue].step, width: "100%"});
-					angular.element("#priceSlider").jqxSlider({theme: "bootstrap", width: "100%", showButtons: true, ticksFrequency: 350, mode: 'fixed',
-						max: currenciesMap[itemValue].max, step: currenciesMap[itemValue].step, rangeSlider: true});
-					angular.element("#priceSlider").jqxSlider('setValue', [0, currenciesMap[itemValue].max]);
-
 					return value;
 				}
 			});
@@ -247,16 +293,13 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			return;
 		}
 		for (var i = 0; i < $scope.userPropertiesMap['currencies'].length; i++) {
-			if ($scope.userPropertiesMap['currencies'][i].currency.code === $scope.currency.code) {
+			if ($scope.userPropertiesMap['currencies'][i].code === $scope.currency.code) {
 				return;
 			}
 		}
 		var currency = {};
-		currency.currency = {};
-		currency.currency.code = $scope.currency.code;
-		currency.currency.id = $scope.currency.id;
-		currency.startValue = $scope.currency.startValue;
-		currency.endValue = $scope.currency.endValue;
+		currency.code = $scope.currency.code;
+		currency.id = $scope.currency.id;
 
 		$scope.userPropertiesMap['currencies'].push(currency);
 	}
@@ -276,6 +319,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			}
 		}
 	};
+
 	$scope.changeVisible = function(propertyName) {
 		if ($scope.userPropertiesMap[propertyName] === visible) {
 			$scope.userPropertiesMap[propertyName] = notVisible;
@@ -283,7 +327,34 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			$scope.userPropertiesMap[propertyName] = visible;
 		}
 	};
-	function updateProfile() {
+
+	$scope.editSocialLinks = function() {
+		if ($scope.socialLinksEdited === false) {
+			$scope.socialLinksEdited = true;
+		} else {
+			$scope.socialLinksEdited = false;
+		}
+	};
+
+	$scope.editPhones = function() {
+		if ($scope.phonesEdited === false) {
+			$scope.phonesEdited = true;
+		} else {
+			$scope.phonesEdited = false;
+		}
+	};
+
+	$scope.editPassport = function() {
+		if ($scope.editedPassport === false) {
+			$scope.editedPassport = true;
+		} else {
+			$scope.editedPassport = false;
+			$scope.updateProfile();
+		}
+	};
+
+	$scope.updateProfile = function() {
+
 		var userPublicProfile = {};
 		userPublicProfile.name = $scope.userPropertiesMap['name'];
 		userPublicProfile.phone = $scope.userPropertiesMap['phone'];
@@ -307,6 +378,43 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		userPublicProfile.languagesEnabled = ($scope.userPropertiesMap['languagesEnabled'] === visible) ? true : false;
 		userPublicProfile.currencies = $scope.userPropertiesMap['currencies'];
 		userPublicProfile.currenciesEnabled = ($scope.userPropertiesMap['currenciesEnabled'] === visible) ? true : false;
+		userPublicProfile.socialLinks = [];
+		var socialLinks = $scope.userPropertiesMap['socialLinks'];
+		for (var i in socialLinks) {
+			var link = {};
+			link.title = socialLinks[i].title;
+			link.link = socialLinks[i].link;
+			link.id = socialLinks[i].id;
+			userPublicProfile.socialLinks.push(link);
+		}
+		userPublicProfile.phones = [];
+		var phones = $scope.userPropertiesMap['phones'];
+		for (var i in phones) {
+			var link = {};
+			link.title = phones[i].title;
+			link.link = phones[i].link;
+			link.id = phones[i].id;
+			userPublicProfile.phones.push(link);
+		}
+		userPublicProfile.videos = [];
+		var videos = $scope.userPropertiesMap['videos'];
+		for (var i in videos) {
+			var link = {};
+			link.title = videos[i].title;
+			link.link = videos[i].link;
+			link.id = videos[i].id;
+			userPublicProfile.videos.push(link);
+		}
+		userPublicProfile.namesLinks = [];
+		var names = $scope.userPropertiesMap['names'];
+		for (var i in names) {
+			var link = {};
+			link.title = names[i].title;
+			link.link = names[i].link;
+			link.id = names[i].id;
+			userPublicProfile.namesLinks.push(link);
+		}
+		userPublicProfile.passportEnabled = $scope.userPropertiesMap['passportEnabled'];
 
 		userProfileResponse = usersProfileResource.updatePublicProfile({}, userPublicProfile);
 		userProfileResponse.$promise.then(function() {
@@ -314,7 +422,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		});
 
 		//var userPrivateProfile = {};
-	}
+	};
 
 	angular.element(document).on("focus", "#name", function() {
 		angular.element(this).mask("SSSSSSSSSSSSSSSSSSSSSSSSSSS",
@@ -391,7 +499,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		userPhotoRequest.imageString = data;
 		var userPhotoResponse = usersProfileResource.setUserPhoto({}, userPhotoRequest);
 		userPhotoResponse.$promise.then(function() {
-			setTimeout(function() {
+			$timeout(function() {
 				location.reload();
 			}, 100);
 		});
@@ -408,7 +516,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		userPhotoRequest.imageString = "";
 		var userPhotoResponse = usersProfileResource.setUserPhoto({}, userPhotoRequest);
 		userPhotoResponse.$promise.then(function() {
-			setTimeout(function() {
+			$timeout(function() {
 				location.reload();
 			}, 100);
 		});

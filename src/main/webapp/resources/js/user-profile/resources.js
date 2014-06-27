@@ -7,7 +7,7 @@ userModule.factory("usersProfileResource", function($resource) {
 		getById: {method: "GET", url: window.context + "webapi/profiles/:id", params:{id: "@id"}},
 		updatePublicProfile: {method: "POST", url: window.context + "webapi/profiles/current"},
 		updatePrivateProfile: {method: "POST", url: window.context + "webapi/profiles/current/private"},
-		setUserPhoto: {method: "POST", url: window.context + "webapi/profiles/current/photo"}
+		setUserPhoto: {method: "PUT", url: window.context + "webapi/profiles/current/photo"}
 	});
 });
 

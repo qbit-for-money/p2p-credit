@@ -5,12 +5,16 @@ import static com.qbit.commons.dao.util.DAOUtil.invokeInTransaction;
 import com.qbit.commons.dao.util.TrCallable;
 import com.qbit.commons.user.UserDAO;
 import com.qbit.commons.user.UserInfo;
+import com.qbit.p2p.credit.commons.model.Currency;
+import com.qbit.p2p.credit.user.model.DataLink;
+import com.qbit.p2p.credit.user.model.Statistic;
 import com.qbit.p2p.credit.user.model.UserCurrency;
 import com.qbit.p2p.credit.user.model.UserPrivateProfile;
 import com.qbit.p2p.credit.user.model.UserPublicProfile;
 import com.qbit.p2p.credit.user.model.UserType;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
@@ -113,67 +117,6 @@ public class UserProfileDAO {
 		}
 	}
 
-	public long lengthWithFilterByRating(long rating, boolean isNoMoreThan) {
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		try {
-			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-			CriteriaQuery<Long> criteria = builder.createQuery(Long.class);
-
-			Root<UserPublicProfile> user = criteria.from(UserPublicProfile.class);
-			Expression<Long> ratingExpression = user.get("rating");
-			Predicate predicate;
-			if (isNoMoreThan) {
-				predicate = builder.le(ratingExpression, rating);
-			} else {
-				predicate = builder.ge(ratingExpression, rating);
-			}
-			criteria.select(builder.count(user));
-			criteria.where(predicate);
-			return entityManager.createQuery(criteria).getSingleResult();
-		} finally {
-			entityManager.close();
-		}
-	}
-
-	public List<UserPublicProfile> findWithFilter(String filterDataField, String queryText, String sortDataField, boolean sortDesc, int offset, int limit) {
-
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		try {
-			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-			CriteriaQuery<UserPublicProfile> criteria = builder.createQuery(UserPublicProfile.class);
-			EntityType<UserPublicProfile> type = entityManager.getMetamodel().entity(UserPublicProfile.class);
-
-			Root<UserPublicProfile> user = criteria.from(UserPublicProfile.class);
-			criteria.select(user);
-			if (filterDataField != null && queryText != null) {
-				criteria.where(
-					builder.or(
-						builder.like(
-							builder.lower(
-								user.get(
-									type.getDeclaredSingularAttribute(filterDataField, String.class)
-								)
-							), "%" + queryText.toLowerCase() + "%"
-						)
-					)
-				);
-			}
-
-			if (sortDesc && sortDataField != null && !sortDataField.isEmpty()) {
-				criteria.orderBy(builder.desc(user.get(sortDataField)));
-			} else if (!sortDesc && sortDataField != null && !sortDataField.isEmpty()) {
-				criteria.orderBy(builder.asc(user.get(sortDataField)));
-			}
-			TypedQuery<UserPublicProfile> query = entityManager.createQuery(criteria);
-			query.setFirstResult(offset);
-			query.setMaxResults(limit);
-			List<UserPublicProfile> users = query.getResultList();
-			return users;
-		} finally {
-			entityManager.close();
-		}
-	}
-
 	public List<UserPublicProfile> findByRating(long rating, boolean isNoMoreThan, String sortDataField, boolean sortDesc, int offset, int limit) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {
@@ -221,18 +164,15 @@ public class UserProfileDAO {
 		}
 	}
 
-	public List<UserPublicProfile> findByOrders(long number, boolean isNoMoreThan, int offset, int limit) {
+	public List<UserPublicProfile> findByOrder(String orderId, int offset, int limit) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {
 			String queryName;
-			if (isNoMoreThan) {
-				queryName = "UserPublicProfile.findByOrdersNoMoreThan";
-			} else {
-				queryName = "UserPublicProfile.findByOrdersNoLessThan";
-			}
+			queryName = "UserPublicProfile.findByOrder";
+
 			TypedQuery<UserPublicProfile> query = entityManager.createNamedQuery(queryName, UserPublicProfile.class);
 
-			query.setParameter("number", number);
+			query.setParameter("orderId", orderId);
 			query.setFirstResult(offset);
 			query.setMaxResults(limit);
 			return query.getResultList();
@@ -282,43 +222,38 @@ public class UserProfileDAO {
 		);
 	}
 
-	public UserPublicProfile updateUserPublicProfile(UserPublicProfile userProfile) {
+	public UserPublicProfile updateUserPublicProfile(final UserPublicProfile userProfile) {
 		if (userProfile == null) {
 			throw new IllegalArgumentException();
 		}
-
-		return updateUserPublicProfile(userProfile.getPublicKey(), userProfile.getName(), userProfile.getMail(),
-			userProfile.isMailEnabled(), userProfile.getPhone(), userProfile.isPhoneEnabled(), userProfile.getLanguages(),
-			userProfile.isLanguagesEnabled(), userProfile.getCurrencies(), userProfile.isCurrenciesEnabled(),
-			userProfile.getPersonalData(), userProfile.isPersonalDataEnabled());
-
-	}
-
-	public UserPublicProfile updateUserPublicProfile(final String publicKey, final String name, final String mail,
-		final boolean mailEnabled, final String phone, final boolean phoneEnabled,
-		final List<String> languages, final boolean languagesEnabled, final List<UserCurrency> currencies,
-		final boolean currenciesEnabled, final String personalData, final boolean personalDataEnabled) {
 		return invokeInTransaction(entityManagerFactory, new TrCallable<UserPublicProfile>() {
 
 			@Override
 			public UserPublicProfile
 				call(EntityManager entityManager) {
-				UserPublicProfile userPublicProfile = entityManager.find(UserPublicProfile.class, publicKey);
+				UserPublicProfile userPublicProfile = entityManager.find(UserPublicProfile.class, userProfile.getPublicKey());
 				if (userPublicProfile == null) {
 					return null;
 				}
 
-				userPublicProfile.setName(name);
-				userPublicProfile.setMail(mail);
-				userPublicProfile.setMailEnabled(mailEnabled);
-				userPublicProfile.setPhone(phone);
-				userPublicProfile.setPhoneEnabled(phoneEnabled);
-				userPublicProfile.setLanguages(languages);
-				userPublicProfile.setLanguagesEnabled(languagesEnabled);
-				userPublicProfile.setCurrencies(currencies);
-				userPublicProfile.setCurrenciesEnabled(currenciesEnabled);
-				userPublicProfile.setPersonalData(personalData);
-				userPublicProfile.setPersonalDataEnabled(personalDataEnabled);
+				userPublicProfile.setName(userProfile.getName());
+				userPublicProfile.setMail(userProfile.getMail());
+				userPublicProfile.setMailEnabled(userProfile.isMailEnabled());
+				userPublicProfile.setPhone(userProfile.getPhone());
+				userPublicProfile.setPhoneEnabled(userProfile.isPhoneEnabled());
+				userPublicProfile.setLanguages(userProfile.getLanguages());
+				userPublicProfile.setLanguagesEnabled(userProfile.isLanguagesEnabled());
+				userPublicProfile.setCurrencies(userProfile.getCurrencies());
+				userPublicProfile.setCurrenciesEnabled(userProfile.isCurrenciesEnabled());
+				userPublicProfile.setPersonalData(userProfile.getPersonalData());
+				userPublicProfile.setPersonalDataEnabled(userProfile.isPersonalDataEnabled());
+				userPublicProfile.setSocialLinks(userProfile.getSocialLinks());
+				userPublicProfile.setVideos(userProfile.getVideos());
+				userPublicProfile.setNamesLinks(userProfile.getNamesLinks());
+				userPublicProfile.setPhones(userProfile.getPhones());
+				userPublicProfile.setPassportEnabled(userProfile.isPassportEnabled());
+				userPublicProfile.setBkiData(userProfile.getBkiData());
+				userPublicProfile.setStatistic(userProfile.getStatistic());
 
 				return userPublicProfile;
 			}

@@ -1,0 +1,68 @@
+<div class="panel-body" ng-controller="OrdersCreateController">
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-xs-1 col-md-1"></div>
+			<div class="col-xs-10 col-md-10" id="order-attributes">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-xs-4 col-md-3 title-edit">
+							Title:
+						</div>
+						<div class="col-xs-7 col-md-8">
+							<input type="text" ng-model="userPropertiesMap
+									['phone']" class="form-control masked-input-jqx" />
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-4 col-md-3 title-edit">
+							Languages:
+						</div>
+						<div class="col-xs-7 col-md-8">
+							<input type="text" id="order-languages" ng-model="userPropertiesMap
+									['languages']" class="form-control input-jqx" style="margin-top: 0;"/>
+						</div>
+					</div>
+					<div class="row">
+
+						<div class="col-xs-4 col-md-3 title-edit">
+							Currency:
+						</div>
+						<div class="col-xs-7 col-md-8">
+							<input type="text" id="currencies" class="form-control input-jqx" ng-model="currencies" ng-change="editCurrencies"/>
+
+						</div>
+
+					</div>	
+					<div class="row">
+						<div class="col-xs-4 col-md-3 title-edit">
+							Reward:
+						</div>
+						<div class="col-xs-7 col-md-8">
+							<input type="text" ng-model="userPropertiesMap
+									['phone']" class="form-control masked-input-jqx" />
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-4 col-md-3 title-edit">
+							End date:
+						</div>
+						<div class="col-xs-7 col-md-8">
+							<input type="text" ng-model="userPropertiesMap
+									['phone']" class="form-control masked-input-jqx" />
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-4 col-md-3 title-edit">
+							Free description:
+						</div>
+					</div>
+					<div class="row" style="min-height: 100px;">
+						<div id="personalEditable"  contenteditable="{{isCurrentUser}}">
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-xs-1 col-md-1"></div>
+		</div>
+	</div>
+</div>

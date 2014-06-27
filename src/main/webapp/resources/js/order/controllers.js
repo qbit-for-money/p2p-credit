@@ -6,7 +6,8 @@ orderModule.controller("OrderInitController", function($scope, $rootScope, users
 		if(!$rootScope.user || ($rootScope.user.publicKey.indexOf("@") === -1)) {
 			authService.openAuthDialog(false, true);
 		} else {
-			window.location.href = window.context + "#/credit";
+			$rootScope.userType = "CREDITOR";
+			window.location.href = window.context + "#/users/" +$rootScope.user.publicKey;
 		}
 	};
 
@@ -14,7 +15,8 @@ orderModule.controller("OrderInitController", function($scope, $rootScope, users
 		if(!$rootScope.user || ($rootScope.user.publicKey.indexOf("@") === -1)) {
 			authService.openAuthDialog(false, true);
 		} else {
-			window.location.href = window.context + "#/borrow";
+			$rootScope.userType = "BORROWER";
+			window.location.href = window.context + "#/users/" +$rootScope.user.publicKey;
 		}
 	};
 });

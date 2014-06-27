@@ -27,6 +27,7 @@ userModule.controller("UserController", function($scope, $rootScope, usersResour
 	};
 
 	$scope.goToProfile = function() {
+		$rootScope.userType = undefined;
 		window.location.href = window.context + "#/users/" + currentUser.publicKey;
 	};
 

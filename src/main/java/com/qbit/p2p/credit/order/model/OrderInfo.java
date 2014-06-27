@@ -1,17 +1,23 @@
 package com.qbit.p2p.credit.order.model;
 
 import com.qbit.commons.model.Identifiable;
+import com.qbit.p2p.credit.commons.model.Currency;
 import com.qbit.p2p.credit.commons.model.DateAdapter;
+import com.qbit.p2p.credit.money.model.serialization.CurrencyAdapter;
 import com.qbit.p2p.credit.user.model.UserCurrency;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.ElementCollection;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -44,13 +50,22 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 
 	private String userPublicKey;
 	private String userName;
+	private String title;
+	@Lob
+	private String orderData;
 	
 	private OrderStatus status;
 	
+	private OrderType type;
+	@ElementCollection
 	private List<String> languages;
-	private List<UserCurrency> currencies;
+	@XmlJavaTypeAdapter(CurrencyAdapter.class)
+	private Currency currency;
+	@Embedded
+	private CurrencyInterval currencyInterval;
 	
-	private int reward;
+	private String reward;
+	private long responses;
 	
 
 	@Override
@@ -86,12 +101,28 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 		this.userName = userName;
 	}
 
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
 	public OrderStatus getStatus() {
 		return status;
 	}
 
 	public void setStatus(OrderStatus status) {
 		this.status = status;
+	}
+
+	public OrderType getType() {
+		return type;
+	}
+
+	public void setType(OrderType type) {
+		this.type = type;
 	}
 
 	public Date getEndDate() {
@@ -110,24 +141,48 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 		this.languages = languages;
 	}
 
-	public List<UserCurrency> getCurrencies() {
-		return currencies;
+	public Currency getCurrency() {
+		return currency;
 	}
 
-	public void setCurrencies(List<UserCurrency> currencies) {
-		this.currencies = currencies;
+	public void setCurrency(Currency currency) {
+		this.currency = currency;
 	}
 
-	public int getReward() {
+	public CurrencyInterval getCurrencyInterval() {
+		return currencyInterval;
+	}
+
+	public void setCurrencyInterval(CurrencyInterval currencyInterval) {
+		this.currencyInterval = currencyInterval;
+	}
+
+	public String getReward() {
 		return reward;
 	}
 
-	public void setReward(int reward) {
+	public void setReward(String reward) {
 		this.reward = reward;
 	}
 
+	public String getOrderData() {
+		return orderData;
+	}
+
+	public void setOrderData(String orderData) {
+		this.orderData = orderData;
+	}
+
+	public long getResponses() {
+		return responses;
+	}
+
+	public void setResponses(long responses) {
+		this.responses = responses;
+	}
+	
 	@Override
 	public String toString() {
-		return "OrderInfo{" + "id=" + id + ", creationDate=" + creationDate + ", endDate=" + endDate + ", userPublicKey=" + userPublicKey + ", userName=" + userName + ", status=" + status + ", languages=" + languages + ", currencies=" + currencies + ", reward=" + reward + '}';
+		return "OrderInfo{" + "id=" + id + ", creationDate=" + creationDate + ", endDate=" + endDate + ", userPublicKey=" + userPublicKey + ", userName=" + userName + ", title=" + title + ", orderData=" + orderData + ", status=" + status + ", type=" + type + ", languages=" + languages + ", currency=" + currency + ", currencyInterval=" + currencyInterval + ", reward=" + reward + ", responses=" + responses + '}';
 	}
 }

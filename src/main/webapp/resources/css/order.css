@@ -25,6 +25,15 @@ and (min-width : 798px) {
 	padding-bottom: 20px;
 }
 
+#order-attributes .row {
+	padding-bottom: 7px;
+}
+
+.create-order-button {
+	float: right; 
+	margin-top: -26px;
+}
+
 .button-lg {
 	height: 8em !important;
 	width: 100% !important;

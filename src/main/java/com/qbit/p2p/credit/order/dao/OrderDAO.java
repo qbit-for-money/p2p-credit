@@ -5,11 +5,20 @@ import static com.qbit.commons.dao.util.DAOUtil.invokeInTransaction;
 import com.qbit.commons.dao.util.TrCallable;
 import com.qbit.commons.user.UserDAO;
 import com.qbit.commons.user.UserInfo;
+import com.qbit.p2p.credit.commons.model.Currency;
+import com.qbit.p2p.credit.order.model.FilterOperator;
 import com.qbit.p2p.credit.order.model.OrderInfo;
 import com.qbit.p2p.credit.order.model.OrderStatus;
+import com.qbit.p2p.credit.order.model.OrderType;
+import com.qbit.p2p.credit.order.model.OrdersData;
+import com.qbit.p2p.credit.order.model.FilterCriteriaValue;
+import com.qbit.p2p.credit.order.resource.OrdersResource;
 import com.qbit.p2p.credit.user.dao.UserProfileDAO;
+import com.qbit.p2p.credit.user.model.UserCurrency;
 import com.qbit.p2p.credit.user.model.UserPublicProfile;
 import com.qbit.p2p.credit.user.model.UserType;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -20,8 +29,11 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.ParameterExpression;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
 import javax.persistence.metamodel.EntityType;
 
 /**
@@ -63,14 +75,14 @@ public class OrderDAO {
 		}
 	}
 
-	public List<OrderInfo> findByUserType(UserType userType, int offset, int limit) {
-		if (userType == null) {
+	public List<OrderInfo> findByType(OrderType orderType, int offset, int limit) {
+		if (orderType == null) {
 			throw new IllegalArgumentException();
 		}
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {
-			TypedQuery<OrderInfo> query = entityManager.createNamedQuery("OrderInfo.findByUserType", OrderInfo.class);
-			query.setParameter("userType", userType);
+			TypedQuery<OrderInfo> query = entityManager.createNamedQuery("OrderInfo.findByType", OrderInfo.class);
+			query.setParameter("orderType", orderType);
 			query.setFirstResult(offset);
 			query.setMaxResults(limit);
 			return query.getResultList();
@@ -123,7 +135,7 @@ public class OrderDAO {
 				if ((profile != null) && (profile.getName() != null) && !profile.getName().isEmpty()) {
 					orderInfo.setUserName(profile.getName());
 				}
-				orderInfo.setStatus(OrderStatus.OPENED);
+				orderInfo.setStatus(OrderStatus.SUCCESS);
 				orderInfo.setCreationDate(new Date());
 				entityManager.persist(orderInfo);
 				return orderInfo;
@@ -146,113 +158,163 @@ public class OrderDAO {
 				OrderInfo order = new OrderInfo();
 				order.setCreationDate(new Date());
 				order.setUserPublicKey(userPublicKey);
-				order.setStatus(OrderStatus.OPENED);
+				order.setStatus(OrderStatus.SUCCESS);
 				entityManager.persist(order);
 				return order;
 			}
 		});
 	}
 
-	public long length(String userPublicKey, String filterDataField, String query) {
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		try {
-			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-			CriteriaQuery<Long> criteria = builder.createQuery(Long.class);
-			EntityType<OrderInfo> type = entityManager.getMetamodel().entity(OrderInfo.class);
-
-			Root<OrderInfo> order = criteria.from(OrderInfo.class);
-			criteria.select(builder.count(order));
-			if ((userPublicKey != null) && !userPublicKey.isEmpty()) {
-				ParameterExpression<String> p = builder.parameter(String.class, "userPublicKey");
-				criteria.where(builder.equal(order.<String>get("userPublicKey"), p));
-			}
-			if (filterDataField != null && query != null) {
-				criteria.where(
-					builder.or(
-						builder.like(
-							builder.lower(
-								order.get(
-									type.getDeclaredSingularAttribute(filterDataField, String.class)
-								)
-							), "%" + query.toLowerCase() + "%"
-						)
-					)
-				);
-			}
-
-			return entityManager.createQuery(criteria).getSingleResult();
-		} finally {
-			entityManager.close();
+	public OrdersData findWithFilter(String userPublicKey, FilterCriteriaValue filterCriteriaValue, UserPublicProfile profile, boolean isLength) {
+		boolean sortDesc = false;
+		if ((filterCriteriaValue != null) && filterCriteriaValue.getSortOrder() != null && filterCriteriaValue.getSortOrder().equals("desc")) {
+			sortDesc = true;
 		}
-	}
-
-	public List<OrderInfo> findWithFilter(String userPublicKey, String filterValue0, String filterDatafield0, 
-		String filterValue1, String filterDatafield1, String sortDataField, boolean sortDesc, int offset, int limit) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {
 			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-			CriteriaQuery<OrderInfo> criteria = builder.createQuery(OrderInfo.class);
+			CriteriaQuery criteria;
 			EntityType<OrderInfo> type = entityManager.getMetamodel().entity(OrderInfo.class);
 
-			Root<OrderInfo> order = criteria.from(OrderInfo.class);
-			criteria.select(order);
-			if ((userPublicKey != null) && !userPublicKey.isEmpty()) {
-				ParameterExpression<String> p = builder.parameter(String.class, "userPublicKey");
-				criteria.where(builder.equal(order.<String>get("userPublicKey"), p));
+			
+			if(isLength) {
+				criteria = builder.createQuery(Long.class);
+			} else {
+				criteria = builder.createQuery(OrderInfo.class);
 			}
-			if ((filterDatafield0 != null) && (filterValue0 != null)) {
-				if (filterDatafield0.equals("reward")) {
-					criteria.where(
-						builder.and(
-							builder.equal(
-								order.get(
-									type.getDeclaredSingularAttribute(filterDatafield0, Integer.class)
-								), filterValue0)
-						)
-					);
+			Root<OrderInfo> order = criteria.from(OrderInfo.class);
+			if(isLength) {
+				criteria.select(builder.count(order));
+			} else {
+				criteria.select(order);
+			}
+			Predicate mainOperatorPredicate = null;
+			if ((userPublicKey != null) && !userPublicKey.isEmpty()) {
+				Expression<String> typeExpression = order.get("userPublicKey");
+				mainOperatorPredicate = builder.equal(typeExpression, userPublicKey);
+			}
+			if ((filterCriteriaValue != null) && (filterCriteriaValue.getOrderType() != null)) {
+				Expression<OrderType> typeExpression = order.get("type");
+				Predicate typePredicate = builder.equal(typeExpression, filterCriteriaValue.getOrderType());
+
+				if (mainOperatorPredicate == null) {
+					mainOperatorPredicate = typePredicate;
 				} else {
-					criteria.where(
-						builder.and(
-							builder.like(
-								builder.lower(
-									order.get(
-										type.getDeclaredSingularAttribute(filterDatafield0, String.class)
-									)
-								), "%" + filterValue0.toLowerCase() + "%"
-							)
-						)
-					);
+					mainOperatorPredicate = builder.and(typePredicate, mainOperatorPredicate);
 				}
 			}
-			if ((filterDatafield1 != null) && (filterValue1 != null)) {
-				criteria.where(
-					builder.or(
-						builder.like(
-							builder.lower(
-								order.get(
-									type.getDeclaredSingularAttribute(filterDatafield1, String.class)
-								)
-							), "%" + filterValue1.toLowerCase() + "%"
-						)
-					)
-				);
+
+			List<FilterCriteriaValue.FilterItem> filterItems = (filterCriteriaValue != null) ? filterCriteriaValue.getFilterItems() : null;
+
+			if (filterItems != null && !filterItems.isEmpty()) {
+				Predicate itemsOperatorPredicate = null;
+				for (FilterCriteriaValue.FilterItem item : filterItems) {
+					if ((item.getFilterDataField() != null) && (item.getFilterValue() != null)) {
+						//ParameterExpression<String> parameter = builder.parameter(String.class, item.getFilterDataField());
+						//Predicate valuePredicate = builder.equal(builder.lower(order.<String>get(item.getFilterDataField())), "%" + item.getFilterValue().toLowerCase() + "%");
+						Predicate valuePredicate = null;
+						if ((item.getFilterCondition() == null) || "EQUAL".equals(item.getFilterCondition())) {
+							if("status".equals(item.getFilterDataField())) {
+								valuePredicate = builder.equal(order.get(item.getFilterDataField()), OrderStatus.valueOf(item.getFilterValue()));
+							} else if("currency".equals(item.getFilterDataField())) {
+								valuePredicate = builder.equal(order.get(item.getFilterDataField()), Currency.valueOf(item.getFilterValue()));
+							} else {
+								valuePredicate = builder.equal(order.get(item.getFilterDataField()), item.getFilterValue());
+							}	
+						} else if ("NOT_EQUAL".equals(item.getFilterCondition())) {
+							//Expression<OrderType> typeExpression = order.get("type");
+							if("status".equals(item.getFilterDataField())) {
+								valuePredicate = builder.notEqual(order.get(item.getFilterDataField()), OrderStatus.valueOf(item.getFilterValue()));
+							} else {
+								valuePredicate = builder.notEqual(order.get(item.getFilterDataField()), item.getFilterValue());
+							}	
+						} else if ("STARTS_WITH".equals(item.getFilterCondition())) {
+
+							valuePredicate = builder.like(
+								builder.lower(
+									order.get(
+										type.getDeclaredSingularAttribute(item.getFilterDataField(), String.class)
+									)
+								), "%" + item.getFilterValue().toLowerCase() + "%"
+							);
+						}
+						if (itemsOperatorPredicate == null) {
+							itemsOperatorPredicate = valuePredicate;
+						} else if ((item.getFilterOperator() == null) || FilterOperator.AND == item.getFilterOperator()) {
+							itemsOperatorPredicate = builder.and(valuePredicate, itemsOperatorPredicate);
+						} else if (FilterOperator.OR == item.getFilterOperator()) {
+							itemsOperatorPredicate = builder.or(valuePredicate, itemsOperatorPredicate);
+						}
+					}
+				}
+				if (mainOperatorPredicate == null) {
+					mainOperatorPredicate = itemsOperatorPredicate;
+				} else {
+					mainOperatorPredicate = builder.and(itemsOperatorPredicate, mainOperatorPredicate);
+				}
+			}
+			List<String> userLanguages = (profile != null) ? profile.getLanguages() : null;
+			if (userLanguages != null && !userLanguages.isEmpty()) {
+				Predicate operatorPredicate = null;
+				Expression<Collection<String>> languages = order.get("languages");
+				for (String language : userLanguages) {
+					Predicate containsLanguages = builder.isMember(language, languages);
+					if (operatorPredicate == null) {
+						operatorPredicate = containsLanguages;
+					} else {
+						operatorPredicate = builder.or(containsLanguages, operatorPredicate);
+					}
+				}
+				if (mainOperatorPredicate == null) {
+					mainOperatorPredicate = operatorPredicate;
+				} else {
+					mainOperatorPredicate = builder.and(operatorPredicate, mainOperatorPredicate);
+				}
 			}
 
+			List<Currency> userCurrencies = (profile != null) ? profile.getCurrencies() : null;
+			if (userCurrencies != null && !userCurrencies.isEmpty()) {
+				Predicate operatorPredicate = null;
+				Expression<Currency> currencyExpression = order.get("currency");
+				for (Currency currency : userCurrencies) {
+					Predicate containsCurrencies = builder.equal(currencyExpression, currency);//builder.isMember(currency, currencies);
+					if (operatorPredicate == null) {
+						operatorPredicate = containsCurrencies;
+					} else {
+						operatorPredicate = builder.or(containsCurrencies, operatorPredicate);
+					}
+				}
+				if (mainOperatorPredicate == null) {
+					mainOperatorPredicate = operatorPredicate;
+				} else {
+					mainOperatorPredicate = builder.and(operatorPredicate, mainOperatorPredicate);
+				}
+			}
+			if(mainOperatorPredicate != null) {
+				criteria.where(mainOperatorPredicate);
+			}
+			
+			if(isLength) {
+				return new OrdersData((Long) entityManager.createQuery(criteria).getSingleResult());
+			}
+			String sortDataField = filterCriteriaValue.getSortDataField();
 			if (sortDesc && sortDataField != null && !sortDataField.isEmpty()) {
-				criteria.orderBy(builder.desc(order.get(sortDataField)));
+				criteria.orderBy(builder.desc(order.get(sortDataField)), builder.asc(order.get("status")));
 			} else if (!sortDesc && sortDataField != null && !sortDataField.isEmpty()) {
-				criteria.orderBy(builder.asc(order.get(sortDataField)));
+				criteria.orderBy(builder.asc(order.get(sortDataField)), builder.asc(order.get("status")));
+			} else {
+				criteria.orderBy(builder.asc(order.get("status")));
 			}
+
 			TypedQuery<OrderInfo> query = entityManager.createQuery(criteria);
-			if ((userPublicKey != null) && !userPublicKey.isEmpty()) {
-				query.setParameter("userPublicKey", userPublicKey);
-			}
-			query.setFirstResult(offset);
-			query.setMaxResults(limit);
+			query.setFirstResult(filterCriteriaValue.getPageNumber() * filterCriteriaValue.getPageSize());
+			query.setMaxResults(filterCriteriaValue.getPageSize());
 			List<OrderInfo> orders = query.getResultList();
-			return orders;
+			
+			return new OrdersData(orders);
 		} finally {
 			entityManager.close();
 		}
 	}
+
 }

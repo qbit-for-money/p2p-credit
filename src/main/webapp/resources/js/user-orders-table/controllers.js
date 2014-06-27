@@ -1,18 +1,16 @@
 var orderModule = angular.module("order");
 
-orderModule.controller("UserOrdersController", function($scope) {
+orderModule.controller("UserOrdersController", function($scope, $rootScope) {
 
 	var source =
 			{
 				dataType: "json",
 				dataFields: [
-					{name: "userPublicKey", type: "string"},
-					{name: "userName", type: "string"},
+					{name: "title", type: "string"},
 					{name: "languages", type: "string"},
-					{name: "currencies", type: "string"},
-					{name: "creationDate", type: "string"},
-					{name: "endDate", type: "string"},
-					{name: "reward", type: "string"}
+					{name: "currency", type: "string"},
+					{name: "responses", type: "int"},
+					{name: "status", type: "string"}
 				],
 				beforeprocessing: function(data) {
 					source.totalrecords = data.length;
@@ -31,33 +29,76 @@ orderModule.controller("UserOrdersController", function($scope) {
 	var adapterFields = {
 		contentType: 'application/json; charset=utf-8',
 		formatData: function(data) {
-			return JSON.stringify(data);
+			var newData = {};
+			newData.filterItems = [];
+
+			for (var i = 0; i < data.filterscount; i++) {
+				newData.filterItems[i] = {};
+				var operator = data[data["filterdatafield" + i] + "operator"];
+				if (operator) {
+					if (operator === "and") {
+						newData.filterItems[i].filterOperator = 1;
+					}
+				}
+
+				newData.filterItems[i].filterDataField = data["filterdatafield" + i];
+				newData.filterItems[i].filterCondition = data["filtercondition" + i];
+				newData.filterItems[i].filterValue = data["filtervalue" + i];
+			}
+
+			newData.sortOrder = data.sortorder;
+			newData.pageNumber = data.pagenum;
+			newData.pageSize = data.pagesize;
+			newData.recordstartindex = data.recordstartindex;
+			newData.recordendindex = data.recordendindex;
+			newData.sortDataField = data.sortdatafield;
+			if ($rootScope.userType === "CREDITOR") {
+				newData.orderType = 1;
+			}
+			if ($rootScope.userType === "BORROWER") {
+				newData.orderType = 2;
+			}
+			return JSON.stringify(newData);
 		},
 		downloadComplete: function(data, status, xhr) {
 			
 			var orders = data.orders;
-			for(var i in orders) {
-				if(orders[i].languages === undefined) 
-					continue;
-				
-				var languagesStr = "";
-				for(var j in orders[i].languages) {
-					languagesStr += orders[i].languages[j].substring(0, 3) + ", ";
+			for (var i in orders) {
+				if (orders[i].order.languages !== undefined) {
+					var languagesStr = "";
+					for (var j in orders[i].order.languages) {
+						languagesStr += orders[i].order.languages[j] + ", ";
+					}
 				}
 				orders[i].languages = languagesStr.substring(0, languagesStr.length - 2);
-			}
-			for(var i in orders) {
-				if(orders[i].currencies === undefined) 
-					continue;
-				
+
 				var currenciesStr = "";
-				
-				for(var j in orders[i].currencies) {
-					currenciesStr += orders[i].currencies[j].currency.code.substring(0, 3) + ", ";
+				var currency = orders[i].order.currency;
+				if (orders[i].order.currency === undefined) {
+					orders[i].order.currency = currenciesStr;
+				} else {
+					var currencyInterval = orders[i].order.currencyInterval;
+					currenciesStr = currency.code + " ( " + currencyInterval.startValue + " : " + currencyInterval.endValue + " )";
+					orders[i].currency = currenciesStr;
+
+					if (orders[i].order.status === "NOT_SUCCESS") {
+						orders[i].order.status = "NOT SUCCESS";
+					}
+					if (orders[i].order.type === 1) {
+						orders[i].order.type = "CREDITOR";
+					}
+					if (orders[i].order.type === 2) {
+						orders[i].order.type = "BORROWER";
+					}
 				}
-				orders[i].currencies = currenciesStr.substring(0, currenciesStr.length - 2);
+				orders[i].title = orders[i].order.title;
+				orders[i].orderData = orders[i].order.orderData;
+				orders[i].status = orders[i].order.status;
+				orders[i].type = orders[i].order.type;
+				orders[i].responses = orders[i].order.responses;
+				
+				orders[i].order = undefined;
 			}
-			//console.log(JSON.stringify(orders));
 		},
 		loadError: function(xhr, status, error) {
 			console.log(error.toString());
@@ -99,7 +140,7 @@ orderModule.controller("UserOrdersController", function($scope) {
 			angular.element(rightcolumn).append(creationDate);
 			angular.element(rightcolumn).append(endDate);
 			angular.element(rightcolumn).append(reward);
-			
+
 
 			angular.element(tabsdiv).jqxTabs({width: "95%", height: 170});
 		}
@@ -109,7 +150,6 @@ orderModule.controller("UserOrdersController", function($scope) {
 			{
 				theme: "bootstrap",
 				width: '100%',
-				
 				source: dataAdapter,
 				pageable: true,
 				showfilterrow: true,
@@ -126,11 +166,11 @@ orderModule.controller("UserOrdersController", function($scope) {
 				},
 				initrowdetails: initRowDetails,
 				columns: [
+					{text: "Title", dataField: "title", columntype: 'textbox', filtertype: 'textbox', filtercondition: 'starts_with'},
 					{text: "Languages", dataField: "languages", columntype: 'textbox', filtertype: 'none'},
-					{text: "Currencies", dataField: "currencies"},
-					{text: "Creation Date", dataField: "creationDate", columntype: 'textbox', filtertype: 'textbox', filtercondition: 'starts_with'},
-					{text: "End Date", dataField: "endDate", columntype: 'textbox', filtertype: 'textbox', filtercondition: 'starts_with'},
-					{text: "Reward", dataField: "reward", columntype: 'textbox', filtertype: 'textbox', filtercondition: 'starts_with'}
+					{text: "Currency", dataField: "currency", filtertype: 'none'},
+					{text: "Responses", dataField: "responses", filtertype: 'none'},
+					{text: "Status", dataField: "status", columntype: 'textbox', filtertype: 'checkedlist', filteritems: ['OPENED', 'PROCESSED', 'SUCCESS', 'NOT SUCCESS', 'ARBITRATION'], width: '110px'},
 				]
 			});
 });
