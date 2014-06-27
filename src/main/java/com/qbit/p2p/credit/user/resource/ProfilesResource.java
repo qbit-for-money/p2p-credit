@@ -13,6 +13,7 @@ import com.qbit.p2p.credit.order.model.FilterCriteriaValue;
 import com.qbit.p2p.credit.order.model.FilterOperator;
 import com.qbit.p2p.credit.order.model.OrderInfo;
 import com.qbit.p2p.credit.order.model.OrderStatus;
+import com.qbit.p2p.credit.order.model.OrderType;
 import com.qbit.p2p.credit.order.model.OrdersData;
 import com.qbit.p2p.credit.order.resource.OrdersResource;
 import com.qbit.p2p.credit.user.dao.UserProfileDAO;
@@ -504,6 +505,12 @@ public class ProfilesResource {
 			List<String> l = new ArrayList<>();
 			Collections.addAll(l, "Russian", "English");
 			order.setLanguages(l);
+			order.setResponses(rand.nextInt(10));
+			if(rand.nextInt(3) < 2) {
+				order.setType(OrderType.CREDIT);
+			} else {
+				order.setType(OrderType.BORROW);
+			}
 
 			orderDAO.create(order);
 		}
