@@ -11,5 +11,7 @@ public enum OrderType {
 	@XmlEnumValue("1")
 	CREDIT, 
 	@XmlEnumValue("2")
-	BORROW
+	BORROW,
+	@XmlEnumValue("3")
+	EXCHANGE
 }

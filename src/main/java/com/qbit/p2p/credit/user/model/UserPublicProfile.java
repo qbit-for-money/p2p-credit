@@ -80,14 +80,14 @@ public class UserPublicProfile implements Serializable {
 	@Embedded
 	private Statistic statistic;
 
-	private Set<DataLink> phones;
+	private List<DataLink> phones;
 	/*@ElementCollection
 	 @MapKeyColumn(name = "name")
 	 @Column(name = "phones_value")
 	 @CollectionTable(name = "phones_map", joinColumns = @JoinColumn(name = "id"))
 	 private Map<String, String> phonesMap = new HashMap<>();*/
 
-	private Set<DataLink> socialLinks;
+	private List<DataLink> socialLinks;
 	/*@XmlAnyElement
 	 @XmlJavaTypeAdapter(MapAdapter.class)
 	 @ElementCollection
@@ -96,8 +96,8 @@ public class UserPublicProfile implements Serializable {
 	 @CollectionTable(name = "social_links_map", joinColumns = @JoinColumn(name = "id"))
 	 private Map<String, String> socialLinksMap = new HashMap<>();*/
 	private boolean passportEnabled;
-	private Set<DataLink> videos;
-	private Set<DataLink> namesLinks;
+	private List<DataLink> videos;
+	private List<DataLink> namesLinks;
 	@Lob
 	private String bkiData;
 
@@ -213,37 +213,38 @@ public class UserPublicProfile implements Serializable {
 		this.passportEnabled = passportEnabled;
 	}
 
-	public Set<DataLink> getPhones() {
+	public List<DataLink> getPhones() {
 		return phones;
 	}
 
-	public void setPhones(Set<DataLink> phones) {
+	public void setPhones(List<DataLink> phones) {
 		this.phones = phones;
 	}
 
-	public Set<DataLink> getSocialLinks() {
+	public List<DataLink> getSocialLinks() {
 		return socialLinks;
 	}
 
-	public void setSocialLinks(Set<DataLink> socialLinks) {
+	public void setSocialLinks(List<DataLink> socialLinks) {
 		this.socialLinks = socialLinks;
 	}
 
-	public Set<DataLink> getVideos() {
+	public List<DataLink> getVideos() {
 		return videos;
 	}
 
-	public void setVideos(Set<DataLink> videos) {
+	public void setVideos(List<DataLink> videos) {
 		this.videos = videos;
 	}
 
-	public Set<DataLink> getNamesLinks() {
+	public List<DataLink> getNamesLinks() {
 		return namesLinks;
 	}
 
-	public void setNamesLinks(Set<DataLink> namesLinks) {
+	public void setNamesLinks(List<DataLink> namesLinks) {
 		this.namesLinks = namesLinks;
 	}
+
 
 	public String getBkiData() {
 		return bkiData;

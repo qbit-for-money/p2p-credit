@@ -1,54 +1,77 @@
 <div class="panel-body" ng-controller="OrdersCreateController">
 	<div class="container-fluid">
 		<div class="row">
+			<div class="col-xs-6 col-md-6" id="order-attributes">
+
+			</div>
+			<div class="col-xs-16 col-md-6" id="order-attributes">
+
+			</div>
+
+
 			<div class="col-xs-1 col-md-1"></div>
 			<div class="col-xs-10 col-md-10" id="order-attributes">
 				<div class="container-fluid">
 					<div class="row">
 						<div class="col-xs-4 col-md-3 title-edit">
-							Title:
+							Category:
 						</div>
-						<div class="col-xs-7 col-md-8">
-							<input type="text" ng-model="userPropertiesMap
-									['phone']" class="form-control masked-input-jqx" />
+						<div class="col-xs-7 col-md-8" ng-class="{'has-success': orderCreatingMap['orderCategories'] && (orderCreatingMap['orderCategories'].length !== 0), 'has-error': !orderCreatingMap['orderCategories'] || (orderCreatingMap['orderCategories'].length === 0)}">
+							<input type="hidden" class="form-control" ui-select2="categorySelect2Options" ng-model="orderCreatingMap['orderCategories']" id="category" data-placeholder="Pick a category" style="width: 100%" />
 						</div>
 					</div>
 					<div class="row">
 						<div class="col-xs-4 col-md-3 title-edit">
 							Languages:
 						</div>
-						<div class="col-xs-7 col-md-8">
-							<input type="text" id="order-languages" ng-model="userPropertiesMap
-									['languages']" class="form-control input-jqx" style="margin-top: 0;"/>
+						<div class="col-xs-7 col-md-8" ng-class="{'has-success': orderCreatingMap['orderLanguages'] && (orderCreatingMap['orderLanguages'].length !== 0), 'has-error': !orderCreatingMap['orderLanguages'] || (orderCreatingMap['orderLanguages'].length === 0)}">
+							<input type="hidden" class="form-control" ui-select2="languageSelect2Options" ng-model="orderCreatingMap['orderLanguages']" id="order-language" data-placeholder="Pick a language" style="width: 100%" />
 						</div>
 					</div>
 					<div class="row">
 
 						<div class="col-xs-4 col-md-3 title-edit">
-							Currency:
+							Take:
 						</div>
-						<div class="col-xs-7 col-md-8">
-							<input type="text" id="currencies" class="form-control input-jqx" ng-model="currencies" ng-change="editCurrencies"/>
-
+						<div class="col-xs-4 col-md-5" ng-hide="takeCurrencyHiden">
+							<div id='take-input' class="form-control masked-input-jqx">
+        </div>
+						</div>
+						<div class="col-xs-3 col-md-3">
+							<div id="take-currency-type" class="form-control input-jqx"></div>
 						</div>
 
 					</div>	
 					<div class="row">
 						<div class="col-xs-4 col-md-3 title-edit">
-							Reward:
+							Give:
 						</div>
-						<div class="col-xs-7 col-md-8">
-							<input type="text" ng-model="userPropertiesMap
-									['phone']" class="form-control masked-input-jqx" />
+						<div class="col-xs-4 col-md-5" ng-hide="giveCurrencyHiden">
+							<div id='give-input' class="form-control masked-input-jqx">
+        </div>
+						</div>
+						<div class="col-xs-3 col-md-3">
+							<div id="give-currency-type" class="form-control input-jqx"></div>
 						</div>
 					</div>
 					<div class="row">
 						<div class="col-xs-4 col-md-3 title-edit">
-							End date:
+							Duration:
 						</div>
-						<div class="col-xs-7 col-md-8">
-							<input type="text" ng-model="userPropertiesMap
-									['phone']" class="form-control masked-input-jqx" />
+						<div class="col-xs-4 col-md-5">
+							<div id='duration-input' class="form-control masked-input-jqx">
+        </div>
+						</div>
+						<div class="col-xs-3 col-md-3">
+							<div id="duration-type" class="form-control input-jqx"></div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-4 col-md-3 title-edit">
+							Booking deadline:
+						</div>
+						<div class="col-xs-7 col-md-8" ng-class="{'has-success': dateInput && (dateInput !== ''), 'has-error': !dateInput || (dateInput === '')}">
+								<input type="text" id="deadline" class="form-control" data="dateInput" date-time-picker placeholder="Pick a booking deadline" readonly="readonly"/>
 						</div>
 					</div>
 					<div class="row">
@@ -56,10 +79,17 @@
 							Free description:
 						</div>
 					</div>
-					<div class="row" style="min-height: 100px;">
-						<div id="personalEditable"  contenteditable="{{isCurrentUser}}">
+					<div class="row">
+						<div id="orderDataEditable"  contenteditable="true" class="ckeditor-area">
 						</div>
 					</div>
+
+					<div class="row" style="margin-top: 30px;">
+						<button class="btn btn-success create-order-button" type="button" ng-click="createOrder()" ng-disabled="!createOrderButtonEnabled || !orderCreatingMap['orderCategories'] || (orderCreatingMap['orderCategories'].length === 0) || !orderCreatingMap['orderLanguages'] || (orderCreatingMap['orderLanguages'].length === 0) || !dateInput || (dateInput === '')">
+							Create order
+						</button>
+					</div>
+
 				</div>
 			</div>
 			<div class="col-xs-1 col-md-1"></div>

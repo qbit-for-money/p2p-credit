@@ -28,6 +28,10 @@ span.error {
 	color: #d9534f;
 }
 
+.jqx-input-invalid {
+	border-color: #a94442 !important;
+}
+
 div.loader-big {
 	padding: 0px 0px; margin: 0px 0px;
 	background: url('../img/loader-big.gif') no-repeat;

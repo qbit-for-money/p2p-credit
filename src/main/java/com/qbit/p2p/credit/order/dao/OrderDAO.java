@@ -7,11 +7,12 @@ import com.qbit.commons.user.UserDAO;
 import com.qbit.commons.user.UserInfo;
 import com.qbit.p2p.credit.commons.model.Currency;
 import com.qbit.p2p.credit.order.model.FilterOperator;
+import com.qbit.p2p.credit.order.model.OrderCategory;
 import com.qbit.p2p.credit.order.model.OrderInfo;
 import com.qbit.p2p.credit.order.model.OrderStatus;
 import com.qbit.p2p.credit.order.model.OrderType;
 import com.qbit.p2p.credit.order.model.OrdersData;
-import com.qbit.p2p.credit.order.model.FilterCriteriaValue;
+import com.qbit.p2p.credit.order.model.SearchRequest;
 import com.qbit.p2p.credit.order.resource.OrdersResource;
 import com.qbit.p2p.credit.user.dao.UserProfileDAO;
 import com.qbit.p2p.credit.user.model.UserCurrency;
@@ -131,12 +132,11 @@ public class OrderDAO {
 				if (userInfo == null) {
 					return null;
 				}
-				UserPublicProfile profile = profileDAO.find(orderInfo.getUserPublicKey());
-				if ((profile != null) && (profile.getName() != null) && !profile.getName().isEmpty()) {
-					orderInfo.setUserName(profile.getName());
-				}
-				orderInfo.setStatus(OrderStatus.SUCCESS);
+				orderInfo.setStatus(OrderStatus.OPENED);
 				orderInfo.setCreationDate(new Date());
+				if(!orderInfo.isValid()) {
+					return null;
+				}
 				entityManager.persist(orderInfo);
 				return orderInfo;
 			}
@@ -164,8 +164,39 @@ public class OrderDAO {
 			}
 		});
 	}
+	
+	public OrderCategory createCategory(final String title) {
+		if ((title == null) || title.isEmpty()) {
+			throw new IllegalArgumentException("Title is empty.");
+		}
+		return invokeInTransaction(entityManagerFactory, new TrCallable<OrderCategory>() {
 
-	public OrdersData findWithFilter(String userPublicKey, FilterCriteriaValue filterCriteriaValue, UserPublicProfile profile, boolean isLength) {
+			@Override
+			public OrderCategory call(EntityManager entityManager) {
+				
+				OrderCategory category = new OrderCategory(title);
+				System.out.println("!!!!! " + category);
+				entityManager.persist(category);
+				return category;
+			}
+		});
+	}
+	
+	public List<OrderCategory> findAllCategories() {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		try {
+			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+			CriteriaQuery<OrderCategory> criteria = builder.createQuery(OrderCategory.class);
+			Root<OrderCategory> category = criteria.from(OrderCategory.class);
+			criteria.select(category);
+			TypedQuery<OrderCategory> query = entityManager.createQuery(criteria);
+			return query.getResultList();
+		} finally {
+			entityManager.close();
+		}
+	}
+
+	public OrdersData findWithFilter(String userPublicKey, SearchRequest filterCriteriaValue, UserPublicProfile profile, boolean isLength, boolean forUser) {
 		boolean sortDesc = false;
 		if ((filterCriteriaValue != null) && filterCriteriaValue.getSortOrder() != null && filterCriteriaValue.getSortOrder().equals("desc")) {
 			sortDesc = true;
@@ -204,11 +235,11 @@ public class OrderDAO {
 				}
 			}
 
-			List<FilterCriteriaValue.FilterItem> filterItems = (filterCriteriaValue != null) ? filterCriteriaValue.getFilterItems() : null;
+			List<SearchRequest.FilterItem> filterItems = (filterCriteriaValue != null) ? filterCriteriaValue.getFilterItems() : null;
 
 			if (filterItems != null && !filterItems.isEmpty()) {
 				Predicate itemsOperatorPredicate = null;
-				for (FilterCriteriaValue.FilterItem item : filterItems) {
+				for (SearchRequest.FilterItem item : filterItems) {
 					if ((item.getFilterDataField() != null) && (item.getFilterValue() != null)) {
 						//ParameterExpression<String> parameter = builder.parameter(String.class, item.getFilterDataField());
 						//Predicate valuePredicate = builder.equal(builder.lower(order.<String>get(item.getFilterDataField())), "%" + item.getFilterValue().toLowerCase() + "%");
@@ -289,6 +320,8 @@ public class OrderDAO {
 				} else {
 					mainOperatorPredicate = builder.and(operatorPredicate, mainOperatorPredicate);
 				}
+			} else if(forUser){
+				mainOperatorPredicate = builder.disjunction();
 			}
 			if(mainOperatorPredicate != null) {
 				criteria.where(mainOperatorPredicate);

@@ -1,7 +1,5 @@
 package com.qbit.p2p.credit.order.model;
 
-import com.qbit.p2p.credit.order.model.FilterOperator;
-import com.qbit.p2p.credit.order.model.OrderType;
 import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlList;
@@ -11,15 +9,15 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Alexander_Sergeev
  */
 @XmlRootElement
-public class FilterCriteriaValue {
+public class SearchRequest {
 
 	public static class FilterItem {
 
-		private String filterValue;
-		private String filterCondition;
 		@XmlElement(required = true)
 		private FilterOperator filterOperator;
 		private String filterDataField;
+		private String filterCondition;
+		private String filterValue;
 
 		public String getFilterValue() {
 			return filterValue;

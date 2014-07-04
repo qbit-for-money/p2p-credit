@@ -1,12 +1,13 @@
 package com.qbit.p2p.credit.order.resource;
 
-import com.qbit.p2p.credit.order.model.FilterCriteriaValue;
+import com.qbit.p2p.credit.order.model.SearchRequest;
 import com.qbit.commons.auth.AuthFilter;
 import static com.qbit.commons.rest.util.RESTUtil.toDate;
 import com.qbit.p2p.credit.commons.model.Currency;
 import com.qbit.p2p.credit.order.dao.OrderDAO;
 import com.qbit.p2p.credit.order.model.CurrencyInterval;
 import com.qbit.p2p.credit.order.model.FilterOperator;
+import com.qbit.p2p.credit.order.model.OrderCategory;
 import com.qbit.p2p.credit.order.model.OrderInfo;
 import com.qbit.p2p.credit.order.model.OrderType;
 import com.qbit.p2p.credit.order.model.OrdersData;
@@ -42,6 +43,25 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Path("orders")
 @Singleton
 public class OrdersResource {
+	
+	@XmlRootElement
+	public static class CategoriesWrapper {
+
+		@XmlElement
+		@XmlList
+		private List<OrderCategory> categories;
+
+		public CategoriesWrapper() {
+		}
+
+		public CategoriesWrapper(List<OrderCategory> categories) {
+			this.categories = categories;
+		}
+
+		public List<OrderCategory> getCategories() {
+			return categories;
+		}
+	}
 
 	@XmlRootElement
 	public static class OrdersWrapper {
@@ -162,24 +182,61 @@ public class OrdersResource {
 	@Path("last")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public OrdersWrapper getLast(FilterCriteriaValue ordersRequest) {
-		String userId = AuthFilter.getUserId(request);
-		if (!userId.contains("@")) {
-			return null;
+	public OrdersWrapper getLast(SearchRequest ordersRequest) {
+		if (ordersRequest == null) {
+			return new OrdersWrapper(null, 0);
 		}
+		if (ordersRequest.getFilterItems() == null) {
+			ordersRequest.setFilterItems(new ArrayList<SearchRequest.FilterItem>());
+		}
+
 		List<OrderInfo> orders = null;
-		UserPublicProfile profile = profileDAO.find(userId);
-		OrdersData ordersData = orderDAO.findWithFilter(userId, ordersRequest, profile, false);
+		UserPublicProfile profile = profileDAO.find(AuthFilter.getUserId(request));
+		OrdersData ordersData = orderDAO.findWithFilter(null, ordersRequest, profile, false, true);
 		if (ordersData != null) {
 			orders = ordersData.getOrders();
 		}
-		List<OrderWrapper> ordersWrappers = new ArrayList<>();
-		for(OrderInfo order : orders) {
-			//UserPublicProfile profile = profileDAO.find(order.getUserPublicKey());
-			OrderWrapper wrapper = new OrderWrapper(order);
-			wrapper.setSuccess(profile.getStatistic().getSuccessTransactionsSum());
+
+		OrdersData ordersSize = orderDAO.findWithFilter(null, ordersRequest, profile, true, true);
+		long length = 0;
+		if (ordersSize != null) {
+			length = ordersSize.getLength();
 		}
 		
+		List<OrderWrapper> ordersWrappers = new ArrayList<>();
+		for(OrderInfo order : orders) {
+			UserPublicProfile profileValue = profileDAO.find(order.getUserPublicKey());
+			OrderWrapper wrapper = new OrderWrapper(order);
+			wrapper.setRating(profileValue.getStatistic().getTransactionsRating());
+			wrapper.setSuccess(profileValue.getStatistic().getSuccessTransactionsSum());
+			String ordersSuccessSizeSum = "";
+			
+			for(Currency currency : profileValue.getCurrencies()) {
+				long ordersSuccessSize = 0;
+				SearchRequest filter = new SearchRequest();
+				SearchRequest.FilterItem item = new SearchRequest.FilterItem();
+				item.setFilterDataField("status");
+				item.setFilterValue("SUCCESS");
+				item.setFilterOperator(FilterOperator.AND);
+				
+				SearchRequest.FilterItem currencyItem = new SearchRequest.FilterItem();
+				currencyItem.setFilterDataField("currency");
+				currencyItem.setFilterValue(currency.name());
+				item.setFilterOperator(FilterOperator.AND);
+				
+				filter.setFilterItems(Arrays.asList(item, currencyItem));
+				OrdersData ordersSuccessSizeData = orderDAO.findWithFilter(profileValue.getPublicKey(), filter, null, true, false);
+				if(ordersSuccessSizeData != null) {
+					ordersSuccessSize = ordersSuccessSizeData.getLength();
+				}
+				ordersSuccessSizeSum += (currency.getCode() + ": " + ordersSuccessSize + " ");
+			}
+			wrapper.setSuccessValue(ordersSuccessSizeSum);
+			//List<UserPublicProfile> responsesProfiles = profileDAO.findByOrder(order.getId(), 0, 0);
+			
+			//wrapper.setSuccess(profileValue.getStatistic().getSuccessTransactionsSum());
+			ordersWrappers.add(wrapper);
+		}
 		return new OrdersWrapper(ordersWrappers, 4);
 	}
 
@@ -187,23 +244,23 @@ public class OrdersResource {
 	@Path("current/withFilter")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public OrdersWrapper getForCurrentWithFilter(FilterCriteriaValue ordersRequest) {
+	public OrdersWrapper getForCurrentWithFilter(SearchRequest ordersRequest) {
 		String userId = AuthFilter.getUserId(request);
 		if (!userId.contains("@")) {
 			return null;
 		}
 		if (ordersRequest.getFilterItems() == null) {
-			ordersRequest.setFilterItems(new ArrayList<FilterCriteriaValue.FilterItem>());
+			ordersRequest.setFilterItems(new ArrayList<SearchRequest.FilterItem>());
 		}
 		List<OrderInfo> orders = null;
 		UserPublicProfile profile = profileDAO.find(userId);
 
-		OrdersData ordersData = orderDAO.findWithFilter(userId, ordersRequest, profile, false);
+		OrdersData ordersData = orderDAO.findWithFilter(userId, ordersRequest, profile, false, true);
 		if (ordersData != null) {
 			orders = ordersData.getOrders();
 		}
 
-		OrdersData ordersSize = orderDAO.findWithFilter(userId, ordersRequest, profile, true);
+		OrdersData ordersSize = orderDAO.findWithFilter(userId, ordersRequest, profile, true, true);
 		long length = 0;
 		if (ordersSize != null) {
 			length = ordersSize.getLength();
@@ -222,22 +279,22 @@ public class OrdersResource {
 	@Path("withFilter")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public OrdersWrapper getWithFilter(FilterCriteriaValue ordersRequest) {
+	public OrdersWrapper getWithFilter(SearchRequest ordersRequest) {
 		if (ordersRequest == null) {
 			return new OrdersWrapper(null, 0);
 		}
 		if (ordersRequest.getFilterItems() == null) {
-			ordersRequest.setFilterItems(new ArrayList<FilterCriteriaValue.FilterItem>());
+			ordersRequest.setFilterItems(new ArrayList<SearchRequest.FilterItem>());
 		}
 
 		List<OrderInfo> orders = null;
 		UserPublicProfile profile = profileDAO.find(AuthFilter.getUserId(request));
-		OrdersData ordersData = orderDAO.findWithFilter(null, ordersRequest, profile, false);
+		OrdersData ordersData = orderDAO.findWithFilter(null, ordersRequest, profile, false, true);
 		if (ordersData != null) {
 			orders = ordersData.getOrders();
 		}
 
-		OrdersData ordersSize = orderDAO.findWithFilter(null, ordersRequest, profile, true);
+		OrdersData ordersSize = orderDAO.findWithFilter(null, ordersRequest, profile, true, true);
 		long length = 0;
 		if (ordersSize != null) {
 			length = ordersSize.getLength();
@@ -253,19 +310,19 @@ public class OrdersResource {
 			
 			for(Currency currency : profileValue.getCurrencies()) {
 				long ordersSuccessSize = 0;
-				FilterCriteriaValue filter = new FilterCriteriaValue();
-				FilterCriteriaValue.FilterItem item = new FilterCriteriaValue.FilterItem();
+				SearchRequest filter = new SearchRequest();
+				SearchRequest.FilterItem item = new SearchRequest.FilterItem();
 				item.setFilterDataField("status");
 				item.setFilterValue("SUCCESS");
 				item.setFilterOperator(FilterOperator.AND);
 				
-				FilterCriteriaValue.FilterItem currencyItem = new FilterCriteriaValue.FilterItem();
+				SearchRequest.FilterItem currencyItem = new SearchRequest.FilterItem();
 				currencyItem.setFilterDataField("currency");
 				currencyItem.setFilterValue(currency.name());
 				item.setFilterOperator(FilterOperator.AND);
 				
 				filter.setFilterItems(Arrays.asList(item, currencyItem));
-				OrdersData ordersSuccessSizeData = orderDAO.findWithFilter(profileValue.getPublicKey(), filter, null, true);
+				OrdersData ordersSuccessSizeData = orderDAO.findWithFilter(profileValue.getPublicKey(), filter, null, true, false);
 				if(ordersSuccessSizeData != null) {
 					ordersSuccessSize = ordersSuccessSizeData.getLength();
 				}
@@ -284,7 +341,21 @@ public class OrdersResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public OrderInfo create(OrderInfo order) {
-		return orderDAO.create(AuthFilter.getUserId(request));
+		String id = AuthFilter.getUserId(request);
+		order.setUserPublicKey(id);
+		System.out.println("!!! ORDER  " + order);
+		if(!order.isValid()) {
+			return null;
+		}
+		System.out.println("!!! ORDER CREATE ");
+		return orderDAO.create(order);
+	}
+	
+	@GET
+	@Path("categories")
+	@Produces(MediaType.APPLICATION_JSON)
+	public CategoriesWrapper getOrdersCategories() {
+		return new CategoriesWrapper(orderDAO.findAllCategories());
 	}
 
 	@GET
@@ -298,19 +369,15 @@ public class OrdersResource {
 		order.setCreationDate(new Date());
 		order.setEndDate(new Date());
 		order.setReward(String.valueOf(rand.nextInt(1000)));
-		UserPublicProfile profile = profileDAO.find(userId);
-		if ((profile != null) && (profile.getName() != null) && !profile.getName().isEmpty()) {
-			order.setUserName(profile.getName());
-		}
 
 		UserCurrency c1 = new UserCurrency(Currency.BITCOIN, 10, 500);
 		//UserCurrency c2 = new UserCurrency(Currency.LITECOIN, 10, 500);
 		//List<UserCurrency> c = new ArrayList<>();
 		//Collections.addAll(c, c1, c2);
-		order.setCurrency(Currency.YANDEX_RUB);
-		order.setCurrencyInterval(new CurrencyInterval(80, 250));
+		
+		//order.setCurrencyInterval(new CurrencyInterval(80, 250));
 		order.setType(OrderType.CREDIT);
-		order.setTitle("Other");
+		//order.setTitle("Other");
 		order.setOrderData("DEFAULT");
 
 		List<String> l = new ArrayList<>();
@@ -318,5 +385,28 @@ public class OrdersResource {
 		order.setLanguages(l);
 
 		return orderDAO.create(order);
+	}
+	
+	@GET
+	@Path("test-category")
+	@Produces(MediaType.APPLICATION_JSON)
+	public OrderCategory createTestCategories() {
+		System.out.println("!!! TEST");
+		String c = "Кредит под процент";
+		orderDAO.createCategory(c);
+		c = "Кредит под залог";
+		orderDAO.createCategory(c);
+		c = "Кредит на образование";
+		orderDAO.createCategory(c);
+		c = "Кредит";
+		orderDAO.createCategory(c);
+		c = "Обмен";
+		orderDAO.createCategory(c);
+		c = "Безвозвратно";
+		orderDAO.createCategory(c);
+		c = "Без %";
+		orderDAO.createCategory(c);
+		c = "Доля";
+		return orderDAO.createCategory(c);
 	}
 }

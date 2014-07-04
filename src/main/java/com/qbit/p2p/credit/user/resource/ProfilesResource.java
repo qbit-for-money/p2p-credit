@@ -9,7 +9,7 @@ import com.qbit.p2p.credit.material.dao.MaterialDAO;
 import com.qbit.p2p.credit.material.model.MaterialType;
 import com.qbit.p2p.credit.material.model.Materials;
 import com.qbit.p2p.credit.order.dao.OrderDAO;
-import com.qbit.p2p.credit.order.model.FilterCriteriaValue;
+import com.qbit.p2p.credit.order.model.SearchRequest;
 import com.qbit.p2p.credit.order.model.FilterOperator;
 import com.qbit.p2p.credit.order.model.OrderInfo;
 import com.qbit.p2p.credit.order.model.OrderStatus;
@@ -289,24 +289,24 @@ public class ProfilesResource {
 			openessRating = openessRating + user.getNamesLinks().size() * 3;
 		}
 		statistic.setOpennessRating(openessRating);
-		FilterCriteriaValue filter = new FilterCriteriaValue();
-		FilterCriteriaValue.FilterItem filterItem = new FilterCriteriaValue.FilterItem();
+		SearchRequest filter = new SearchRequest();
+		SearchRequest.FilterItem filterItem = new SearchRequest.FilterItem();
 		filterItem.setFilterDataField("status");
 		filterItem.setFilterValue("SUCCESS");
 		filterItem.setFilterOperator(FilterOperator.AND);
 		filterItem.setFilterCondition("EQUAL");
 		filter.setFilterItems(Arrays.asList(filterItem));
-		OrdersData successData = orderDAO.findWithFilter(publicKey, filter, null, true);
+		OrdersData successData = orderDAO.findWithFilter(publicKey, filter, null, true, false);
 		
 		filterItem.setFilterValue("NOT_SUCCESS");
 		filter.setFilterItems(Arrays.asList(filterItem));
-		OrdersData notSuccessData = orderDAO.findWithFilter(publicKey, filter, null, true);
+		OrdersData notSuccessData = orderDAO.findWithFilter(publicKey, filter, null, true, false);
 		if((successData != null) && (notSuccessData != null)) {
 			transactionsRating = successData.getLength() - notSuccessData.getLength();
 			
 		}
 		statistic.setTransactionsRating(transactionsRating);
-		OrdersData allOrdersData = orderDAO.findWithFilter(publicKey, null, null, true);
+		OrdersData allOrdersData = orderDAO.findWithFilter(publicKey, null, null, true, false);
 		if(allOrdersData != null) {
 			allOrders = allOrdersData.getLength();
 		}
@@ -314,13 +314,13 @@ public class ProfilesResource {
 		filterItem.setFilterCondition("NOT_EQUAL");
 		filterItem.setFilterValue("OPENED");
 		filter.setFilterItems(Arrays.asList(filterItem));
-		OrdersData allTransactionsData = orderDAO.findWithFilter(publicKey, filter, null, true);
+		OrdersData allTransactionsData = orderDAO.findWithFilter(publicKey, filter, null, true, false);
 		if(allOrdersData != null) {
 			allTransactions = allTransactionsData.getLength();
 		}
 		statistic.setTransactionsSum(allTransactions);
 		
-		OrdersData allUsersTransactionsData = orderDAO.findWithFilter(null, filter, null, true);
+		OrdersData allUsersTransactionsData = orderDAO.findWithFilter(null, filter, null, true, false);
 		if(allUsersTransactionsData != null) {
 			allUsersTransactions = allUsersTransactionsData.getLength();
 		}
@@ -329,13 +329,13 @@ public class ProfilesResource {
 		filterItem.setFilterCondition("EQUAL");
 		filterItem.setFilterValue("SUCCESS");
 		filter.setFilterItems(Arrays.asList(filterItem));
-		OrdersData allSuccessTransactionsData = orderDAO.findWithFilter(publicKey, filter, null, true);
+		OrdersData allSuccessTransactionsData = orderDAO.findWithFilter(publicKey, filter, null, true, false);
 		if(allOrdersData != null) {
 			allSuccessTransactions = allSuccessTransactionsData.getLength();
 		}
 		statistic.setSuccessTransactionsSum(allSuccessTransactions);
 		
-		OrdersData allUsersSuccessTransactionsData = orderDAO.findWithFilter(null, filter, null, true);
+		OrdersData allUsersSuccessTransactionsData = orderDAO.findWithFilter(null, filter, null, true, false);
 		if(allUsersSuccessTransactionsData != null) {
 			allUsersSuccessTransactions = allUsersSuccessTransactionsData.getLength();
 		}
@@ -495,12 +495,9 @@ public class ProfilesResource {
 			order.setEndDate(new Date());
 			order.setReward(String.valueOf(rand.nextInt(1000)));
 			order.setStatus(OrderStatus.OPENED);
-			if ((user.getName() != null) && !user.getName().isEmpty()) {
-				order.setUserName(user.getName());
-			}
 
 			//Collections.addAll(c, c1, c2);
-			order.setCurrency(Currency.BITCOIN);
+			//order.setCurrency(Currency.BITCOIN);
 
 			List<String> l = new ArrayList<>();
 			Collections.addAll(l, "Russian", "English");

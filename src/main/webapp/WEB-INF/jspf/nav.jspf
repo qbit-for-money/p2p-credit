@@ -16,9 +16,12 @@
 		<!-- Collect the nav links, forms, and other content for toggling -->
 		<div class="collapse navbar-collapse" collapse="isNavbarCollapsed">
 
-			<ul class="nav navbar-nav">
-				<li ng-class="{ active: isActive('/')}" title="Create order"><a href="#"><span class="glyphicon glyphicon-shopping-cart"></span></a></li>
-				<!--li ng-class="{ active: isActive('/order-init')}" title="Create order" ng-if="isGoogleAuth()"><a href="#/order-init" ng-cl><span class="glyphicon glyphicon-shopping-cart"></span></a></li-->
+			<ul class="nav navbar-nav visible-xs" style="cursor: pointer">
+				<!--li ng-class="{ active: isActive('/')}" title="Create order"><a href="#"><span class="glyphicon glyphicon-th"></span></a></li-->
+				<li title="Last orders" ng-hide="!isActive('/')"><a ng-click="gotoLastOrders()"><span class="glyphicon glyphicon-th-list"></span></a></li>
+				<li title="Init order" ng-hide="!isActive('/')"><a ng-click="gotoOrderInit()"><span class="glyphicon glyphicon-shopping-cart"></span></a></li>
+				<li title="Presentation" ng-hide="!isActive('/')"><a ng-click="gotoVideo()"><span class="glyphicon glyphicon-facetime-video"></span></a></li>
+				<li title="Presentation" ng-hide="!isActive('/')"><a ng-click="gotoImage()"><span class="glyphicon glyphicon-picture"></span></a></li>
 			</ul>
 
 			<%@ include file="user.jspf" %>

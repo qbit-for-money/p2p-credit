@@ -47,22 +47,28 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 	@XmlJavaTypeAdapter(DateAdapter.class)
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date endDate;
+	private int duration;
+	private DurationType durationType;
 
 	private String userPublicKey;
-	private String userName;
-	private String title;
+	@ElementCollection
+	private List<String> categories;
 	@Lob
 	private String orderData;
 	
 	private OrderStatus status;
 	
-	private OrderType type;
+	//private OrderType type;
 	@ElementCollection
 	private List<String> languages;
 	@XmlJavaTypeAdapter(CurrencyAdapter.class)
-	private Currency currency;
-	@Embedded
-	private CurrencyInterval currencyInterval;
+	private Currency givingCurrency;
+	@XmlJavaTypeAdapter(CurrencyAdapter.class)
+	private Currency takingCurrency;
+	private double takingValue;
+	private double givingValue;
+	//@Embedded
+	//private CurrencyInterval currencyInterval;
 	
 	private String reward;
 	private long responses;
@@ -93,36 +99,12 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 		this.userPublicKey = userPublicKey;
 	}
 
-	public String getUserName() {
-		return userName;
-	}
-
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
 	public OrderStatus getStatus() {
 		return status;
 	}
 
 	public void setStatus(OrderStatus status) {
 		this.status = status;
-	}
-
-	public OrderType getType() {
-		return type;
-	}
-
-	public void setType(OrderType type) {
-		this.type = type;
 	}
 
 	public Date getEndDate() {
@@ -141,21 +123,54 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 		this.languages = languages;
 	}
 
-	public Currency getCurrency() {
-		return currency;
+	public int getDuration() {
+		return duration;
 	}
 
-	public void setCurrency(Currency currency) {
-		this.currency = currency;
+	public void setDuration(int duration) {
+		this.duration = duration;
 	}
 
-	public CurrencyInterval getCurrencyInterval() {
-		return currencyInterval;
+	public List<String> getCategories() {
+		return categories;
 	}
 
-	public void setCurrencyInterval(CurrencyInterval currencyInterval) {
-		this.currencyInterval = currencyInterval;
+	public void setCategories(List<String> categories) {
+		this.categories = categories;
 	}
+
+	public Currency getGivingCurrency() {
+		return givingCurrency;
+	}
+
+	public void setGivingCurrency(Currency givingCurrency) {
+		this.givingCurrency = givingCurrency;
+	}
+
+	public Currency getTakingCurrency() {
+		return takingCurrency;
+	}
+
+	public void setTakingCurrency(Currency takingCurrency) {
+		this.takingCurrency = takingCurrency;
+	}
+
+	public double getTakingValue() {
+		return takingValue;
+	}
+
+	public void setTakingValue(double takingValue) {
+		this.takingValue = takingValue;
+	}
+
+	public double getGivingValue() {
+		return givingValue;
+	}
+
+	public void setGivingValue(double givingValue) {
+		this.givingValue = givingValue;
+	}
+
 
 	public String getReward() {
 		return reward;
@@ -180,9 +195,29 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 	public void setResponses(long responses) {
 		this.responses = responses;
 	}
+
+	public DurationType getDurationType() {
+		return durationType;
+	}
+
+	public void setDurationType(DurationType durationType) {
+		this.durationType = durationType;
+	}
 	
+	public boolean isValid() {
+		return (endDate != null) 
+			&& (duration != 0)
+			&& (durationType != null)
+			&& (userPublicKey != null) 
+			&& !userPublicKey.isEmpty() 
+			&& (categories != null) 
+			&& (languages != null) 
+			&& (takingCurrency != null || givingCurrency != null) 
+			&& (takingValue != 0 || givingValue != 0);
+	}
+
 	@Override
 	public String toString() {
-		return "OrderInfo{" + "id=" + id + ", creationDate=" + creationDate + ", endDate=" + endDate + ", userPublicKey=" + userPublicKey + ", userName=" + userName + ", title=" + title + ", orderData=" + orderData + ", status=" + status + ", type=" + type + ", languages=" + languages + ", currency=" + currency + ", currencyInterval=" + currencyInterval + ", reward=" + reward + ", responses=" + responses + '}';
+		return "OrderInfo{" + "id=" + id + ", creationDate=" + creationDate + ", endDate=" + endDate + ", duration=" + duration + ", durationType=" + durationType + ", userPublicKey=" + userPublicKey + ", categories=" + categories + ", orderData=" + orderData + ", status=" + status + ", languages=" + languages + ", givingCurrency=" + givingCurrency + ", takingCurrency=" + takingCurrency + ", takingValue=" + takingValue + ", givingValue=" + givingValue + ", reward=" + reward + ", responses=" + responses + '}';
 	}
 }

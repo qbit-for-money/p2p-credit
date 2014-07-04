@@ -10,7 +10,14 @@
 								<img id="user-photo-change" ng-hide="!imageSrc" width="100%" ng-src="{{imageSrc}}" />
 							</div>
 						</div>
-						<div class="col-xs-12 col-md-12" style="min-width: 180px; padding-bottom: 10px;">
+						<div class="col-xs-12 col-md-12" style="padding-top: 1px; min-width: 180px;">
+							<div class="progress">
+								<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{userPropertiesMap['rating']}}" aria-valuemin="0" aria-valuemax="100" ng-style="{width : (userPropertiesMap['rating'] + '%') }">
+									Rating: {{userPropertiesMap['rating']}}
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-12 col-md-12" style="min-width: 180px; margin-top: -19px; padding-bottom: 10px;">
 							<div class="browse-button btn btn-default col-xs-6 col-md-6" ng-if="isCurrentUser && !editUserPhoto && edit">
 								<span class="glyphicon glyphicon-refresh"></span>
 								<input type="file" name="file" ng-file-select="onFileSelect($files)" >
@@ -25,7 +32,7 @@
 			<div class="col-xs-12 col-md-9" style="padding-bottom: 5%;">
 				<div class="container-fluid">
 					<div class="row">
-						<div class="col-xs-6 col-md-10 " ng-if="!edit">
+						<div class="col-xs-6 col-md-9 " ng-if="!edit">
 							<h4>{{userPropertiesMap['name']}}</h4>
 						</div>
 
@@ -34,8 +41,15 @@
 								['name']" placeholder="Name" maxlength="20"/>
 						</div>
 
-						<div class="col-xs-3 col-md-1 navbar-right" style="float: right;" ng-hide="!isCurrentUser">
-							<button class="btn btn-default navbar-right" ng-disabled="disabledEditButton" ng-click="editProfile()"><span class="glyphicon glyphicon-edit"></span></button>
+						<div class="col-xs-3 col-md-3 navbar-right"  ng-hide="!isCurrentUser">
+							<button class="btn btn-default navbar-right" ng-disabled="disabledEditButton" ng-click="editProfile()" ng-hide="edit"><span class="glyphicon glyphicon-edit"></span></button>
+
+							<div class="input-group navbar-right" ng-hide="!edit">
+								<span class="btn-group">
+									<button class="btn btn-default" ng-disabled="disabledEditButton" ng-click="savePersonalPage()"><span class="glyphicon glyphicon-save"></span></button>
+									<button class="btn btn-default" ng-disabled="disabledEditButton" ng-click="editProfile()"><span class="glyphicon glyphicon-edit"></span></button>
+								</span>
+							</div>
 						</div>
 					</div>
 					<div class="row">
@@ -44,15 +58,6 @@
 
 					<div id="user-attributes" class="row">
 						<div class="container-fluid">
-							
-								<div class="row" ng-if="!edit">
-									<div class="col-xs-5 col-md-5"></div>
-									<div class="col-xs-6 col-md-6">	
-										{{ratingOpenness}} {{ratingTransactions}} {{ordersSumValue}} {{transactionsSum}} {{successTransactionsSum}} {{allTransactionsSum}} {{allSuccessTransactionsSum}}
-									</div>
-								</div>
-							
-							<div class="col-xs-12 col-md-12"><hr></div>
 							<div class="row" ng-if="(!edit && userPropertiesMap['mail']) || edit">
 
 								<div class="col-xs-4 col-md-2 title" ng-if="!edit && userPropertiesMap['mail']">
@@ -62,10 +67,10 @@
 									{{userPropertiesMap['mail']}}
 								</div>
 
-								<div class="col-xs-4 col-md-3 title-edit" ng-if="edit">
+								<div class="col-xs-4 col-md-3 title-edit" ng-hide="!edit">
 									Mail:
 								</div>
-								<div class="input-group col-xs-7 col-md-8" ng-if="edit">
+								<div class="input-group col-xs-7 col-md-8" ng-hide="!edit">
 									<input type="text" id="mail" ng-model="userPropertiesMap
 										['mail']" class="form-control" />
 									<span class="input-group-btn">
@@ -84,10 +89,10 @@
 									{{userPropertiesMap['phone']}}
 								</div>
 
-								<div class="col-xs-4 col-md-3 title-edit" ng-if="edit">
+								<div class="col-xs-4 col-md-3 title-edit" ng-hide="!edit">
 									Phone:
 								</div>
-								<div class="input-group col-xs-7 col-md-8" ng-if="edit">
+								<div class="input-group col-xs-7 col-md-8" ng-hide="!edit">
 									<input type="text" id="phone" ng-model="userPropertiesMap
 										['phone']" class="form-control masked-input-jqx" />
 									<span class="input-group-btn">
@@ -103,15 +108,13 @@
 									Languages:
 								</div>
 								<div class="col-xs-7 col-md-8" ng-if="!edit && userPropertiesMap['languages']">
-									{{userPropertiesMap['languages']}}
+									{{userPropertiesMap['languagesStr']}}
 								</div>
-
-								<div class="col-xs-4 col-md-3 title-edit" ng-if="edit">
+								<div class="col-xs-4 col-md-3 title-edit" ng-hide="!edit">
 									Languages:
 								</div>
-								<div class="input-group col-xs-7 col-md-8" ng-if="edit">
-									<input type="text" id="languages" ng-model="userPropertiesMap
-										['languages']" class="form-control input-jqx" style="margin-top: 0;"/>
+								<div class="input-group col-xs-7 col-md-8" ng-hide="!edit">
+									<input type="hidden" class="form-control" ui-select2="languageSelect2Options" ng-model="userPropertiesMap['languages']" id="order-language" data-placeholder="Pick a language" style="width: 100%" />
 									<span class="input-group-btn">
 										<button class="btn btn-default" type="button" ng-click="changeVisible('languagesEnabled')">
 											<span class="span-jqx glyphicon glyphicon-eye-{{userPropertiesMap['languagesEnabled']}}"></span>
@@ -125,14 +128,15 @@
 									Currencies:
 								</div>
 								<div class="col-xs-7 col-md-8" ng-if="!edit && userPropertiesMap['currencies']">
-									{{currencies}}
+									{{userPropertiesMap['currenciesStr']}}
 								</div>
 
-								<div class="col-xs-4 col-md-3 title-edit" ng-if="edit">
+								<div class="col-xs-4 col-md-3 title-edit" ng-hide="!edit">
 									Currencies:
 								</div>
 								<div class="input-group col-xs-7 col-md-8" ng-if="edit">
-									<input type="text" id="currencies" class="form-control input-jqx" ng-model="currencies" ng-change="editCurrencies"/>
+									<input type="hidden" class="form-control" ui-select2="currenciesSelect2Options" ng-model="userPropertiesMap['currencies']" id="currency" data-placeholder="Pick a currency" style="width: 100%" />
+									<!--input type="text" id="currencies" class="form-control input-jqx" ng-model="currencies" ng-change="editCurrencies"/-->
 									<span class="input-group-btn">
 										<button class="btn btn-default" type="button" ng-click="changeVisible('currenciesEnabled')">
 											<span class="span-jqx glyphicon glyphicon-eye-{{userPropertiesMap['currenciesEnabled']}}"></span>
@@ -166,45 +170,109 @@
 									</button>
 								</div>
 							</div>
-
 						</div>
 					</div>
-					<links-list links="userPropertiesMap['socialLinks']" type="'social-link'" save-data="updateProfile()" current="userPropertiesMap['isCurrentUser']"></links-list>
-					<links-list links="userPropertiesMap['phones']" type="'phone'" save-data="updateProfile()" current="userPropertiesMap['isCurrentUser']"></links-list>
 					<div class="row">
-						<div class="col-xs-7 col-md-7" style="margin-bottom: -26px; margin-top: 17px;" ng-hide="userPropertiesMap['passportEnabled'] === false">Ready to show passport</div>
-						<div class="col-xs-7 col-md-7" style="margin-bottom: -26px; margin-top: 17px;" ng-hide="userPropertiesMap['passportEnabled'] !== false">Not ready to show passport</div>
-						<div class="col-xs-5 col-md-5">
-							<div class="navbar-right" ng-hide="!isCurrentUser">
-								<button class="btn btn-default" style="margin-bottom: -17px; margin-top: 15px;" type="button" ng-click="editPassport()">
-									<span class="glyphicon glyphicon-edit"></span>
-								</button>
+						<div class="col-xs-12 col-md-12"><hr></div>
+					</div>
+					<div class="row" style="padding-bottom: 20px;">
+						<div class="col-xs-5 col-md-3">Openness: {{ratingOpenness}}	</div>
+						<div class="col-xs-5 col-md-3">Transactions: {{ratingTransactions}}</div>
+						<div class="col-xs-5 col-md-3">Orders sum: {{ordersSumValue}}</div>
+						<div class="col-xs-5 col-md-3">Transactions sum: {{transactionsSum}}</div>
+						<div class="col-xs-5 col-md-4">Success transactions sum: {{successTransactionsSum}}</div>
+						<div class="col-xs-5 col-md-4">All transactions sum: {{allTransactionsSum}}</div>
+						<div class="col-xs-5 col-md-4">All success transactions sum: {{allSuccessTransactionsSum}}</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+
+		<div class="row" id="addition-attributes">
+			<div class="col-xs-12 col-md-12">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-xs-3 col-md-3" style="margin-top: 1px;">Personal info</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-12 col-md-12"><hr></div>
+					</div>
+					<div class="row" style="padding-bottom: 5px;">
+						<div class="col-xs-12 col-md-12">
+							<div id="personalEditable" ng-hide="!edit"  contenteditable="true" class="ckeditor-area">
+							</div>
+							<div id="personalNotEditable" ng-hide="edit" ng-bind-html="userPropertiesMap['personalData']">
+							</div>
+						</div>
+					</div>
+					<div class="row" style="padding-bottom: 15px;">
+						<div class="col-xs-3 col-md-3 navbar-right"  ng-hide="!isCurrentUser">			
+							<div class="navbar-right" >
+								<button class="btn btn-default" ng-hide="!edit" ng-disabled="disabledEditButton" ng-click="savePersonalPage()"><span class="glyphicon glyphicon-save"></span></button>
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-xs-3 col-md-3 navbar-right"  ng-hide="!isCurrentUser">
+							<button class="btn btn-default navbar-right" ng-disabled="disabledEditButton" ng-click="editAdditionalProfile()" ng-hide="editAdditional"><span class="glyphicon glyphicon-edit"></span></button>
+
+							<div class="input-group navbar-right" ng-hide="!editAdditional">
+								<span class="btn-group">
+									<button class="btn btn-default" ng-disabled="disabledEditButton" ng-click="saveAdditionalData()"><span class="glyphicon glyphicon-save"></span></button>
+									<button class="btn btn-default" ng-disabled="disabledEditButton" ng-click="editAdditionalProfile()"><span class="glyphicon glyphicon-edit"></span></button>
+								</span>
 							</div>
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-xs-12 col-md-12"><hr></div>
-					</div>
-					<div id="user-attributes" class="row">
-						<div class="col-xs-5 col-md-5"  ng-hide="editedPassport === false">
-							
-								<input type="checkbox" ng-model="userPropertiesMap['passportEnabled']"> Is ready to show passport 
-								
-							
+						<div class="col-xs-12 col-md-12">
+							<div class="container-fluid">
+								<links-list links="userPropertiesMap['socialLinks']" type="'social-link'" save-data="updateProfile()" current="userPropertiesMap['isCurrentUser']" edited="editAdditional"></links-list>
+								<links-list links="userPropertiesMap['phones']" type="'phone'" save-data="updateProfile()" current="userPropertiesMap['isCurrentUser']" edited="editAdditional"></links-list>
+							</div>
 						</div>
 					</div>
-					<links-list links="userPropertiesMap['videos']" type="'video'" save-data="updateProfile()" current="userPropertiesMap['isCurrentUser']"></links-list>
-					<links-list links="userPropertiesMap['names']" type="'name'" save-data="updateProfile()" current="userPropertiesMap['isCurrentUser']"></links-list>
 
 					<div class="row">
-						<div class="col-xs-3 col-md-3" style="margin-top: 17px;">Сredit history</div>
+						<div class="col-xs-12 col-md-12">
+							<div class="container-fluid">
+								<div class="row" style="padding-bottom: 25px;">
+									<div class="col-xs-1 col-md-1" style="margin-bottom: -26px; margin-top: 17px;" ng-hide="!editAdditional"><input type="checkbox" ng-model="userPropertiesMap['passportEnabled']"></div>
+									<div class="col-xs-7 col-md-7" style="margin-bottom: -26px; margin-top: 17px;" ng-hide="userPropertiesMap['passportEnabled'] === false">Ready to show passport</div>
+									<div class="col-xs-7 col-md-7" style="margin-bottom: -26px; margin-top: 17px;" ng-hide="userPropertiesMap['passportEnabled'] !== false">Not ready to show passport</div>
+								</div>
+								<div class="row">
+									<div class="col-xs-12 col-md-12"><hr></div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<links-list links="userPropertiesMap['videos']" type="'video'" save-data="updateProfile()" current="userPropertiesMap['isCurrentUser']" edited="editAdditional"></links-list>
+					<links-list links="userPropertiesMap['names']" type="'name'" save-data="updateProfile()" current="userPropertiesMap['isCurrentUser']" edited="editAdditional"></links-list>
+
+					<div class="row">
+						<div class="col-xs-3 col-md-3" style="margin-top: 10px;">Сredit history</div>
 					</div>
 					<div class="row">
 						<div class="col-xs-12 col-md-12"><hr></div>
 					</div>
 
+					<div class="row" style="padding-bottom: 5px;">
+						<div class="col-xs-12 col-md-12">
+							<div id="bkiEditable" ng-hide="!editAdditional" contenteditable="true" class="ckeditor-area">
+							</div>
+							<div id="bkiNotEditable" ng-hide="editAdditional" ng-bind-html="userPropertiesMap['bkiData']">
+							</div>
+						</div>
+					</div>
+
 					<div class="row">
-						<div id="bkiEditable"  contenteditable="{{isCurrentUser}}" style="min-height: 200px;" ng-blur="saveBKI()">
+						<div class="col-xs-3 col-md-3 navbar-right"  ng-hide="!isCurrentUser">			
+							<div class="navbar-right" >
+								<button class="btn btn-default" ng-hide="!editAdditional" ng-disabled="disabledEditButton" ng-click="saveAdditionalData()"><span class="glyphicon glyphicon-save"></span></button>
+							</div>
 						</div>
 					</div>
 				</div>

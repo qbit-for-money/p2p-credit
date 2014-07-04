@@ -6,13 +6,13 @@ angular.module("captcha-auth", ["ngResource"]);
 
 angular.module("order", ["ngResource"]);
 
-angular.module("user-profile", ["ngResource"]);
+angular.module("user-profile", ["ngResource", "ngSanitize"]);
 
 angular.module("user-edit", ["ngResource"]);
 
 angular.module("navbar", ["ngResource"]);
 
-angular.module("main", ["ngRoute", "ui.bootstrap", "chieffancypants.loadingBar", "common", "user", "captcha-auth", "order", "user-profile", "user-edit", "navbar"]);
+angular.module("main", ["ngRoute", "ui.bootstrap", "chieffancypants.loadingBar", "common", "user", "captcha-auth", "order", "user-profile", "user-edit", "navbar", "ui.select2"]);
 
 angular.module("main").config(function($routeProvider) {
 	$routeProvider.when("/", {

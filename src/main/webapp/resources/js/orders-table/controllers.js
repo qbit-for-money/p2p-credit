@@ -1,7 +1,6 @@
 var orderModule = angular.module("order");
 
 orderModule.controller("OrdersController", function($scope, $rootScope) {
-	console.log($rootScope.userType)
 	var source =
 			{
 				dataType: "json",

@@ -20,15 +20,26 @@
 }
 
 #user-attributes .row {
-	padding-bottom: 7px;
+	padding-bottom: 2px;
+}
+
+#addition-attributes .row {
+	padding-bottom: 2px;
+	padding-left: 2px;
+	padding-right: 2px;
 }
 
 #user-attributes .title {
 	color: #d58512;
 }
 
+#addition-attributes hr {
+	margin-top: 0px;
+	margin-bottom: 2px;
+}
+
 #user-links .row {
-	padding-bottom: 7px;
+	padding-bottom: 2px;
 }
 
 #user-links .title {
@@ -130,10 +141,15 @@ select.custom {
 
 .link-item {
 	overflow: hidden;
-	line-height: 40px;
+	line-height: 30px;
 	white-space: nowrap;
 }
 
 .title-item {
 	color: #7bbdd9;
+}
+
+.ckeditor-area {
+	min-height: 200px; 
+	border: 1px double #ecf2f2; 
 }

@@ -36,9 +36,9 @@ userProfileModule.directive("ngFileSelect", function() {
 userProfileModule.directive('dateTimePicker', function() {
 	return {
 		scope: {
-			ngModel: '='
+			ngModel: '=', data: '='
 		},
-		link: function(scope, element, attrs) {
+		link: function(scope, element, attrs, ngModel) {
 			var endDate = new Date();
 			endDate.setYear(1900 + endDate.getYear() - 5);
 			element.datepicker({
@@ -47,6 +47,18 @@ userProfileModule.directive('dateTimePicker', function() {
 				autoclose: true,
 				todayBtn: true,
 				todayHighlight: true
+			}).on('changeDate', function(ev) {
+				scope.$apply(function() {
+					scope.data = ev.date.valueOf();
+				});
+			}).on('change', function(ev) {
+				scope.$apply(function() {
+					if(ev.date) {
+						scope.data = ev.date.valueOf();
+					} else {
+						scope.data = "";
+					}
+				});
 			});
 		}
 	};
@@ -71,13 +83,13 @@ userProfileModule.directive('embedSrc', function() {
 userProfileModule.directive("linksList", function() {
 	return {
 		restrict: "E",
-		scope: {links: "=", type: "=", current: "=", saveData: "&"},
+		scope: {links: "=", type: "=", current: "=", edited: "=", saveData: "&"},
 		templateUrl: "resources/html/user/links.html",
 		link: function(scope, element, attrs, ngModelCtrl) {
 			scope.newLink = {};
 			scope.newLink.title = "";
 			scope.newLink.link = "";
-			scope.edited = false;
+			//scope.edited = false;
 			if (scope.type === "phone") {
 				scope.itemPlaceholder = "Phone";
 				scope.title = "Phones";
@@ -88,28 +100,28 @@ userProfileModule.directive("linksList", function() {
 			}
 			if (scope.type === "video") {
 				scope.title = "YouTube videos";
-				scope.itemPlaceholder = "Link";
+				scope.itemPlaceholder = "YouTube Link";
 			}
 			if (scope.type === "name") {
 				scope.title = "Names";
 				scope.itemPlaceholder = "Link";
 			}
 
-			scope.editItems = function() {
-				if (scope.edited === false) {
-					scope.edited = true;
-					if (scope.type === "phone") {
-						angular.element("#input-phone").jqxMaskedInput({mask: '+## (###)###-##-##'});
-						angular.element("#input-phone").jqxMaskedInput('inputValue', "07");
+			scope.$watch("edited",
+					function() {
+						if (scope.edited === true) {
+							scope.editItems();
+						}
+					}, true);
 
-					}
-				} else {
-					scope.saveData();
-					scope.edited = false;
+			scope.editItems = function() {
+				if (scope.type === "phone") {
+					angular.element("#input-phone").jqxMaskedInput({mask: '+## (###)###-##-##'});
+					angular.element("#input-phone").jqxMaskedInput('inputValue', "07");
 				}
 			};
 
-			function isValidItem(link) {
+			scope.isValidItem = function(link, isEditing) {
 				if (!link.link || link.link === "") {
 					return false;
 				}
@@ -120,9 +132,19 @@ userProfileModule.directive("linksList", function() {
 				if (((scope.type === "social-link") || (scope.type === "video") || (scope.type === "name")) && !urlregex.test(link.link)) {
 					return false;
 				}
-
+				var count = 0;
+				for (var i in scope.links) {
+					if (scope.type === "video" && (scope.links[i].link === updateYouTubeLink(link.link))) {
+						count++;
+					} else if (scope.links[i].link === link.link) {
+						count++;
+					}
+				}
+				if (!isEditing && count > 0 || (isEditing && (isEditing === true) && (count > 1))) {
+					return false;
+				}
 				return true;
-			}
+			};
 
 			function updateYouTubeLink(link) {
 				link = link.replace("http:", "https:");
@@ -131,17 +153,10 @@ userProfileModule.directive("linksList", function() {
 			}
 
 			scope.addLink = function() {
-				if (!isValidItem(scope.newLink)) {
+				if (!scope.isValidItem(scope.newLink)) {
 					return;
 				}
-				
-				for (var i in scope.links) {
-					if (scope.type === "video" && (scope.links[i].link === updateYouTubeLink(scope.newLink.link))) {
-						return;
-					}else if (scope.links[i].link === scope.newLink.link) {
-						return;
-					}
-				}
+
 				var newLink = {};
 				newLink.title = scope.newLink.title;
 				newLink.link = scope.newLink.link;
@@ -194,7 +209,7 @@ userProfileModule.directive("linksList", function() {
 							}
 							return;
 						} else {
-							if (isValidItem(scope.links[i])) {
+							if (scope.isValidItem(scope.links[i], true)) {
 								scope.links[i].edited = false;
 							}
 							return;
