@@ -1,40 +1,43 @@
 <div class="row" style="margin-bottom: 20px;">
 	<div class="col-xs-offset-0 col-xs-12 col-md-offset-1 col-md-10">
 		<div class="panel-group" id="accordion">
-			<div class="panel panel-default">
-				<div class="panel-heading">
+			<div class="panel panel-default" ng-hide="!currentUser.publicKey">
+				<div class="panel-heading" ng-click="collapse('#collapseOne')" style="cursor: pointer">
 					<h4 class="panel-title">
-						<a data-toggle="collapse" data-parent="#accordion" href="#collapseOne"><span class="glyphicon glyphicon-user"></span></a>
+						<span class="glyphicon glyphicon-user"></span>
 					</h4>
 				</div>
 				<div id="collapseOne" class="panel-collapse in collapse">
 					<div ng-include src="'resources/html/user/personal-info.html'"></div>
 				</div>
 			</div>
-			<div class="panel panel-default" ng-if="isCurrentUser">
-				<div class="panel-heading">
+			<div class="panel panel-default" ng-hide="!isCurrentUser">
+				<div class="panel-heading" ng-click="collapse('#collapseThree')" style="cursor: pointer">
 					<h4 class="panel-title">
-						<a data-toggle="collapse" data-parent="#accordion" href="#collapseThree" ng-click="initOrdersCreation()"><span class="glyphicon glyphicon-th-list"></span></a>
+						<span class="glyphicon glyphicon-th-list"></span>
 					</h4>
 				</div>
-				<div id="collapseThree" class="panel-collapse in collapse">
+				<div id="collapseThree" class="panel-collapse collapse">
 					<div ng-include src="'resources/html/user/create-order.html'"></div>
 				</div>
 			</div>
 			<div class="panel panel-default" ng-if="isCurrentUser">
-				<div class="panel-heading">
+				<div class="panel-heading" ng-click="collapse('#collapseFour')" style="cursor: pointer">
 					<h4 class="panel-title">
-						<a data-toggle="collapse" data-parent="#accordion" href="#collapseFour"><span class="glyphicon glyphicon-th-list"></span></a>
+						<span class="glyphicon glyphicon-th-list"></span>
 					</h4>
+					<div class="navbar-right"><button class="btn btn-success create-order-button" type="button" ng-click="openFormAndCreateOrder()" title="Create order">
+							<span class="glyphicon glyphicon-plus"></span>
+						</button></div>
 				</div>
 				<div id="collapseFour" class="panel-collapse collapse">
 					<div ng-include src="'resources/html/user/personal-orders-table.html'"></div>
 				</div>
 			</div>
 			<div class="panel panel-default" ng-if="isCurrentUser">
-				<div class="panel-heading">
+				<div class="panel-heading" ng-click="collapse('#collapseFive')" style="cursor: pointer">
 					<h4 class="panel-title">
-						<a data-toggle="collapse" data-parent="#accordion" href="#collapseFive"><span class="glyphicon glyphicon-shopping-cart"></span></a>
+						<span class="glyphicon glyphicon-shopping-cart"></span>
 					</h4>
 				</div>
 				<div id="collapseFive" class="panel-collapse in collapse">

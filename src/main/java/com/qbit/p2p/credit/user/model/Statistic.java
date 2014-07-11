@@ -15,6 +15,7 @@ public class Statistic implements Serializable {
 	private long successTransactionsSum;
 	private long allTransactionsSum;
 	private long allSuccessTransactionsSum;
+	private long summaryRating;
 
 	public long getOpennessRating() {
 		return opennessRating;
@@ -72,8 +73,16 @@ public class Statistic implements Serializable {
 		this.allSuccessTransactionsSum = allSuccessTransactionsSum;
 	}
 
+	public long getSummaryRating() {
+		return summaryRating;
+	}
+
+	public void setSummaryRating(long summaryRating) {
+		this.summaryRating = summaryRating;
+	}
+	
 	@Override
 	public String toString() {
-		return "Statistic{" + "opennessRating=" + opennessRating + ", transactionsRating=" + transactionsRating + ", ordersSumValue=" + ordersSumValue + ", transactionsSum=" + transactionsSum + ", successTransactionsSum=" + successTransactionsSum + ", allTransactionsSum=" + allTransactionsSum + ", allSuccessTransactionsSum=" + allSuccessTransactionsSum + '}';
+		return "Statistic{" + "opennessRating=" + opennessRating + ", transactionsRating=" + transactionsRating + ", ordersSumValue=" + ordersSumValue + ", transactionsSum=" + transactionsSum + ", successTransactionsSum=" + successTransactionsSum + ", allTransactionsSum=" + allTransactionsSum + ", allSuccessTransactionsSum=" + allSuccessTransactionsSum + ", summaryRating=" + summaryRating + '}';
 	}
 }

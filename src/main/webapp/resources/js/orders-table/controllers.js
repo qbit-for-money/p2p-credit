@@ -1,120 +1,9 @@
 var orderModule = angular.module("order");
 
-orderModule.controller("OrdersController", function($scope, $rootScope) {
-	var source =
-			{
-				dataType: "json",
-				dataFields: [
-					{name: "userPublicKey", type: "string"},
-					{name: "userName", type: "string"},
-					{name: "title", type: "string"},
-					{name: "languages", type: "string"},
-					{name: "currency", type: "string"},
-					{name: "endDate", type: "string"},
-					{name: "reward", type: "string"},
-					{name: "responses", type: "int"},
-					{name: "status", type: "string"},
-					{name: "rating", type: "int"},
-					{name: "success", type: "int"},
-					{name: "successValue", type: "string"},
-					{name: "partnersRating", type: "int"}
-				],
-				beforeprocessing: function(data) {
-					source.totalrecords = data.length;
-				},
-				sort: function() {
-					angular.element("#orders-table").jqxGrid('updatebounddata');
-				},
-				filter: function() {
-					angular.element("#orders-table").jqxGrid('updatebounddata');
-				},
-				root: "orders",
-				type: "POST",
-				url: window.context + "webapi/orders/withFilter"
-			};
+orderModule.controller("OrdersController", function($scope, $rootScope, userProfileService) {
 
-	var adapterFields = {
-		contentType: 'application/json; charset=utf-8',
-		formatData: function(data) {
-			//console.log(JSON.stringify(data))
-			var newData = {};
-			newData.filterItems = [];
-			
-			for(var i = 0; i < data.filterscount; i++) {
-				newData.filterItems[i] = {};
-				var operator = data[data["filterdatafield" + i] + "operator"];
-				if(operator) {
-					if(operator === "and") {
-						newData.filterItems[i].filterOperator = 1;
-					}  
-					//newData.filterItems[i].filterOperator = 1;//operator;//.toUpperCase();
-				}
-				console.log(data["filterdatafield" + i])
-				
-				newData.filterItems[i].filterDataField = data["filterdatafield" + i];
-				newData.filterItems[i].filterCondition = data["filtercondition" + i];
-				newData.filterItems[i].filterValue = data["filtervalue" + i];
-			}
-			
-			newData.sortOrder = data.sortorder;
-			newData.pageNumber = data.pagenum;
-			newData.pageSize = data.pagesize;
-			newData.recordstartindex = data.recordstartindex;
-			newData.recordendindex = data.recordendindex;
-			newData.sortDataField = data.sortdatafield;
-			if($rootScope.userType === "CREDITOR") {
-				newData.orderType = 2;
-			}
-			if($rootScope.userType === "BORROWER") {
-				newData.orderType = 1;
-			}
-			console.log(JSON.stringify(newData));
-			return JSON.stringify(newData);
-		},
-		downloadComplete: function(data, status, xhr) {
-			var orders = data.orders;
-			for (var i in orders) {
-				if (orders[i].order.languages !== undefined) {
-					var languagesStr = "";
-					for (var j in orders[i].order.languages) {
-						languagesStr += orders[i].order.languages[j] + ", ";
-					}
-				}
-				orders[i].languages = languagesStr.substring(0, languagesStr.length - 2);
+	userProfileService.getAllCategories(initTable);
 
-				var currenciesStr = "";
-				var currency = orders[i].order.currency;
-				if (orders[i].order.currency === undefined) {
-					orders[i].order.currency = currenciesStr;
-				} else {
-					var currencyInterval = orders[i].order.currencyInterval;
-					currenciesStr = currency.code + " ( " + currencyInterval.startValue + " : " + currencyInterval.endValue + " )";
-					orders[i].currency = currenciesStr;
-
-					if (orders[i].order.status === "NOT_SUCCESS") {
-						orders[i].order.status = "NOT SUCCESS";
-					}
-					if (orders[i].order.type === 1) {
-						orders[i].order.type = "CREDITOR";
-					}
-					if (orders[i].order.type === 2) {
-						orders[i].order.type = "BORROWER";
-					}
-				}
-				orders[i].title = orders[i].order.title;
-				orders[i].orderData = orders[i].order.orderData;
-				orders[i].status = orders[i].order.status;
-				orders[i].type = orders[i].order.type;
-				orders[i].responses = orders[i].order.responses;
-				
-				orders[i].order = undefined;
-			}
-			//console.log(JSON.stringify(data));
-		},
-		loadError: function(xhr, status, error) {
-			console.log(error.toString());
-		}
-	};
 
 	var initRowDetails = function(index, parentElement, gridElement, datarecord) {
 		var tabsdiv = null;
@@ -154,10 +43,10 @@ orderModule.controller("OrdersController", function($scope, $rootScope) {
 			angular.element(rightcolumn).append(creationDate);
 			angular.element(rightcolumn).append(endDate);
 			angular.element(rightcolumn).append(reward);
-			
+
 			var ordercontainer = angular.element('<div style="margin: 5px;"></div>');
 			ordercontainer.appendTo(angular.element(order));
-            angular.element(order).append(ordercontainer);
+			angular.element(order).append(ordercontainer);
 			var chatButton = angular.element('<div style="float: left; width: 50%;"><button style="float: right;" class="btn btn-default btn-lg" type="button">Chat</button></div>');
 			var approveButton = angular.element('<div style="float: left; width: 40%;"><button style="margin-left: 10px;" class="btn btn-success btn-lg" type="button">Approve</button></div>');
 			ordercontainer.append(chatButton);
@@ -167,38 +56,114 @@ orderModule.controller("OrdersController", function($scope, $rootScope) {
 			angular.element(tabsdiv).jqxTabs({width: "95%", height: 170});
 		}
 	};
-	var dataAdapter = new $.jqx.dataAdapter(source, adapterFields);
-	angular.element("#orders-table").jqxGrid(
-			{
-				theme: "bootstrap",
-				width: '100%',
-				source: dataAdapter,
-				pageable: true,
-				showfilterrow: true,
-				sortable: true,
-				filterable: true,
-				virtualmode: true,
-				rendergridrows: function() {
-					return dataAdapter.records;
-				},
-				rowdetails: true,
-				rowdetailstemplate: {rowdetails: "<div style='margin: 10px;'><ul style='margin-left: 30px;'><li class='title'></li><li>Order Init</li></ul><div class='information'></div><div class='order-init'></div></div>", rowdetailsheight: 200},
-				ready: function() {
-				},
-				initrowdetails: initRowDetails,
-				columns: [
-					{text: "Title", dataField: "title", columntype: 'textbox', filtertype: 'textbox', filtercondition: 'starts_with'},
-					{text: "Languages", dataField: "languages", columntype: 'textbox', filtertype: 'none'},
-					{text: "Currency", dataField: "currency", filtertype: 'none'},
-					{text: "Responses", dataField: "responses", filtertype: 'none'},
-					{text: "Status", dataField: "status", columntype: 'textbox', filtertype: 'checkedlist', filteritems: ['OPENED', 'PROCESSED', 'SUCCESS', 'NOT SUCCESS', 'ARBITRATION'], width: '110px'},
-					/*{text: "End Date", dataField: "endDate", columntype: 'date', filtertype: 'none'},*/
-					{text: "Rating", dataField: "rating", filtertype: 'none'},
-					{text: "Successful deal", dataField: "success", filtertype: 'none'},
-					{text: "Successful value", dataField: "successValue", filtertype: 'none'},
-					{text: "Partners rating", dataField: "partnersRating", filtertype: 'none'}
-				]
-			});
+
+
+
+	var daterenderer = function(row, column, value) {
+		if (value.toString().indexOf("/") === -1) {
+			var date = new Date(value);
+			var month = date.getMonth();
+			month++;
+			var dd = date.getDate().toString();
+			value = (dd[1] ? dd : "0" + dd[0]) + "/" + month + "/" + date.getFullYear();
+		}
+		return value;
+	};
+	var dataAdapter = new $.jqx.dataAdapter(getSource("webapi/orders/withFilter", "#orders-table"), getAdapterFields());
+	angular.element("#orders-table").on("bindingComplete", function(event) {
+		console.log("BIND")
+	});
+	function initTable(categories) {
+		var languages = userProfileService.getAllLanguages();
+		angular.element("#orders-table").jqxGrid(
+				{
+					theme: "bootstrap",
+					width: '100%',
+					source: dataAdapter,
+					pageable: true,
+					sortable: true,
+					showfilterrow: true,
+					filterable: true,
+					//autorowheight: true,
+					//autoheight: true,
+					virtualmode: true,
+					//autoshowfiltericon: true,
+					rendergridrows: function() {
+						return dataAdapter.records;
+					},
+					rowdetails: true,
+					rowdetailstemplate: {rowdetails: "<div style='margin: 10px;'><ul style='margin-left: 30px;'><li class='title'></li><li>Order Init</li></ul><div class='information'></div><div class='order-init'></div></div>", rowdetailsheight: 200},
+					/*ready: function() {
+					 var localizationObject = {
+					 filterstringcomparisonoperators: ['contains', 'does not contain'],
+					 // filter numeric comparison operators.
+					 filternumericcomparisonoperators: ['less than', 'greater than'],
+					 // filter date comparison operators.
+					 filterdatecomparisonoperators: ['less than', 'greater than'],
+					 // filter bool comparison operators.
+					 filterbooleancomparisonoperators: ['equal', 'not equal']
+					 }
+					 $("#orders-table").jqxGrid('localizestrings', localizationObject);
+					 },*/
+					 /*updatefilterconditions: function (type, defaultconditions) {
+					 var stringcomparisonoperators = ['CONTAINS', 'DOES_NOT_CONTAIN'];
+					 var numericcomparisonoperators = ['LESS_THAN', 'GREATER_THAN'];
+					 var datecomparisonoperators = ['LESS_THAN', 'GREATER_THAN'];
+					 var booleancomparisonoperators = ['EQUAL', 'NOT_EQUAL'];
+					 switch (type) {
+					 case 'stringfilter':
+					 return stringcomparisonoperators;
+					 case 'numericfilter':
+					 return numericcomparisonoperators;
+					 case 'datefilter':
+					 return datecomparisonoperators;
+					 case 'booleanfilter':
+					 return booleancomparisonoperators;
+					 }
+					 },*/
+					 /*updatefilterpanel: function (filtertypedropdown1, filtertypedropdown2, filteroperatordropdown, filterinputfield1, filterinputfield2, filterbutton, clearbutton,
+					 columnfilter, filtertype, filterconditions) {
+					 var index1 = 0;
+					 var index2 = 0;
+					 if (columnfilter != null) {
+					 var filter1 = columnfilter.getfilterat(0);
+					 var filter2 = columnfilter.getfilterat(1);
+					 if (filter1) {
+					 index1 = filterconditions.indexOf(filter1.comparisonoperator);
+					 var value1 = filter1.filtervalue;
+					 filterinputfield1.val(value1);
+					 }
+					 if (filter2) {
+					 index2 = filterconditions.indexOf(filter2.comparisonoperator);
+					 var value2 = filter2.filtervalue;
+					 filterinputfield2.val(value2);
+					 }
+					 }
+					 filtertypedropdown1.jqxDropDownList({ autoDropDownHeight: true, selectedIndex: index1 });
+					 filtertypedropdown2.jqxDropDownList({ autoDropDownHeight: true, selectedIndex: index2 });
+					 },*/
+					initrowdetails: initRowDetails,
+					columns: [
+						{text: "Categories", dataField: "categories", columntype: 'textbox', filtertype: 'checkedlist', filteritems: categories, filtercondition: 'starts_with', width: '140px', sortable: false, cellclassname: cellclassname},
+						{text: "Languages", dataField: "languages", columntype: 'textbox', filtertype: 'checkedlist', filteritems: languages, width: '150px', sortable: false, cellclassname: cellclassname},
+						{text: "Take", dataField: "takingCurrency", filtertype: 'textbox', width: '80px', cellclassname: cellclassname},
+						{text: "Give", dataField: "givingCurrency", filtertype: 'textbox', width: '80px', cellclassname: cellclassname},
+						{text: "Duration", dataField: "duration", filtertype: 'number', width: '80px', cellclassname: cellclassname},
+						{text: "Rating", dataField: "summaryRating", columntype: 'textbox', filtertype: 'textbox', width: '60px', cellclassname: cellclassname},
+						{text: "Openness rating", dataField: "opennessRating", columntype: 'textbox', filtertype: 'textbox', width: '120px', cellclassname: cellclassname},
+						{text: "Orders", dataField: "ordersSumValue", columntype: 'textbox', filtertype: 'textbox', cellclassname: cellclassname, width: '60px'},
+						{text: "Success value", dataField: "successValue", filtertype: 'textbox', cellclassname: cellclassname, width: '150px'},
+						{text: "Partners rating", dataField: "partnersRating", columntype: 'textbox', filtertype: 'textbox', width: '100px', cellclassname: cellclassname},
+						{text: "Booking deadline", dataField: "endDate", filtertype: 'date', width: '120px', cellclassname: cellclassname, cellsformat: 'd'}
+					]
+				});
+	}
+
+	//$('#clearfilteringbutton').jqxButton({ height: 25});
+	$('#clearfilteringbutton').click(function() {
+		console.log("RRRRR%")
+		$("#orders-table").jqxGrid('clearfilters');
+	});
 });
 
 

@@ -14,7 +14,7 @@
 					<div class="col-xs-7 col-md-4" ng-repeat="linkItem in links">
 						<div class="container-fluid">
 							<div class="row">
-								<div class="col-xs-12 col-md-12" ng-hide="!(type === 'video' && !linkItem.title && (!linkItem.edited || (linkItem.edited === false)))">
+								<div class="col-xs-12 col-md-12" ng-hide="!(type === 'video' && !linkItem.title && !linkItem.edited)">
 									<div class="container-fluid">
 										<div class="row">
 											<div class="col-xs-12 col-md-12" title="{{linkItem.title}}">
@@ -36,7 +36,7 @@
 					</div>
 				</div>
 				<div class="row" ng-repeat="linkItem in links" ng-hide="type === 'video'">
-					<div class="col-xs-8 col-md-8" ng-hide="!(type === 'social-link' && linkItem.title && (!linkItem.edited || (linkItem.edited === false)))">
+					<div class="col-xs-8 col-md-8" ng-hide="!(type === 'social-link' && linkItem.title && !linkItem.edited)">
 						<div class="container-fluid">
 							<div class="row">
 								<div class="col-xs-12 col-md-12 link-item"><a href="{{linkItem.link}}">{{linkItem.title}}</a></div>
@@ -44,7 +44,7 @@
 						</div>
 					</div>
 
-					<div class="col-xs-8 col-md-8" ng-hide="!(((type === 'social-link') || (type === 'name')) && !linkItem.title && (!linkItem.edited || (linkItem.edited === false)))">
+					<div class="col-xs-8 col-md-8" ng-hide="!(((type === 'social-link') || (type === 'name')) && !linkItem.title && !linkItem.edited)">
 						<div class="container-fluid">
 							<div class="row">
 								<div class="col-xs-12 col-md-12 link-item"><a href="{{linkItem.link}}">{{linkItem.link}}</a></div>
@@ -52,14 +52,14 @@
 						</div>
 					</div>
 
-					<div class="col-xs-8 col-md-8" ng-hide="!(type === 'phone' && linkItem.title && (!linkItem.edited || (linkItem.edited === false)))">
+					<div class="col-xs-8 col-md-8" ng-hide="!(type === 'phone' && linkItem.title && !linkItem.edited)">
 						<div class="container-fluid">
 							<div class="row">
 								<div class="col-xs-6 col-md-6 link-item title-item">{{linkItem.title}}</div><div class="col-xs-6 col-md-6">{{linkItem.link}}</div>
 							</div>
 						</div>
 					</div>
-					<div class="col-xs-8 col-md-8" ng-hide="!(type === 'phone' && !linkItem.title && (!linkItem.edited || (linkItem.edited === false)))">
+					<div class="col-xs-8 col-md-8" ng-hide="!(type === 'phone' && !linkItem.title && !linkItem.edited)">
 						<div class="container-fluid">
 							<div class="row">
 								<div class="col-xs-6 col-md-6"></div><div class="col-xs-6 col-md-6 link-item">{{linkItem.link}}</div>

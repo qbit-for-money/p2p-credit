@@ -4,7 +4,7 @@ authModule.controller("AuthDialogOpeningController", function(authService) {
 	authService.openAuthDialog(true);
 });
 
-authModule.controller("AuthDialogController", function($scope, captchaAuthResource, isNotCaptcha) {
+authModule.controller("AuthDialogController", function($scope, captchaAuthResource, isNotCaptcha, redirectUrl) {
 	$scope.isNotCaptcha = isNotCaptcha;
 	var timestamp = new Date().getTime();
 	$scope.auth = "google";
@@ -12,6 +12,10 @@ authModule.controller("AuthDialogController", function($scope, captchaAuthResour
 	$scope.model.pin = "";
 	$scope.model.encodedKey = "";
 	$scope.captchaSrc = "";
+	$scope.url = "webapi/oauth2/authenticate";
+	if((redirectUrl !== undefined) && (redirectUrl !== "")) {
+		$scope.url +=  "?redirect=" + redirectUrl;
+	}
 
 	function changePin() {
 		var pin = $scope.model.pin;

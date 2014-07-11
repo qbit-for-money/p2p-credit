@@ -38,4 +38,16 @@ public class Env {
 	public String getUserPhotoPathFolder() {
 		return properties.getProperty("user.photo.pathFolder");
 	}
+	
+	@XmlElement
+	public double getUserOpenessRatingFactor() {
+		return Double.parseDouble(properties.getProperty("user.openessRating.factor"));
+	}
+	
+	@XmlElement
+	public double getUserAllTransactionsFactor() {
+		return Double.parseDouble(properties.getProperty("user.allTransactions.factor"));
+	}
+	
+	
 }

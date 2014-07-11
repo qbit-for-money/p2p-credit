@@ -46,7 +46,7 @@
 	color: #d58512;
 }
 
-#collapseOne, #collapseTwo {
+#collapseOne, #collapseTwo, #collapseThree {
 	height: auto !important;
 }
 
@@ -152,4 +152,21 @@ select.custom {
 .ckeditor-area {
 	min-height: 200px; 
 	border: 1px double #ecf2f2; 
+}
+
+#take-input, #give-input, #duration-input {
+	border-color: #3c763d;
+}
+
+.credit-row
+{
+	background-color: #ffe5e9;
+}
+.borrow-row
+{
+	background-color: #e5fff4;
+}
+.exchange-row
+{
+	background-color: #f8f8f8;
 }

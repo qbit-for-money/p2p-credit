@@ -1,6 +1,6 @@
 var userModule = angular.module("user");
 
-userModule.controller("UserController", function($scope, $rootScope, usersResource, authService) {
+userModule.controller("UserController", function($scope, $rootScope, usersResource, authService, $location) {
 	$scope.keyType = "user";
 	$scope.logoutButton = "";
 	var currentUser = usersResource.current({});
@@ -21,7 +21,7 @@ userModule.controller("UserController", function($scope, $rootScope, usersResour
 	$rootScope.isGoogleAuth = function() {
 		return $rootScope.user && ($rootScope.user.publicKey.indexOf("@") !== -1);
 	};
-	
+
 	$scope.goToOrderInit = function() {
 		window.location.href = window.context;
 	};
@@ -32,9 +32,10 @@ userModule.controller("UserController", function($scope, $rootScope, usersResour
 	};
 
 	$scope.authWithGoogle = function() {
-		window.location.href = window.context + "webapi/oauth2/authenticate";
+		console.log("GOOGLE: " + window.context + $location.$$path)
+		window.location.href = window.context + "webapi/oauth2/authenticate?redirect=" + window.context + $location.$$path;
 	};
-	
+
 	$scope.openAuthDialog = function() {
 		authService.openAuthDialog(false);
 	};
@@ -42,7 +43,8 @@ userModule.controller("UserController", function($scope, $rootScope, usersResour
 	$scope.logout = function() {
 		var logoutResponse = usersResource.logout({});
 		logoutResponse.$promise.then(function() {
-			$scope.goToOrderInit();
+			//location.reload();
+			window.location.href = window.context;
 		});
 	};
 });

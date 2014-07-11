@@ -6,10 +6,14 @@ import com.qbit.p2p.credit.commons.model.DateAdapter;
 import com.qbit.p2p.credit.money.model.serialization.CurrencyAdapter;
 import com.qbit.p2p.credit.user.model.UserCurrency;
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -58,15 +62,20 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 	
 	private OrderStatus status;
 	
+	private List<Respond> responses;
+	
+	
 	//private OrderType type;
 	@ElementCollection
-	private List<String> languages;
+	private List<String> languages = new ArrayList<String>();
 	@XmlJavaTypeAdapter(CurrencyAdapter.class)
 	private Currency givingCurrency;
 	@XmlJavaTypeAdapter(CurrencyAdapter.class)
 	private Currency takingCurrency;
-	private double takingValue;
-	private double givingValue;
+	@Column(precision = 10, scale = 3)
+	private BigDecimal takingValue;
+	@Column(precision = 10, scale = 3)
+	private BigDecimal givingValue;
 	//@Embedded
 	//private CurrencyInterval currencyInterval;
 	
@@ -155,20 +164,20 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 		this.takingCurrency = takingCurrency;
 	}
 
-	public double getTakingValue() {
+	public BigDecimal getTakingValue() {
 		return takingValue;
 	}
 
-	public void setTakingValue(double takingValue) {
-		this.takingValue = takingValue;
+	public void setTakingValue(BigDecimal takingValue) {
+		this.takingValue = takingValue.setScale(3, RoundingMode.HALF_UP);
 	}
 
-	public double getGivingValue() {
+	public BigDecimal getGivingValue() {
 		return givingValue;
 	}
 
-	public void setGivingValue(double givingValue) {
-		this.givingValue = givingValue;
+	public void setGivingValue(BigDecimal givingValue) {
+		this.givingValue = givingValue.setScale(3, RoundingMode.HALF_UP);
 	}
 
 
@@ -213,7 +222,7 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 			&& (categories != null) 
 			&& (languages != null) 
 			&& (takingCurrency != null || givingCurrency != null) 
-			&& (takingValue != 0 || givingValue != 0);
+			&& (!BigDecimal.ZERO.equals(takingValue) || !BigDecimal.ZERO.equals(givingValue));
 	}
 
 	@Override

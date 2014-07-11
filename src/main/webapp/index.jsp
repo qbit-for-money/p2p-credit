@@ -75,7 +75,9 @@
 		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxmaskedinput.js"></script> 
 		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxnumberinput.js"></script> 
 		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxslider.js"></script> 
-		
+		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxdatetimeinput.js"></script> 
+		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxcalendar.js"></script> 
+
 		<script type="text/javascript">
 			// Global constants
 			window.context = "${context}";
@@ -104,10 +106,14 @@
 		<script type="text/javascript" src="resources/js/user-profile/resources.js"></script>
 		<script type="text/javascript" src="resources/js/user-profile/controllers.js"></script>
 		<script type="text/javascript" src="resources/js/user-profile/directives.js"></script>
+		<script type="text/javascript" src="resources/js/user-profile/services.js"></script>
 		<script type="text/javascript" src="resources/js/user-orders-table/controllers.js"></script>
-		
+
 		<script type="text/javascript" src="resources/js/navbar/controllers.js"></script>
-		
+
 		<script type="text/javascript" src="resources/js/order-create/controllers.js"></script>
+
+		<div ng-include src="'resources/html/templates/templates.html'"></div>
+		<script type="text/javascript" src="resources/js/common/tables-common.js"></script>
 	</body>
 </html>

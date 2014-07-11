@@ -9,18 +9,15 @@ import com.qbit.p2p.credit.material.dao.MaterialDAO;
 import com.qbit.p2p.credit.material.model.MaterialType;
 import com.qbit.p2p.credit.material.model.Materials;
 import com.qbit.p2p.credit.order.dao.OrderDAO;
+import com.qbit.p2p.credit.order.model.FilterCondition;
+import com.qbit.p2p.credit.order.model.FilterItem;
 import com.qbit.p2p.credit.order.model.SearchRequest;
 import com.qbit.p2p.credit.order.model.FilterOperator;
 import com.qbit.p2p.credit.order.model.OrderInfo;
 import com.qbit.p2p.credit.order.model.OrderStatus;
-import com.qbit.p2p.credit.order.model.OrderType;
-import com.qbit.p2p.credit.order.model.OrdersData;
-import com.qbit.p2p.credit.order.resource.OrdersResource;
 import com.qbit.p2p.credit.user.dao.UserProfileDAO;
-import com.qbit.p2p.credit.user.model.DataLink;
 import com.qbit.p2p.credit.user.model.Point2;
 import com.qbit.p2p.credit.user.model.Statistic;
-import com.qbit.p2p.credit.user.model.UserCurrency;
 import com.qbit.p2p.credit.user.model.UserPrivateProfile;
 import com.qbit.p2p.credit.user.model.UserPublicProfile;
 import java.awt.image.BufferedImage;
@@ -51,8 +48,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlList;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -261,6 +256,9 @@ public class ProfilesResource {
 		if(user == null) {
 			return null;
 		}
+		if((user.getName() != null) && !user.getName().isEmpty()) {
+			openessRating = openessRating + 5;
+		}
 		if(user.isPassportEnabled()) {
 			openessRating = openessRating + 5;
 		}
@@ -290,55 +288,54 @@ public class ProfilesResource {
 		}
 		statistic.setOpennessRating(openessRating);
 		SearchRequest filter = new SearchRequest();
-		SearchRequest.FilterItem filterItem = new SearchRequest.FilterItem();
+		FilterItem filterItem = new FilterItem();
 		filterItem.setFilterDataField("status");
 		filterItem.setFilterValue("SUCCESS");
 		filterItem.setFilterOperator(FilterOperator.AND);
-		filterItem.setFilterCondition("EQUAL");
+		filterItem.setFilterCondition(FilterCondition.EQUAL);
 		filter.setFilterItems(Arrays.asList(filterItem));
-		OrdersData successData = orderDAO.findWithFilter(publicKey, filter, null, true, false);
+		long successLength = orderDAO.getLengthWithFilter(publicKey, filter, null);
 		
 		filterItem.setFilterValue("NOT_SUCCESS");
 		filter.setFilterItems(Arrays.asList(filterItem));
-		OrdersData notSuccessData = orderDAO.findWithFilter(publicKey, filter, null, true, false);
-		if((successData != null) && (notSuccessData != null)) {
-			transactionsRating = successData.getLength() - notSuccessData.getLength();
-			
-		}
+		long notSuccessLength = orderDAO.getLengthWithFilter(publicKey, filter, null);
+			transactionsRating = successLength - notSuccessLength;
 		statistic.setTransactionsRating(transactionsRating);
-		OrdersData allOrdersData = orderDAO.findWithFilter(publicKey, null, null, true, false);
-		if(allOrdersData != null) {
-			allOrders = allOrdersData.getLength();
-		}
+		allOrders = orderDAO.getLengthWithFilter(publicKey, null, null);
+		//if(allOrdersData != null) {
+		//	allOrders = allOrdersData.getLength();
+		//}
 		statistic.setOrdersSumValue(allOrders);
-		filterItem.setFilterCondition("NOT_EQUAL");
+		filterItem.setFilterCondition(FilterCondition.NOT_EQUAL);
 		filterItem.setFilterValue("OPENED");
 		filter.setFilterItems(Arrays.asList(filterItem));
-		OrdersData allTransactionsData = orderDAO.findWithFilter(publicKey, filter, null, true, false);
-		if(allOrdersData != null) {
-			allTransactions = allTransactionsData.getLength();
-		}
+		allTransactions = orderDAO.getLengthWithFilter(publicKey, filter, null);
+		//if(allOrdersData != null) {
+		//	allTransactions = allTransactionsData.getLength();
+		//}
 		statistic.setTransactionsSum(allTransactions);
+		System.out.println("!! RATING: " + openessRating + " " + allTransactions);
+		statistic.setSummaryRating((long)(openessRating * env.getUserOpenessRatingFactor()) + (long)(allTransactions * env.getUserAllTransactionsFactor()));
 		
-		OrdersData allUsersTransactionsData = orderDAO.findWithFilter(null, filter, null, true, false);
-		if(allUsersTransactionsData != null) {
-			allUsersTransactions = allUsersTransactionsData.getLength();
-		}
+		allUsersTransactions = orderDAO.getLengthWithFilter(null, filter, null);
+		//if(allUsersTransactionsData != null) {
+		//	allUsersTransactions = allUsersTransactionsData.getLength();
+		//}
 		statistic.setAllTransactionsSum(allUsersTransactions);
 		
-		filterItem.setFilterCondition("EQUAL");
+		filterItem.setFilterCondition(FilterCondition.EQUAL);
 		filterItem.setFilterValue("SUCCESS");
 		filter.setFilterItems(Arrays.asList(filterItem));
-		OrdersData allSuccessTransactionsData = orderDAO.findWithFilter(publicKey, filter, null, true, false);
-		if(allOrdersData != null) {
-			allSuccessTransactions = allSuccessTransactionsData.getLength();
-		}
+		allSuccessTransactions = orderDAO.getLengthWithFilter(publicKey, filter, null);
+		//if(allOrdersData != null) {
+		//	allSuccessTransactions = allSuccessTransactionsData.getLength();
+		//}
 		statistic.setSuccessTransactionsSum(allSuccessTransactions);
 		
-		OrdersData allUsersSuccessTransactionsData = orderDAO.findWithFilter(null, filter, null, true, false);
-		if(allUsersSuccessTransactionsData != null) {
-			allUsersSuccessTransactions = allUsersSuccessTransactionsData.getLength();
-		}
+		allUsersSuccessTransactions = orderDAO.getLengthWithFilter(null, filter, null);
+		//if(allUsersSuccessTransactionsData != null) {
+		//	allUsersSuccessTransactions = allUsersSuccessTransactionsData.getLength();
+		//}
 		statistic.setAllSuccessTransactionsSum(allUsersSuccessTransactions);
 		
 		return statistic;
@@ -503,11 +500,11 @@ public class ProfilesResource {
 			Collections.addAll(l, "Russian", "English");
 			order.setLanguages(l);
 			order.setResponses(rand.nextInt(10));
-			if(rand.nextInt(3) < 2) {
+			/*if(rand.nextInt(3) < 2) {
 				order.setType(OrderType.CREDIT);
 			} else {
 				order.setType(OrderType.BORROW);
-			}
+			}*/
 
 			orderDAO.create(order);
 		}

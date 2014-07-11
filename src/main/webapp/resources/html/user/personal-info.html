@@ -12,8 +12,8 @@
 						</div>
 						<div class="col-xs-12 col-md-12" style="padding-top: 1px; min-width: 180px;">
 							<div class="progress">
-								<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{userPropertiesMap['rating']}}" aria-valuemin="0" aria-valuemax="100" ng-style="{width : (userPropertiesMap['rating'] + '%') }">
-									Rating: {{userPropertiesMap['rating']}}
+								<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{summaryRating}}" aria-valuemin="0" aria-valuemax="100" ng-style="{width : (summaryRating + '%') }">
+									<span style="color: #d58512; overflow: hidden; white-space: nowrap; padding-left: 3px;"> Rating: {{summaryRating}}</span>
 								</div>
 							</div>
 						</div>
@@ -175,16 +175,13 @@
 					<div class="row">
 						<div class="col-xs-12 col-md-12"><hr></div>
 					</div>
-					<div class="row" style="padding-bottom: 20px;">
-						<div class="col-xs-5 col-md-3">Openness: {{ratingOpenness}}	</div>
-						<div class="col-xs-5 col-md-3">Transactions: {{ratingTransactions}}</div>
-						<div class="col-xs-5 col-md-3">Orders sum: {{ordersSumValue}}</div>
-						<div class="col-xs-5 col-md-3">Transactions sum: {{transactionsSum}}</div>
-						<div class="col-xs-5 col-md-4">Success transactions sum: {{successTransactionsSum}}</div>
-						<div class="col-xs-5 col-md-4">All transactions sum: {{allTransactionsSum}}</div>
-						<div class="col-xs-5 col-md-4">All success transactions sum: {{allSuccessTransactionsSum}}</div>
-					</div>
-
+					<div class="row">Openness: {{ratingOpenness}}	</div>
+					<div class="row">Transactions: {{ratingTransactions}}</div>
+					<div class="row">Orders sum: {{ordersSumValue}}</div>
+					<div class="row">Transactions sum: {{transactionsSum}}</div>
+					<div class="row">Success transactions sum: {{successTransactionsSum}}</div>
+					<div class="row">All transactions sum: {{allTransactionsSum}}</div>
+					<div class="row">All success transactions sum: {{allSuccessTransactionsSum}}</div>
 				</div>
 			</div>
 		</div>

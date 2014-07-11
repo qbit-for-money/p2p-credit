@@ -36,7 +36,7 @@ userProfileModule.directive("ngFileSelect", function() {
 userProfileModule.directive('dateTimePicker', function() {
 	return {
 		scope: {
-			ngModel: '=', data: '='
+			ngModel: '=', data: '=', validate: '&'
 		},
 		link: function(scope, element, attrs, ngModel) {
 			var endDate = new Date();
@@ -49,15 +49,7 @@ userProfileModule.directive('dateTimePicker', function() {
 				todayHighlight: true
 			}).on('changeDate', function(ev) {
 				scope.$apply(function() {
-					scope.data = ev.date.valueOf();
-				});
-			}).on('change', function(ev) {
-				scope.$apply(function() {
-					if(ev.date) {
-						scope.data = ev.date.valueOf();
-					} else {
-						scope.data = "";
-					}
+					scope.validate();
 				});
 			});
 		}
@@ -78,7 +70,7 @@ userProfileModule.directive('embedSrc', function() {
 			});
 		}
 	};
-})
+});
 
 userProfileModule.directive("linksList", function() {
 	return {
