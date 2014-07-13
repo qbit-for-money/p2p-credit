@@ -4,12 +4,18 @@ orderModule.controller("UserOrdersController", function($scope, $rootScope, $int
 
 	var initRowDetails = function(index, parentElement, gridElement, datarecord) {
 		var tabsdiv = null;
-		var information = null;
 		tabsdiv = angular.element(angular.element(parentElement).children()[0]);
 		if (tabsdiv !== null) {
-			var template = angular.element("#ordersTableDetailTmpl2").text();
+			var template = angular.element("#userOrdersTableDetailTmpl").text();
 			var exp = $interpolate(template);
-			var context = {greeting: 'Hello', name: "Sanek"};
+			var context = {
+				name: datarecord.userName, 
+				languages: datarecord.userLanguages,
+				currencies: datarecord.userCurrencies,
+				mail: datarecord.userMail,
+				phone: datarecord.userPhone,
+				freeDescription: datarecord.orderData
+			};
 			var result = exp(context);
 			//result.appendTo(tabsdiv);
 			tabsdiv.append(result);
@@ -54,7 +60,7 @@ orderModule.controller("UserOrdersController", function($scope, $rootScope, $int
 			angular.element(rightcolumn).append(reward);*/
 
 
-			angular.element(tabsdiv).jqxTabs({width: "95%", height: 170});
+			angular.element(tabsdiv).jqxTabs({width: "95%", height: 240});
 		}
 	};
 	var ordersTable = angular.element('#user-orders-table');
@@ -97,7 +103,7 @@ orderModule.controller("UserOrdersController", function($scope, $rootScope, $int
 					return dataAdapter.records;
 				},
 				rowdetails: true,
-				rowdetailstemplate: {rowdetails: "<div style='margin: 10px;'></div>", rowdetailsheight: 200},
+				rowdetailstemplate: {rowdetails: "<div style='margin: 10px;'></div>", rowdetailsheight: 300},
 				ready: function() {
 				},
 				initrowdetails: initRowDetails,

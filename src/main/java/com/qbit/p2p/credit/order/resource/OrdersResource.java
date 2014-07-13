@@ -5,6 +5,7 @@ import com.qbit.commons.auth.AuthFilter;
 import static com.qbit.commons.rest.util.RESTUtil.toDate;
 import com.qbit.p2p.credit.commons.model.Currency;
 import com.qbit.p2p.credit.commons.util.DateUtil;
+import com.qbit.p2p.credit.money.model.serialization.CurrencyAdapter;
 import com.qbit.p2p.credit.order.dao.OrderDAO;
 import com.qbit.p2p.credit.order.model.FilterCondition;
 import com.qbit.p2p.credit.order.model.FilterItem;
@@ -12,6 +13,8 @@ import com.qbit.p2p.credit.order.model.FilterOperator;
 import com.qbit.p2p.credit.order.model.OrderCategory;
 import com.qbit.p2p.credit.order.model.OrderInfo;
 import com.qbit.p2p.credit.order.model.OrderType;
+import com.qbit.p2p.credit.order.model.Respond;
+import com.qbit.p2p.credit.order.model.RespondStatus;
 import com.qbit.p2p.credit.user.dao.UserProfileDAO;
 import com.qbit.p2p.credit.user.model.UserCurrency;
 import com.qbit.p2p.credit.user.model.UserPublicProfile;
@@ -37,6 +40,7 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlList;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * @author Alexander_Sergeev
@@ -93,12 +97,19 @@ public class OrdersResource {
 	public static class OrderWrapper {
 
 		private OrderInfo order;
+		private String id;
 		private long summaryRating;
 		private long opennessRating;
 		private long ordersSumValue;
 		private long successTransactionsSum;
 		private long partnersRating;
 		private String successValue;
+		private String userName;
+		private String userPhone;
+		private String userMail;
+		@XmlJavaTypeAdapter(CurrencyAdapter.class)
+		private List<Currency> userCurrencies;
+		private List<String> userLanguages;
 
 		public OrderWrapper() {
 		}
@@ -113,6 +124,14 @@ public class OrdersResource {
 
 		public void setOrder(OrderInfo order) {
 			this.order = order;
+		}
+
+		public String getId() {
+			return id;
+		}
+
+		public void setId(String id) {
+			this.id = id;
 		}
 
 		public long getSummaryRating() {
@@ -163,9 +182,76 @@ public class OrdersResource {
 			this.successValue = successValue;
 		}
 
+		public String getUserName() {
+			return userName;
+		}
+
+		public void setUserName(String userName) {
+			this.userName = userName;
+		}
+
+		public String getUserPhone() {
+			return userPhone;
+		}
+
+		public void setUserPhone(String userPhone) {
+			this.userPhone = userPhone;
+		}
+
+		public List<Currency> getUserCurrencies() {
+			return userCurrencies;
+		}
+
+		public void setUserCurrencies(List<Currency> userCurrencies) {
+			this.userCurrencies = userCurrencies;
+		}
+
+		public List<String> getUserLanguages() {
+			return userLanguages;
+		}
+
+		public void setUserLanguages(List<String> userLanguages) {
+			this.userLanguages = userLanguages;
+		}
+
+		public String getUserMail() {
+			return userMail;
+		}
+
+		public void setUserMail(String userMail) {
+			this.userMail = userMail;
+		}
+
 		@Override
 		public String toString() {
-			return "OrderWrapper{" + "order=" + order + ", summaryRating=" + summaryRating + ", opennessRating=" + opennessRating + ", ordersSumValue=" + ordersSumValue + ", successTransactionsSum=" + successTransactionsSum + ", partnersRating=" + partnersRating + ", successValue=" + successValue + '}';
+			return "OrderWrapper{" + "order=" + order + ", summaryRating=" + summaryRating + ", opennessRating=" + opennessRating + ", ordersSumValue=" + ordersSumValue + ", successTransactionsSum=" + successTransactionsSum + ", partnersRating=" + partnersRating + ", successValue=" + successValue + ", userName=" + userName + ", userPhone=" + userPhone + ", userCurrencies=" + userCurrencies + ", userLanguages=" + userLanguages + '}';
+		}
+	}
+	
+	@XmlRootElement
+	public static class ResponseRequest {
+		private String orderId;
+		private String comment;
+
+		public String getOrderId() {
+			return orderId;
+		}
+
+		public void setOrderId(String orderId) {
+			this.orderId = orderId;
+		}
+
+		public String getComment() {
+			return comment;
+		}
+
+		public void setComment(String comment) {
+			this.comment = comment;
+		}
+
+		@Override
+		public String toString() {
+			return "ResponseRequest{" + "orderId=" + orderId + ", comment=" + comment + '}';
 		}
 	}
 
@@ -337,12 +423,28 @@ public class OrdersResource {
 
 		List<OrderWrapper> ordersWrappers = new ArrayList<>();
 		for (OrderInfo order : orders) {
+			System.out.println("@@@ " + order.getId());
 			UserPublicProfile profileValue = profileDAO.find(order.getUserPublicKey());
 			OrderWrapper wrapper = new OrderWrapper(order);
+			wrapper.setId(order.getId());
 			wrapper.setSummaryRating(profileValue.getStatistic().getSummaryRating());
 			wrapper.setOpennessRating(profileValue.getStatistic().getOpennessRating());
 			wrapper.setSuccessTransactionsSum(profileValue.getStatistic().getSuccessTransactionsSum());
 			wrapper.setOrdersSumValue(profileValue.getStatistic().getOrdersSumValue());
+			if(profileValue.isPhoneEnabled()) {
+				wrapper.setUserPhone(profileValue.getPhone());
+			}
+			if(profileValue.isMailEnabled()) {
+				wrapper.setUserMail(profileValue.getMail());
+			}
+			if(profileValue.isCurrenciesEnabled()) {
+				wrapper.setUserCurrencies(profileValue.getCurrencies());
+			}
+			if(profileValue.isLanguagesEnabled()) {
+				wrapper.setUserLanguages(profileValue.getLanguages());
+			}
+			wrapper.setUserName(profileValue.getName());
+
 			String ordersSuccessSizeSum = "";
 			if (profileValue.getCurrencies() != null) {
 				for (Currency currency : profileValue.getCurrencies()) {
@@ -386,6 +488,39 @@ public class OrdersResource {
 		System.out.println("!!! -ORDER  " + order);
 		OrderInfo o = orderDAO.create(order);
 		System.out.println("!!! ORDER CREATE " + o);
+		return o;
+	}
+	
+	@POST
+	@Path("addResponse")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public OrderInfo addResponse(ResponseRequest responseRequest) {
+		String id = AuthFilter.getUserId(request);
+		if((responseRequest == null) || (responseRequest.getOrderId() == null) || responseRequest.getOrderId().isEmpty()) {
+			return null;
+		}
+		OrderInfo order = orderDAO.find(responseRequest.getOrderId());
+		if(order == null) {
+			return null;
+		}
+		Respond respond = new Respond();
+		respond.setUserPublicKey(id);
+		respond.setCreationDate(new Date());
+		respond.setComment(responseRequest.getComment());
+		respond.setStatus(RespondStatus.WAITING);
+		List<Respond> responses = order.getResponses();
+		if(responses == null) {
+			responses = new ArrayList<>();
+			order.setResponses(responses);
+		}
+		if(!responses.contains(respond)) {
+			responses.add(respond);
+		} else {
+			return null;
+		}
+		System.out.println("!!! +ORDER  " + order);
+		OrderInfo o = orderDAO.update(order);
 		return o;
 	}
 

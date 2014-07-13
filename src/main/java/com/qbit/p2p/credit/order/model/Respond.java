@@ -3,6 +3,7 @@ package com.qbit.p2p.credit.order.model;
 import com.qbit.p2p.credit.commons.model.DateAdapter;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 import javax.persistence.Embeddable;
 import javax.persistence.Lob;
 import javax.persistence.Temporal;
@@ -53,6 +54,28 @@ public class Respond implements Serializable {
 
 	public void setStatus(RespondStatus status) {
 		this.status = status;
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 7;
+		hash = 41 * hash + Objects.hashCode(this.userPublicKey);
+		return hash;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final Respond other = (Respond) obj;
+		if (!Objects.equals(this.userPublicKey, other.userPublicKey)) {
+			return false;
+		}
+		return true;
 	}
 
 	@Override

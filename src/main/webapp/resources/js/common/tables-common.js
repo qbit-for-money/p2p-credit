@@ -7,43 +7,49 @@ var cellclassname = function(row, column, value, data) {
 		return "borrow-row";
 	}
 };
-//path = "webapi/orders/withFilter"
-//id = "#orders-table"
 function getSource(path, id) {
 	var source =
-			{
-				dataType: "json",
-				dataFields: [
-					{name: "categories", type: "string"},
-					{name: "userName", type: "string"},
-					{name: "title", type: "string"},
-					{name: "languages", type: "string"},
-					{name: "takingCurrency", type: "string"},
-					{name: "givingCurrency", type: "string"},
-					{name: "duration", type: "string"},
-					{name: "reward", type: "string"},
-					{name: "responses", type: "number"},
-					{name: "status", type: "string"},
-					{name: "summaryRating", type: "number"},
-					{name: "opennessRating", type: "number"},
-					{name: "ordersSumValue", type: "string"},
-					{name: "successValue", type: "string"},
-					{name: "partnersRating", type: "number"},
-					{name: "endDate", type: "date"}
-				],
-				beforeprocessing: function(data) {
-					source.totalrecords = data.length;
-				},
-				sort: function() {
-					angular.element(id).jqxGrid('updatebounddata');
-				},
-				filter: function() {
-					angular.element(id).jqxGrid('updatebounddata');
-				},
-				root: "orders",
-				type: "POST",
-				url: window.context + path
-			};
+		{
+			dataType: "json",
+			dataFields: [
+				{name: "categories", type: "string"},
+				{name: "title", type: "string"},
+				{name: "languages", type: "string"},
+				{name: "takingCurrency", type: "string"},
+				{name: "givingCurrency", type: "string"},
+				{name: "duration", type: "string"},
+				{name: "reward", type: "string"},
+				//{name: "responses", type: "number"},
+				{name: "responsesCount", type: "number"},
+				{name: "status", type: "string"},
+				{name: "summaryRating", type: "number"},
+				{name: "opennessRating", type: "number"},
+				{name: "ordersSumValue", type: "string"},
+				{name: "successValue", type: "string"},
+				{name: "partnersRating", type: "number"},
+				{name: "endDate", type: "date"},
+				{name: "userName", type: "string"},
+				{name: "userMail", type: "string"},
+				{name: "userPhone", type: "string"},
+				{name: "userCurrencies", type: "string"},
+				{name: "userLanguages", type: "string"},
+				{name: "userPublicKey", type: "string"},
+				{name: "orderData", type: "string"},
+				{name: "id", type: "string"}
+			],
+			beforeprocessing: function(data) {
+				source.totalrecords = data.length;
+			},
+			sort: function() {
+				angular.element(id).jqxGrid('updatebounddata');
+			},
+			filter: function() {
+				angular.element(id).jqxGrid('updatebounddata');
+			},
+			root: "orders",
+			type: "POST",
+			url: window.context + path
+		};
 	return source;
 }
 
@@ -60,7 +66,6 @@ function getAdapterFields() {
 
 				newData.filterItems[i] = {};
 				var operator = data[data["filterdatafield" + i] + "operator"];
-
 				if (operator) {
 					if (operator === "and") {
 						newData.filterItems[i].filterOperator = 1;
@@ -94,7 +99,9 @@ function getAdapterFields() {
 		},
 		downloadComplete: function(data, status, xhr) {
 			var orders = data.orders;
+			//console.log(JSON.stringify(orders))
 			for (var i in orders) {
+				//console.log(JSON.stringify(orders[i].id))
 				if (orders[i].order.languages !== undefined) {
 					var languagesStr = "";
 					var categoriesStr = "";
@@ -107,7 +114,6 @@ function getAdapterFields() {
 				}
 				orders[i].languages = languagesStr.substring(0, languagesStr.length - 2);
 				orders[i].categories = categoriesStr.substring(0, categoriesStr.length - 2);
-
 				var takingCurrenciesStr = "";
 				if (!orders[i].order.takingCurrency || !orders[i].order.takingValue) {
 					orders[i].order.takingCurrency = takingCurrenciesStr;
@@ -123,12 +129,28 @@ function getAdapterFields() {
 					givingCurrenciesStr = orders[i].order.givingCurrency.code + " ( " + orders[i].order.givingValue + " )";
 					orders[i].givingCurrency = givingCurrenciesStr;
 				}
-				
-				orders[i].ordersSumValue = orders[i].ordersSumValue + " : " + orders[i].successTransactionsSum;
 
+				orders[i].ordersSumValue = orders[i].ordersSumValue + " : " + orders[i].successTransactionsSum;
 				if (orders[i].order.status === "NOT_SUCCESS") {
 					orders[i].order.status = "NOT SUCCESS";
 				}
+
+
+				if (orders[i].userCurrencies  &&!orders[i].userCurrencies.length !== 0) {
+					var userCurrenciesStr = "";
+					for (var j in orders[i].userCurrencies) {
+						userCurrenciesStr += orders[i].userCurrencies[j].code + ", "
+					}
+					orders[i].userCurrencies = userCurrenciesStr.substring(0, userCurrenciesStr.length - 2);
+				}
+				if (orders[i].userLanguages && orders[i].userLanguages.length !== 0) {
+					var userLanguagesStr = "";
+					for (var j in orders[i].userLanguages) {
+						userLanguagesStr += orders[i].userLanguages[j] + ", "
+					}
+					orders[i].userLanguages = userLanguagesStr.substring(0, userLanguagesStr.length - 2);
+				}
+
 				orders[i].title = orders[i].order.title;
 				orders[i].orderData = orders[i].order.orderData;
 				orders[i].status = orders[i].order.status;
@@ -136,9 +158,10 @@ function getAdapterFields() {
 				orders[i].responses = orders[i].order.responses;
 				orders[i].duration = orders[i].order.duration + " " + ((orders[i].order.durationType === "HOUR") ? "hours" : "days");
 				orders[i].endDate = formatDate(orders[i].order.endDate);
+				orders[i].userPublicKey = orders[i].order.userPublicKey;
 				orders[i].order = undefined;
 			}
-			console.log("BIND: " + JSON.stringify(orders))
+			//console.log("BIND: " + JSON.stringify(orders))
 
 		},
 		loadError: function(xhr, status, error) {

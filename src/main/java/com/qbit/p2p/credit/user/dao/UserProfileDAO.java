@@ -7,6 +7,7 @@ import com.qbit.commons.user.UserDAO;
 import com.qbit.commons.user.UserInfo;
 import com.qbit.p2p.credit.commons.model.Currency;
 import com.qbit.p2p.credit.user.model.DataLink;
+import com.qbit.p2p.credit.user.model.Language;
 import com.qbit.p2p.credit.user.model.Statistic;
 import com.qbit.p2p.credit.user.model.UserCurrency;
 import com.qbit.p2p.credit.user.model.UserPrivateProfile;
@@ -286,5 +287,35 @@ public class UserProfileDAO {
 				return userPrivateProfile;
 			}
 		});
+	}
+	
+	public Language createLanguage(final String title) {
+		if ((title == null) || title.isEmpty()) {
+			throw new IllegalArgumentException("Title is empty.");
+		}
+		return invokeInTransaction(entityManagerFactory, new TrCallable<Language>() {
+
+			@Override
+			public Language call(EntityManager entityManager) {
+
+				Language language = new Language(title);
+				entityManager.persist(language);
+				return language;
+			}
+		});
+	}
+
+	public List<Language> findAllLanguages() {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		try {
+			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+			CriteriaQuery<Language> criteria = builder.createQuery(Language.class);
+			Root<Language> language = criteria.from(Language.class);
+			criteria.select(language);
+			TypedQuery<Language> query = entityManager.createQuery(criteria);
+			return query.getResultList();
+		} finally {
+			entityManager.close();
+		}
 	}
 }

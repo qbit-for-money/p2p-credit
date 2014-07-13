@@ -130,10 +130,44 @@ public class OrderDAO {
 				if (userInfo == null) {
 					return null;
 				}
-				orderInfo.setStatus(OrderStatus.SUCCESS);
+				orderInfo.setStatus(OrderStatus.OPENED);
 				orderInfo.setCreationDate(new Date());
 				entityManager.persist(orderInfo);
 				return orderInfo;
+			}
+		});
+	}
+	
+	public OrderInfo update(final OrderInfo newOrder) {
+		if (newOrder == null) {
+			throw new IllegalArgumentException();
+		}
+		return invokeInTransaction(entityManagerFactory, new TrCallable<OrderInfo>() {
+
+			@Override
+			public OrderInfo
+				call(EntityManager entityManager) {
+				OrderInfo order = entityManager.find(OrderInfo.class, newOrder.getId());
+				if (order == null) {
+					return null;
+				}
+				order.setCategories(newOrder.getCategories());
+				order.setCreationDate(newOrder.getCreationDate());
+				order.setDuration(newOrder.getDuration());
+				order.setDurationType(newOrder.getDurationType());
+				order.setEndDate(newOrder.getEndDate());
+				order.setGivingCurrency(newOrder.getGivingCurrency());
+				order.setGivingValue(newOrder.getGivingValue());
+				order.setLanguages(newOrder.getLanguages());
+				order.setOrderData(newOrder.getOrderData());
+				order.setResponses(newOrder.getResponses());
+				order.setReward(newOrder.getReward());
+				order.setStatus(newOrder.getStatus());
+				order.setTakingCurrency(newOrder.getTakingCurrency());
+				order.setTakingValue(newOrder.getTakingValue());
+				order.setUserPublicKey(newOrder.getUserPublicKey());
+
+				return order;
 			}
 		});
 	}

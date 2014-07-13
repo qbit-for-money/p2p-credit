@@ -8,7 +8,8 @@ orderModule.factory("categoriesResource", function($resource) {
 
 orderModule.factory("ordersResource", function($resource) {
 	return $resource(window.context + "webapi/orders", {}, {
-		create: {method: "PUT"}
+		create: {method: "PUT"},
+		addResponse: {method: "POST", url: window.context + "webapi/orders/addResponse"}
 	});
 });
 

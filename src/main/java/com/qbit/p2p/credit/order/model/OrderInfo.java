@@ -67,7 +67,7 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 	
 	//private OrderType type;
 	@ElementCollection
-	private List<String> languages = new ArrayList<String>();
+	private List<String> languages;
 	@XmlJavaTypeAdapter(CurrencyAdapter.class)
 	private Currency givingCurrency;
 	@XmlJavaTypeAdapter(CurrencyAdapter.class)
@@ -76,11 +76,7 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 	private BigDecimal takingValue;
 	@Column(precision = 10, scale = 3)
 	private BigDecimal givingValue;
-	//@Embedded
-	//private CurrencyInterval currencyInterval;
-	
 	private String reward;
-	private long responses;
 	
 
 	@Override
@@ -197,13 +193,14 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 		this.orderData = orderData;
 	}
 
-	public long getResponses() {
+	public List<Respond> getResponses() {
 		return responses;
 	}
 
-	public void setResponses(long responses) {
+	public void setResponses(List<Respond> responses) {
 		this.responses = responses;
 	}
+
 
 	public DurationType getDurationType() {
 		return durationType;

@@ -16,3 +16,9 @@ userModule.factory("currencyResource", function($resource) {
 		findAll: {method: "GET"}
 	});
 });
+
+userModule.factory("languagesResource", function($resource) {
+	return $resource(window.context + "webapi/profiles/languages", {}, {
+		findAll: {method: "GET"}
+	});
+});

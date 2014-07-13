@@ -16,6 +16,7 @@ import com.qbit.p2p.credit.order.model.FilterOperator;
 import com.qbit.p2p.credit.order.model.OrderInfo;
 import com.qbit.p2p.credit.order.model.OrderStatus;
 import com.qbit.p2p.credit.user.dao.UserProfileDAO;
+import com.qbit.p2p.credit.user.model.Language;
 import com.qbit.p2p.credit.user.model.Point2;
 import com.qbit.p2p.credit.user.model.Statistic;
 import com.qbit.p2p.credit.user.model.UserPrivateProfile;
@@ -59,6 +60,25 @@ import sun.misc.BASE64Decoder;
 @Path("profiles")
 @Singleton
 public class ProfilesResource {
+	
+	@XmlRootElement
+	public static class LanguagesWrapper {
+
+		@XmlElement
+		@XmlList
+		private List<Language> languages;
+
+		public LanguagesWrapper() {
+		}
+
+		public LanguagesWrapper(List<Language> languages) {
+			this.languages = languages;
+		}
+
+		public List<Language> getLanguages() {
+			return languages;
+		}
+	}
 
 	public static class UserPhotoRequest {
 
@@ -448,6 +468,13 @@ public class ProfilesResource {
 		}
 		return outputStream.toByteArray();
 	}
+	
+	@GET
+	@Path("languages")
+	@Produces(MediaType.APPLICATION_JSON)
+	public LanguagesWrapper getOrdersCategories() {
+		return new LanguagesWrapper(userProfileDAO.findAllLanguages());
+	}
 
 	@GET
 	@Path("random")
@@ -499,7 +526,7 @@ public class ProfilesResource {
 			List<String> l = new ArrayList<>();
 			Collections.addAll(l, "Russian", "English");
 			order.setLanguages(l);
-			order.setResponses(rand.nextInt(10));
+			//order.setResponses(rand.nextInt(10));
 			/*if(rand.nextInt(3) < 2) {
 				order.setType(OrderType.CREDIT);
 			} else {
@@ -507,6 +534,15 @@ public class ProfilesResource {
 			}*/
 
 			orderDAO.create(order);
+		}
+	}
+	
+	@GET
+	@Path("create_language")
+	public void createLanguages() {
+		String[] languages = {"Abkhaz","Afar","Afrikaans","Akan","Albanian","Amharic","Arabic","Aragonese","Armenian","Assamese","Avaric","Avestan","Aymara","Azerbaijani","Bambara","Bashkir","Basque","Belarusian","Bengali","Bihari","Bislama","Bosnian","Breton","Bulgarian","Burmese","Catalan; Valencian","Chamorro","Chechen","Chichewa; Chewa; Nyanja","Chinese","Chuvash","Cornish","Corsican","Cree","Croatian","Czech","Danish","Divehi; Dhivehi; Maldivian;","Dutch","English","Esperanto","Estonian","Ewe","Faroese","Fijian","Finnish","French","Fula; Fulah; Pulaar; Pular","Galician","Georgian","German","Greek, Modern","Guaraní","Gujarati","Haitian; Haitian Creole","Hausa","Hebrew (modern)","Herero","Hindi","Hiri Motu","Hungarian","Interlingua","Indonesian","Interlingue","Irish","Igbo","Inupiaq","Ido","Icelandic","Italian","Inuktitut","Japanese","Javanese","Kalaallisut, Greenlandic","Kannada","Kanuri","Kashmiri","Kazakh","Khmer","Kikuyu, Gikuyu","Kinyarwanda","Kirghiz, Kyrgyz","Komi","Kongo","Korean","Kurdish","Kwanyama, Kuanyama","Latin","Luxembourgish, Letzeburgesch","Luganda","Limburgish, Limburgan, Limburger","Lingala","Lao","Lithuanian","Luba-Katanga","Latvian","Manx","Macedonian","Malagasy","Malay","Malayalam","Maltese","Māori","Marathi (Marāṭhī)","Marshallese","Mongolian","Nauru","Navajo, Navaho","Norwegian Bokmål","North Ndebele","Nepali","Ndonga","Norwegian Nynorsk","Norwegian","Nuosu","South Ndebele","Occitan","Ojibwe, Ojibwa","Old Slavonic","Oromo","Oriya","Ossetian, Ossetic","Panjabi, Punjabi","Pāli","Persian","Polish","Pashto, Pushto","Portuguese","Quechua","Romansh","Kirundi","Romanian, Moldavian, Moldovan","Russian","Sanskrit (Saṁskṛta)","Sardinian","Sindhi","Northern Sami","Samoan","Sango","Serbian","Scottish Gaelic; Gaelic","Shona","Sinhala, Sinhalese","Slovak","Slovene","Somali","Southern Sotho","Spanish; Castilian","Sundanese","Swahili","Swati","Swedish","Tamil","Telugu","Tajik","Thai","Tigrinya","Tibetan Standard, Tibetan, Central","Turkmen","Tagalog","Tswana","Tonga (Tonga Islands)","Turkish","Tsonga","Tatar","Twi","Tahitian","Uighur, Uyghur","Ukrainian","Urdu","Uzbek","Venda","Vietnamese","Volapük","Walloon","Welsh","Wolof","Western Frisian","Xhosa","Yiddish","Yoruba","Zhuang, Chuang"};
+		for(String l : languages) {
+			userProfileDAO.createLanguage(l);
 		}
 	}
 }

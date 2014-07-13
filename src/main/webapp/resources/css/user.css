@@ -170,3 +170,7 @@ select.custom {
 {
 	background-color: #f8f8f8;
 }
+
+.static-position {
+	position: static !important;
+}
