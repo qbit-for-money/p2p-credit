@@ -1,28 +1,71 @@
 package com.qbit.p2p.credit.order.model;
 
+import com.qbit.commons.model.Identifiable;
 import com.qbit.p2p.credit.commons.model.DateAdapter;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
+import javax.persistence.Access;
+import javax.persistence.AccessType;
 import javax.persistence.Embeddable;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * @author Alexander_Sergeev
  */
-@Embeddable
-public class Respond implements Serializable {
+@Entity
+@Access(AccessType.FIELD)
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
+public class Respond implements Identifiable<String>, Serializable {
+	@ManyToOne
+	private OrderInfo orderInfo;
 
+	private static final long serialVersionUID = 1L;
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	@XmlTransient
+	private String id;
 	private String userPublicKey;
+	private String userName;
+	private String userPhone;
+	private String userEmail;
 	@XmlJavaTypeAdapter(DateAdapter.class)
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date creationDate;
 	@Lob
 	private String comment;
 	RespondStatus status;
+
+	@Override
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public OrderInfo getOrderInfo() {
+		return orderInfo;
+	}
+
+	public void setOrderInfo(OrderInfo orderInfo) {
+		this.orderInfo = orderInfo;
+	}
 
 	public String getUserPublicKey() {
 		return userPublicKey;
@@ -56,10 +99,34 @@ public class Respond implements Serializable {
 		this.status = status;
 	}
 
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public String getUserPhone() {
+		return userPhone;
+	}
+
+	public void setUserPhone(String userPhone) {
+		this.userPhone = userPhone;
+	}
+
+	public String getUserEmail() {
+		return userEmail;
+	}
+
+	public void setUserEmail(String userEmail) {
+		this.userEmail = userEmail;
+	}
+
 	@Override
 	public int hashCode() {
-		int hash = 7;
-		hash = 41 * hash + Objects.hashCode(this.userPublicKey);
+		int hash = 5;
+		hash = 53 * hash + Objects.hashCode(this.id);
 		return hash;
 	}
 
@@ -72,14 +139,36 @@ public class Respond implements Serializable {
 			return false;
 		}
 		final Respond other = (Respond) obj;
-		if (!Objects.equals(this.userPublicKey, other.userPublicKey)) {
+		if (!Objects.equals(this.id, other.id)) {
 			return false;
 		}
 		return true;
 	}
+	
+	
 
+	/*@Override
+	public int hashCode() {
+	int hash = 7;
+	hash = 41 * hash + Objects.hashCode(this.userPublicKey);
+	return hash;
+	}
+	@Override
+	public boolean equals(Object obj) {
+	if (obj == null) {
+	return false;
+	}
+	if (getClass() != obj.getClass()) {
+	return false;
+	}
+	final Respond other = (Respond) obj;
+	if (!Objects.equals(this.userPublicKey, other.userPublicKey)) {
+	return false;
+	}
+	return true;
+	}*/
 	@Override
 	public String toString() {
-		return "Respond{" + "userPublicKey=" + userPublicKey + ", creationDate=" + creationDate + ", comment=" + comment + ", status=" + status + '}';
+		return "Respond{" + "userPublicKey=" + userPublicKey + ", userName=" + userName + ", userPhone=" + userPhone + ", userEmail=" + userEmail + ", creationDate=" + creationDate + ", comment=" + comment + ", status=" + status + '}';
 	}
 }

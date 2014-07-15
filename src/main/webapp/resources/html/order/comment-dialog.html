@@ -7,14 +7,9 @@
 				</textarea>
 			</div>
 		</div>
-		<!--div class="row">
-			<div class="col-xs-12 col-md-12">
-				<div class="col-xs-12 col-md-12"><hr></div>
-			</div>
-		</div-->
 		<div class="row" style="padding-top: 15px;">
 			<div class="col-xs-6 col-md-6">
-				<button class="btn btn-success navbar-right" type="button" ng-click="save(comment)" style="width: 60%">
+				<button class="btn btn-success navbar-right" ng-disabled="comment === ''" type="button" ng-click="save(comment)" style="width: 60%">
 					Yes!
 				</button>
 			</div>

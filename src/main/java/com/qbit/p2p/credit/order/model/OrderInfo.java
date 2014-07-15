@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.List;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
@@ -22,6 +23,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -62,7 +65,11 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 	
 	private OrderStatus status;
 	
+	@OneToMany(mappedBy = "orderInfo", cascade=CascadeType.ALL)
 	private List<Respond> responses;
+	
+	@OneToOne(cascade=CascadeType.ALL)
+	private Comment comment;
 	
 	
 	//private OrderType type;
@@ -165,7 +172,11 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 	}
 
 	public void setTakingValue(BigDecimal takingValue) {
-		this.takingValue = takingValue.setScale(3, RoundingMode.HALF_UP);
+		if(takingValue != null) {
+			this.takingValue = takingValue.setScale(3, RoundingMode.HALF_UP);
+		} else {
+			this.takingValue = null;
+		}
 	}
 
 	public BigDecimal getGivingValue() {
@@ -173,7 +184,11 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 	}
 
 	public void setGivingValue(BigDecimal givingValue) {
-		this.givingValue = givingValue.setScale(3, RoundingMode.HALF_UP);
+		if(givingValue != null) {
+			this.givingValue = givingValue.setScale(3, RoundingMode.HALF_UP);
+		} else {
+			this.givingValue = null;
+		}
 	}
 
 
@@ -209,6 +224,14 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 	public void setDurationType(DurationType durationType) {
 		this.durationType = durationType;
 	}
+
+	public Comment getComment() {
+		return comment;
+	}
+
+	public void setComment(Comment comment) {
+		this.comment = comment;
+	}
 	
 	public boolean isValid() {
 		return (endDate != null) 
@@ -224,6 +247,6 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 
 	@Override
 	public String toString() {
-		return "OrderInfo{" + "id=" + id + ", creationDate=" + creationDate + ", endDate=" + endDate + ", duration=" + duration + ", durationType=" + durationType + ", userPublicKey=" + userPublicKey + ", categories=" + categories + ", orderData=" + orderData + ", status=" + status + ", languages=" + languages + ", givingCurrency=" + givingCurrency + ", takingCurrency=" + takingCurrency + ", takingValue=" + takingValue + ", givingValue=" + givingValue + ", reward=" + reward + ", responses=" + responses + '}';
+		return "OrderInfo{" + "id=" + id + ", creationDate=" + creationDate + ", endDate=" + endDate + ", duration=" + duration + ", durationType=" + durationType + ", userPublicKey=" + userPublicKey + ", categories=" + categories + ", orderData=" + orderData + ", status=" + status + ", responses=" + responses + ", comment=" + comment + ", languages=" + languages + ", givingCurrency=" + givingCurrency + ", takingCurrency=" + takingCurrency + ", takingValue=" + takingValue + ", givingValue=" + givingValue + ", reward=" + reward + '}';
 	}
 }

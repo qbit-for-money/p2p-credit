@@ -14,9 +14,12 @@ import com.qbit.p2p.credit.order.model.OrderCategory;
 import com.qbit.p2p.credit.order.model.OrderInfo;
 import com.qbit.p2p.credit.order.model.OrderStatus;
 import com.qbit.p2p.credit.order.model.OrderType;
+import com.qbit.p2p.credit.order.model.Respond;
+import com.qbit.p2p.credit.order.model.RespondStatus;
 import com.qbit.p2p.credit.order.model.SearchRequest;
 import com.qbit.p2p.credit.user.dao.UserProfileDAO;
 import com.qbit.p2p.credit.user.model.UserPublicProfile;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -29,6 +32,8 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -137,7 +142,26 @@ public class OrderDAO {
 			}
 		});
 	}
-	
+
+	public Respond changeResponseStatus(final Respond newResponse) {
+		if (newResponse == null) {
+			throw new IllegalArgumentException();
+		}
+		return invokeInTransaction(entityManagerFactory, new TrCallable<Respond>() {
+
+			@Override
+			public Respond
+				call(EntityManager entityManager) {
+				Respond response = entityManager.find(Respond.class, newResponse.getId());
+				if (response == null) {
+					return null;
+				}
+				response.setStatus(newResponse.getStatus());
+				return response;
+			}
+		});
+	}
+
 	public OrderInfo update(final OrderInfo newOrder) {
 		if (newOrder == null) {
 			throw new IllegalArgumentException();
@@ -152,7 +176,6 @@ public class OrderDAO {
 					return null;
 				}
 				order.setCategories(newOrder.getCategories());
-				order.setCreationDate(newOrder.getCreationDate());
 				order.setDuration(newOrder.getDuration());
 				order.setDurationType(newOrder.getDurationType());
 				order.setEndDate(newOrder.getEndDate());
@@ -160,13 +183,22 @@ public class OrderDAO {
 				order.setGivingValue(newOrder.getGivingValue());
 				order.setLanguages(newOrder.getLanguages());
 				order.setOrderData(newOrder.getOrderData());
-				order.setResponses(newOrder.getResponses());
+				if(order.getResponses() == null) {
+					order.setResponses(new ArrayList<Respond>());
+				}
+				for (Respond r : newOrder.getResponses()) {
+					if (!order.getResponses().contains(r)) {
+						order.getResponses().add(r);
+					} else if((r.getId() != null) && !r.getId().isEmpty() && (r.getStatus() != null) ) {
+						changeResponseStatus(r);
+					}
+				}
 				order.setReward(newOrder.getReward());
 				order.setStatus(newOrder.getStatus());
 				order.setTakingCurrency(newOrder.getTakingCurrency());
 				order.setTakingValue(newOrder.getTakingValue());
 				order.setUserPublicKey(newOrder.getUserPublicKey());
-
+				order.setComment(newOrder.getComment());
 				return order;
 			}
 		});
@@ -286,6 +318,7 @@ public class OrderDAO {
 			Predicate itemsOperatorPredicate = null;
 			Predicate languagesPredicate = null;
 			Predicate categoriesPredicate = null;
+			Predicate statusesPredicate = null;
 			for (FilterItem item : filterItems) {
 				if ((item.getFilterDataField() != null) && (item.getFilterValue() != null)) {
 					//ParameterExpression<String> parameter = builder.parameter(String.class, item.getFilterDataField());
@@ -295,6 +328,11 @@ public class OrderDAO {
 					if ((item.getFilterCondition() == null) || (FilterCondition.EQUAL == item.getFilterCondition())) {
 						if ("status".equals(item.getFilterDataField())) {
 							valuePredicate = builder.equal(order.get(item.getFilterDataField()), OrderStatus.valueOf(item.getFilterValue()));
+							if (statusesPredicate == null) {
+								statusesPredicate = valuePredicate;
+							} else {
+								statusesPredicate = builder.or(valuePredicate, statusesPredicate);
+							}
 						} else if ("givingCurrency".equals(item.getFilterDataField())) {
 							valuePredicate = builder.equal(order.get(item.getFilterDataField()), Currency.valueOf(item.getFilterValue()));
 						} else if ("partnersRating".equals(item.getFilterDataField()) || "success".equals(item.getFilterDataField())) {
@@ -350,7 +388,6 @@ public class OrderDAO {
 							), "%" + item.getFilterValue().toLowerCase() + "%"
 						);
 					} else if (FilterCondition.LESS_THAN_OR_EQUAL == item.getFilterCondition()) {
-						//continue;
 						if ("endDate".toLowerCase().equals(item.getFilterDataField().toLowerCase())) {
 
 							valuePredicate = builder.lessThanOrEqualTo(order.<Date>get(item.getFilterDataField()), DateUtil.stringToDate(item.getFilterValue()));
@@ -359,7 +396,6 @@ public class OrderDAO {
 							valuePredicate = builder.lessThanOrEqualTo(order.<String>get(item.getFilterDataField()), item.getFilterValue());
 						}
 					} else if (FilterCondition.LESS_THAN == item.getFilterCondition()) {
-						//continue;
 						if ("endDate".toLowerCase().equals(item.getFilterDataField().toLowerCase())) {
 
 							valuePredicate = builder.lessThan(order.<Date>get(item.getFilterDataField()), DateUtil.stringToDate(item.getFilterValue()));
@@ -368,9 +404,7 @@ public class OrderDAO {
 							valuePredicate = builder.lessThan(order.<String>get(item.getFilterDataField()), item.getFilterValue());
 						}
 					} else if (FilterCondition.GREATER_THAN_OR_EQUAL == item.getFilterCondition()) {
-						//continue;
 						if ("endDate".toLowerCase().equals(item.getFilterDataField().toLowerCase())) {
-							System.out.println("%%% " + DateUtil.stringToDate(item.getFilterValue()));
 							valuePredicate = builder.greaterThanOrEqualTo(order.<Date>get(item.getFilterDataField()), DateUtil.stringToDate(item.getFilterValue()));
 						} else if ("summaryRating".equals(item.getFilterDataField()) || "opennessRating".equals(item.getFilterDataField())) {
 							Subquery<UserPublicProfile> subquery = criteria.subquery(UserPublicProfile.class);
@@ -381,13 +415,31 @@ public class OrderDAO {
 							valuePredicate = builder.in(order.get("userPublicKey")).value(subquery);
 							//subquery.where(builder.ge(fromUserPublicProfile.get("pint"),30000));
 							//valuePredicate = builder.greaterThanOrEqualTo(order.<Date>get(item.getFilterDataField()), DateUtil.stringToDate(item.getFilterValue()));
+						} else if ("responsesCount".equals(item.getFilterDataField())) {
+							
+							//Join<OrderInfo, Respond> secondTable = order.join("responses", JoinType.LEFT);
+							/*builder.count(order.get("responses"));
+							
+							Subquery<Long> subquery = criteria.subquery(Long.class);
+							Root fromRespond = subquery.from(Respond.class);
+							Root respond = criteria.from(Respond.class);
+							//Expression<Long> responsesExpression = null;
+							//responsesExpression = builder.countDistinct(fromRespond);
+							subquery.select(builder.countDistinct(fromRespond));
+							//subquery.where(builder.equal(fromRespond.join("orderInfo").get("id"), order.get("id")));
+							//subquery.where(builder.equal(fromUserPublicProfile.get("name"), "gg"));
+							//subquery.where(builder.greaterThanOrEqualTo(builder.countDistinct(fromRespond.get("publicKey")), Long.parseLong(item.getFilterValue())));
+							query.select(cb.count(u)).where(cb.in(u).value(subquery));
+							Predicate valuePredicate1 = builder.in(order.get("userPublicKey")).value(subquery);*/
+							Expression<Collection> e = order.get("responses");
+							valuePredicate = builder.greaterThanOrEqualTo(builder.count(e), Long.parseLong(item.getFilterValue()));
+							//subquery.where(builder.ge(fromUserPublicProfile.get("pint"),30000));
+							//valuePredicate = builder.greaterThanOrEqualTo(order.<Date>get(item.getFilterDataField()), DateUtil.stringToDate(item.getFilterValue()));
 						} else {
 							valuePredicate = builder.greaterThanOrEqualTo(order.<String>get(item.getFilterDataField()), item.getFilterValue());
 						}
 					} else if (FilterCondition.GREATER_THAN == item.getFilterCondition()) {
-						//continue;
 						if ("endDate".toLowerCase().equals(item.getFilterDataField().toLowerCase())) {
-							System.out.println("%%% " + DateUtil.stringToDate(item.getFilterValue()));
 							valuePredicate = builder.greaterThan(order.<Date>get(item.getFilterDataField()), DateUtil.stringToDate(item.getFilterValue()));
 						} else {
 							valuePredicate = builder.greaterThan(order.<String>get(item.getFilterDataField()), item.getFilterValue());
@@ -414,6 +466,13 @@ public class OrderDAO {
 					mainOperatorPredicate = categoriesPredicate;
 				} else {
 					mainOperatorPredicate = builder.and(categoriesPredicate, mainOperatorPredicate);
+				}
+			}
+			if (statusesPredicate != null) {
+				if (mainOperatorPredicate == null) {
+					mainOperatorPredicate = statusesPredicate;
+				} else {
+					mainOperatorPredicate = builder.and(statusesPredicate, mainOperatorPredicate);
 				}
 			}
 

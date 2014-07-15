@@ -161,7 +161,7 @@ userProfileModule.directive("linksList", function() {
 				scope.newLink.link = "";
 				scope.newLink.edited = false;
 				if (scope.type === "phone") {
-					getPhoneCode()
+					//getPhoneCode();
 					angular.element("#input-phone").jqxMaskedInput({mask: '+## (###)###-##-##'});
 					angular.element("#input-phone").jqxMaskedInput('inputValue', "07");
 				}

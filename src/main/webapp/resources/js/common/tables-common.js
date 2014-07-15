@@ -9,47 +9,48 @@ var cellclassname = function(row, column, value, data) {
 };
 function getSource(path, id) {
 	var source =
-		{
-			dataType: "json",
-			dataFields: [
-				{name: "categories", type: "string"},
-				{name: "title", type: "string"},
-				{name: "languages", type: "string"},
-				{name: "takingCurrency", type: "string"},
-				{name: "givingCurrency", type: "string"},
-				{name: "duration", type: "string"},
-				{name: "reward", type: "string"},
-				//{name: "responses", type: "number"},
-				{name: "responsesCount", type: "number"},
-				{name: "status", type: "string"},
-				{name: "summaryRating", type: "number"},
-				{name: "opennessRating", type: "number"},
-				{name: "ordersSumValue", type: "string"},
-				{name: "successValue", type: "string"},
-				{name: "partnersRating", type: "number"},
-				{name: "endDate", type: "date"},
-				{name: "userName", type: "string"},
-				{name: "userMail", type: "string"},
-				{name: "userPhone", type: "string"},
-				{name: "userCurrencies", type: "string"},
-				{name: "userLanguages", type: "string"},
-				{name: "userPublicKey", type: "string"},
-				{name: "orderData", type: "string"},
-				{name: "id", type: "string"}
-			],
-			beforeprocessing: function(data) {
-				source.totalrecords = data.length;
-			},
-			sort: function() {
-				angular.element(id).jqxGrid('updatebounddata');
-			},
-			filter: function() {
-				angular.element(id).jqxGrid('updatebounddata');
-			},
-			root: "orders",
-			type: "POST",
-			url: window.context + path
-		};
+			{
+				dataType: "json",
+				dataFields: [
+					{name: "categories", type: "string"},
+					{name: "title", type: "string"},
+					{name: "languages", type: "string"},
+					{name: "takingCurrency", type: "string"},
+					{name: "givingCurrency", type: "string"},
+					{name: "duration", type: "string"},
+					{name: "reward", type: "string"},
+					//{name: "responses", type: "number"},
+					{name: "responsesCount", type: "number"},
+					{name: "responses", type: "string"},
+					{name: "status", type: "string"},
+					{name: "summaryRating", type: "number"},
+					{name: "opennessRating", type: "number"},
+					{name: "ordersSumValue", type: "string"},
+					{name: "successValue", type: "string"},
+					{name: "partnersRating", type: "number"},
+					{name: "endDate", type: "date"},
+					{name: "userName", type: "string"},
+					{name: "userMail", type: "string"},
+					{name: "userPhone", type: "string"},
+					{name: "userCurrencies", type: "string"},
+					{name: "userLanguages", type: "string"},
+					{name: "userPublicKey", type: "string"},
+					{name: "orderData", type: "string"},
+					{name: "id", type: "string"}
+				],
+				beforeprocessing: function(data) {
+					source.totalrecords = data.length;
+				},
+				sort: function() {
+					angular.element(id).jqxGrid('updatebounddata');
+				},
+				filter: function() {
+					angular.element(id).jqxGrid('updatebounddata');
+				},
+				root: "orders",
+				type: "POST",
+				url: window.context + path
+			};
 	return source;
 }
 
@@ -60,7 +61,8 @@ function getAdapterFields() {
 			var newData = {};
 			newData.filterItems = [];
 			for (var i = 0; i < data.filterscount; i++) {
-				if (!isInt(data["filtervalue" + i]) && ((data["filterdatafield" + i] === "summaryRating") || (data["filterdatafield" + i] === "opennessRating") || (data["filterdatafield" + i] === "success") || (data["filterdatafield" + i] === "partnersRating"))) {
+
+				if (!isInt(data["filtervalue" + i]) && isNumberField(data["filterdatafield" + i])) {
 					continue;
 				}
 
@@ -83,10 +85,10 @@ function getAdapterFields() {
 					//var month = date.get
 					newData.filterItems[i].filterValue = monthNames[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear();
 				}
-				if ((data["filterdatafield" + i] === "summaryRating") || (data["filterdatafield" + i] === "opennessRating") || (data["filterdatafield" + i] === "success") || (data["filterdatafield" + i] === "partnersRating")) {
+				if (isNumberField(data["filterdatafield" + i])) {
 					newData.filterItems[i].filterCondition = "GREATER_THAN_OR_EQUAL";
 				}
-				//console.log(JSON.stringify(newData.filterItems[i]))
+				console.log(JSON.stringify(newData.filterItems[i]))
 			}
 			console.log(JSON.stringify(newData.filterItems))
 			newData.sortOrder = data.sortorder;
@@ -99,7 +101,7 @@ function getAdapterFields() {
 		},
 		downloadComplete: function(data, status, xhr) {
 			var orders = data.orders;
-			//console.log(JSON.stringify(orders))
+			console.log(JSON.stringify(orders))
 			for (var i in orders) {
 				//console.log(JSON.stringify(orders[i].id))
 				if (orders[i].order.languages !== undefined) {
@@ -134,9 +136,12 @@ function getAdapterFields() {
 				if (orders[i].order.status === "NOT_SUCCESS") {
 					orders[i].order.status = "NOT SUCCESS";
 				}
+				if (orders[i].order.status === "IN_PROCESS") {
+					orders[i].order.status = "IN PROCESS";
+				}
 
 
-				if (orders[i].userCurrencies  &&!orders[i].userCurrencies.length !== 0) {
+				if (orders[i].userCurrencies && !orders[i].userCurrencies.length !== 0) {
 					var userCurrenciesStr = "";
 					for (var j in orders[i].userCurrencies) {
 						userCurrenciesStr += orders[i].userCurrencies[j].code + ", "
@@ -156,9 +161,15 @@ function getAdapterFields() {
 				orders[i].status = orders[i].order.status;
 				orders[i].type = orders[i].order.type;
 				orders[i].responses = orders[i].order.responses;
+				if (orders[i].responses && orders[i].responses.length) {
+					orders[i].responsesCount = orders[i].responses.length;
+				} else {
+					orders[i].responsesCount = 0;
+				}
 				orders[i].duration = orders[i].order.duration + " " + ((orders[i].order.durationType === "HOUR") ? "hours" : "days");
 				orders[i].endDate = formatDate(orders[i].order.endDate);
 				orders[i].userPublicKey = orders[i].order.userPublicKey;
+				orders[i].responses = orders[i].order.responses;
 				orders[i].order = undefined;
 			}
 			//console.log("BIND: " + JSON.stringify(orders))
@@ -173,6 +184,23 @@ function getAdapterFields() {
 function isInt(str) {
 	var n = ~~Number(str);
 	return String(n) === str && n >= 0;
+}
+
+function isNumberField(field) {
+	switch (field) {
+		case "summaryRating":
+			return true;
+		case "opennessRating":
+			return true;
+		case "success":
+			return true;
+		case "partnersRating":
+			return true;
+		case "responsesCount":
+			return true;
+		default:
+			return false;
+	}
 }
 
 function formatDate(value) {

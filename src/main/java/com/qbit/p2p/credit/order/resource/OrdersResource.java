@@ -7,11 +7,13 @@ import com.qbit.p2p.credit.commons.model.Currency;
 import com.qbit.p2p.credit.commons.util.DateUtil;
 import com.qbit.p2p.credit.money.model.serialization.CurrencyAdapter;
 import com.qbit.p2p.credit.order.dao.OrderDAO;
+import com.qbit.p2p.credit.order.model.Comment;
 import com.qbit.p2p.credit.order.model.FilterCondition;
 import com.qbit.p2p.credit.order.model.FilterItem;
 import com.qbit.p2p.credit.order.model.FilterOperator;
 import com.qbit.p2p.credit.order.model.OrderCategory;
 import com.qbit.p2p.credit.order.model.OrderInfo;
+import com.qbit.p2p.credit.order.model.OrderStatus;
 import com.qbit.p2p.credit.order.model.OrderType;
 import com.qbit.p2p.credit.order.model.Respond;
 import com.qbit.p2p.credit.order.model.RespondStatus;
@@ -227,11 +229,13 @@ public class OrdersResource {
 			return "OrderWrapper{" + "order=" + order + ", summaryRating=" + summaryRating + ", opennessRating=" + opennessRating + ", ordersSumValue=" + ordersSumValue + ", successTransactionsSum=" + successTransactionsSum + ", partnersRating=" + partnersRating + ", successValue=" + successValue + ", userName=" + userName + ", userPhone=" + userPhone + ", userCurrencies=" + userCurrencies + ", userLanguages=" + userLanguages + '}';
 		}
 	}
-	
+
 	@XmlRootElement
 	public static class ResponseRequest {
+
 		private String orderId;
 		private String comment;
+		private String userId;
 
 		public String getOrderId() {
 			return orderId;
@@ -249,9 +253,49 @@ public class OrdersResource {
 			this.comment = comment;
 		}
 
+		public String getUserId() {
+			return userId;
+		}
+
+		public void setUserId(String userId) {
+			this.userId = userId;
+		}
+		
 		@Override
 		public String toString() {
-			return "ResponseRequest{" + "orderId=" + orderId + ", comment=" + comment + '}';
+			return "ResponseRequest{" + "orderId=" + orderId + ", comment=" + comment + ", userId=" + userId + '}';
+		}
+	}
+	
+	@XmlRootElement
+	public static class OrderStatusRequest {
+
+		private String orderId;
+		private String comment;
+		private OrderStatus status;
+
+		public String getOrderId() {
+			return orderId;
+		}
+
+		public void setOrderId(String orderId) {
+			this.orderId = orderId;
+		}
+
+		public String getComment() {
+			return comment;
+		}
+
+		public void setComment(String comment) {
+			this.comment = comment;
+		}
+
+		public OrderStatus getStatus() {
+			return status;
+		}
+
+		public void setStatus(OrderStatus status) {
+			this.status = status;
 		}
 	}
 
@@ -372,7 +416,20 @@ public class OrdersResource {
 		//}
 		List<OrderWrapper> ordersWrappers = new ArrayList<>();
 		for (OrderInfo order : orders) {
+			if (order.getResponses() != null) {
+				for (Respond response : order.getResponses()) {
+					UserPublicProfile responseProfile = profileDAO.find(response.getUserPublicKey());
+					if (!responseProfile.isMailEnabled()) {
+						response.setUserEmail(null);
+					}
+					if (!responseProfile.isPhoneEnabled()) {
+						response.setUserPhone(null);
+					}
+				}
+			}
+
 			OrderWrapper wrapper = new OrderWrapper(order);
+			wrapper.setId(order.getId());
 			ordersWrappers.add(wrapper);
 		}
 
@@ -411,7 +468,6 @@ public class OrdersResource {
 		//if (ordersData != null) {
 		//	orders = ordersData.getOrders();
 		//}
-		
 
 		long length = orderDAO.getLengthWithFilter(null, ordersRequest, profile);
 		System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!1! WRAPPER: " + orders);
@@ -423,7 +479,18 @@ public class OrdersResource {
 
 		List<OrderWrapper> ordersWrappers = new ArrayList<>();
 		for (OrderInfo order : orders) {
-			System.out.println("@@@ " + order.getId());
+			if (order.getResponses() != null) {
+				for (Respond response : order.getResponses()) {
+					UserPublicProfile responseProfile = profileDAO.find(response.getUserPublicKey());
+					if (!responseProfile.isMailEnabled()) {
+						response.setUserEmail(null);
+					}
+					if (!responseProfile.isPhoneEnabled()) {
+						response.setUserPhone(null);
+					}
+				}
+			}
+			//order.setResponses(null);
 			UserPublicProfile profileValue = profileDAO.find(order.getUserPublicKey());
 			OrderWrapper wrapper = new OrderWrapper(order);
 			wrapper.setId(order.getId());
@@ -431,16 +498,16 @@ public class OrdersResource {
 			wrapper.setOpennessRating(profileValue.getStatistic().getOpennessRating());
 			wrapper.setSuccessTransactionsSum(profileValue.getStatistic().getSuccessTransactionsSum());
 			wrapper.setOrdersSumValue(profileValue.getStatistic().getOrdersSumValue());
-			if(profileValue.isPhoneEnabled()) {
+			if (profileValue.isPhoneEnabled()) {
 				wrapper.setUserPhone(profileValue.getPhone());
 			}
-			if(profileValue.isMailEnabled()) {
+			if (profileValue.isMailEnabled()) {
 				wrapper.setUserMail(profileValue.getMail());
 			}
-			if(profileValue.isCurrenciesEnabled()) {
+			if (profileValue.isCurrenciesEnabled()) {
 				wrapper.setUserCurrencies(profileValue.getCurrencies());
 			}
-			if(profileValue.isLanguagesEnabled()) {
+			if (profileValue.isLanguagesEnabled()) {
 				wrapper.setUserLanguages(profileValue.getLanguages());
 			}
 			wrapper.setUserName(profileValue.getName());
@@ -485,23 +552,21 @@ public class OrdersResource {
 		if (!order.isValid()) {
 			return null;
 		}
-		System.out.println("!!! -ORDER  " + order);
 		OrderInfo o = orderDAO.create(order);
-		System.out.println("!!! ORDER CREATE " + o);
 		return o;
 	}
-	
+
 	@POST
 	@Path("addResponse")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public OrderInfo addResponse(ResponseRequest responseRequest) {
 		String id = AuthFilter.getUserId(request);
-		if((responseRequest == null) || (responseRequest.getOrderId() == null) || responseRequest.getOrderId().isEmpty()) {
+		if ((responseRequest == null) || (responseRequest.getOrderId() == null) || responseRequest.getOrderId().isEmpty()) {
 			return null;
 		}
 		OrderInfo order = orderDAO.find(responseRequest.getOrderId());
-		if(order == null) {
+		if (order == null) {
 			return null;
 		}
 		Respond respond = new Respond();
@@ -509,20 +574,68 @@ public class OrdersResource {
 		respond.setCreationDate(new Date());
 		respond.setComment(responseRequest.getComment());
 		respond.setStatus(RespondStatus.WAITING);
+		UserPublicProfile profile = profileDAO.find(id);
+		if (profile != null) {
+			respond.setUserName(profile.getName());
+			respond.setUserEmail(profile.getMail());
+			respond.setUserPhone(profile.getPhone());
+		}
+
 		List<Respond> responses = order.getResponses();
-		if(responses == null) {
+		if (responses == null) {
 			responses = new ArrayList<>();
 			order.setResponses(responses);
 		}
-		if(!responses.contains(respond)) {
-			responses.add(respond);
-		} else {
-			return null;
-		}
-		System.out.println("!!! +ORDER  " + order);
+		responses.add(respond);
 		OrderInfo o = orderDAO.update(order);
 		return o;
 	}
+	
+	@POST
+	@Path("approveResponse")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public OrderInfo approveResponse(ResponseRequest responseRequest) {
+		OrderInfo order = orderDAO.find(responseRequest.getOrderId());
+		if (order == null) {
+			return null;
+		}
+		if(order.getResponses() != null) {
+			for(Respond respond : order.getResponses()) {
+				if(respond.getUserPublicKey().equals(responseRequest.getUserId())) {
+					respond.setStatus(RespondStatus.APPROVED);
+					order.setStatus(OrderStatus.IN_PROCESS);
+					orderDAO.update(order);
+				}
+			}
+		}
+		return null;
+	}
+	
+	@POST
+	@Path("changeStatus")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public OrderInfo changeOrderStatus(OrderStatusRequest statusRequest) {
+		OrderInfo order = orderDAO.find(statusRequest.getOrderId());
+		if (order == null) {
+			return null;
+		}
+		String id = AuthFilter.getUserId(request);
+		if(!order.getUserPublicKey().equals(id) || isСompleted(order.getStatus()) || !isСompleted(statusRequest.getStatus())) {
+			return null;
+		}
+		order.setStatus(statusRequest.getStatus());
+		order.setComment(new Comment(statusRequest.getComment()));
+		return orderDAO.update(order);
+	}
+	
+	private boolean isСompleted(OrderStatus status) {
+		return ((status == OrderStatus.SUCCESS) 
+			|| (status == OrderStatus.NOT_SUCCESS) 
+			|| (status == OrderStatus.ARBITRATION));
+	}
+	
 
 	@GET
 	@Path("categories")

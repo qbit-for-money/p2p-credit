@@ -28,7 +28,7 @@
 		</div-->
 		<div class="wrapper">
 			<%@ include file="WEB-INF/jspf/nav.jspf" %>
-			<div class="container">
+			<div class="container">		
 				<div ng-view></div>
 			</div>
 			<div class="push"></div>
@@ -47,6 +47,7 @@
 		<script type="text/javascript" src="resources/lib/angular/angular-route.min.js"></script>
 		<script type="text/javascript" src="resources/lib/angular/angular-resource.min.js"></script>
 		<script type="text/javascript" src="resources/lib/angular/angular-touch.min.js"></script>
+		<script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.11.0.js"></script>
 		<script type="text/javascript" src="resources/lib/angular/select2.js"></script>
 		<script type="text/javascript" src="resources/lib/angular/loading-bar.min.js"></script>
 		<script type="text/javascript" src="resources/lib/angular/angular-sanitize.min.js"></script>
@@ -103,11 +104,14 @@
 		<script type="text/javascript" src="resources/js/last-orders-table/controllers.js"></script>
 
 		<script type="text/javascript" src="resources/lib/imgareaselect/scripts/upload.js"></script>
+		
 		<script type="text/javascript" src="resources/js/user-profile/resources.js"></script>
 		<script type="text/javascript" src="resources/js/user-profile/controllers.js"></script>
 		<script type="text/javascript" src="resources/js/user-profile/directives.js"></script>
 		<script type="text/javascript" src="resources/js/user-profile/services.js"></script>
+		
 		<script type="text/javascript" src="resources/js/user-orders-table/controllers.js"></script>
+		<script type="text/javascript" src="resources/js/user-orders-table/directives.js"></script>
 
 		<script type="text/javascript" src="resources/js/navbar/controllers.js"></script>
 

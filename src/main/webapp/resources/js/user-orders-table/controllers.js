@@ -1,71 +1,78 @@
 var orderModule = angular.module("order");
 
-orderModule.controller("UserOrdersController", function($scope, $rootScope, $interpolate) {
+orderModule.controller("UserOrdersController", function($scope, $rootScope, $interpolate, $compile, ordersResource, $modal, userProfileService) {
+
+	$scope.approve = function(orderId, userId) {
+		var response = {};
+		response.orderId = orderId;
+		response.userId = userId;
+		var orderResponse = ordersResource.approveResponse({}, response);
+
+		orderResponse.$promise.then(function() {
+			angular.element('#user-orders-table').jqxGrid('updatebounddata');
+			angular.element('#orders-table').jqxGrid('updatebounddata');
+		});
+	};
+
+	userProfileService.getAllCategories(function(categories) {
+		userProfileService.getAllLanguages(function(languages) {
+			initTable(categories, languages);
+		});
+	});
+
 
 	var initRowDetails = function(index, parentElement, gridElement, datarecord) {
+
 		var tabsdiv = null;
 		tabsdiv = angular.element(angular.element(parentElement).children()[0]);
 		if (tabsdiv !== null) {
+			console.log("()()()()() " + JSON.stringify(datarecord))
+			var responsesContent = "";
+			for (var i in datarecord.responses) {
+				var publicKey = datarecord.responses[i].userPublicKey;
+				datarecord.responses[i].imgurl = window.context + "webapi/profiles/" + publicKey + "/photo";
+				datarecord.responses[i].userurl = window.context + "#/users/" + publicKey;
+
+				var responsesTemplate = angular.element("#responsesTmpl").text();
+				var responsesExp = $interpolate(responsesTemplate);
+				var responsesContext = {
+					imgurl: datarecord.responses[i].imgurl,
+					userurl: datarecord.responses[i].userurl,
+					isComment: (!datarecord.responses[i].comment) ? false : true,
+					isAttributes: datarecord.responses[i].comment ? false : true,
+					comment: datarecord.responses[i].comment,
+					name: datarecord.responses[i].userName,
+					mail: datarecord.responses[i].userEmail,
+					phone: datarecord.responses[i].userPhone,
+					orderId: datarecord.id,
+					userId: publicKey,
+					status: datarecord.responses[i].status,
+					orderStatus: datarecord.status,
+					//openCommentDialog: openCommentDialog
+				};
+				var responseContent = responsesExp(responsesContext);
+				responsesContent += responseContent;
+			}
+			if (responsesContent === "") {
+				responsesContent = "Empty list";
+			}
 			var template = angular.element("#userOrdersTableDetailTmpl").text();
 			var exp = $interpolate(template);
 			var context = {
-				name: datarecord.userName, 
-				languages: datarecord.userLanguages,
-				currencies: datarecord.userCurrencies,
-				mail: datarecord.userMail,
-				phone: datarecord.userPhone,
-				freeDescription: datarecord.orderData
+				freeDescription: datarecord.orderData,
 			};
-			var result = exp(context);
-			//result.appendTo(tabsdiv);
+
+			var content = exp(context);
+			content = content.replace('#responses-list', responsesContent)
+			var result = $compile(content)($scope);
 			tabsdiv.append(result);
-			/*information = tabsdiv.find('.information');
-			var title = tabsdiv.find('.title');
-			title.text(datarecord.userName);
-			var container = angular.element('<div style="margin: 5px;"></div>')
-			container.appendTo(angular.element(information));
-			var photocolumn = angular.element('<div style="float: left; width: 15%;"></div>');
-			var leftcolumn = angular.element('<div style="float: left; width: 45%;"></div>');
-			var rightcolumn = angular.element('<div style="float: left; width: 40%;"></div>');
-			container.append(photocolumn);
-			container.append(leftcolumn);
-			container.append(rightcolumn);
-			var photo = angular.element("<div class='jqx-rc-all' style='margin: 10px;'><b>Photo:</b></div>");
-			var image = angular.element("<div style='margin-top: 10px;'></div>");
-			var imgurl = window.context + "webapi/profiles/" + datarecord.userPublicKey + "/photo";
-			var img = angular.element('<img height="60" src="' + imgurl + '"/>');
-			image.append(img);
-			image.appendTo(photo);
-			photocolumn.append(photo);
-
-			var context = {greeting: 'Hello', name: "Sanek"};
-
-			var template = angular.element("#ordersTableDetailTmpl").text();
-			var exp = $interpolate(template);
-			//expect(exp(context)).toEqual('Hello !');
-			var result = exp(context);
-			console.log("--- " + result);
-
-			var languages = result;//orderDetailTemp;//"<div style='margin: 10px;'><b>Languages:</b> " + datarecord.languages + "</div>";
-			var currencies = "<div style='margin: 10px;'><b>Currencies:</b> " + datarecord.currencies + "</div>";
-
-			angular.element(leftcolumn).append(languages);
-			angular.element(leftcolumn).append(currencies);
-
-			var reward = "<div style='margin: 10px;'><b>Rating:</b> " + datarecord.reward + "</div>";
-			var creationDate = "<div style='margin: 10px;'><b>Creation Date:</b> " + datarecord.creationDate + "</div>";
-			var endDate = "<div style='margin: 10px;'><b>End Date:</b> " + datarecord.endDate + "</div>";
-			angular.element(rightcolumn).append(creationDate);
-			angular.element(rightcolumn).append(endDate);
-			angular.element(rightcolumn).append(reward);*/
-
-
+			$scope.$apply();
 			angular.element(tabsdiv).jqxTabs({width: "95%", height: 240});
 		}
 	};
 	var ordersTable = angular.element('#user-orders-table');
 	var dataAdapter = new $.jqx.dataAdapter(getSource("webapi/orders/current/withFilter", ordersTable), getAdapterFields());
-	
+
 	var bindingCount = 0;
 	ordersTable.on("bindingComplete", function(event) {
 		if ($rootScope.userOrderDetails && $rootScope.userOrderDetails === true) {
@@ -83,39 +90,54 @@ orderModule.controller("UserOrdersController", function($scope, $rootScope, $int
 				ordersTable.jqxGrid('gotopage', 0);
 				//ordersTable.jqxGrid('showrowdetails', 0);
 			} else {
-				console.log("~==============ws~")
 			}
-
-			console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 		}
 	});
-	ordersTable.jqxGrid(
-			{
-				theme: "bootstrap",
-				width: '100%',
-				source: dataAdapter,
-				pageable: true,
-				showfilterrow: true,
-				sortable: true,
-				filterable: true,
-				virtualmode: true,
-				rendergridrows: function() {
-					return dataAdapter.records;
-				},
-				rowdetails: true,
-				rowdetailstemplate: {rowdetails: "<div style='margin: 10px;'></div>", rowdetailsheight: 300},
-				ready: function() {
-				},
-				initrowdetails: initRowDetails,
-				columns: [
-					{text: "Categories", dataField: "categories", columntype: 'textbox', filtertype: 'textbox', filtercondition: 'starts_with', sortable: false, cellclassname: cellclassname},
-					{text: "Languages", dataField: "languages", columntype: 'textbox', filtertype: 'none', sortable: false, cellclassname: cellclassname},
-					{text: "Take", dataField: "takingCurrency", filtertype: 'none', width: '80px', cellclassname: cellclassname},
-					{text: "Give", dataField: "givingCurrency", filtertype: 'none', width: '80px', cellclassname: cellclassname},
-					{text: "Duration", dataField: "duration", filtertype: 'none', width: '80px', cellclassname: cellclassname},
-					{text: "Responses", dataField: "responses", filtertype: 'none', width: '80px', cellclassname: cellclassname},
-					{text: "Status", dataField: "status", columntype: 'textbox', filtertype: 'checkedlist', filteritems: ['OPENED', 'PROCESSED', 'SUCCESS', 'NOT SUCCESS', 'ARBITRATION'], width: '110px', cellclassname: cellclassname},
-					{text: "Booking deadline", dataField: "endDate", filtertype: 'none', width: '120px', cellclassname: cellclassname, cellsformat: 'd'}
-				]
-			});
+	function initTable(categories, languages) {
+		ordersTable.jqxGrid(
+				{
+					theme: "bootstrap",
+					width: '100%',
+					source: dataAdapter,
+					pageable: true,
+					showfilterrow: true,
+					sortable: true,
+					filterable: true,
+					virtualmode: true,
+					rendergridrows: function() {
+						return dataAdapter.records;
+					},
+					rowdetails: true,
+					rowdetailstemplate: {rowdetails: "<div style='margin: 10px;'></div>", rowdetailsheight: 300},
+					ready: function() {
+					},
+					initrowdetails: initRowDetails,
+					columns: [
+						{text: "Categories", dataField: "categories", columntype: 'textbox', filtertype: 'checkedlist', filteritems: categories, filtercondition: 'starts_with', width: '160px', sortable: false, cellclassname: cellclassname},
+						{text: "Languages", dataField: "languages", columntype: 'textbox', filtertype: 'checkedlist', filteritems: languages, width: '160px', sortable: false, cellclassname: cellclassname},
+						{text: "Take", dataField: "takingCurrency", filtertype: 'textbox', width: '85px', cellclassname: cellclassname},
+						{text: "Give", dataField: "givingCurrency", filtertype: 'textbox', width: '85px', cellclassname: cellclassname},
+						{text: "Duration", dataField: "duration", filtertype: 'number', width: '80px', cellclassname: cellclassname},
+						{text: "Responses", dataField: "responsesCount", filtertype: 'textbox', width: '80px', cellclassname: cellclassname},
+						{text: "Status", dataField: "status", columntype: 'textbox', filtertype: 'list', filteritems: ['OPENED', 'IN_PROCESS', 'SUCCESS', 'NOT_SUCCESS', 'ARBITRATION'], width: '110px', cellclassname: cellclassname},
+						{text: "Booking deadline", dataField: "endDate", filtertype: 'date', width: '120px', cellclassname: cellclassname, cellsformat: 'd'}
+					]
+				});
+	}
+	
+});
+
+orderModule.controller("ChangeStatusDialogController", function($scope, addResponse, orderId, status, $modalInstance) {
+	$scope.comment = "";
+	$scope.addResponse = addResponse;
+	$scope.orderId = orderId;
+
+	$scope.save = function(comment) {
+		addResponse(orderId, comment, status);
+		$modalInstance.close();
+	};
+
+	$scope.cancel = function() {
+		$modalInstance.dismiss('canceled');
+	};
 });
