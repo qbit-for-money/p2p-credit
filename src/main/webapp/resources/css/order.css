@@ -14,6 +14,11 @@ and (min-width : 798px) {
 		padding-top: 25%;
 		padding-bottom: 20px;
 	}
+	
+	.credit {
+		max-height: 150px; 
+		font-size: 54px;
+	}
 
 	.credit img { 
 		height: 100%; 

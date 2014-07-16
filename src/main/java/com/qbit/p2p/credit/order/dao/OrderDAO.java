@@ -13,9 +13,7 @@ import com.qbit.p2p.credit.order.model.FilterOperator;
 import com.qbit.p2p.credit.order.model.OrderCategory;
 import com.qbit.p2p.credit.order.model.OrderInfo;
 import com.qbit.p2p.credit.order.model.OrderStatus;
-import com.qbit.p2p.credit.order.model.OrderType;
 import com.qbit.p2p.credit.order.model.Respond;
-import com.qbit.p2p.credit.order.model.RespondStatus;
 import com.qbit.p2p.credit.order.model.SearchRequest;
 import com.qbit.p2p.credit.user.dao.UserProfileDAO;
 import com.qbit.p2p.credit.user.model.UserPublicProfile;
@@ -32,8 +30,6 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -71,22 +67,6 @@ public class OrderDAO {
 		try {
 			TypedQuery<OrderInfo> query = entityManager.createNamedQuery("OrderInfo.findByUser", OrderInfo.class);
 			query.setParameter("userPublicKey", userPublicKey);
-			query.setFirstResult(offset);
-			query.setMaxResults(limit);
-			return query.getResultList();
-		} finally {
-			entityManager.close();
-		}
-	}
-
-	public List<OrderInfo> findByType(OrderType orderType, int offset, int limit) {
-		if (orderType == null) {
-			throw new IllegalArgumentException();
-		}
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		try {
-			TypedQuery<OrderInfo> query = entityManager.createNamedQuery("OrderInfo.findByType", OrderInfo.class);
-			query.setParameter("orderType", orderType);
 			query.setFirstResult(offset);
 			query.setMaxResults(limit);
 			return query.getResultList();
@@ -266,7 +246,6 @@ public class OrderDAO {
 			query.setFirstResult(filterCriteriaValue.getPageNumber() * filterCriteriaValue.getPageSize());
 			query.setMaxResults(filterCriteriaValue.getPageSize());
 			List<OrderInfo> orders = query.getResultList();
-			//System.out.println("@@@ " + orders);
 			return orders;
 		} finally {
 			entityManager.close();
@@ -478,7 +457,7 @@ public class OrderDAO {
 
 			if (mainOperatorPredicate == null) {
 				mainOperatorPredicate = itemsOperatorPredicate;
-			} else {
+			} else if(itemsOperatorPredicate != null){
 				mainOperatorPredicate = builder.and(itemsOperatorPredicate, mainOperatorPredicate);
 			}
 		}
@@ -529,6 +508,7 @@ public class OrderDAO {
 			} else {
 				mainOperatorPredicate = builder.and(operatorPredicate, mainOperatorPredicate);
 			}
+			//Join p = order.join("responses");
 		}
 		if (mainOperatorPredicate != null) {
 			criteria.where(mainOperatorPredicate);

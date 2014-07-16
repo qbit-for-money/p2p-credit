@@ -81,7 +81,6 @@ userProfileModule.directive("linksList", function() {
 			scope.newLink = {};
 			scope.newLink.title = "";
 			scope.newLink.link = "";
-			//scope.edited = false;
 			if (scope.type === "phone") {
 				scope.itemPlaceholder = "Phone";
 				scope.title = "Phones";

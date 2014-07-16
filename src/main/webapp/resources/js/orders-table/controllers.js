@@ -23,24 +23,19 @@ orderModule.controller("OrdersController", function($scope, ordersResource, user
 
 	var initRowDetails = function(index, parentElement, gridElement, datarecord) {
 		var tabsdiv = null;
-		var information = null;
-		var order = null;
 		tabsdiv = angular.element(angular.element(parentElement).children()[0]);
 		if (tabsdiv !== null) {
-			//console.log("&&***&& " + JSON.stringify(datarecord))
 			var imgurl = window.context + "webapi/profiles/" + datarecord.userPublicKey + "/photo";
 			var userurl = window.context + "#/users/" + datarecord.userPublicKey;
 			var template = angular.element("#ordersTableDetailTmpl").text();
 			var exp = $interpolate(template);
 			var disabled = false;
 			for (var i in datarecord.responses) {
-				console.log(JSON.stringify(userService.get()))
 				if(datarecord.responses[i].userPublicKey === userService.get().publicKey) {
 					disabled = true;
 				}
 			}
 			
-
 			var context = {
 				name: datarecord.userName,
 				imgurl: imgurl,
@@ -63,17 +58,6 @@ orderModule.controller("OrdersController", function($scope, ordersResource, user
 	};
 
 
-
-	/*var daterenderer = function(row, column, value) {
-		if (value.toString().indexOf("/") === -1) {
-			var date = new Date(value);
-			var month = date.getMonth();
-			month++;
-			var dd = date.getDate().toString();
-			value = (dd[1] ? dd : "0" + dd[0]) + "/" + month + "/" + date.getFullYear();
-		}
-		return value;
-	};*/
 	var dataAdapter = new $.jqx.dataAdapter(getSource("webapi/orders/withFilter", "#orders-table"), getAdapterFields());
 	angular.element("#orders-table").on("bindingComplete", function(event) {
 		console.log("BIND")
@@ -88,64 +72,12 @@ orderModule.controller("OrdersController", function($scope, ordersResource, user
 				sortable: true,
 				showfilterrow: true,
 				filterable: true,
-				//autorowheight: true,
-				//autoheight: true,
 				virtualmode: true,
-				//autoshowfiltericon: true,
 				rendergridrows: function() {
 					return dataAdapter.records;
 				},
 				rowdetails: true,
 				rowdetailstemplate: {rowdetails: "<div style='margin: 10px;'></div>", rowdetailsheight: 300},
-				/*ready: function() {
-				 var localizationObject = {
-				 filterstringcomparisonoperators: ['contains', 'does not contain'],
-				 // filter numeric comparison operators.
-				 filternumericcomparisonoperators: ['less than', 'greater than'],
-				 // filter date comparison operators.
-				 filterdatecomparisonoperators: ['less than', 'greater than'],
-				 // filter bool comparison operators.
-				 filterbooleancomparisonoperators: ['equal', 'not equal']
-				 }
-				 $("#orders-table").jqxGrid('localizestrings', localizationObject);
-				 },*/
-				/*updatefilterconditions: function (type, defaultconditions) {
-				 var stringcomparisonoperators = ['CONTAINS', 'DOES_NOT_CONTAIN'];
-				 var numericcomparisonoperators = ['LESS_THAN', 'GREATER_THAN'];
-				 var datecomparisonoperators = ['LESS_THAN', 'GREATER_THAN'];
-				 var booleancomparisonoperators = ['EQUAL', 'NOT_EQUAL'];
-				 switch (type) {
-				 case 'stringfilter':
-				 return stringcomparisonoperators;
-				 case 'numericfilter':
-				 return numericcomparisonoperators;
-				 case 'datefilter':
-				 return datecomparisonoperators;
-				 case 'booleanfilter':
-				 return booleancomparisonoperators;
-				 }
-				 },*/
-				/*updatefilterpanel: function (filtertypedropdown1, filtertypedropdown2, filteroperatordropdown, filterinputfield1, filterinputfield2, filterbutton, clearbutton,
-				 columnfilter, filtertype, filterconditions) {
-				 var index1 = 0;
-				 var index2 = 0;
-				 if (columnfilter != null) {
-				 var filter1 = columnfilter.getfilterat(0);
-				 var filter2 = columnfilter.getfilterat(1);
-				 if (filter1) {
-				 index1 = filterconditions.indexOf(filter1.comparisonoperator);
-				 var value1 = filter1.filtervalue;
-				 filterinputfield1.val(value1);
-				 }
-				 if (filter2) {
-				 index2 = filterconditions.indexOf(filter2.comparisonoperator);
-				 var value2 = filter2.filtervalue;
-				 filterinputfield2.val(value2);
-				 }
-				 }
-				 filtertypedropdown1.jqxDropDownList({ autoDropDownHeight: true, selectedIndex: index1 });
-				 filtertypedropdown2.jqxDropDownList({ autoDropDownHeight: true, selectedIndex: index2 });
-				 },*/
 				initrowdetails: initRowDetails,
 				columns: [
 					{text: "Categories", dataField: "categories", columntype: 'textbox', filtertype: 'checkedlist', filteritems: categories, filtercondition: 'starts_with', width: '140px', sortable: false, cellclassname: cellclassname},
@@ -162,12 +94,6 @@ orderModule.controller("OrdersController", function($scope, ordersResource, user
 				]
 			});
 	}
-
-	//$('#clearfilteringbutton').jqxButton({ height: 25});
-	$('#clearfilteringbutton').click(function() {
-		console.log("RRRRR%")
-		$("#orders-table").jqxGrid('clearfilters');
-	});
 
 	$scope.openCommentDialog = function(orderId) {
 		angular.element("#contentorders-table > div.jqx-grid-content.jqx-grid-content-bootstrap.jqx-widget-content.jqx-widget-content-bootstrap > div.jqx-enableselect.jqx-widget-content.jqx-widget-content-bootstrap").addClass("static-position");

@@ -40,6 +40,15 @@ public class Env {
 	}
 	
 	@XmlElement
+	public String getLastOrdersPathFolder() {
+		return properties.getProperty("lastOrders.pathFolder");
+	}
+	
+	public int getUpdateLastOrdersPeriodSecs() {
+		return Integer.parseInt(properties.getProperty("lastOrders.worker.period.hours"));
+	}
+	
+	@XmlElement
 	public double getUserOpenessRatingFactor() {
 		return Double.parseDouble(properties.getProperty("user.openessRating.factor"));
 	}

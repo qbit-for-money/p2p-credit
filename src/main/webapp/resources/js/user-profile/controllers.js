@@ -117,6 +117,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 
 			$scope.userPropertiesMap['languages'] = userProfileResponse.languages;
 			if (userProfileResponse.languages) {
+				$scope.orderCreatingMap['orderLanguages'] = userProfileResponse.languages;
 				var languages = "";
 				for (var i = 0; i < userProfileResponse.languages.length; i++) {
 					languages += (userProfileResponse.languages[i] + ", ");
@@ -158,6 +159,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 
 			var categoriesResponse = categoriesResource.findAll();
 			categoriesResponse.$promise.then(function() {
+				$scope.categories.allCategories.splice(0, $scope.categories.allCategories.length);
 				for (var i in categoriesResponse.categories) {
 					$scope.categories.allCategories.push(categoriesResponse.categories[i].title);
 				}
@@ -166,6 +168,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 
 			var languagesResponse = languagesResource.findAll();
 			languagesResponse.$promise.then(function() {
+				$scope.languages.allLanguages.splice(0, $scope.languages.allLanguages.length);
 				for (var i in languagesResponse.languages) {
 					$scope.languages.allLanguages.push(languagesResponse.languages[i].title);
 				}
@@ -346,7 +349,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		angular.element("#give-input").jqxNumberInput("clear");
 		angular.element("#duration-input").jqxNumberInput("val", "");
 		$scope.orderCreatingMap['orderCategories'] = [];
-		$scope.orderCreatingMap['orderLanguages'] = [];
+		//$scope.orderCreatingMap['orderLanguages'] = [];
 	}
 
 	$scope.createOrder = function() {
@@ -388,12 +391,10 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		orderInfo.languages = $scope.orderCreatingMap['orderLanguages'];
 
 		addItems($scope.userPropertiesMap['languages'], orderInfo.languages);
-		console.log("!!!@@@@!!!! CREATE: " + JSON.stringify(orderInfo))
 		var orderResponse = ordersResource.create({}, orderInfo);
 		orderResponse.$promise.then(function() {
 			clearOrder();
 			$rootScope.userOrderDetails = true;
-			console.log("USER_DETAIL: " + $rootScope.userOrderDetails);
 			if (angular.element("#collapseThree").hasClass("in")) {
 				angular.element("#collapseThree").collapse("hide");
 			}

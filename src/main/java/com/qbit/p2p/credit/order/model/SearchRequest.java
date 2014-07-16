@@ -19,7 +19,6 @@ public class SearchRequest {
 	private int recordstartindex;
 	private int recordendindex;
 	private String sortDataField;
-	private OrderType orderType;
 
 	public List<FilterItem> getFilterItems() {
 		return filterItems;
@@ -77,16 +76,8 @@ public class SearchRequest {
 		this.sortDataField = sortDataField;
 	}
 
-	public OrderType getOrderType() {
-		return orderType;
-	}
-
-	public void setOrderType(OrderType orderType) {
-		this.orderType = orderType;
-	}
-
 	@Override
 	public String toString() {
-		return "OrdersRequest{" + "filterItems=" + filterItems + ", sortOrder=" + sortOrder + ", pageNumber=" + pageNumber + ", pageSize=" + pageSize + ", recordstartindex=" + recordstartindex + ", recordendindex=" + recordendindex + ", sortDataField=" + sortDataField + ", orderType=" + orderType + '}';
+		return "SearchRequest{" + "filterItems=" + filterItems + ", sortOrder=" + sortOrder + ", pageNumber=" + pageNumber + ", pageSize=" + pageSize + ", recordstartindex=" + recordstartindex + ", recordendindex=" + recordendindex + ", sortDataField=" + sortDataField + '}';
 	}
 }

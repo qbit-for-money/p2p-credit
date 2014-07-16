@@ -322,40 +322,30 @@ public class ProfilesResource {
 			transactionsRating = successLength - notSuccessLength;
 		statistic.setTransactionsRating(transactionsRating);
 		allOrders = orderDAO.getLengthWithFilter(publicKey, null, null);
-		//if(allOrdersData != null) {
-		//	allOrders = allOrdersData.getLength();
-		//}
+
 		statistic.setOrdersSumValue(allOrders);
 		filterItem.setFilterCondition(FilterCondition.NOT_EQUAL);
 		filterItem.setFilterValue("OPENED");
 		filter.setFilterItems(Arrays.asList(filterItem));
 		allTransactions = orderDAO.getLengthWithFilter(publicKey, filter, null);
-		//if(allOrdersData != null) {
-		//	allTransactions = allTransactionsData.getLength();
-		//}
+
 		statistic.setTransactionsSum(allTransactions);
 		System.out.println("!! RATING: " + openessRating + " " + allTransactions);
 		statistic.setSummaryRating((long)(openessRating * env.getUserOpenessRatingFactor()) + (long)(allTransactions * env.getUserAllTransactionsFactor()));
 		
 		allUsersTransactions = orderDAO.getLengthWithFilter(null, filter, null);
-		//if(allUsersTransactionsData != null) {
-		//	allUsersTransactions = allUsersTransactionsData.getLength();
-		//}
+
 		statistic.setAllTransactionsSum(allUsersTransactions);
 		
 		filterItem.setFilterCondition(FilterCondition.EQUAL);
 		filterItem.setFilterValue("SUCCESS");
 		filter.setFilterItems(Arrays.asList(filterItem));
 		allSuccessTransactions = orderDAO.getLengthWithFilter(publicKey, filter, null);
-		//if(allOrdersData != null) {
-		//	allSuccessTransactions = allSuccessTransactionsData.getLength();
-		//}
+
 		statistic.setSuccessTransactionsSum(allSuccessTransactions);
 		
 		allUsersSuccessTransactions = orderDAO.getLengthWithFilter(null, filter, null);
-		//if(allUsersSuccessTransactionsData != null) {
-		//	allUsersSuccessTransactions = allUsersSuccessTransactionsData.getLength();
-		//}
+
 		statistic.setAllSuccessTransactionsSum(allUsersSuccessTransactions);
 		
 		return statistic;

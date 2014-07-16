@@ -7,11 +7,13 @@ import java.util.Date;
 import java.util.Objects;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
@@ -30,7 +32,8 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Respond implements Identifiable<String>, Serializable {
-	@ManyToOne
+	@ManyToOne(optional=false)
+	@JoinColumn(name="ORDERINFO_ID",referencedColumnName="ID")
 	private OrderInfo orderInfo;
 
 	private static final long serialVersionUID = 1L;
@@ -145,28 +148,6 @@ public class Respond implements Identifiable<String>, Serializable {
 		return true;
 	}
 	
-	
-
-	/*@Override
-	public int hashCode() {
-	int hash = 7;
-	hash = 41 * hash + Objects.hashCode(this.userPublicKey);
-	return hash;
-	}
-	@Override
-	public boolean equals(Object obj) {
-	if (obj == null) {
-	return false;
-	}
-	if (getClass() != obj.getClass()) {
-	return false;
-	}
-	final Respond other = (Respond) obj;
-	if (!Objects.equals(this.userPublicKey, other.userPublicKey)) {
-	return false;
-	}
-	return true;
-	}*/
 	@Override
 	public String toString() {
 		return "Respond{" + "userPublicKey=" + userPublicKey + ", userName=" + userName + ", userPhone=" + userPhone + ", userEmail=" + userEmail + ", creationDate=" + creationDate + ", comment=" + comment + ", status=" + status + '}';

@@ -73,6 +73,12 @@ function getAdapterFields() {
 						newData.filterItems[i].filterOperator = 1;
 					}
 				}
+				if (data["filtervalue" + i] === "NOT SUCCESS") {
+					data["filtervalue" + i] = "NOT_SUCCESS";
+				}
+				if (data["filtervalue" + i] === "IN PROCESS") {
+					data["filtervalue" + i] = "IN_PROCESS";
+				}
 
 				newData.filterItems[i].filterDataField = data["filterdatafield" + i];
 				newData.filterItems[i].filterCondition = data["filtercondition" + i];
@@ -81,16 +87,12 @@ function getAdapterFields() {
 					var date = new Date(data["filtervalue" + i]);
 					var monthNames = ["January", "February", "March", "April", "May", "June",
 						"July", "August", "September", "October", "November", "December"];
-					//monthNames[date.getMonth()]
-					//var month = date.get
 					newData.filterItems[i].filterValue = monthNames[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear();
 				}
 				if (isNumberField(data["filterdatafield" + i])) {
 					newData.filterItems[i].filterCondition = "GREATER_THAN_OR_EQUAL";
 				}
-				console.log(JSON.stringify(newData.filterItems[i]))
 			}
-			console.log(JSON.stringify(newData.filterItems))
 			newData.sortOrder = data.sortorder;
 			newData.pageNumber = data.pagenum;
 			newData.pageSize = data.pagesize;
@@ -101,9 +103,7 @@ function getAdapterFields() {
 		},
 		downloadComplete: function(data, status, xhr) {
 			var orders = data.orders;
-			console.log(JSON.stringify(orders))
 			for (var i in orders) {
-				//console.log(JSON.stringify(orders[i].id))
 				if (orders[i].order.languages !== undefined) {
 					var languagesStr = "";
 					var categoriesStr = "";
@@ -172,7 +172,6 @@ function getAdapterFields() {
 				orders[i].responses = orders[i].order.responses;
 				orders[i].order = undefined;
 			}
-			//console.log("BIND: " + JSON.stringify(orders))
 
 		},
 		loadError: function(xhr, status, error) {

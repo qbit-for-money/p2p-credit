@@ -1,6 +1,6 @@
 var orderModule = angular.module("order");
 
-orderModule.controller("UserOrdersController", function($scope, $rootScope, $interpolate, $compile, ordersResource, $modal, userProfileService) {
+orderModule.controller("UserOrdersController", function($scope, $rootScope, $interpolate, $timeout, $compile, ordersResource, $modal, userProfileService) {
 
 	$scope.approve = function(orderId, userId) {
 		var response = {};
@@ -26,7 +26,6 @@ orderModule.controller("UserOrdersController", function($scope, $rootScope, $int
 		var tabsdiv = null;
 		tabsdiv = angular.element(angular.element(parentElement).children()[0]);
 		if (tabsdiv !== null) {
-			console.log("()()()()() " + JSON.stringify(datarecord))
 			var responsesContent = "";
 			for (var i in datarecord.responses) {
 				var publicKey = datarecord.responses[i].userPublicKey;
@@ -72,24 +71,19 @@ orderModule.controller("UserOrdersController", function($scope, $rootScope, $int
 	};
 	var ordersTable = angular.element('#user-orders-table');
 	var dataAdapter = new $.jqx.dataAdapter(getSource("webapi/orders/current/withFilter", ordersTable), getAdapterFields());
-
-	var bindingCount = 0;
+	$scope.orders = {};
 	ordersTable.on("bindingComplete", function(event) {
-		if ($rootScope.userOrderDetails && $rootScope.userOrderDetails === true) {
-			if (bindingCount > 0)
-				bindingCount--;
-			if (bindingCount === 0) {
-				$rootScope.userOrderDetails = false;
-			}
+		if ($rootScope.userOrderDetails === true) {
 			var paginginformation = ordersTable.jqxGrid('getpaginginformation');
 			var pagenum = paginginformation.pagenum;
-			console.log("P: " + pagenum)
-			ordersTable.jqxGrid('showrowdetails', 0);
-			if (pagenum !== 0) {
-				bindingCount = 3;
+			if (pagenum > 0) {
+				$scope.$apply();
 				ordersTable.jqxGrid('gotopage', 0);
-				//ordersTable.jqxGrid('showrowdetails', 0);
 			} else {
+				$rootScope.userOrderDetails = false;
+				$timeout(function() {
+					ordersTable.jqxGrid('showrowdetails', 0);
+				}, 800);
 			}
 		}
 	});
@@ -119,12 +113,12 @@ orderModule.controller("UserOrdersController", function($scope, $rootScope, $int
 						{text: "Give", dataField: "givingCurrency", filtertype: 'textbox', width: '85px', cellclassname: cellclassname},
 						{text: "Duration", dataField: "duration", filtertype: 'number', width: '80px', cellclassname: cellclassname},
 						{text: "Responses", dataField: "responsesCount", filtertype: 'textbox', width: '80px', cellclassname: cellclassname},
-						{text: "Status", dataField: "status", columntype: 'textbox', filtertype: 'list', filteritems: ['OPENED', 'IN_PROCESS', 'SUCCESS', 'NOT_SUCCESS', 'ARBITRATION'], width: '110px', cellclassname: cellclassname},
+						{text: "Status", dataField: "status", columntype: 'textbox', filtertype: 'list', filteritems: ['OPENED', 'IN PROCESS', 'SUCCESS', 'NOT SUCCESS', 'ARBITRATION'], width: '110px', cellclassname: cellclassname},
 						{text: "Booking deadline", dataField: "endDate", filtertype: 'date', width: '120px', cellclassname: cellclassname, cellsformat: 'd'}
 					]
 				});
 	}
-	
+
 });
 
 orderModule.controller("ChangeStatusDialogController", function($scope, addResponse, orderId, status, $modalInstance) {

@@ -32,6 +32,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 /**
  * @author Alexander_Sergeev
@@ -40,6 +41,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @Access(AccessType.FIELD)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class OrderInfo implements Identifiable<String>, Serializable {
 	
 	private static final long serialVersionUID = 1L;
@@ -65,14 +67,12 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 	
 	private OrderStatus status;
 	
-	@OneToMany(mappedBy = "orderInfo", cascade=CascadeType.ALL)
-	private List<Respond> responses;
+	@OneToMany(cascade=CascadeType.ALL, targetEntity=Respond.class)
+	private List<Respond> responses = new ArrayList<>();
 	
 	@OneToOne(cascade=CascadeType.ALL)
 	private Comment comment;
 	
-	
-	//private OrderType type;
 	@ElementCollection
 	private List<String> languages;
 	@XmlJavaTypeAdapter(CurrencyAdapter.class)
@@ -232,7 +232,7 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 	public void setComment(Comment comment) {
 		this.comment = comment;
 	}
-	
+
 	public boolean isValid() {
 		return (endDate != null) 
 			&& (duration != 0)
