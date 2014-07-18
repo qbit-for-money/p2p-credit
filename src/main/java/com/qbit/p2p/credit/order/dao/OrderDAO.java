@@ -16,6 +16,7 @@ import com.qbit.p2p.credit.order.model.OrderStatus;
 import com.qbit.p2p.credit.order.model.Respond;
 import com.qbit.p2p.credit.order.model.SearchRequest;
 import com.qbit.p2p.credit.user.dao.UserProfileDAO;
+import com.qbit.p2p.credit.user.model.Language;
 import com.qbit.p2p.credit.user.model.UserPublicProfile;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,15 +27,18 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.Tuple;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 import javax.persistence.metamodel.EntityType;
+import javax.ws.rs.WebApplicationException;
 
 /**
  *
@@ -115,6 +119,30 @@ public class OrderDAO {
 				if (userInfo == null) {
 					return null;
 				}
+				/*List<OrderCategory> categories = findAllCategories();
+				 //for(OrderCategory category : categories) {
+				 //	if(newOrder.getCategories().)
+				 //}
+				 List<OrderCategory> orderCategories = orderInfo.getCategories();
+				 if(orderCategories == null) {
+				 orderInfo.setCategories(new ArrayList<OrderCategory>());
+				 }
+				
+				 for (OrderCategory category : orderCategories) {
+				 if (categories.contains(category)) {
+				 category.setId(categories.get(categories.indexOf(category)).getId());
+				 System.out.println("||||||||||||||||||| " + category);
+				 }
+					
+				 //orderCategories.add(category);
+				 }*/
+				List<OrderCategory> orderCategories = orderInfo.getCategories();
+				if (orderCategories == null) {
+					orderInfo.setCategories(new ArrayList<OrderCategory>());
+				}
+				for (OrderCategory category : orderCategories) {
+					category.setCategoryForOrder(true);
+				}
 				orderInfo.setStatus(OrderStatus.OPENED);
 				orderInfo.setCreationDate(new Date());
 				entityManager.persist(orderInfo);
@@ -123,25 +151,24 @@ public class OrderDAO {
 		});
 	}
 
-	public Respond changeResponseStatus(final Respond newResponse) {
-		if (newResponse == null) {
-			throw new IllegalArgumentException();
-		}
-		return invokeInTransaction(entityManagerFactory, new TrCallable<Respond>() {
+	/*public Respond changeResponseStatus(final Respond newResponse) {
+	 if (newResponse == null) {
+	 throw new IllegalArgumentException();
+	 }
+	 return invokeInTransaction(entityManagerFactory, new TrCallable<Respond>() {
 
-			@Override
-			public Respond
-				call(EntityManager entityManager) {
-				Respond response = entityManager.find(Respond.class, newResponse.getId());
-				if (response == null) {
-					return null;
-				}
-				response.setStatus(newResponse.getStatus());
-				return response;
-			}
-		});
-	}
-
+	 @Override
+	 public Respond
+	 call(EntityManager entityManager) {
+	 Respond response = entityManager.find(Respond.class, newResponse.getId());
+	 if (response == null) {
+	 return null;
+	 }
+	 response.setStatus(newResponse.getStatus());
+	 return response;
+	 }
+	 });
+	 }*/
 	public OrderInfo update(final OrderInfo newOrder) {
 		if (newOrder == null) {
 			throw new IllegalArgumentException();
@@ -155,7 +182,24 @@ public class OrderDAO {
 				if (order == null) {
 					return null;
 				}
-				order.setCategories(newOrder.getCategories());
+				List<OrderCategory> categories = findAllCategories();
+				//for(OrderCategory category : categories) {
+				//	if(newOrder.getCategories().)
+				//}
+				List<OrderCategory> orderCategories = order.getCategories();
+				if (orderCategories == null) {
+					order.setCategories(new ArrayList<OrderCategory>());
+				}
+
+				for (OrderCategory category : newOrder.getCategories()) {
+					if (categories.contains(category)) {
+						//category.setId(categories.get(categories.indexOf(category)).getId());
+						System.out.println("||||||||||||||||||| " + category);
+					}
+
+					//orderCategories.add(category);
+				}
+				//order.setCategories(newOrder.getCategories());
 				order.setDuration(newOrder.getDuration());
 				order.setDurationType(newOrder.getDurationType());
 				order.setEndDate(newOrder.getEndDate());
@@ -163,25 +207,37 @@ public class OrderDAO {
 				order.setGivingValue(newOrder.getGivingValue());
 				order.setLanguages(newOrder.getLanguages());
 				order.setOrderData(newOrder.getOrderData());
-				if(order.getResponses() == null) {
+				if (order.getResponses() == null) {
 					order.setResponses(new ArrayList<Respond>());
 				}
 				for (Respond r : newOrder.getResponses()) {
 					if (!order.getResponses().contains(r)) {
 						order.getResponses().add(r);
-					} else if((r.getId() != null) && !r.getId().isEmpty() && (r.getStatus() != null) ) {
-						changeResponseStatus(r);
 					}
 				}
-				order.setReward(newOrder.getReward());
 				order.setStatus(newOrder.getStatus());
 				order.setTakingCurrency(newOrder.getTakingCurrency());
 				order.setTakingValue(newOrder.getTakingValue());
 				order.setUserPublicKey(newOrder.getUserPublicKey());
 				order.setComment(newOrder.getComment());
+				if (newOrder.getApprovedResponseId() != null) {
+					//newOrder.getApprovedResponse().setId(null);
+					order.setApprovedResponseId(newOrder.getApprovedResponseId());
+					System.out.println("############################# " + order.getApprovedResponseId());
+				}
 				return order;
 			}
 		});
+	}
+
+	public Respond findResponse(String id) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		try {
+			return DAOUtil.find(entityManagerFactory.createEntityManager(),
+				Respond.class, id, null);
+		} finally {
+			entityManager.close();
+		}
 	}
 
 	public OrderCategory createCategory(final String title) {
@@ -194,6 +250,7 @@ public class OrderDAO {
 			public OrderCategory call(EntityManager entityManager) {
 
 				OrderCategory category = new OrderCategory(title);
+				category.setCategoryForOrder(false);
 				entityManager.persist(category);
 				return category;
 			}
@@ -206,9 +263,20 @@ public class OrderDAO {
 			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 			CriteriaQuery<OrderCategory> criteria = builder.createQuery(OrderCategory.class);
 			Root<OrderCategory> category = criteria.from(OrderCategory.class);
+			//Join<Entity2>  join2 = root3.join("entity2");
 			criteria.select(category);
+			criteria.where(builder.equal(category.get("categoryForOrder"), "f"));
+			//where(builder.greaterThanOrEqualTo(category.join("ordercategory2").get(item.getFilterDataField()), item.getFilterValue()));
 			TypedQuery<OrderCategory> query = entityManager.createQuery(criteria);
-			return query.getResultList();
+			//TypedQuery<OrderCategory> query = entityManager.createQuery("SELECT DISTINCT t0 FROM OrderCategory t0 where t0.id NOT IN ( select o.id from OrderCategory o JOIN o.)", OrderCategory.class);
+			//TypedQuery<OrderCategory> query = entityManager.createQuery("SELECT t0 FROM OrderCategory t0 where t0.orderInfo IS NOT NULL ", OrderCategory.class);
+			//TypedQuery<OrderCategory> query = entityManager.createQuery(criteria);
+			List<OrderCategory> c = query.getResultList();
+			//TypedQuery<Respond> query2 = entityManager.createQuery("SELECT t0 FROM Respond t0 LEFT", Respond.class);
+
+			System.out.println("__________________________________ " + c);
+			//System.out.println("________________+++_______________ " + query2.getResultList());
+			return c;
 		} finally {
 			entityManager.close();
 		}
@@ -279,16 +347,6 @@ public class OrderDAO {
 			Expression<String> typeExpression = order.get("userPublicKey");
 			mainOperatorPredicate = builder.equal(typeExpression, userPublicKey);
 		}
-		/*if ((filterCriteriaValue != null) && (filterCriteriaValue.getOrderType() != null)) {
-		 Expression<OrderType> typeExpression = order.get("type");
-		 Predicate typePredicate = builder.equal(typeExpression, filterCriteriaValue.getOrderType());
-
-		 if (mainOperatorPredicate == null) {
-		 mainOperatorPredicate = typePredicate;
-		 } else {
-		 mainOperatorPredicate = builder.and(typePredicate, mainOperatorPredicate);
-		 }
-		 }*/
 
 		List<FilterItem> filterItems = (filterCriteriaValue != null) ? filterCriteriaValue.getFilterItems() : null;
 
@@ -318,7 +376,7 @@ public class OrderDAO {
 							Path<Integer> field = order.get(item.getFilterDataField());
 							valuePredicate = builder.equal(field, Integer.valueOf(item.getFilterValue()));
 						} else if ("languages".equals(item.getFilterDataField())) {
-							Expression<Collection<String>> languages = order.get("languages");
+							Expression<Collection<String>> languages = order.get("languages").get("title");
 							String language = item.getFilterValue();
 							Predicate containsLanguages = builder.isMember(language, languages);
 
@@ -329,7 +387,7 @@ public class OrderDAO {
 							}
 
 						} else if ("categories".equals(item.getFilterDataField())) {
-							Expression<Collection<String>> categories = order.get("categories");
+							Expression<Collection<String>> categories = order.get("categories").get("title");
 							String category = item.getFilterValue();
 							Predicate containsCategories = builder.isMember(category, categories);
 
@@ -395,23 +453,55 @@ public class OrderDAO {
 							//subquery.where(builder.ge(fromUserPublicProfile.get("pint"),30000));
 							//valuePredicate = builder.greaterThanOrEqualTo(order.<Date>get(item.getFilterDataField()), DateUtil.stringToDate(item.getFilterValue()));
 						} else if ("responsesCount".equals(item.getFilterDataField())) {
-							
+
 							//Join<OrderInfo, Respond> secondTable = order.join("responses", JoinType.LEFT);
 							/*builder.count(order.get("responses"));
 							
-							Subquery<Long> subquery = criteria.subquery(Long.class);
-							Root fromRespond = subquery.from(Respond.class);
-							Root respond = criteria.from(Respond.class);
-							//Expression<Long> responsesExpression = null;
-							//responsesExpression = builder.countDistinct(fromRespond);
-							subquery.select(builder.countDistinct(fromRespond));
-							//subquery.where(builder.equal(fromRespond.join("orderInfo").get("id"), order.get("id")));
-							//subquery.where(builder.equal(fromUserPublicProfile.get("name"), "gg"));
-							//subquery.where(builder.greaterThanOrEqualTo(builder.countDistinct(fromRespond.get("publicKey")), Long.parseLong(item.getFilterValue())));
-							query.select(cb.count(u)).where(cb.in(u).value(subquery));
-							Predicate valuePredicate1 = builder.in(order.get("userPublicKey")).value(subquery);*/
-							Expression<Collection> e = order.get("responses");
+							 Subquery<Long> subquery = criteria.subquery(Long.class);
+							 Root fromRespond = subquery.from(Respond.class);
+							 Root respond = criteria.from(Respond.class);
+							 //Expression<Long> responsesExpression = null;
+							 //responsesExpression = builder.countDistinct(fromRespond);
+							 subquery.select(builder.countDistinct(fromRespond));
+							 //subquery.where(builder.equal(fromRespond.join("orderInfo").get("id"), order.get("id")));
+							 //subquery.where(builder.equal(fromUserPublicProfile.get("name"), "gg"));
+							 //subquery.where(builder.greaterThanOrEqualTo(builder.countDistinct(fromRespond.get("publicKey")), Long.parseLong(item.getFilterValue())));
+							 query.select(cb.count(u)).where(cb.in(u).value(subquery));
+							 Predicate valuePredicate1 = builder.in(order.get("userPublicKey")).value(subquery);*/
+							Expression<Collection<String>> e = order.get("responses").get("id");
 							valuePredicate = builder.greaterThanOrEqualTo(builder.count(e), Long.parseLong(item.getFilterValue()));
+							//subquery.where(builder.ge(fromUserPublicProfile.get("pint"),30000));
+							//valuePredicate = builder.greaterThanOrEqualTo(order.<Date>get(item.getFilterDataField()), DateUtil.stringToDate(item.getFilterValue()));
+						} else if ("partnersRating".equals(item.getFilterDataField())) {
+
+							Subquery<Long> criteria1 = criteria.subquery(Long.class);
+							Root<UserPublicProfile> orderProfile = criteria1.from(UserPublicProfile.class);
+							criteria.select(orderProfile.get("statistic").get("summaryRating"));
+
+							criteria1.select(builder.countDistinct(orderProfile.get("statistic").get("summaryRating")));
+							Expression<Long> ex = orderProfile.get("statistic").get("summaryRating");
+							criteria1.select(builder.sum(ex));
+							//criteria.select(builder.sumAsLong(profile.get("statistic").get("summaryRating")));
+
+							Subquery<String> usersIdSubquery = criteria1.subquery(String.class);
+							Root fromResponse = usersIdSubquery.from(Respond.class);
+							usersIdSubquery.select(fromResponse.get("userPublicKey")).distinct(true);
+
+							Subquery<String> subquery = usersIdSubquery.subquery(String.class);
+							Root fromOrderInfo = subquery.from(OrderInfo.class);
+							subquery.select(fromOrderInfo.get("approvedResponseId"));
+
+							Predicate p1 = builder.and(builder.equal(fromOrderInfo.get("userPublicKey"), order.get("userPublicKey")), builder.equal(fromOrderInfo.get("status"), OrderStatus.SUCCESS));
+							subquery.where(p1);
+
+							Predicate p2 = builder.in(fromResponse.get("id")).value(subquery);
+							usersIdSubquery.where(p2);
+
+							Predicate p3 = builder.in(orderProfile.get("publicKey")).value(usersIdSubquery);
+							criteria.where(p3);
+
+							//Expression<Collection<String>> e = order.get("responses").get("id");
+							valuePredicate = builder.greaterThanOrEqualTo(builder.sum(ex), Long.parseLong(item.getFilterValue()));
 							//subquery.where(builder.ge(fromUserPublicProfile.get("pint"),30000));
 							//valuePredicate = builder.greaterThanOrEqualTo(order.<Date>get(item.getFilterDataField()), DateUtil.stringToDate(item.getFilterValue()));
 						} else {
@@ -457,16 +547,16 @@ public class OrderDAO {
 
 			if (mainOperatorPredicate == null) {
 				mainOperatorPredicate = itemsOperatorPredicate;
-			} else if(itemsOperatorPredicate != null){
+			} else if (itemsOperatorPredicate != null) {
 				mainOperatorPredicate = builder.and(itemsOperatorPredicate, mainOperatorPredicate);
 			}
 		}
-		List<String> userLanguages = (profile != null) ? profile.getLanguages() : null;
+		List<Language> userLanguages = (profile != null) ? profile.getLanguages() : null;
 		if (userLanguages != null && !userLanguages.isEmpty()) {
 			Predicate operatorPredicate = null;
-			Expression<Collection<String>> languages = order.get("languages");
-			for (String language : userLanguages) {
-				Predicate containsLanguages = builder.isMember(language, languages);
+			Expression<Collection<String>> languages = order.get("languages").get("title");
+			for (Language language : userLanguages) {
+				Predicate containsLanguages = builder.isMember(language.getTitle(), languages);
 				if (operatorPredicate == null) {
 					operatorPredicate = containsLanguages;
 				} else {
@@ -514,6 +604,182 @@ public class OrderDAO {
 			criteria.where(mainOperatorPredicate);
 		}
 		return criteria;
+	}
+
+	public long getPartnersRating(String userPublicKey) {
+		if ((userPublicKey == null) || userPublicKey.isEmpty()) {
+			throw new WebApplicationException();
+		}
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		try {
+			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+			CriteriaQuery<Long> criteria;
+			//EntityType<OrderInfo> type = entityManager.getMetamodel().entity(OrderInfo.class);
+
+			/*criteria = builder.createQuery(Long.class);
+			 Root<UserPublicProfile> profile = criteria.from(UserPublicProfile.class);
+			 CriteriaQuery<UserPublicProfile> select = criteria.select(profile);
+			 Subquery<UserPublicProfile> subquery = criteria.subquery(UserPublicProfile.class);*/
+			/*criteria = builder.createQuery(String.class);
+			 Root<OrderInfo> order = criteria.from(OrderInfo.class);
+			 criteria.select(order.get("approvedResponseId"));
+			 Predicate p = builder.and(builder.equal(order.get("userPublicKey"), userPublicKey), builder.equal(order.get("status"), OrderStatus.SUCCESS));
+			 criteria.where(p);*/
+			/*criteria = builder.createQuery(String.class);
+			 Root<Respond> response = criteria.from(Respond.class);
+			 criteria.select(response.get("userPublicKey")).distinct(true);*/
+			criteria = builder.createQuery(Long.class);
+			Root<UserPublicProfile> profile = criteria.from(UserPublicProfile.class);
+			//criteria.select(profile.get("statistic").get("summaryRating"));
+
+			//criteria.select(builder.countDistinct(profile.get("statistic").get("summaryRating")));
+			Expression<Long> ex = profile.get("statistic").get("summaryRating");
+			criteria.select(builder.sum(ex));
+			//criteria.select(builder.sumAsLong(profile.get("statistic").get("summaryRating")));
+
+			Subquery<String> usersIdSubquery = criteria.subquery(String.class);
+			Root fromResponse = criteria.from(Respond.class);
+			usersIdSubquery.select(fromResponse.get("userPublicKey")).distinct(true);
+
+			Subquery<String> subquery = usersIdSubquery.subquery(String.class);
+			Root fromOrderInfo = subquery.from(OrderInfo.class);
+			subquery.select(fromOrderInfo.get("approvedResponseId"));
+
+			Predicate p1 = builder.and(builder.equal(fromOrderInfo.get("userPublicKey"), userPublicKey), builder.equal(fromOrderInfo.get("status"), OrderStatus.SUCCESS));
+			subquery.where(p1);
+
+			Predicate p2 = builder.in(fromResponse.get("id")).value(subquery);
+			usersIdSubquery.where(p2);
+
+			Predicate p3 = builder.in(profile.get("publicKey")).value(usersIdSubquery);
+			criteria.where(p3);
+			//Subquery<UserPublicProfile> subquery = criteria.subquery(UserPublicProfile.class);
+
+			//Root<OrderInfo> order = criteria.from(OrderInfo.class);
+			//CriteriaQuery<Object> select = criteria.select(builder.countDistinct(order));
+			//Subquery<UserPublicProfile> subquery = criteria.subquery(UserPublicProfile.class);
+			//Root fromUserPublicProfile = subquery.from(UserPublicProfile.class);
+			//subquery.select(fromUserPublicProfile.get("publicKey"));
+			//subquery.where(builder.equal(fromUserPublicProfile.get("name"), "gg"));
+			//subquery.where(builder.greaterThanOrEqualTo(fromUserPublicProfile.join("statistic").get(item.getFilterDataField()), item.getFilterValue()));
+			//valuePredicate = builder.in(order.get("userPublicKey")).value(subquery); 
+			//TypedQuery<Long> query = entityManager.createQuery("select count(u) from UserPublicProfile u where u.publicKey in (select Respond.userPublicKey from Respond where Respond.id in (select Respond.id from orderinfo_respond where orderinfo_respond.orderinfo_id in (select orderinfo.id from orderinfo where orderinfo.userpublickey = :publicKey)))", Long.class);
+			//TypedQuery<Long> query = entityManager.createQuery("select count(o.responses) from OrderInfo o", Long.class);// in (select o.id from OrderInfo o where o.userPublicKey = :publicKey)", Long.class);// where OrderInfo.id in (select o.id from OrderInfo o where o.userPublicKey = :publicKey)", Long.class);
+			//builder.createTupleQuery()
+			/*@NamedQuery(name = "UserPublicProfile.findByOrder",
+			 query = "SELECT u FROM UserPublicProfile u, OrderInfo o WHERE "
+			 + " o.userPublicKey = u.publicKey AND o.id = :orderId")})*/
+			//query.setParameter("publicKey", userPublicKey);
+			//TypedQuery<String> query = entityManager.createQuery(criteria);
+			//List<String> orders = query.getResultList();
+			//System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^: " + orders + " :^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+			TypedQuery<Long> query = entityManager.createQuery(criteria);
+			System.out.println("+++++++++++++++++ " + query.getSingleResult());
+			return 0;//entityManager.createQuery(criteria).getSingleResult();
+		} finally {
+			entityManager.close();
+		}
+	}
+
+	public long getPartnersRating3() {
+
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		try {
+			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+			CriteriaQuery<Tuple> criteria;
+			//EntityType<OrderInfo> type = entityManager.getMetamodel().entity(OrderInfo.class);
+
+			/*criteria = builder.createQuery(Long.class);
+			 Root<UserPublicProfile> profile = criteria.from(UserPublicProfile.class);
+			 CriteriaQuery<UserPublicProfile> select = criteria.select(profile);
+			 Subquery<UserPublicProfile> subquery = criteria.subquery(UserPublicProfile.class);*/
+			/*criteria = builder.createQuery(String.class);
+			 Root<OrderInfo> order = criteria.from(OrderInfo.class);
+			 criteria.select(order.get("approvedResponseId"));
+			 Predicate p = builder.and(builder.equal(order.get("userPublicKey"), userPublicKey), builder.equal(order.get("status"), OrderStatus.SUCCESS));
+			 criteria.where(p);*/
+			/*criteria = builder.createQuery(String.class);
+			 Root<Respond> response = criteria.from(Respond.class);
+			 criteria.select(response.get("userPublicKey")).distinct(true);*/
+			//***criteria = builder.createQuery(String.class);
+			criteria = builder.createTupleQuery();
+			Root<UserPublicProfile> profile = criteria.from(UserPublicProfile.class);
+			//criteria.select(profile.get("statistic").get("summaryRating"));
+
+			//criteria.select(builder.countDistinct(profile.get("statistic").get("summaryRating")));
+			//Expression<Long> ex = profile.get("statistic").get("summaryRating");
+			
+			
+			
+			
+			
+			
+			
+			
+			Subquery<Long> criteria1 = criteria.subquery(Long.class);
+			Root<UserPublicProfile> profile1 = criteria1.from(UserPublicProfile.class);
+			Expression<Long> ex = profile1.get("statistic").get("summaryRating");
+			//criteria.select(profile.get("statistic").get("summaryRating"));
+
+			//criteria.select(builder.countDistinct(profile.get("statistic").get("summaryRating")));
+			//Expression<Long> ex = profile.get("statistic").get("summaryRating");
+			criteria1.select(builder.sum(ex));
+
+			//criteria.select(builder.sumAsLong(profile.get("statistic").get("summaryRating")));
+			Subquery<String> usersIdSubquery = criteria1.subquery(String.class);
+			Root fromResponse = criteria1.from(Respond.class);
+			usersIdSubquery.select(fromResponse.get("userPublicKey")).distinct(true);
+
+			Subquery<String> subquery = usersIdSubquery.subquery(String.class);
+			Root fromOrderInfo = subquery.from(OrderInfo.class);
+			subquery.select(fromOrderInfo.get("approvedResponseId"));
+
+			Predicate p1 = builder.and(builder.equal(fromOrderInfo.get("userPublicKey"), profile.get("publicKey")), builder.equal(fromOrderInfo.get("status"), OrderStatus.SUCCESS));
+			subquery.where(p1);
+
+			Predicate p2 = builder.in(fromResponse.get("id")).value(subquery).isNotNull();
+			usersIdSubquery.where(p2);
+
+			Predicate p3 = builder.in(profile1.get("publicKey")).value(usersIdSubquery);
+			criteria1.where(p3);
+			
+			criteria.multiselect(profile.get("publicKey"), criteria1.getSelection());
+			//Predicate p4 = builder.in(profile.get("publicKey")).value(criteria1);
+			
+			//criteria.groupBy(profile.get("publicKey"));
+			
+			Predicate and = builder.and(builder.greaterThanOrEqualTo(criteria1.getSelection(), (long) 1), builder.isNotNull(subquery.getSelection()));
+			criteria.having(and);
+			//criteria.where(builder.isNotNull(subquery.getSelection()));
+
+			List<Tuple> l = entityManager.createQuery(criteria).getResultList();
+			for (Tuple t : l) {
+				System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&& " + t.get(0) + " " + t.get(1));
+			}
+
+			//Subquery<UserPublicProfile> subquery = criteria.subquery(UserPublicProfile.class);
+			//Root<OrderInfo> order = criteria.from(OrderInfo.class);
+			//CriteriaQuery<Object> select = criteria.select(builder.countDistinct(order));
+			//Subquery<UserPublicProfile> subquery = criteria.subquery(UserPublicProfile.class);
+			//Root fromUserPublicProfile = subquery.from(UserPublicProfile.class);
+			//subquery.select(fromUserPublicProfile.get("publicKey"));
+			//subquery.where(builder.equal(fromUserPublicProfile.get("name"), "gg"));
+			//subquery.where(builder.greaterThanOrEqualTo(fromUserPublicProfile.join("statistic").get(item.getFilterDataField()), item.getFilterValue()));
+			//valuePredicate = builder.in(order.get("userPublicKey")).value(subquery); 
+			//TypedQuery<Long> query = entityManager.createQuery("select count(u) from UserPublicProfile u where u.publicKey in (select Respond.userPublicKey from Respond where Respond.id in (select Respond.id from orderinfo_respond where orderinfo_respond.orderinfo_id in (select orderinfo.id from orderinfo where orderinfo.userpublickey = :publicKey)))", Long.class);
+			//TypedQuery<Long> query = entityManager.createQuery("select count(o.responses) from OrderInfo o", Long.class);// in (select o.id from OrderInfo o where o.userPublicKey = :publicKey)", Long.class);// where OrderInfo.id in (select o.id from OrderInfo o where o.userPublicKey = :publicKey)", Long.class);
+			//builder.createTupleQuery()
+			/*@NamedQuery(name = "UserPublicProfile.findByOrder",
+			 query = "SELECT u FROM UserPublicProfile u, OrderInfo o WHERE "
+			 + " o.userPublicKey = u.publicKey AND o.id = :orderId")})*/
+			//query.setParameter("publicKey", userPublicKey);
+			//TypedQuery<String> query = entityManager.createQuery(criteria);
+			//List<String> orders = query.getResultList();
+			//System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^: " + orders + " :^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+			return 0;//(Long) entityManager.createQuery(criteria).getSingleResult();
+		} finally {
+			entityManager.close();
+		}
 	}
 
 }

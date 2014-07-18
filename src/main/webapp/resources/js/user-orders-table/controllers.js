@@ -1,6 +1,6 @@
 var orderModule = angular.module("order");
 
-orderModule.controller("UserOrdersController", function($scope, $rootScope, $interpolate, $timeout, $compile, ordersResource, $modal, userProfileService) {
+orderModule.controller("UserOrdersController", function($scope, $rootScope, $interpolate, $timeout, $compile, ordersResource, $modal, userProfileService, usersProfileResource) {
 
 	$scope.approve = function(orderId, userId) {
 		var response = {};
@@ -22,18 +22,35 @@ orderModule.controller("UserOrdersController", function($scope, $rootScope, $int
 
 
 	var initRowDetails = function(index, parentElement, gridElement, datarecord) {
-
+//console.log(JSON.stringify(datarecord))
 		var tabsdiv = null;
 		tabsdiv = angular.element(angular.element(parentElement).children()[0]);
 		if (tabsdiv !== null) {
 			var responsesContent = "";
+			//ordersResource.getResponse({'id': datarecord.approvedResponseId});
+			//console.log("#$#$#$ " + datarecord.approvedResponseId + " ** " + JSON.stringify(datarecord.responses));
+			/*var responses = [];
 			for (var i in datarecord.responses) {
+			
+			
+		}
+		var userProfileResponse = usersProfileResource.getById({'id': publicKey});
+			userProfileResponse.$promise.then(function() {
+					
+			});*/
+			for (var i in datarecord.responses) {
+				console.log(datarecord.responses[i].id)
 				var publicKey = datarecord.responses[i].userPublicKey;
 				datarecord.responses[i].imgurl = window.context + "webapi/profiles/" + publicKey + "/photo";
 				datarecord.responses[i].userurl = window.context + "#/users/" + publicKey;
 
 				var responsesTemplate = angular.element("#responsesTmpl").text();
 				var responsesExp = $interpolate(responsesTemplate);
+				console.log((datarecord.approvedResponseId) ? true : false)
+				
+
+				
+				
 				var responsesContext = {
 					imgurl: datarecord.responses[i].imgurl,
 					userurl: datarecord.responses[i].userurl,
@@ -45,9 +62,10 @@ orderModule.controller("UserOrdersController", function($scope, $rootScope, $int
 					phone: datarecord.responses[i].userPhone,
 					orderId: datarecord.id,
 					userId: publicKey,
-					status: datarecord.responses[i].status,
+					approvedResponseId: datarecord.approvedResponseId,
 					orderStatus: datarecord.status,
-					//openCommentDialog: openCommentDialog
+					status: (datarecord.approvedResponseId) ? true : false
+							//openCommentDialog: openCommentDialog
 				};
 				var responseContent = responsesExp(responsesContext);
 				responsesContent += responseContent;
@@ -58,7 +76,7 @@ orderModule.controller("UserOrdersController", function($scope, $rootScope, $int
 			var template = angular.element("#userOrdersTableDetailTmpl").text();
 			var exp = $interpolate(template);
 			var context = {
-				freeDescription: datarecord.orderData,
+				freeDescription: datarecord.orderData
 			};
 
 			var content = exp(context);

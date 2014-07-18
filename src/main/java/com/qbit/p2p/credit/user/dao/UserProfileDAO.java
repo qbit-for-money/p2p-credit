@@ -299,6 +299,7 @@ public class UserProfileDAO {
 			public Language call(EntityManager entityManager) {
 
 				Language language = new Language(title);
+				language.setWithoutParent(true);
 				entityManager.persist(language);
 				return language;
 			}
@@ -312,6 +313,7 @@ public class UserProfileDAO {
 			CriteriaQuery<Language> criteria = builder.createQuery(Language.class);
 			Root<Language> language = criteria.from(Language.class);
 			criteria.select(language);
+			criteria.where(builder.equal(language.get("withoutParent"), "t"));
 			TypedQuery<Language> query = entityManager.createQuery(criteria);
 			return query.getResultList();
 		} finally {

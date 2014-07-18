@@ -29,6 +29,8 @@ public class Language implements Identifiable<String>, Serializable {
 	private String id;
 	
 	private String title;
+	
+	private boolean withoutParent;
 
 	public Language() {
 	}
@@ -52,6 +54,14 @@ public class Language implements Identifiable<String>, Serializable {
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public boolean isWithoutParent() {
+		return withoutParent;
+	}
+
+	public void setWithoutParent(boolean withoutParent) {
+		this.withoutParent = withoutParent;
 	}
 
 	@Override

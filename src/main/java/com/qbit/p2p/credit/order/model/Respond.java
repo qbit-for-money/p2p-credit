@@ -7,8 +7,6 @@ import java.util.Date;
 import java.util.Objects;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -16,6 +14,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.SecondaryTable;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -28,6 +28,8 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * @author Alexander_Sergeev
  */
 @Entity
+/*@SecondaryTable(name="approved_response", pkJoinColumns={
+      @PrimaryKeyJoinColumn(name="id", referencedColumnName="id")})*/
 @Access(AccessType.FIELD)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -51,7 +53,6 @@ public class Respond implements Identifiable<String>, Serializable {
 	private Date creationDate;
 	@Lob
 	private String comment;
-	RespondStatus status;
 
 	@Override
 	public String getId() {
@@ -92,14 +93,6 @@ public class Respond implements Identifiable<String>, Serializable {
 
 	public void setComment(String comment) {
 		this.comment = comment;
-	}
-
-	public RespondStatus getStatus() {
-		return status;
-	}
-
-	public void setStatus(RespondStatus status) {
-		this.status = status;
 	}
 
 	public String getUserName() {
@@ -147,9 +140,9 @@ public class Respond implements Identifiable<String>, Serializable {
 		}
 		return true;
 	}
-	
+
 	@Override
 	public String toString() {
-		return "Respond{" + "userPublicKey=" + userPublicKey + ", userName=" + userName + ", userPhone=" + userPhone + ", userEmail=" + userEmail + ", creationDate=" + creationDate + ", comment=" + comment + ", status=" + status + '}';
+		return "Respond{" + "orderInfo=" + orderInfo + ", id=" + id + ", userPublicKey=" + userPublicKey + ", userName=" + userName + ", userPhone=" + userPhone + ", userEmail=" + userEmail + ", creationDate=" + creationDate + ", comment=" + comment + '}';
 	}
 }

@@ -36,7 +36,9 @@ function getSource(path, id) {
 					{name: "userLanguages", type: "string"},
 					{name: "userPublicKey", type: "string"},
 					{name: "orderData", type: "string"},
-					{name: "id", type: "string"}
+					{name: "id", type: "string"}, 
+					//{name: "responseId", type: "string"}, 
+					{name: "approvedResponseId", type: "string"}
 				],
 				beforeprocessing: function(data) {
 					source.totalrecords = data.length;
@@ -103,15 +105,16 @@ function getAdapterFields() {
 		},
 		downloadComplete: function(data, status, xhr) {
 			var orders = data.orders;
+			console.log(JSON.stringify(orders));
 			for (var i in orders) {
 				if (orders[i].order.languages !== undefined) {
 					var languagesStr = "";
 					var categoriesStr = "";
 					for (var j in orders[i].order.languages) {
-						languagesStr += orders[i].order.languages[j] + ", ";
+						languagesStr += orders[i].order.languages[j].title + ", ";
 					}
 					for (var j in orders[i].order.categories) {
-						categoriesStr += orders[i].order.categories[j] + ", ";
+						categoriesStr += orders[i].order.categories[j].title + ", ";
 					}
 				}
 				orders[i].languages = languagesStr.substring(0, languagesStr.length - 2);
@@ -151,7 +154,7 @@ function getAdapterFields() {
 				if (orders[i].userLanguages && orders[i].userLanguages.length !== 0) {
 					var userLanguagesStr = "";
 					for (var j in orders[i].userLanguages) {
-						userLanguagesStr += orders[i].userLanguages[j] + ", "
+						userLanguagesStr += orders[i].userLanguages[j].title + ", "
 					}
 					orders[i].userLanguages = userLanguagesStr.substring(0, userLanguagesStr.length - 2);
 				}
@@ -166,10 +169,11 @@ function getAdapterFields() {
 				} else {
 					orders[i].responsesCount = 0;
 				}
+				//orders[i].id = orders[i].order.id;
+				orders[i].approvedResponseId = orders[i].order.approvedResponseId;
 				orders[i].duration = orders[i].order.duration + " " + ((orders[i].order.durationType === "HOUR") ? "hours" : "days");
 				orders[i].endDate = formatDate(orders[i].order.endDate);
 				orders[i].userPublicKey = orders[i].order.userPublicKey;
-				orders[i].responses = orders[i].order.responses;
 				orders[i].order = undefined;
 			}
 

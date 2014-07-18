@@ -18,6 +18,7 @@ import com.qbit.p2p.credit.order.model.OrderStatus;
 import com.qbit.p2p.credit.order.model.Respond;
 import com.qbit.p2p.credit.order.model.RespondStatus;
 import com.qbit.p2p.credit.user.dao.UserProfileDAO;
+import com.qbit.p2p.credit.user.model.Language;
 import com.qbit.p2p.credit.user.model.UserCurrency;
 import com.qbit.p2p.credit.user.model.UserPublicProfile;
 import java.io.File;
@@ -100,6 +101,10 @@ public class OrdersResource {
 
 		public long getLength() {
 			return length;
+		}
+
+		public void setLength(long length) {
+			this.length = length;
 		}
 	}
 
@@ -314,7 +319,7 @@ public class OrdersResource {
 
 	@Inject
 	private UserProfileDAO profileDAO;
-	
+
 	@Inject
 	private Env env;
 
@@ -337,13 +342,13 @@ public class OrdersResource {
 	public OrdersWrapper getLast(SearchRequest ordersRequest) {
 		return readLastOrders();
 	}
-	
-	public void writeLastOrders() { 
+
+	public void writeLastOrders() {
 		SearchRequest ordersRequest = new SearchRequest();
 		ordersRequest.setPageNumber(0);
 		ordersRequest.setPageSize(4);
 		OrdersWrapper wrapper = getOrdersFromDB(ordersRequest, null);
-
+		wrapper.setLength(4);
 		ObjectMapper mapper = new ObjectMapper();
 		try {
 			mapper.writeValue(new File(env.getLastOrdersPathFolder() + "LAST_ORDERS.json"), wrapper);
@@ -353,6 +358,15 @@ public class OrdersResource {
 	}
 
 	private OrdersWrapper readLastOrders() {
+		SearchRequest ordersRequest = new SearchRequest();
+		ordersRequest.setPageNumber(0);
+		ordersRequest.setPageSize(4);
+		//OrdersWrapper wrapper1 = getOrdersFromDB(ordersRequest, null);
+		orderDAO.getPartnersRating3();
+		orderDAO.getPartnersRating("alex.qbit9@gmail.com");
+		orderDAO.getPartnersRating("ivan.fly.666@gmail.com");
+		orderDAO.getPartnersRating("aleksashka6666@gmail.com");
+		//System.out.println("??????????????????????????????????????????????????? " + orderDAO.getPartnersRating("aleksashka6666@gmail.com"));
 		ObjectMapper mapper = new ObjectMapper();
 		OrdersWrapper wrapper = null;
 		try {
@@ -410,27 +424,29 @@ public class OrdersResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public OrdersWrapper getWithFilter(SearchRequest ordersRequest) {
-		
+
 		UserPublicProfile profile = null;
-		if(AuthFilter.getUserId(request) != null) {
+		if (AuthFilter.getUserId(request) != null) {
 			profile = profileDAO.find(AuthFilter.getUserId(request));
 		}
 
 		return getOrdersFromDB(ordersRequest, profile);
 	}
-	
+
 	private OrdersWrapper getOrdersFromDB(SearchRequest ordersRequest, UserPublicProfile profile) {
+
 		if (ordersRequest == null) {
 			return new OrdersWrapper(null, 0);
 		}
 		if (ordersRequest.getFilterItems() == null) {
 			ordersRequest.setFilterItems(new ArrayList<FilterItem>());
 		}
+
 		FilterItem openedOrders = new FilterItem();
 		openedOrders.setFilterDataField("status");
 		openedOrders.setFilterValue("OPENED");
 		openedOrders.setFilterOperator(FilterOperator.AND);
-		ordersRequest.getFilterItems().add(openedOrders); 
+		ordersRequest.getFilterItems().add(openedOrders);
 
 		FilterItem greaterThanCurrentDate = new FilterItem();
 		greaterThanCurrentDate.setFilterDataField("endDate");
@@ -439,15 +455,13 @@ public class OrdersResource {
 		greaterThanCurrentDate.setFilterOperator(FilterOperator.AND);
 		ordersRequest.getFilterItems().add(greaterThanCurrentDate);
 
-		List<OrderInfo> orders = null;
-		
-		orders = orderDAO.findWithFilter(null, ordersRequest, profile);
+		List<OrderInfo> orders = orderDAO.findWithFilter(null, ordersRequest, profile);
 
 		long length = orderDAO.getLengthWithFilter(null, ordersRequest, profile);
 
-		List<OrderWrapper> ordersWrappers = new ArrayList<>();	
+		List<OrderWrapper> ordersWrappers = new ArrayList<>();
 		for (OrderInfo order : orders) {
-			long responsesRating = 0;
+
 			if (order.getResponses() != null) {
 				for (Respond response : order.getResponses()) {
 					UserPublicProfile responseProfile = profileDAO.find(response.getUserPublicKey());
@@ -457,17 +471,18 @@ public class OrdersResource {
 					if (!responseProfile.isPhoneEnabled()) {
 						response.setUserPhone(null);
 					}
-					responsesRating += responseProfile.getStatistic().getSummaryRating();
 				}
 			}
 			UserPublicProfile profileValue = profileDAO.find(order.getUserPublicKey());
+			//List<OrderInfo> partnersOrders = orderDAO.findWithFilter(null, ordersRequest, profile);
+
 			OrderWrapper wrapper = new OrderWrapper(order);
 			wrapper.setId(order.getId());
 			wrapper.setSummaryRating(profileValue.getStatistic().getSummaryRating());
 			wrapper.setOpennessRating(profileValue.getStatistic().getOpennessRating());
 			wrapper.setSuccessTransactionsSum(profileValue.getStatistic().getSuccessTransactionsSum());
 			wrapper.setOrdersSumValue(profileValue.getStatistic().getOrdersSumValue());
-			wrapper.setPartnersRating(responsesRating);
+			wrapper.setPartnersRating(orderDAO.getPartnersRating(order.getUserPublicKey()));
 			if (profileValue.isPhoneEnabled()) {
 				wrapper.setUserPhone(profileValue.getPhone());
 			}
@@ -478,12 +493,18 @@ public class OrdersResource {
 				wrapper.setUserCurrencies(profileValue.getCurrencies());
 			}
 			if (profileValue.isLanguagesEnabled()) {
-				wrapper.setUserLanguages(profileValue.getLanguages());
+				if(profileValue.getLanguages() != null) {
+					List<String> userLanguages = new ArrayList<>();
+					for(Language language : profileValue.getLanguages()) {
+						userLanguages.add(language.getTitle());
+					}
+					wrapper.setUserLanguages(userLanguages);
+				}	
 			}
 			wrapper.setUserName(profileValue.getName());
 
 			String ordersSuccessSizeSum = "";
-			if (profileValue.getCurrencies() != null) {
+			if ((profileValue.getCurrencies() != null) && !profileValue.getCurrencies().isEmpty()) {
 				for (Currency currency : profileValue.getCurrencies()) {
 					long ordersSuccessSize = 0;
 					SearchRequest filter = new SearchRequest();
@@ -536,11 +557,18 @@ public class OrdersResource {
 		if (order == null) {
 			return null;
 		}
+		if (order.getResponses() != null) {
+			for (Respond orderResponse : order.getResponses()) {
+				if (orderResponse.getUserPublicKey().equals(id)) {
+					return null;
+				}
+			}
+		}
+
 		Respond respond = new Respond();
 		respond.setUserPublicKey(id);
 		respond.setCreationDate(new Date());
 		respond.setComment(responseRequest.getComment());
-		respond.setStatus(RespondStatus.WAITING);
 		UserPublicProfile profile = profileDAO.find(id);
 		if (profile != null) {
 			respond.setUserName(profile.getName());
@@ -569,14 +597,23 @@ public class OrdersResource {
 		}
 		if (order.getResponses() != null) {
 			for (Respond respond : order.getResponses()) {
-				if (respond.getUserPublicKey().equals(responseRequest.getUserId())) {
-					respond.setStatus(RespondStatus.APPROVED);
+				if (respond.getUserPublicKey().equals(responseRequest.getUserId()) && (order.getApprovedResponseId()== null)) {
+					order.setApprovedResponseId(respond.getId());
+					
 					order.setStatus(OrderStatus.IN_PROCESS);
 					orderDAO.update(order);
 				}
 			}
 		}
 		return null;
+	}
+	
+	
+	@GET
+	@Path("response")
+	@Produces(MediaType.APPLICATION_JSON)
+		public Respond getByUser(@QueryParam("id") String id) {
+		return orderDAO.findResponse(id);
 	}
 
 	@POST
@@ -620,14 +657,13 @@ public class OrdersResource {
 		order.setUserPublicKey(userId);
 		order.setCreationDate(new Date());
 		order.setEndDate(new Date());
-		order.setReward(String.valueOf(rand.nextInt(1000)));
 
 		UserCurrency c1 = new UserCurrency(Currency.BITCOIN, 10, 500);
 		order.setOrderData("DEFAULT");
 
 		List<String> l = new ArrayList<>();
 		Collections.addAll(l, "English", "Arabic");
-		order.setLanguages(l);
+		//order.setLanguages(l);
 
 		return orderDAO.create(order);
 	}

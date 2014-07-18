@@ -4,7 +4,7 @@ import com.qbit.commons.model.Identifiable;
 import com.qbit.p2p.credit.commons.model.Currency;
 import com.qbit.p2p.credit.commons.model.DateAdapter;
 import com.qbit.p2p.credit.money.model.serialization.CurrencyAdapter;
-import com.qbit.p2p.credit.user.model.UserCurrency;
+import com.qbit.p2p.credit.user.model.Language;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -16,13 +16,14 @@ import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.Lob;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
@@ -43,9 +44,9 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 @XmlAccessorType(XmlAccessType.FIELD)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OrderInfo implements Identifiable<String>, Serializable {
-	
+
 	private static final long serialVersionUID = 1L;
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@XmlTransient
@@ -60,21 +61,29 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 	private DurationType durationType;
 
 	private String userPublicKey;
-	@ElementCollection
-	private List<String> categories;
+
+	@ManyToMany(cascade = CascadeType.ALL)
+	private List<OrderCategory> categories;
 	@Lob
 	private String orderData;
-	
+
 	private OrderStatus status;
-	
-	@OneToMany(cascade=CascadeType.ALL, targetEntity=Respond.class)
+
+	@OneToMany(cascade = CascadeType.ALL, targetEntity = Respond.class)
 	private List<Respond> responses = new ArrayList<>();
-	
-	@OneToOne(cascade=CascadeType.ALL)
+
+	//@OneToOne(cascade = CascadeType.ALL)
+	//@JoinTable(name = "approved_response")
+	//@JoinTable(name = "approved_response", joinColumns = @JoinColumn(name = "id"),
+	//	inverseJoinColumns = @JoinColumn(name = "id"))
+	//@JoinColumn(name="A_ID", referencedColumnName="id")
+	private String approvedResponseId;
+
+	@OneToOne(cascade = CascadeType.ALL)
 	private Comment comment;
-	
-	@ElementCollection
-	private List<String> languages;
+
+	@ManyToMany(cascade = CascadeType.ALL)
+	private List<Language> languages;
 	@XmlJavaTypeAdapter(CurrencyAdapter.class)
 	private Currency givingCurrency;
 	@XmlJavaTypeAdapter(CurrencyAdapter.class)
@@ -83,8 +92,6 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 	private BigDecimal takingValue;
 	@Column(precision = 10, scale = 3)
 	private BigDecimal givingValue;
-	private String reward;
-	
 
 	@Override
 	public String getId() {
@@ -127,14 +134,6 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 		this.endDate = endDate;
 	}
 
-	public List<String> getLanguages() {
-		return languages;
-	}
-
-	public void setLanguages(List<String> languages) {
-		this.languages = languages;
-	}
-
 	public int getDuration() {
 		return duration;
 	}
@@ -143,12 +142,28 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 		this.duration = duration;
 	}
 
-	public List<String> getCategories() {
+	public List<OrderCategory> getCategories() {
 		return categories;
 	}
 
-	public void setCategories(List<String> categories) {
+	public void setCategories(List<OrderCategory> categories) {
 		this.categories = categories;
+	}
+
+	public String getApprovedResponseId() {
+		return approvedResponseId;
+	}
+
+	public void setApprovedResponseId(String approvedResponseId) {
+		this.approvedResponseId = approvedResponseId;
+	}
+
+	public List<Language> getLanguages() {
+		return languages;
+	}
+
+	public void setLanguages(List<Language> languages) {
+		this.languages = languages;
 	}
 
 	public Currency getGivingCurrency() {
@@ -172,7 +187,7 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 	}
 
 	public void setTakingValue(BigDecimal takingValue) {
-		if(takingValue != null) {
+		if (takingValue != null) {
 			this.takingValue = takingValue.setScale(3, RoundingMode.HALF_UP);
 		} else {
 			this.takingValue = null;
@@ -184,20 +199,11 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 	}
 
 	public void setGivingValue(BigDecimal givingValue) {
-		if(givingValue != null) {
+		if (givingValue != null) {
 			this.givingValue = givingValue.setScale(3, RoundingMode.HALF_UP);
 		} else {
 			this.givingValue = null;
 		}
-	}
-
-
-	public String getReward() {
-		return reward;
-	}
-
-	public void setReward(String reward) {
-		this.reward = reward;
 	}
 
 	public String getOrderData() {
@@ -216,7 +222,6 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 		this.responses = responses;
 	}
 
-
 	public DurationType getDurationType() {
 		return durationType;
 	}
@@ -234,19 +239,19 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 	}
 
 	public boolean isValid() {
-		return (endDate != null) 
+		return (endDate != null)
 			&& (duration != 0)
 			&& (durationType != null)
-			&& (userPublicKey != null) 
-			&& !userPublicKey.isEmpty() 
-			&& (categories != null) 
-			&& (languages != null) 
-			&& (takingCurrency != null || givingCurrency != null) 
+			&& (userPublicKey != null)
+			&& !userPublicKey.isEmpty()
+			&& (categories != null)
+			&& (languages != null)
+			&& (takingCurrency != null || givingCurrency != null)
 			&& (!BigDecimal.ZERO.equals(takingValue) || !BigDecimal.ZERO.equals(givingValue));
 	}
 
 	@Override
 	public String toString() {
-		return "OrderInfo{" + "id=" + id + ", creationDate=" + creationDate + ", endDate=" + endDate + ", duration=" + duration + ", durationType=" + durationType + ", userPublicKey=" + userPublicKey + ", categories=" + categories + ", orderData=" + orderData + ", status=" + status + ", responses=" + responses + ", comment=" + comment + ", languages=" + languages + ", givingCurrency=" + givingCurrency + ", takingCurrency=" + takingCurrency + ", takingValue=" + takingValue + ", givingValue=" + givingValue + ", reward=" + reward + '}';
+		return "OrderInfo{" + "id=" + id + ", creationDate=" + creationDate + ", endDate=" + endDate + ", duration=" + duration + ", durationType=" + durationType + ", userPublicKey=" + userPublicKey + ", categories=" + categories + ", orderData=" + orderData + ", status=" + status + ", responses=" + responses + ", approvedResponseId=" + approvedResponseId + ", comment=" + comment + ", languages=" + languages + ", givingCurrency=" + givingCurrency + ", takingCurrency=" + takingCurrency + ", takingValue=" + takingValue + ", givingValue=" + givingValue + '}';
 	}
 }

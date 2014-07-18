@@ -57,7 +57,7 @@ public class P2PCreditApp extends Application {
 		addBinding(newBinder(OrdersResource.class).to(OrdersResource.class).in(Singleton.class), configuration);
 		
 		configuration.commit();
-		serviceLocator.createAndInitialize(OrderFlowScheduler.class);
+		//serviceLocator.createAndInitialize(OrderFlowScheduler.class);
 	}
 
 	/**

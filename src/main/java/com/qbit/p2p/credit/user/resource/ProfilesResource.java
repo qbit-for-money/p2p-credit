@@ -491,7 +491,7 @@ public class ProfilesResource {
 			}
 			user.setMail(publicKey + i + "@mail.ru");
 			user.setMailEnabled(true);
-			user.setLanguages(Arrays.asList("Russian, English"));
+			//user.setLanguages(Arrays.asList("Russian, English"));
 			user.setLanguagesEnabled(true);
 			Currency c1 = Currency.BITCOIN;//new Currency(Currency.BITCOIN, 10, 500);
 			Currency c2 = Currency.LITECOIN;//new Currency(Currency.LITECOIN, 10, 500);
@@ -507,7 +507,6 @@ public class ProfilesResource {
 			order.setUserPublicKey(user.getPublicKey());
 			order.setCreationDate(new Date());
 			order.setEndDate(new Date());
-			order.setReward(String.valueOf(rand.nextInt(1000)));
 			order.setStatus(OrderStatus.OPENED);
 
 			//Collections.addAll(c, c1, c2);
@@ -515,7 +514,7 @@ public class ProfilesResource {
 
 			List<String> l = new ArrayList<>();
 			Collections.addAll(l, "Russian", "English");
-			order.setLanguages(l);
+			//order.setLanguages(l);
 			//order.setResponses(rand.nextInt(10));
 			/*if(rand.nextInt(3) < 2) {
 				order.setType(OrderType.CREDIT);

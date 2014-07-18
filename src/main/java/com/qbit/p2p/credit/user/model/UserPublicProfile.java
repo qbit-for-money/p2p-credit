@@ -51,10 +51,10 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  query = "SELECT u FROM UserPublicProfile u WHERE u.rating >= :rating"),
  @NamedQuery(name = "UserPublicProfile.count",
  query = "SELECT count(u) FROM UserPublicProfile u")})*/
-@NamedQueries({
+/*@NamedQueries({
 	@NamedQuery(name = "UserPublicProfile.findByOrder",
 		query = "SELECT u FROM UserPublicProfile u, OrderInfo o WHERE "
-		+ " o.userPublicKey = u.publicKey AND o.id = :orderId")})
+		+ " o.userPublicKey = u.publicKey AND o.id = :orderId")})*/
 @Access(AccessType.FIELD)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -69,7 +69,8 @@ public class UserPublicProfile implements Serializable {
 	private boolean mailEnabled;
 	private String phone;
 	private boolean phoneEnabled;
-	private List<String> languages;
+	@ManyToMany(cascade=CascadeType.ALL)
+	private List<Language> languages;
 	private boolean languagesEnabled;
 	@XmlJavaTypeAdapter(CurrencyAdapter.class)
 	private List<Currency> currencies;
@@ -149,11 +150,11 @@ public class UserPublicProfile implements Serializable {
 		this.phoneEnabled = phoneEnabled;
 	}
 
-	public List<String> getLanguages() {
+	public List<Language> getLanguages() {
 		return languages;
 	}
 
-	public void setLanguages(List<String> languages) {
+	public void setLanguages(List<Language> languages) {
 		this.languages = languages;
 	}
 

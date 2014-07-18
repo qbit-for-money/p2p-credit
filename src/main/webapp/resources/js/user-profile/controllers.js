@@ -42,6 +42,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 	var allCurrencies = [];
 	var orderCurrencies = ["None"];
 	$scope.userPropertiesMap['currencies'] = [];
+	$scope.userPropertiesMap['languages'] = [];
 	$scope.createOrderButtonEnabled = false;
 
 	$scope.currenciesSelect2Options = {
@@ -115,12 +116,18 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			$scope.userPropertiesMap['phoneEnabled'] = (userProfileResponse.phoneEnabled === true) ? visible : notVisible;
 			$scope.userPropertiesMap['languagesEnabled'] = (userProfileResponse.languagesEnabled === true) ? visible : notVisible;
 
-			$scope.userPropertiesMap['languages'] = userProfileResponse.languages;
 			if (userProfileResponse.languages) {
-				$scope.orderCreatingMap['orderLanguages'] = userProfileResponse.languages;
+				if($scope.orderCreatingMap['orderLanguages']) {
+					$scope.orderCreatingMap['orderLanguages'].splice(0, $scope.orderCreatingMap['orderLanguages'].length);
+				}
+				if($scope.userPropertiesMap['languages']) {
+					$scope.userPropertiesMap['languages'].splice(0, $scope.userPropertiesMap['languages'].length);
+				}
 				var languages = "";
 				for (var i = 0; i < userProfileResponse.languages.length; i++) {
-					languages += (userProfileResponse.languages[i] + ", ");
+					$scope.orderCreatingMap['orderLanguages'].push(userProfileResponse.languages[i].title);
+					$scope.userPropertiesMap['languages'].push(userProfileResponse.languages[i].title);
+					languages += (userProfileResponse.languages[i].title + ", ");
 				}
 				languages = languages.substring(0, languages.length - 2);
 				$scope.userPropertiesMap['languagesStr'] = languages;
@@ -182,6 +189,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			}
 			reloadSCEditorInstance();
 			reloadBKIscEditor();
+			$scope.isValidOrder()
 
 
 		});
@@ -329,7 +337,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		var categories = $scope.orderCreatingMap['orderCategories'];
 		var languages = $scope.orderCreatingMap['orderLanguages'];
 		if (!data || data === "" || !$scope.isValidDateInput() || !duration || duration <= 0 || !categories
-			|| categories.length === 0 || !languages || languages.length === 0) {
+				|| categories.length === 0 || !languages || languages.length === 0) {
 			$scope.createOrderButtonEnabled = false;
 		} else if (takingCurrency !== "None" && (!takingValue || takingValue <= 0)) {
 			$scope.createOrderButtonEnabled = false;
@@ -354,6 +362,9 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 
 	$scope.createOrder = function() {
 		userService.get();
+		if (!$scope.isValidOrder()) {
+			return;
+		}
 		var data = CKEDITOR.instances.orderDataEditable.getData();
 		var orderInfo = {};
 		orderInfo.orderData = data;
@@ -387,10 +398,21 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		} else if (durationType === "Days") {
 			orderInfo.durationType = "DAY";
 		}
-		orderInfo.categories = $scope.orderCreatingMap['orderCategories'];
-		orderInfo.languages = $scope.orderCreatingMap['orderLanguages'];
+		//orderInfo.categories = $scope.orderCreatingMap['orderCategories'];
+		orderInfo.categories = [];
+		for (var i in $scope.orderCreatingMap['orderCategories']) {
+			orderInfo.categories[i] = {};
+			orderInfo.categories[i].title = $scope.orderCreatingMap['orderCategories'][i];
+		}
+		orderInfo.languages = [];
+		for (var i in $scope.orderCreatingMap['orderLanguages']) {
+			orderInfo.languages[i] = {};
+			orderInfo.languages[i].title = $scope.orderCreatingMap['orderLanguages'][i];
+		}
+		//orderInfo.languages = $scope.orderCreatingMap['orderLanguages'];
 
-		addItems($scope.userPropertiesMap['languages'], orderInfo.languages);
+
+		//addItems($scope.userPropertiesMap['languages'], orderInfo.languages);
 		var orderResponse = ordersResource.create({}, orderInfo);
 		orderResponse.$promise.then(function() {
 			clearOrder();
@@ -460,7 +482,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 
 	function reloadSCEditorInstance() {
 		if ($scope.userPropertiesMap['personalData'] && (($scope.userPropertiesMap['personalData'].toString() === "DEFAULT")
-			|| ($scope.userPropertiesMap['personalData'].toString().indexOf("<p>DEFAULT</p>") === 0))) {
+				|| ($scope.userPropertiesMap['personalData'].toString().indexOf("<p>DEFAULT</p>") === 0))) {
 			if ($scope.isCurrentUser && $scope.edit) {
 				CKEDITOR.instances.personalEditable.setData(defaultPersonalData);
 			} else if (!$scope.edit) {
@@ -486,7 +508,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 
 	function reloadBKIscEditor() {
 		if ($scope.userPropertiesMap['bkiData'] && (($scope.userPropertiesMap['bkiData'].toString() === "DEFAULT")
-			|| ($scope.userPropertiesMap['bkiData'].toString().indexOf("<p>DEFAULT</p>") === 0))) {
+				|| ($scope.userPropertiesMap['bkiData'].toString().indexOf("<p>DEFAULT</p>") === 0))) {
 			if ($scope.isCurrentUser && $scope.editAdditional) {
 				CKEDITOR.instances.bkiEditable.setData(defaultPersonalData);
 			} else if (!$scope.editAdditional) {
@@ -647,7 +669,16 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 
 		userPublicProfile.personalData = ($scope.userPropertiesMap['personalData']) ? $scope.userPropertiesMap['personalData'].toString() : null;
 		userPublicProfile.bkiData = ($scope.userPropertiesMap['bkiData']) ? $scope.userPropertiesMap['bkiData'].toString() : null;
-		userPublicProfile.languages = $scope.userPropertiesMap['languages'];
+
+		if ($scope.userPropertiesMap['languages'] && ($scope.userPropertiesMap['languages'].length !== null)) {
+			userPublicProfile.languages = [];
+			for (var i in $scope.userPropertiesMap['languages']) {
+				userPublicProfile.languages[i] = {};
+				userPublicProfile.languages[i].title = $scope.userPropertiesMap['languages'][i];
+			}
+		}
+
+		//userPublicProfile.languages = $scope.userPropertiesMap['languages'];
 		userPublicProfile.languagesEnabled = ($scope.userPropertiesMap['languagesEnabled'] === visible) ? true : false;
 		userPublicProfile.currencies = [];
 		for (var i in $scope.userPropertiesMap['currencies']) {
@@ -706,9 +737,9 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 
 	angular.element(document).on("focus", "#name", function() {
 		angular.element(this).mask("SSSSSSSSSSSSSSSSSSSSSSSSSSS",
-			{'translation': {
-					S: {pattern: /[A-Za-zА-Яа-я0-9]/}
-				}});
+				{'translation': {
+						S: {pattern: /[A-Za-zА-Яа-я0-9]/}
+					}});
 	});
 	/*angular.element(document).on("focus", "#mail", function() {
 	 angular.element(this).mask("SSSSSSSSSSSSSS",
@@ -726,44 +757,44 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		});
 		modalInstance.result.then(function() {
 		},
-			function() {
-				var ias = angular.element('#user-photo-change').imgAreaSelect({instance: true});
-				ias.setOptions({hide: true});
-				ias.update();
-			});
+				function() {
+					var ias = angular.element('#user-photo-change').imgAreaSelect({instance: true});
+					ias.setOptions({hide: true});
+					ias.update();
+				});
 	};
 	$scope.getFile = function(file) {
 		$scope.editUserPhoto = true;
 		fileReader.readAsDataUrl(file, $scope)
-			.then(function(result) {
-				$scope.imageSrc = result;
-				var imag = new Image();
-				imag.src = $scope.imageSrc;
-				if ((imag.width > PHOTO_MAX_WIDTH) || (imag.height > PHOTO_MAX_HEIGHT) || (imag.width < PHOTO_MIN_WIDTH) || (imag.height < PHOTO_MIN_HEIGHT)) {
-					$scope.imageSrc = null;
-					$scope.editUserPhoto = false;
-					return;
-				}
-				setTimeout(function() {
-					var elementWidth = angular.element("#user-photo-change").width();
-					var ratio = imag.width / elementWidth;
-					angular.element('#user-photo-change').imgAreaSelect({
-						aspectRatio: '3:4',
-						handles: true,
-						minWidth: elementWidth / ratio,
-						x1: 0, y1: 0, x2: 80, y2: 105,
-						onSelectEnd: function(img, selection) {
+				.then(function(result) {
+					$scope.imageSrc = result;
+					var imag = new Image();
+					imag.src = $scope.imageSrc;
+					if ((imag.width > PHOTO_MAX_WIDTH) || (imag.height > PHOTO_MAX_HEIGHT) || (imag.width < PHOTO_MIN_WIDTH) || (imag.height < PHOTO_MIN_HEIGHT)) {
+						$scope.imageSrc = null;
+						$scope.editUserPhoto = false;
+						return;
+					}
+					setTimeout(function() {
+						var elementWidth = angular.element("#user-photo-change").width();
+						var ratio = imag.width / elementWidth;
+						angular.element('#user-photo-change').imgAreaSelect({
+							aspectRatio: '3:4',
+							handles: true,
+							minWidth: elementWidth / ratio,
+							x1: 0, y1: 0, x2: 80, y2: 105,
+							onSelectEnd: function(img, selection) {
 
-							resultX1 = Math.floor(selection.x1 * ratio);
-							resultX2 = Math.floor(selection.x2 * ratio);
-							resultY1 = Math.floor(selection.y1 * ratio);
-							resultY2 = Math.floor(selection.y2 * ratio);
-							resultX2 = (resultX2 - resultX1 > 800) ? (resultX1 + 800) : resultX2;
-							resultY2 = (resultY2 - resultY1 > 800) ? (resultY1 + 800) : resultY2;
-						}
-					});
-				}, 150);
-			});
+								resultX1 = Math.floor(selection.x1 * ratio);
+								resultX2 = Math.floor(selection.x2 * ratio);
+								resultY1 = Math.floor(selection.y1 * ratio);
+								resultY2 = Math.floor(selection.y2 * ratio);
+								resultX2 = (resultX2 - resultX1 > 800) ? (resultX1 + 800) : resultX2;
+								resultY2 = (resultY2 - resultY1 > 800) ? (resultY1 + 800) : resultY2;
+							}
+						});
+					}, 150);
+				});
 	};
 	$scope.saveUserPhoto = function() {
 

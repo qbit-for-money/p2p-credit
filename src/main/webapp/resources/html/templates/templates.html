@@ -43,11 +43,11 @@
 			<div class='container-fluid'>
 				<div class='col-xs-12 col-md-12' style='margin-top: 12px;'>
 					<div class="navbar-right">
-						<button class="btn btn-success" type="button" ng-hide="{{status === 'APPROVED'}}" ng-disabled="{{orderStatus !== 'OPENED'}}" ng-click="approve({{orderId}}, '{{userId}}')">
+						<button class="btn btn-success" type="button" ng-hide="{{status === true}}" ng-disabled="{{orderStatus !== 'OPENED'}}" ng-click="approve({{orderId}}, '{{userId}}')">
 							Yes!
 						</button>
 
-						<bs-dropdown data-menu-type="button" order-id={{orderId}} ng-hide="{{(status !== 'APPROVED') || ((orderStatus !== 'OPENED') && (orderStatus !== 'IN PROCESS'))}}"></bs-dropdown>
+						<bs-dropdown data-menu-type="button" order-id={{orderId}} ng-hide="{{(status !== true) || ((orderStatus !== 'OPENED') && (orderStatus !== 'IN PROCESS'))}}"></bs-dropdown>
 					</div>
 				</div>
 			</div>
