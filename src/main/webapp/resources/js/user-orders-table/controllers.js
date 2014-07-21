@@ -30,14 +30,14 @@ orderModule.controller("UserOrdersController", function($scope, $rootScope, $int
 			//ordersResource.getResponse({'id': datarecord.approvedResponseId});
 			//console.log("#$#$#$ " + datarecord.approvedResponseId + " ** " + JSON.stringify(datarecord.responses));
 			/*var responses = [];
-			for (var i in datarecord.responses) {
-			
-			
-		}
-		var userProfileResponse = usersProfileResource.getById({'id': publicKey});
-			userProfileResponse.$promise.then(function() {
-					
-			});*/
+			 for (var i in datarecord.responses) {
+			 
+			 
+			 }
+			 var userProfileResponse = usersProfileResource.getById({'id': publicKey});
+			 userProfileResponse.$promise.then(function() {
+			 
+			 });*/
 			for (var i in datarecord.responses) {
 				console.log(datarecord.responses[i].id)
 				var publicKey = datarecord.responses[i].userPublicKey;
@@ -47,10 +47,10 @@ orderModule.controller("UserOrdersController", function($scope, $rootScope, $int
 				var responsesTemplate = angular.element("#responsesTmpl").text();
 				var responsesExp = $interpolate(responsesTemplate);
 				console.log((datarecord.approvedResponseId) ? true : false)
-				
 
-				
-				
+
+
+
 				var responsesContext = {
 					imgurl: datarecord.responses[i].imgurl,
 					userurl: datarecord.responses[i].userurl,
@@ -115,6 +115,8 @@ orderModule.controller("UserOrdersController", function($scope, $rootScope, $int
 					showfilterrow: true,
 					sortable: true,
 					filterable: true,
+					columnsresize: true,
+					columnsreorder: true,
 					virtualmode: true,
 					rendergridrows: function() {
 						return dataAdapter.records;

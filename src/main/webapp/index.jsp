@@ -65,6 +65,8 @@
 		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxgrid.pager.js"></script>
 		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxgrid.sort.js"></script>
 		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxgrid.filter.js"></script>
+		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxgrid.columnsresize.js"></script> 
+		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxgrid.columnsreorder.js"></script>
 		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxcheckbox.js"></script>
 		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxtabs.js"></script>
 		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxmenu.js"></script>
@@ -77,7 +79,7 @@
 		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxnumberinput.js"></script> 
 		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxslider.js"></script> 
 		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxdatetimeinput.js"></script> 
-		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxcalendar.js"></script> 
+		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxcalendar.js"></script>  
 
 		<script type="text/javascript">
 			// Global constants

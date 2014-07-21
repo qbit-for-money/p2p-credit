@@ -48,6 +48,7 @@ userProfileModule.directive('dateTimePicker', function() {
 				todayBtn: true,
 				todayHighlight: true
 			}).on('changeDate', function(ev) {
+				angular.element("body > div.datepicker.dropdown-menu").css("display","none");
 				scope.$apply(function() {
 					scope.validate();
 				});

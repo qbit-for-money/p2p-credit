@@ -1,5 +1,10 @@
 <div class="panel-body">
 	<div class="container-fluid">
+		<div class="row ng-hide" ng-show="edit">
+						<div class="col-xs-12 col-md-12">
+							<alert type="'warning'"><h4 style="margin-bottom: 0px;">User photo size should be greater than 400x300 and less than 2000x2000.</h4></alert>
+						</div>
+					</div>
 		<div class="row">
 			<div class="col-xs-4 col-md-3">
 				<div class="container-fluid">
@@ -25,6 +30,11 @@
 							<button class="btn btn-default col-xs-6 col-md-6" ng-hide="!(isCurrentUser && !editUserPhoto && edit)" style="float: right" ng-click="deleteUserPhoto()"><span class="glyphicon glyphicon-remove-circle"></span></button>
 							<button class="btn btn-default col-xs-6 col-md-6" ng-hide="!editUserPhoto" ng-click="saveUserPhoto()"><span class="glyphicon glyphicon-ok"></span></button>
 							<button class="btn btn-default col-xs-6 col-md-6" ng-hide="!editUserPhoto" style="float: right" ng-click="cancel()"><span class="glyphicon glyphicon-remove"></span></button>
+						</div>
+					</div>
+					<div class="row ng-hide" ng-show="showUserPhotoError" style="">
+						<div class="col-xs-12 col-md-12">
+							<alert type="'danger'" close="showUserPhotoError = false"><h4 style="margin-bottom: 0px;">{{photoErrorMessage}}</h4></alert>
 						</div>
 					</div>
 				</div>

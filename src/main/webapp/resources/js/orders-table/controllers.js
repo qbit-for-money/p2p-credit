@@ -31,11 +31,11 @@ orderModule.controller("OrdersController", function($scope, ordersResource, user
 			var exp = $interpolate(template);
 			var disabled = false;
 			for (var i in datarecord.responses) {
-				if(datarecord.responses[i].userPublicKey === userService.get().publicKey) {
+				if (datarecord.responses[i].userPublicKey === userService.get().publicKey) {
 					disabled = true;
 				}
 			}
-			
+
 			var context = {
 				name: datarecord.userName,
 				imgurl: imgurl,
@@ -64,35 +64,37 @@ orderModule.controller("OrdersController", function($scope, ordersResource, user
 	});
 	function initTable(categories, languages) {
 		angular.element("#orders-table").jqxGrid(
-			{
-				theme: "bootstrap",
-				width: '100%',
-				source: dataAdapter,
-				pageable: true,
-				sortable: true,
-				showfilterrow: true,
-				filterable: true,
-				virtualmode: true,
-				rendergridrows: function() {
-					return dataAdapter.records;
-				},
-				rowdetails: true,
-				rowdetailstemplate: {rowdetails: "<div style='margin: 10px;'></div>", rowdetailsheight: 300},
-				initrowdetails: initRowDetails,
-				columns: [
-					{text: "Categories", dataField: "categories", columntype: 'textbox', filtertype: 'checkedlist', filteritems: categories, filtercondition: 'starts_with', width: '140px', sortable: false, cellclassname: cellclassname},
-					{text: "Languages", dataField: "languages", columntype: 'textbox', filtertype: 'checkedlist', filteritems: languages, width: '150px', sortable: false, cellclassname: cellclassname},
-					{text: "Take", dataField: "takingCurrency", filtertype: 'textbox', width: '85px', cellclassname: cellclassname},
-					{text: "Give", dataField: "givingCurrency", filtertype: 'textbox', width: '85px', cellclassname: cellclassname},
-					{text: "Duration", dataField: "duration", filtertype: 'number', width: '80px', cellclassname: cellclassname},
-					{text: "Rating", dataField: "summaryRating", columntype: 'textbox', filtertype: 'textbox', width: '60px', cellclassname: cellclassname},
-					{text: "Openness rating", dataField: "opennessRating", columntype: 'textbox', filtertype: 'textbox', width: '120px', cellclassname: cellclassname},
-					{text: "Orders", dataField: "ordersSumValue", columntype: 'textbox', filtertype: 'textbox', cellclassname: cellclassname, width: '60px'},
-					{text: "Success value", dataField: "successValue", filtertype: 'textbox', cellclassname: cellclassname, width: '150px'},
-					{text: "Partners rating", dataField: "partnersRating", columntype: 'textbox', filtertype: 'textbox', width: '100px', cellclassname: cellclassname},
-					{text: "Booking deadline", dataField: "endDate", filtertype: 'date', width: '120px', cellclassname: cellclassname, cellsformat: 'd'}
-				]
-			});
+				{
+					theme: "bootstrap",
+					width: '100%',
+					source: dataAdapter,
+					pageable: true,
+					sortable: true,
+					showfilterrow: true,
+					filterable: true,
+					columnsresize: true,
+					columnsreorder: true,
+					virtualmode: true,
+					rendergridrows: function() {
+						return dataAdapter.records;
+					},
+					rowdetails: true,
+					rowdetailstemplate: {rowdetails: "<div style='margin: 10px;'></div>", rowdetailsheight: 300},
+					initrowdetails: initRowDetails,
+					columns: [
+						{text: "Categories", dataField: "categories", columntype: 'textbox', filtertype: 'checkedlist', filteritems: categories, filtercondition: 'starts_with', width: '140px', sortable: false, cellclassname: cellclassname},
+						{text: "Languages", dataField: "languages", columntype: 'textbox', filtertype: 'checkedlist', filteritems: languages, width: '150px', sortable: false, cellclassname: cellclassname},
+						{text: "Take", dataField: "takingCurrency", filtertype: 'textbox', width: '85px', cellclassname: cellclassname},
+						{text: "Give", dataField: "givingCurrency", filtertype: 'textbox', width: '85px', cellclassname: cellclassname},
+						{text: "Duration", dataField: "duration", filtertype: 'number', width: '80px', cellclassname: cellclassname},
+						{text: "Rating", dataField: "summaryRating", columntype: 'textbox', filtertype: 'textbox', width: '60px', cellclassname: cellclassname},
+						{text: "Openness rating", dataField: "opennessRating", columntype: 'textbox', filtertype: 'textbox', width: '120px', cellclassname: cellclassname},
+						{text: "Orders", dataField: "ordersSumValue", columntype: 'textbox', filtertype: 'textbox', cellclassname: cellclassname, width: '60px'},
+						{text: "Success value", dataField: "successValue", filtertype: 'textbox', cellclassname: cellclassname, width: '150px'},
+						{text: "Partners rating", dataField: "partnersRating", columntype: 'textbox', filtertype: 'textbox', width: '100px', cellclassname: cellclassname},
+						{text: "Booking deadline", dataField: "endDate", filtertype: 'date', width: '120px', cellclassname: cellclassname, cellsformat: 'd'}
+					]
+				});
 	}
 
 	$scope.openCommentDialog = function(orderId) {
@@ -114,10 +116,10 @@ orderModule.controller("OrdersController", function($scope, ordersResource, user
 		});
 		modalInstance.result.then(function() {
 		},
-			function() {
-				angular.element("#contentorders-table > div.jqx-grid-content.jqx-grid-content-bootstrap.jqx-widget-content.jqx-widget-content-bootstrap > div.jqx-enableselect.jqx-widget-content.jqx-widget-content-bootstrap").removeClass("static-position");
-				angular.element("#contentuser-orders-table > div.jqx-grid-content.jqx-grid-content-bootstrap.jqx-widget-content.jqx-widget-content-bootstrap > div.jqx-enableselect.jqx-widget-content.jqx-widget-content-bootstrap").removeClass("static-position");
-			});
+				function() {
+					angular.element("#contentorders-table > div.jqx-grid-content.jqx-grid-content-bootstrap.jqx-widget-content.jqx-widget-content-bootstrap > div.jqx-enableselect.jqx-widget-content.jqx-widget-content-bootstrap").removeClass("static-position");
+					angular.element("#contentuser-orders-table > div.jqx-grid-content.jqx-grid-content-bootstrap.jqx-widget-content.jqx-widget-content-bootstrap > div.jqx-enableselect.jqx-widget-content.jqx-widget-content-bootstrap").removeClass("static-position");
+				});
 	};
 });
 
@@ -125,7 +127,7 @@ orderModule.controller("CommentDialogController", function($scope, addResponse, 
 	$scope.comment = "";
 	$scope.addResponse = addResponse;
 	$scope.orderId = orderId;
-	
+
 	$scope.save = function(comment) {
 		addResponse(orderId, comment);
 		$modalInstance.close();

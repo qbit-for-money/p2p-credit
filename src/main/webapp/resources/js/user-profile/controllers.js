@@ -9,6 +9,10 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 	var resultX2 = PHOTO_MIN_WIDTH;
 	var resultY1 = 0;
 	var resultY2 = PHOTO_MIN_HEIGHT;
+	var errorMessages = {};
+	errorMessages["MIN_SIZE"] = "User photo size should be greater than 400x300.";
+	errorMessages["MAX_SIZE"] = "User photo size should be less than 2000x2000.";
+	errorMessages["IMAGE_TYPE"] = "Image type should be .jpg.";
 	$scope.edit = false;
 	$scope.editAdditional = false;
 	$scope.editedPassport = false;
@@ -117,10 +121,10 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			$scope.userPropertiesMap['languagesEnabled'] = (userProfileResponse.languagesEnabled === true) ? visible : notVisible;
 
 			if (userProfileResponse.languages) {
-				if($scope.orderCreatingMap['orderLanguages']) {
+				if ($scope.orderCreatingMap['orderLanguages']) {
 					$scope.orderCreatingMap['orderLanguages'].splice(0, $scope.orderCreatingMap['orderLanguages'].length);
 				}
-				if($scope.userPropertiesMap['languages']) {
+				if ($scope.userPropertiesMap['languages']) {
 					$scope.userPropertiesMap['languages'].splice(0, $scope.userPropertiesMap['languages'].length);
 				}
 				var languages = "";
@@ -489,7 +493,9 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 				$scope.userPropertiesMap['personalData'] = $sce.trustAsHtml(defaultPersonalData);
 			}
 		} else if ($scope.isCurrentUser && $scope.edit) {
-			CKEDITOR.instances.personalEditable.setData($scope.userPropertiesMap['personalData'].toString());
+			if ($scope.userPropertiesMap['personalData']) {
+				CKEDITOR.instances.personalEditable.setData($scope.userPropertiesMap['personalData'].toString());
+			}
 		}
 	}
 
@@ -514,14 +520,14 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			} else if (!$scope.editAdditional) {
 				$scope.userPropertiesMap['bkiData'] = $sce.trustAsHtml(defaultPersonalData);
 			}
-		} else if ($scope.isCurrentUser && $scope.editAdditional) {
+		} else if ($scope.isCurrentUser && $scope.editAdditional && $scope.userPropertiesMap['bkiData']) {
 			CKEDITOR.instances.bkiEditable.setData($scope.userPropertiesMap['bkiData'].toString());
 		}
 	}
 
 	$scope.savePersonalPage = function() {
 		var data = CKEDITOR.instances.personalEditable.getData();
-		if (data !== $scope.userPropertiesMap['personalData'].toString()) {
+		if (!$scope.userPropertiesMap['personalData'] || data !== $scope.userPropertiesMap['personalData'].toString()) {
 			$scope.userPropertiesMap['personalData'] = $sce.trustAsHtml(data);
 		}
 		$scope.endEditing();
@@ -529,7 +535,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 
 	$scope.saveAdditionalData = function() {
 		var data = CKEDITOR.instances.bkiEditable.getData();
-		if (data !== $scope.userPropertiesMap['bkiData'].toString()) {
+		if (!$scope.userPropertiesMap['bkiData'] || data !== $scope.userPropertiesMap['bkiData'].toString()) {
 			$scope.userPropertiesMap['bkiData'] = $sce.trustAsHtml(data);
 		}
 		$scope.updateProfile();
@@ -738,7 +744,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 	angular.element(document).on("focus", "#name", function() {
 		angular.element(this).mask("SSSSSSSSSSSSSSSSSSSSSSSSSSS",
 				{'translation': {
-						S: {pattern: /[A-Za-zА-Яа-я0-9]/}
+						S: {pattern: /[A-Za-zА-Яа-я0-9\s]/}
 					}});
 	});
 	/*angular.element(document).on("focus", "#mail", function() {
@@ -763,18 +769,33 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 					ias.update();
 				});
 	};
+	function loadImageError() {
+		$scope.showUserPhotoError = true;
+		$scope.imageSrc = null;
+		$scope.editUserPhoto = false;
+		return;
+	}
 	$scope.getFile = function(file) {
 		$scope.editUserPhoto = true;
+		$scope.showUserPhotoError = false;
 		fileReader.readAsDataUrl(file, $scope)
 				.then(function(result) {
 					$scope.imageSrc = result;
 					var imag = new Image();
 					imag.src = $scope.imageSrc;
-					if ((imag.width > PHOTO_MAX_WIDTH) || (imag.height > PHOTO_MAX_HEIGHT) || (imag.width < PHOTO_MIN_WIDTH) || (imag.height < PHOTO_MIN_HEIGHT)) {
-						$scope.imageSrc = null;
-						$scope.editUserPhoto = false;
-						return;
+					if ((imag.width > PHOTO_MAX_WIDTH) || (imag.height > PHOTO_MAX_HEIGHT)) {
+						$scope.photoErrorMessage = errorMessages["MAX_SIZE"];
+						loadImageError();
 					}
+					if ((imag.width < PHOTO_MIN_WIDTH) || (imag.height < PHOTO_MIN_HEIGHT)) {
+						$scope.photoErrorMessage = errorMessages["MIN_SIZE"];
+						loadImageError();
+					}
+					if ((!$scope.imageSrc) || ($scope.imageSrc.indexOf("jpg") === -1) || ($scope.imageSrc.indexOf("jpeg") === -1)) {
+						$scope.photoErrorMessage = errorMessages["IMAGE_TYPE"];
+						loadImageError();
+					}
+
 					setTimeout(function() {
 						var elementWidth = angular.element("#user-photo-change").width();
 						var ratio = imag.width / elementWidth;
@@ -821,6 +842,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		ias.update();
 		$scope.imageSrc = null;
 		$scope.editUserPhoto = false;
+		$scope.showUserPhotoError = false;
 	};
 	$scope.deleteUserPhoto = function() {
 		var userPhotoRequest = {};
