@@ -340,6 +340,7 @@ public class OrdersResource {
 	@Path("last")
 	@Produces(MediaType.APPLICATION_JSON)
 	public OrdersWrapper getLast(SearchRequest ordersRequest) {
+		writeLastOrders();
 		return readLastOrders();
 	}
 
