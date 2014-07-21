@@ -1,5 +1,5 @@
 <script id="responsesTmpl" type="text/x-angular-tmpl">
-<li class="list-group-item">
+<li class="list-group-item" id="{{userId}}">
 
 	<div class="row">
 		<div class="col-xs-3 col-md-2">
@@ -19,8 +19,8 @@
 		</div>
 		<div class="col-xs-6 col-md-7" ng-if="{{isAttributes}}">
 			<div class='container-fluid'>
-				<div class='col-xs-12 col-md-12' style='margin: 6px;'>
-					Name: {{name}}
+				<div class='col-xs-12 col-md-12' style='margin: 6px;' id='name'>
+					Name: <span></span>{{name}}
 				</div>
 			</div>
 			<div class='container-fluid'>

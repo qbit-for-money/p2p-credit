@@ -39,8 +39,8 @@ orderModule.controller("OrdersController", function($scope, ordersResource, user
 			var context = {
 				name: datarecord.userName,
 				imgurl: imgurl,
-				languages: datarecord.userLanguages,
-				currencies: datarecord.userCurrencies,
+				languages: (datarecord.userLanguages) ? datarecord.userLanguages : "",
+				currencies: (datarecord.userCurrencies) ? datarecord.userLanguages : "",
 				userurl: userurl,
 				mail: datarecord.userMail,
 				phone: datarecord.userPhone,
@@ -60,7 +60,7 @@ orderModule.controller("OrdersController", function($scope, ordersResource, user
 
 	var dataAdapter = new $.jqx.dataAdapter(getSource("webapi/orders/withFilter", "#orders-table"), getAdapterFields());
 	angular.element("#orders-table").on("bindingComplete", function(event) {
-		console.log("BIND")
+		
 	});
 	function initTable(categories, languages) {
 		angular.element("#orders-table").jqxGrid(
