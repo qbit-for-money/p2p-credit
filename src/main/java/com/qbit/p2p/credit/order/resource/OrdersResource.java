@@ -340,6 +340,7 @@ public class OrdersResource {
 	@Path("last")
 	@Produces(MediaType.APPLICATION_JSON)
 	public OrdersWrapper getLast(SearchRequest ordersRequest) {
+		writeLastOrders();
 		return readLastOrders();
 	}
 
@@ -362,10 +363,11 @@ public class OrdersResource {
 		ordersRequest.setPageNumber(0);
 		ordersRequest.setPageSize(4);
 		//OrdersWrapper wrapper1 = getOrdersFromDB(ordersRequest, null);
-		orderDAO.getPartnersRating3();
+		//orderDAO.getPartnersRating3();
 		orderDAO.getPartnersRating("alex.qbit9@gmail.com");
 		orderDAO.getPartnersRating("ivan.fly.666@gmail.com");
 		orderDAO.getPartnersRating("aleksashka6666@gmail.com");
+		
 		//System.out.println("??????????????????????????????????????????????????? " + orderDAO.getPartnersRating("aleksashka6666@gmail.com"));
 		ObjectMapper mapper = new ObjectMapper();
 		OrdersWrapper wrapper = null;

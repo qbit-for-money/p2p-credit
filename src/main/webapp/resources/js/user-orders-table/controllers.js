@@ -39,14 +39,13 @@ orderModule.controller("UserOrdersController", function($scope, $rootScope, $int
 			 
 			 });*/
 			for (var i in datarecord.responses) {
-				console.log(datarecord.responses[i].id)
 				var publicKey = datarecord.responses[i].userPublicKey;
 				datarecord.responses[i].imgurl = window.context + "webapi/profiles/" + publicKey + "/photo";
 				datarecord.responses[i].userurl = window.context + "#/users/" + publicKey;
 
 				var responsesTemplate = angular.element("#responsesTmpl").text();
 				var responsesExp = $interpolate(responsesTemplate);
-				console.log((datarecord.approvedResponseId) ? true : false)
+				
 
 
 
@@ -64,7 +63,8 @@ orderModule.controller("UserOrdersController", function($scope, $rootScope, $int
 					userId: publicKey,
 					approvedResponseId: datarecord.approvedResponseId,
 					orderStatus: datarecord.status,
-					status: (datarecord.approvedResponseId) ? true : false
+					status: (datarecord.approvedResponseId) ? true : false,
+					isApprovedResponse: (datarecord.approvedResponseId === datarecord.responses[i].id) ? true : false
 							//openCommentDialog: openCommentDialog
 				};
 				var responseContent = responsesExp(responsesContext);

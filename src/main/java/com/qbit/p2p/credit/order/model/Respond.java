@@ -42,7 +42,7 @@ public class Respond implements Identifiable<String>, Serializable {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@XmlTransient
+	//@XmlTransient
 	private String id;
 	private String userPublicKey;
 	private String userName;

@@ -1,5 +1,4 @@
 var userProfileModule = angular.module("user-profile");
-
 userProfileModule.controller("UserProfileController", function($scope, $rootScope, $modal, $location, usersResource, userService, usersProfileResource, currencyResource, categoriesResource, ordersResource, fileReader, $timeout, $sce, authService, userProfileService, languagesResource) {
 	var PHOTO_MIN_HEIGHT = 400;
 	var PHOTO_MIN_WIDTH = 300;
@@ -23,7 +22,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 	$scope.hasFocus = false;
 	$scope.isCurrentUser = false;
 	$scope.isOrdersFormOpening = false;
-
 	var currenciesMap = {};
 	$scope.scEditor = {};
 	$scope.scEditor.dataInitialized = false;
@@ -35,7 +33,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 	var userPublicKeyFromPath = $location.$$path.replace("/users/", "");
 	var userProfileResponse;
 	$scope.currentUser = usersResource.current({});
-
 	$scope.categories = {};
 	$scope.categories.allCategories = [];
 	$scope.languages = {};
@@ -48,7 +45,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 	$scope.userPropertiesMap['currencies'] = [];
 	$scope.userPropertiesMap['languages'] = [];
 	$scope.createOrderButtonEnabled = false;
-
 	$scope.currenciesSelect2Options = {
 		allowClear: true,
 		tags: allCurrencies,
@@ -57,7 +53,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		maximumSelectionSize: 20,
 		maximumInputLength: 20
 	};
-
 	$scope.categorySelect2Options = {
 		allowClear: true,
 		tags: $scope.categories.allCategories,
@@ -88,7 +83,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			}
 		}
 	};
-
 	$scope.currentUser.$promise.then(function() {
 		if (!$scope.currentUser.publicKey) {
 			authService.openAuthDialog(true, false, "/users/" + userPublicKeyFromPath);
@@ -110,7 +104,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		reloadAllCurrencies();
 		reloadData();
 	});
-
 	function reloadData() {
 		userProfileResponse.$promise.then(function() {
 			$scope.userPropertiesMap['name'] = userProfileResponse.name;
@@ -119,7 +112,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			$scope.userPropertiesMap['phone'] = userProfileResponse.phone;
 			$scope.userPropertiesMap['phoneEnabled'] = (userProfileResponse.phoneEnabled === true) ? visible : notVisible;
 			$scope.userPropertiesMap['languagesEnabled'] = (userProfileResponse.languagesEnabled === true) ? visible : notVisible;
-
 			if (userProfileResponse.languages) {
 				if ($scope.orderCreatingMap['orderLanguages']) {
 					$scope.orderCreatingMap['orderLanguages'].splice(0, $scope.orderCreatingMap['orderLanguages'].length);
@@ -167,7 +159,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			$scope.userPropertiesMap['personalDataEnabled'] = (userProfileResponse.personalDataEnabled === true) ? visible : notVisible;
 			$scope.userPropertiesMap['bkiData'] = $sce.trustAsHtml(userProfileResponse.bkiData);
 			$scope.userPhotoSrc = window.context + "webapi/profiles/" + userProfileResponse.publicKey + "/photo";
-
 			var categoriesResponse = categoriesResource.findAll();
 			categoriesResponse.$promise.then(function() {
 				$scope.categories.allCategories.splice(0, $scope.categories.allCategories.length);
@@ -175,8 +166,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 					$scope.categories.allCategories.push(categoriesResponse.categories[i].title);
 				}
 			});
-
-
 			var languagesResponse = languagesResource.findAll();
 			languagesResponse.$promise.then(function() {
 				$scope.languages.allLanguages.splice(0, $scope.languages.allLanguages.length);
@@ -184,10 +173,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 					$scope.languages.allLanguages.push(languagesResponse.languages[i].title);
 				}
 			});
-
-
-
-
 			if ($scope.edit) {
 				startEditing();
 			}
@@ -245,17 +230,14 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			}
 		}
 	};
-
 	$scope.initOrdersCreation = function() {
 		if (!$scope.isOrdersFormOpening) {
 			$scope.isOrdersFormOpening = true;
 			initOrderckEditor();
-
 			$timeout(function() {
 
 				currenciesMap[orderCurrencies[0]] = {};
 				currenciesMap[orderCurrencies[0]].max = 0;
-
 				angular.element('#take-currency-type').jqxDropDownList({source: orderCurrencies, autoDropDownHeight: true, selectedIndex: 1, width: '84%', height: '20px'});
 				angular.element('#take-currency-type').on('select', function(event) {
 					var index = event.args.index;
@@ -278,7 +260,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 				});
 				angular.element("#take-input").jqxNumberInput({width: '100%', height: '25px', symbol: orderCurrencies[1], min: 0.01, max: currenciesMap[orderCurrencies[1]].max, digits: getDigits(currenciesMap[orderCurrencies[1]].max), spinButtons: true, negativeSymbol: '-'});
 				angular.element("#take-input").on('change', $scope.isValidOrder);
-
 				angular.element('#give-currency-type').jqxDropDownList({source: orderCurrencies, autoDropDownHeight: true, selectedIndex: 1, width: '84%', height: '20px'});
 				angular.element('#give-currency-type').on('select', function(event) {
 					var index = event.args.index;
@@ -317,16 +298,13 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			$scope.isOrdersFormOpening = false;
 		}
 	};
-
 	$scope.isValidDateInput = function() {
 		return angular.element("#deadline").val() !== "";
 	};
-
 	$scope.isValidTakingInput = function() {
 		var val = angular.element("#take-input").jqxNumberInput('val');
 		return val !== "" && val > 0;
 	};
-
 	$scope.isValidOrder = function() {
 		if (!$scope.isOrdersFormOpening) {
 			$scope.createOrderButtonEnabled = false;
@@ -352,11 +330,9 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		}
 		return $scope.createOrderButtonEnabled;
 	};
-
 	function clearOrder() {
 		CKEDITOR.instances.orderDataEditable.setData("");
 		angular.element("#deadline").val("");
-
 		angular.element("#take-input").jqxNumberInput("clear");
 		angular.element("#give-input").jqxNumberInput("clear");
 		angular.element("#duration-input").jqxNumberInput("val", "");
@@ -431,11 +407,8 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 
 			$scope.updateProfile();
 			$scope.isOrdersFormOpening = false;
-
-
 		});
 	};
-
 	function addItems(destArray, original) {
 		if (!destArray || !original) {
 			return;
@@ -532,7 +505,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		}
 		$scope.endEditing();
 	};
-
 	$scope.saveAdditionalData = function() {
 		var data = CKEDITOR.instances.bkiEditable.getData();
 		if (!$scope.userPropertiesMap['bkiData'] || data !== $scope.userPropertiesMap['bkiData'].toString()) {
@@ -540,7 +512,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		}
 		$scope.updateProfile();
 	};
-
 	$scope.editProfile = function() {
 		if ($scope.disabledEditButton) {
 			return;
@@ -556,7 +527,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		}
 		disableEditButton();
 	};
-
 	$scope.editAdditionalProfile = function() {
 		if ($scope.disabledEditButton) {
 			return;
@@ -573,9 +543,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		}
 		disableEditButton();
 	};
-
-
-
 	function disableEditButton() {
 		$scope.disabledEditButton = true;
 		$timeout(function() {
@@ -595,7 +562,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			languages = languages.substring(0, languages.length - 2);
 		}
 		$scope.userPropertiesMap['languagesStr'] = languages;
-
 		var currenciesStr = "";
 		for (var i in $scope.userPropertiesMap['currencies']) {
 			languages += $scope.userPropertiesMap['currencies'][i] + ", "
@@ -605,9 +571,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		}
 		$scope.userPropertiesMap['currenciesStr'] = currenciesStr;
 		$scope.updateProfile();
-
 	};
-
 	function startEditing() {
 		if ($scope.currencies) {
 			$scope.currencies += ", ";
@@ -626,7 +590,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			$scope.userPropertiesMap[propertyName] = visible;
 		}
 	};
-
 	$scope.editSocialLinks = function() {
 		if ($scope.socialLinksEdited === false) {
 			$scope.socialLinksEdited = true;
@@ -634,7 +597,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			$scope.socialLinksEdited = false;
 		}
 	};
-
 	$scope.editPhones = function() {
 		if ($scope.phonesEdited === false) {
 			$scope.phonesEdited = true;
@@ -642,7 +604,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			$scope.phonesEdited = false;
 		}
 	};
-
 	$scope.editPassport = function() {
 		if ($scope.editedPassport === false) {
 			$scope.editedPassport = true;
@@ -651,10 +612,8 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			$scope.updateProfile();
 		}
 	};
-
 	$scope.updateProfile = function() {
 		disableEditButton();
-
 		var userPublicProfile = {};
 		userPublicProfile.name = $scope.userPropertiesMap['name'];
 		userPublicProfile.phone = $scope.userPropertiesMap['phone'];
@@ -666,7 +625,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 
 		userPublicProfile.mail = $scope.userPropertiesMap['mail'];
 		userPublicProfile.mailEnabled = ($scope.userPropertiesMap['mailEnabled'] === visible) ? true : false;
-
 		if ($scope.userPropertiesMap['personalDataEnabled'] === visible) {
 			userPublicProfile.personalDataEnabled = true;
 		} else {
@@ -675,7 +633,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 
 		userPublicProfile.personalData = ($scope.userPropertiesMap['personalData']) ? $scope.userPropertiesMap['personalData'].toString() : null;
 		userPublicProfile.bkiData = ($scope.userPropertiesMap['bkiData']) ? $scope.userPropertiesMap['bkiData'].toString() : null;
-
 		if ($scope.userPropertiesMap['languages'] && ($scope.userPropertiesMap['languages'].length !== null)) {
 			userPublicProfile.languages = [];
 			for (var i in $scope.userPropertiesMap['languages']) {
@@ -730,17 +687,14 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			userPublicProfile.namesLinks.push(link);
 		}
 		userPublicProfile.passportEnabled = $scope.userPropertiesMap['passportEnabled'];
-
 		userProfileResponse = usersProfileResource.updatePublicProfile({}, userPublicProfile);
 		userProfileResponse.$promise.then(function() {
 			reloadData();
 			angular.element('#user-orders-table').jqxGrid('updatebounddata');
 			angular.element('#orders-table').jqxGrid('updatebounddata');
 		});
-
 		//var userPrivateProfile = {};
 	};
-
 	angular.element(document).on("focus", "#name", function() {
 		angular.element(this).mask("SSSSSSSSSSSSSSSSSSSSSSSSSSS",
 				{'translation': {
@@ -773,49 +727,51 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		$scope.showUserPhotoError = true;
 		$scope.imageSrc = null;
 		$scope.editUserPhoto = false;
+		$scope.$apply();
 		return;
 	}
 	$scope.getFile = function(file) {
 		$scope.editUserPhoto = true;
 		$scope.showUserPhotoError = false;
-		fileReader.readAsDataUrl(file, $scope)
-				.then(function(result) {
-					$scope.imageSrc = result;
-					var imag = new Image();
-					imag.src = $scope.imageSrc;
-					if ((imag.width > PHOTO_MAX_WIDTH) || (imag.height > PHOTO_MAX_HEIGHT)) {
-						$scope.photoErrorMessage = errorMessages["MAX_SIZE"];
-						loadImageError();
-					}
-					if ((imag.width < PHOTO_MIN_WIDTH) || (imag.height < PHOTO_MIN_HEIGHT)) {
-						$scope.photoErrorMessage = errorMessages["MIN_SIZE"];
-						loadImageError();
-					}
-					if ((!$scope.imageSrc) || ($scope.imageSrc.indexOf("jpg") === -1) || ($scope.imageSrc.indexOf("jpeg") === -1)) {
-						$scope.photoErrorMessage = errorMessages["IMAGE_TYPE"];
-						loadImageError();
-					}
+		fileReader.readAsDataUrl(file, $scope).then(function(result) {
+			$scope.imageSrc = result;
+			var imag = new Image();
+			imag.onload = function() {
 
-					setTimeout(function() {
-						var elementWidth = angular.element("#user-photo-change").width();
-						var ratio = imag.width / elementWidth;
-						angular.element('#user-photo-change').imgAreaSelect({
-							aspectRatio: '3:4',
-							handles: true,
-							minWidth: elementWidth / ratio,
-							x1: 0, y1: 0, x2: 80, y2: 105,
-							onSelectEnd: function(img, selection) {
+				if ((result.indexOf("jpg") === -1)
+						&& (result.indexOf("jpeg") === -1)) {
+					$scope.photoErrorMessage = errorMessages["IMAGE_TYPE"];
+					loadImageError();
+				}
+				if ((imag.width > PHOTO_MAX_WIDTH) || (imag.height > PHOTO_MAX_HEIGHT)) {
+					$scope.photoErrorMessage = errorMessages["MAX_SIZE"];
+					loadImageError();
+				}
+				if ((imag.width < PHOTO_MIN_WIDTH) || (imag.height < PHOTO_MIN_HEIGHT)) {
+					$scope.photoErrorMessage = errorMessages["MIN_SIZE"];
+					loadImageError();
+				}
 
-								resultX1 = Math.floor(selection.x1 * ratio);
-								resultX2 = Math.floor(selection.x2 * ratio);
-								resultY1 = Math.floor(selection.y1 * ratio);
-								resultY2 = Math.floor(selection.y2 * ratio);
-								resultX2 = (resultX2 - resultX1 > 800) ? (resultX1 + 800) : resultX2;
-								resultY2 = (resultY2 - resultY1 > 800) ? (resultY1 + 800) : resultY2;
-							}
-						});
-					}, 150);
+				var elementWidth = angular.element("#user-photo-change").width();
+				var ratio = imag.width / elementWidth;
+				angular.element('#user-photo-change').imgAreaSelect({
+					aspectRatio: '3:4',
+					handles: true,
+					minWidth: elementWidth / ratio,
+					x1: 0, y1: 0, x2: 80, y2: 105,
+					onSelectEnd: function(img, selection) {
+
+						resultX1 = Math.floor(selection.x1 * ratio);
+						resultX2 = Math.floor(selection.x2 * ratio);
+						resultY1 = Math.floor(selection.y1 * ratio);
+						resultY2 = Math.floor(selection.y2 * ratio);
+						resultX2 = (resultX2 - resultX1 > 800) ? (resultX1 + 800) : resultX2;
+						resultY2 = (resultY2 - resultY1 > 800) ? (resultY1 + 800) : resultY2;
+					}
 				});
+			};
+			imag.src = $scope.imageSrc;
+		});
 	};
 	$scope.saveUserPhoto = function() {
 
@@ -826,7 +782,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		userPhotoRequest.endPoint.x = resultX2;
 		userPhotoRequest.startPoint.y = resultY1;
 		userPhotoRequest.endPoint.y = resultY2;
-
 		var data = $scope.imageSrc.replace(/^data:image\/(png|jpg|jpeg);base64,/, "");
 		userPhotoRequest.imageString = data;
 		var userPhotoResponse = usersProfileResource.setUserPhoto({}, userPhotoRequest);
@@ -854,7 +809,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			}, 100);
 		});
 	};
-
 	$scope.collapse = function(id) {
 		if (angular.element(id).hasClass("in")) {
 			angular.element(id).collapse("hide");

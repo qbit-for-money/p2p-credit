@@ -19,6 +19,7 @@ import com.qbit.p2p.credit.user.dao.UserProfileDAO;
 import com.qbit.p2p.credit.user.model.Language;
 import com.qbit.p2p.credit.user.model.UserPublicProfile;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -36,6 +37,7 @@ import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Selection;
 import javax.persistence.criteria.Subquery;
 import javax.persistence.metamodel.EntityType;
 import javax.ws.rs.WebApplicationException;
@@ -296,7 +298,7 @@ public class OrderDAO {
 			criteria = builder.createQuery(OrderInfo.class);
 			Root<OrderInfo> order = criteria.from(OrderInfo.class);
 			CriteriaQuery<Object> select = criteria.select(order).distinct(true);
-			criteria = formCriteria(criteria, builder, order, select, type, userPublicKey, filterCriteriaValue, profile);
+			criteria = formCriteria(criteria, builder, order, select, type, userPublicKey, filterCriteriaValue, profile, entityManager);
 
 			String sortDataField = filterCriteriaValue.getSortDataField();
 			if (sortDesc && sortDataField != null && !sortDataField.isEmpty()) {
@@ -332,7 +334,7 @@ public class OrderDAO {
 			Root<OrderInfo> order = criteria.from(OrderInfo.class);
 
 			CriteriaQuery<Object> select = criteria.select(builder.countDistinct(order));
-			criteria = formCriteria(criteria, builder, order, select, type, userPublicKey, filterCriteriaValue, profile);
+			criteria = formCriteria(criteria, builder, order, select, type, userPublicKey, filterCriteriaValue, profile, entityManager);
 
 			return (Long) entityManager.createQuery(criteria).getSingleResult();
 		} finally {
@@ -341,7 +343,7 @@ public class OrderDAO {
 	}
 
 	private CriteriaQuery formCriteria(CriteriaQuery criteria, CriteriaBuilder builder, Root<OrderInfo> order, CriteriaQuery<Object> select,
-		EntityType<OrderInfo> type, String userPublicKey, SearchRequest filterCriteriaValue, UserPublicProfile profile) {
+		EntityType<OrderInfo> type, String userPublicKey, SearchRequest filterCriteriaValue, UserPublicProfile profile, EntityManager entityManager) {
 		Predicate mainOperatorPredicate = null;
 		if ((userPublicKey != null) && !userPublicKey.isEmpty()) {
 			Expression<String> typeExpression = order.get("userPublicKey");
@@ -470,40 +472,17 @@ public class OrderDAO {
 							 Predicate valuePredicate1 = builder.in(order.get("userPublicKey")).value(subquery);*/
 							Expression<Collection<String>> e = order.get("responses").get("id");
 							valuePredicate = builder.greaterThanOrEqualTo(builder.count(e), Long.parseLong(item.getFilterValue()));
-							//subquery.where(builder.ge(fromUserPublicProfile.get("pint"),30000));
-							//valuePredicate = builder.greaterThanOrEqualTo(order.<Date>get(item.getFilterDataField()), DateUtil.stringToDate(item.getFilterValue()));
 						} else if ("partnersRating".equals(item.getFilterDataField())) {
 
-							Subquery<Long> criteria1 = criteria.subquery(Long.class);
-							Root<UserPublicProfile> orderProfile = criteria1.from(UserPublicProfile.class);
-							criteria.select(orderProfile.get("statistic").get("summaryRating"));
-
-							criteria1.select(builder.countDistinct(orderProfile.get("statistic").get("summaryRating")));
-							Expression<Long> ex = orderProfile.get("statistic").get("summaryRating");
-							criteria1.select(builder.sum(ex));
-							//criteria.select(builder.sumAsLong(profile.get("statistic").get("summaryRating")));
-
-							Subquery<String> usersIdSubquery = criteria1.subquery(String.class);
-							Root fromResponse = usersIdSubquery.from(Respond.class);
-							usersIdSubquery.select(fromResponse.get("userPublicKey")).distinct(true);
-
-							Subquery<String> subquery = usersIdSubquery.subquery(String.class);
-							Root fromOrderInfo = subquery.from(OrderInfo.class);
-							subquery.select(fromOrderInfo.get("approvedResponseId"));
-
-							Predicate p1 = builder.and(builder.equal(fromOrderInfo.get("userPublicKey"), order.get("userPublicKey")), builder.equal(fromOrderInfo.get("status"), OrderStatus.SUCCESS));
-							subquery.where(p1);
-
-							Predicate p2 = builder.in(fromResponse.get("id")).value(subquery);
-							usersIdSubquery.where(p2);
-
-							Predicate p3 = builder.in(orderProfile.get("publicKey")).value(usersIdSubquery);
-							criteria.where(p3);
-
-							//Expression<Collection<String>> e = order.get("responses").get("id");
-							valuePredicate = builder.greaterThanOrEqualTo(builder.sum(ex), Long.parseLong(item.getFilterValue()));
-							//subquery.where(builder.ge(fromUserPublicProfile.get("pint"),30000));
-							//valuePredicate = builder.greaterThanOrEqualTo(order.<Date>get(item.getFilterDataField()), DateUtil.stringToDate(item.getFilterValue()));
+							TypedQuery<String> query = entityManager.createQuery("SELECT t1.publicKey FROM UserPublicProfile t0, UserPublicProfile t1 GROUP BY t0.publicKey, t1.publicKey HAVING t0.publicKey IN (SELECT DISTINCT t2.userPublicKey FROM Respond t2 WHERE t2.id IN (SELECT t3.approvedResponseId FROM OrderInfo t3 WHERE (t3.status = :status) AND (t3.userPublicKey = t1.publicKey))) AND SUM(t0.statistic.summaryRating) >= :rating - 1", String.class);
+							query.setParameter("status", OrderStatus.SUCCESS);
+							System.out.println("***@@@@@ " + Long.parseLong(item.getFilterValue()));
+							query.setParameter("rating", Long.parseLong(item.getFilterValue()));
+							List<String> publicKeys = query.getResultList();
+							if ((publicKeys == null) || publicKeys.isEmpty()) {
+								publicKeys.add("");
+							}
+							valuePredicate = order.get("userPublicKey").in(publicKeys);
 						} else {
 							valuePredicate = builder.greaterThanOrEqualTo(order.<String>get(item.getFilterDataField()), item.getFilterValue());
 						}
@@ -598,7 +577,6 @@ public class OrderDAO {
 			} else {
 				mainOperatorPredicate = builder.and(operatorPredicate, mainOperatorPredicate);
 			}
-			//Join p = order.join("responses");
 		}
 		if (mainOperatorPredicate != null) {
 			criteria.where(mainOperatorPredicate);
@@ -614,28 +592,11 @@ public class OrderDAO {
 		try {
 			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 			CriteriaQuery<Long> criteria;
-			//EntityType<OrderInfo> type = entityManager.getMetamodel().entity(OrderInfo.class);
-
-			/*criteria = builder.createQuery(Long.class);
-			 Root<UserPublicProfile> profile = criteria.from(UserPublicProfile.class);
-			 CriteriaQuery<UserPublicProfile> select = criteria.select(profile);
-			 Subquery<UserPublicProfile> subquery = criteria.subquery(UserPublicProfile.class);*/
-			/*criteria = builder.createQuery(String.class);
-			 Root<OrderInfo> order = criteria.from(OrderInfo.class);
-			 criteria.select(order.get("approvedResponseId"));
-			 Predicate p = builder.and(builder.equal(order.get("userPublicKey"), userPublicKey), builder.equal(order.get("status"), OrderStatus.SUCCESS));
-			 criteria.where(p);*/
-			/*criteria = builder.createQuery(String.class);
-			 Root<Respond> response = criteria.from(Respond.class);
-			 criteria.select(response.get("userPublicKey")).distinct(true);*/
 			criteria = builder.createQuery(Long.class);
 			Root<UserPublicProfile> profile = criteria.from(UserPublicProfile.class);
-			//criteria.select(profile.get("statistic").get("summaryRating"));
 
-			//criteria.select(builder.countDistinct(profile.get("statistic").get("summaryRating")));
-			Expression<Long> ex = profile.get("statistic").get("summaryRating");
-			criteria.select(builder.sum(ex));
-			//criteria.select(builder.sumAsLong(profile.get("statistic").get("summaryRating")));
+			Expression<Integer> ex = profile.get("statistic").get("summaryRating");
+			criteria.select(builder.sumAsLong(ex));
 
 			Subquery<String> usersIdSubquery = criteria.subquery(String.class);
 			Root fromResponse = criteria.from(Respond.class);
@@ -651,135 +612,12 @@ public class OrderDAO {
 			Predicate p2 = builder.in(fromResponse.get("id")).value(subquery);
 			usersIdSubquery.where(p2);
 
-			Predicate p3 = builder.in(profile.get("publicKey")).value(usersIdSubquery);
+			Predicate p3 = builder.and(builder.in(profile.get("publicKey")).value(usersIdSubquery), builder.notEqual(profile.get("publicKey"), userPublicKey));
 			criteria.where(p3);
-			//Subquery<UserPublicProfile> subquery = criteria.subquery(UserPublicProfile.class);
-
-			//Root<OrderInfo> order = criteria.from(OrderInfo.class);
-			//CriteriaQuery<Object> select = criteria.select(builder.countDistinct(order));
-			//Subquery<UserPublicProfile> subquery = criteria.subquery(UserPublicProfile.class);
-			//Root fromUserPublicProfile = subquery.from(UserPublicProfile.class);
-			//subquery.select(fromUserPublicProfile.get("publicKey"));
-			//subquery.where(builder.equal(fromUserPublicProfile.get("name"), "gg"));
-			//subquery.where(builder.greaterThanOrEqualTo(fromUserPublicProfile.join("statistic").get(item.getFilterDataField()), item.getFilterValue()));
-			//valuePredicate = builder.in(order.get("userPublicKey")).value(subquery); 
-			//TypedQuery<Long> query = entityManager.createQuery("select count(u) from UserPublicProfile u where u.publicKey in (select Respond.userPublicKey from Respond where Respond.id in (select Respond.id from orderinfo_respond where orderinfo_respond.orderinfo_id in (select orderinfo.id from orderinfo where orderinfo.userpublickey = :publicKey)))", Long.class);
-			//TypedQuery<Long> query = entityManager.createQuery("select count(o.responses) from OrderInfo o", Long.class);// in (select o.id from OrderInfo o where o.userPublicKey = :publicKey)", Long.class);// where OrderInfo.id in (select o.id from OrderInfo o where o.userPublicKey = :publicKey)", Long.class);
-			//builder.createTupleQuery()
-			/*@NamedQuery(name = "UserPublicProfile.findByOrder",
-			 query = "SELECT u FROM UserPublicProfile u, OrderInfo o WHERE "
-			 + " o.userPublicKey = u.publicKey AND o.id = :orderId")})*/
-			//query.setParameter("publicKey", userPublicKey);
-			//TypedQuery<String> query = entityManager.createQuery(criteria);
-			//List<String> orders = query.getResultList();
-			//System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^: " + orders + " :^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-			TypedQuery<Long> query = entityManager.createQuery(criteria);
-			System.out.println("+++++++++++++++++ " + query.getSingleResult());
-			return 0;//entityManager.createQuery(criteria).getSingleResult();
+			Long result = entityManager.createQuery(criteria).getSingleResult();
+			return (result == null) ? 0 : result;
 		} finally {
 			entityManager.close();
 		}
 	}
-
-	public long getPartnersRating3() {
-
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		try {
-			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-			CriteriaQuery<Tuple> criteria;
-			//EntityType<OrderInfo> type = entityManager.getMetamodel().entity(OrderInfo.class);
-
-			/*criteria = builder.createQuery(Long.class);
-			 Root<UserPublicProfile> profile = criteria.from(UserPublicProfile.class);
-			 CriteriaQuery<UserPublicProfile> select = criteria.select(profile);
-			 Subquery<UserPublicProfile> subquery = criteria.subquery(UserPublicProfile.class);*/
-			/*criteria = builder.createQuery(String.class);
-			 Root<OrderInfo> order = criteria.from(OrderInfo.class);
-			 criteria.select(order.get("approvedResponseId"));
-			 Predicate p = builder.and(builder.equal(order.get("userPublicKey"), userPublicKey), builder.equal(order.get("status"), OrderStatus.SUCCESS));
-			 criteria.where(p);*/
-			/*criteria = builder.createQuery(String.class);
-			 Root<Respond> response = criteria.from(Respond.class);
-			 criteria.select(response.get("userPublicKey")).distinct(true);*/
-			//***criteria = builder.createQuery(String.class);
-			criteria = builder.createTupleQuery();
-			Root<UserPublicProfile> profile = criteria.from(UserPublicProfile.class);
-			//criteria.select(profile.get("statistic").get("summaryRating"));
-
-			//criteria.select(builder.countDistinct(profile.get("statistic").get("summaryRating")));
-			//Expression<Long> ex = profile.get("statistic").get("summaryRating");
-			
-			
-			
-			
-			
-			
-			
-			
-			Subquery<Long> criteria1 = criteria.subquery(Long.class);
-			Root<UserPublicProfile> profile1 = criteria1.from(UserPublicProfile.class);
-			Expression<Long> ex = profile1.get("statistic").get("summaryRating");
-			//criteria.select(profile.get("statistic").get("summaryRating"));
-
-			//criteria.select(builder.countDistinct(profile.get("statistic").get("summaryRating")));
-			//Expression<Long> ex = profile.get("statistic").get("summaryRating");
-			criteria1.select(builder.sum(ex));
-
-			//criteria.select(builder.sumAsLong(profile.get("statistic").get("summaryRating")));
-			Subquery<String> usersIdSubquery = criteria1.subquery(String.class);
-			Root fromResponse = criteria1.from(Respond.class);
-			usersIdSubquery.select(fromResponse.get("userPublicKey")).distinct(true);
-
-			Subquery<String> subquery = usersIdSubquery.subquery(String.class);
-			Root fromOrderInfo = subquery.from(OrderInfo.class);
-			subquery.select(fromOrderInfo.get("approvedResponseId"));
-
-			Predicate p1 = builder.and(builder.equal(fromOrderInfo.get("userPublicKey"), profile.get("publicKey")), builder.equal(fromOrderInfo.get("status"), OrderStatus.SUCCESS));
-			subquery.where(p1);
-
-			Predicate p2 = builder.in(fromResponse.get("id")).value(subquery).isNotNull();
-			usersIdSubquery.where(p2);
-
-			Predicate p3 = builder.in(profile1.get("publicKey")).value(usersIdSubquery);
-			criteria1.where(p3);
-			
-			criteria.multiselect(profile.get("publicKey"), criteria1.getSelection());
-			//Predicate p4 = builder.in(profile.get("publicKey")).value(criteria1);
-			
-			//criteria.groupBy(profile.get("publicKey"));
-			
-			Predicate and = builder.and(builder.greaterThanOrEqualTo(criteria1.getSelection(), (long) 1), builder.isNotNull(subquery.getSelection()));
-			criteria.having(and);
-			//criteria.where(builder.isNotNull(subquery.getSelection()));
-
-			List<Tuple> l = entityManager.createQuery(criteria).getResultList();
-			for (Tuple t : l) {
-				System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&& " + t.get(0) + " " + t.get(1));
-			}
-
-			//Subquery<UserPublicProfile> subquery = criteria.subquery(UserPublicProfile.class);
-			//Root<OrderInfo> order = criteria.from(OrderInfo.class);
-			//CriteriaQuery<Object> select = criteria.select(builder.countDistinct(order));
-			//Subquery<UserPublicProfile> subquery = criteria.subquery(UserPublicProfile.class);
-			//Root fromUserPublicProfile = subquery.from(UserPublicProfile.class);
-			//subquery.select(fromUserPublicProfile.get("publicKey"));
-			//subquery.where(builder.equal(fromUserPublicProfile.get("name"), "gg"));
-			//subquery.where(builder.greaterThanOrEqualTo(fromUserPublicProfile.join("statistic").get(item.getFilterDataField()), item.getFilterValue()));
-			//valuePredicate = builder.in(order.get("userPublicKey")).value(subquery); 
-			//TypedQuery<Long> query = entityManager.createQuery("select count(u) from UserPublicProfile u where u.publicKey in (select Respond.userPublicKey from Respond where Respond.id in (select Respond.id from orderinfo_respond where orderinfo_respond.orderinfo_id in (select orderinfo.id from orderinfo where orderinfo.userpublickey = :publicKey)))", Long.class);
-			//TypedQuery<Long> query = entityManager.createQuery("select count(o.responses) from OrderInfo o", Long.class);// in (select o.id from OrderInfo o where o.userPublicKey = :publicKey)", Long.class);// where OrderInfo.id in (select o.id from OrderInfo o where o.userPublicKey = :publicKey)", Long.class);
-			//builder.createTupleQuery()
-			/*@NamedQuery(name = "UserPublicProfile.findByOrder",
-			 query = "SELECT u FROM UserPublicProfile u, OrderInfo o WHERE "
-			 + " o.userPublicKey = u.publicKey AND o.id = :orderId")})*/
-			//query.setParameter("publicKey", userPublicKey);
-			//TypedQuery<String> query = entityManager.createQuery(criteria);
-			//List<String> orders = query.getResultList();
-			//System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^: " + orders + " :^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-			return 0;//(Long) entityManager.createQuery(criteria).getSingleResult();
-		} finally {
-			entityManager.close();
-		}
-	}
-
 }

@@ -47,7 +47,7 @@
 							Yes!
 						</button>
 
-						<bs-dropdown data-menu-type="button" order-id={{orderId}} ng-hide="{{(status !== true) || ((orderStatus !== 'OPENED') && (orderStatus !== 'IN PROCESS'))}}"></bs-dropdown>
+						<bs-dropdown data-menu-type="button" order-id={{orderId}} ng-hide="{{(status !== true) || ((orderStatus === 'SUCCESS') || (orderStatus === 'NOT SUCCESS') || (orderStatus === 'ARBITRATION')) || (orderStatus === 'IN PROCESS') && (isApprovedResponse == false)}}"></bs-dropdown>
 					</div>
 				</div>
 			</div>
