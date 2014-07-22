@@ -24,6 +24,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
@@ -39,6 +41,9 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
  * @author Alexander_Sergeev
  */
 @Entity
+@NamedQueries({
+	@NamedQuery(name = "OrderInfo.findByPartnersRating",
+			query = "SELECT t1.publicKey FROM UserPublicProfile t0, UserPublicProfile t1 GROUP BY t0.publicKey, t1.publicKey HAVING t0.publicKey IN (SELECT DISTINCT t2.userPublicKey FROM Respond t2 WHERE t2.id IN (SELECT t3.approvedResponseId FROM OrderInfo t3 WHERE (t3.status = :status) AND (t3.userPublicKey = t1.publicKey) AND (t3.userPublicKey <> t0.publicKey))) AND SUM(t0.statistic.summaryRating) >= :rating - 1 ORDER BY SUM(t0.statistic.summaryRating) ASC")})
 @Access(AccessType.FIELD)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)

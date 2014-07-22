@@ -1,10 +1,12 @@
 package com.qbit.p2p.credit.user.model;
 
 import com.qbit.p2p.credit.commons.model.Currency;
+import com.qbit.p2p.credit.money.model.serialization.CurrencyAdapter;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * @author Alexander_Sergeev
@@ -17,6 +19,7 @@ public class ShortProfile {
 	private String mail;
 	private String phone;
 	private List<Language> languages;
+	@XmlJavaTypeAdapter(CurrencyAdapter.class)
 	private List<Currency> currencies;
 
 	public String getPublicKey() {

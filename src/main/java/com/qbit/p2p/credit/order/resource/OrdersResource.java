@@ -362,13 +362,7 @@ public class OrdersResource {
 		SearchRequest ordersRequest = new SearchRequest();
 		ordersRequest.setPageNumber(0);
 		ordersRequest.setPageSize(4);
-		//OrdersWrapper wrapper1 = getOrdersFromDB(ordersRequest, null);
-		//orderDAO.getPartnersRating3();
-		orderDAO.getPartnersRating("alex.qbit9@gmail.com");
-		orderDAO.getPartnersRating("ivan.fly.666@gmail.com");
-		orderDAO.getPartnersRating("aleksashka6666@gmail.com");
-		
-		//System.out.println("??????????????????????????????????????????????????? " + orderDAO.getPartnersRating("aleksashka6666@gmail.com"));
+		orderDAO.test();
 		ObjectMapper mapper = new ObjectMapper();
 		OrdersWrapper wrapper = null;
 		try {
@@ -400,18 +394,6 @@ public class OrdersResource {
 
 		List<OrderWrapper> ordersWrappers = new ArrayList<>();
 		for (OrderInfo order : orders) {
-			if (order.getResponses() != null) {
-				for (Respond response : order.getResponses()) {
-					UserPublicProfile responseProfile = profileDAO.find(response.getUserPublicKey());
-					if (!responseProfile.isMailEnabled()) {
-						response.setUserEmail(null);
-					}
-					if (!responseProfile.isPhoneEnabled()) {
-						response.setUserPhone(null);
-					}
-				}
-			}
-
 			OrderWrapper wrapper = new OrderWrapper(order);
 			wrapper.setId(order.getId());
 			ordersWrappers.add(wrapper);
@@ -463,18 +445,6 @@ public class OrdersResource {
 
 		List<OrderWrapper> ordersWrappers = new ArrayList<>();
 		for (OrderInfo order : orders) {
-
-			if (order.getResponses() != null) {
-				for (Respond response : order.getResponses()) {
-					UserPublicProfile responseProfile = profileDAO.find(response.getUserPublicKey());
-					if (!responseProfile.isMailEnabled()) {
-						response.setUserEmail(null);
-					}
-					if (!responseProfile.isPhoneEnabled()) {
-						response.setUserPhone(null);
-					}
-				}
-			}
 			UserPublicProfile profileValue = profileDAO.find(order.getUserPublicKey());
 			//List<OrderInfo> partnersOrders = orderDAO.findWithFilter(null, ordersRequest, profile);
 
@@ -571,13 +541,6 @@ public class OrdersResource {
 		respond.setUserPublicKey(id);
 		respond.setCreationDate(new Date());
 		respond.setComment(responseRequest.getComment());
-		UserPublicProfile profile = profileDAO.find(id);
-		if (profile != null) {
-			respond.setUserName(profile.getName());
-			respond.setUserEmail(profile.getMail());
-			respond.setUserPhone(profile.getPhone());
-		}
-
 		List<Respond> responses = order.getResponses();
 		if (responses == null) {
 			responses = new ArrayList<>();

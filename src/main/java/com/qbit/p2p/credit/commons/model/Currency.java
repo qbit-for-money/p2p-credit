@@ -4,8 +4,9 @@ package com.qbit.p2p.credit.commons.model;
  * @author Alexander_Sergeev
  */
 public enum Currency {
-	
-	YANDEX_RUB("RUR", 400), 
+	RUR("RUR", 400), 
+	YANDEX_RUR("Yandex RUR", 400), 
+	WEBMONEY_RUR("WebMoney RUR", 400), 
 	BITCOIN("BTC", 20),
 	LITECOIN("LTC", 300);
 	

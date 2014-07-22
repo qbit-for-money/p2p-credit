@@ -11,7 +11,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 	var errorMessages = {};
 	errorMessages["MIN_SIZE"] = "User photo size should be greater than 400x300";
 	errorMessages["MAX_SIZE"] = "User photo size should be less than 2000x2000";
-	errorMessages["IMAGE_TYPE"] = "Image type should be .jpg";
+	errorMessages["IMAGE_TYPE"] = "Image type should be JPG";
 	$scope.edit = false;
 	$scope.editAdditional = false;
 	$scope.editedPassport = false;

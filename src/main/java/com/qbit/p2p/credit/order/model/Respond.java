@@ -14,22 +14,17 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.SecondaryTable;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * @author Alexander_Sergeev
  */
 @Entity
-/*@SecondaryTable(name="approved_response", pkJoinColumns={
-      @PrimaryKeyJoinColumn(name="id", referencedColumnName="id")})*/
 @Access(AccessType.FIELD)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -42,12 +37,8 @@ public class Respond implements Identifiable<String>, Serializable {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	//@XmlTransient
 	private String id;
 	private String userPublicKey;
-	private String userName;
-	private String userPhone;
-	private String userEmail;
 	@XmlJavaTypeAdapter(DateAdapter.class)
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date creationDate;
@@ -95,30 +86,6 @@ public class Respond implements Identifiable<String>, Serializable {
 		this.comment = comment;
 	}
 
-	public String getUserName() {
-		return userName;
-	}
-
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-
-	public String getUserPhone() {
-		return userPhone;
-	}
-
-	public void setUserPhone(String userPhone) {
-		this.userPhone = userPhone;
-	}
-
-	public String getUserEmail() {
-		return userEmail;
-	}
-
-	public void setUserEmail(String userEmail) {
-		this.userEmail = userEmail;
-	}
-
 	@Override
 	public int hashCode() {
 		int hash = 5;
@@ -143,6 +110,6 @@ public class Respond implements Identifiable<String>, Serializable {
 
 	@Override
 	public String toString() {
-		return "Respond{" + "orderInfo=" + orderInfo + ", id=" + id + ", userPublicKey=" + userPublicKey + ", userName=" + userName + ", userPhone=" + userPhone + ", userEmail=" + userEmail + ", creationDate=" + creationDate + ", comment=" + comment + '}';
+		return "Respond{" + "orderInfo=" + orderInfo + ", id=" + id + ", userPublicKey=" + userPublicKey + ", creationDate=" + creationDate + ", comment=" + comment + '}';
 	}
 }

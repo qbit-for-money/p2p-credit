@@ -117,8 +117,6 @@
 
 		<script type="text/javascript" src="resources/js/navbar/controllers.js"></script>
 
-		<script type="text/javascript" src="resources/js/order-create/controllers.js"></script>
-
 		<div ng-include src="'resources/html/templates/templates.html'"></div>
 		<script type="text/javascript" src="resources/js/common/tables-common.js"></script>
 	</body>

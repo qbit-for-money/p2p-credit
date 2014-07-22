@@ -22,22 +22,10 @@ orderModule.controller("UserOrdersController", function($scope, $rootScope, $int
 
 
 	var initRowDetails = function(index, parentElement, gridElement, datarecord) {
-//console.log(JSON.stringify(datarecord))
 		var tabsdiv = null;
 		tabsdiv = angular.element(angular.element(parentElement).children()[0]);
 		if (tabsdiv !== null) {
 			var responsesContent = "";
-			//ordersResource.getResponse({'id': datarecord.approvedResponseId});
-			//console.log("#$#$#$ " + datarecord.approvedResponseId + " ** " + JSON.stringify(datarecord.responses));
-			/*var responses = [];
-			 for (var i in datarecord.responses) {
-			 
-			 
-			 }
-			 var userProfileResponse = usersProfileResource.getById({'id': publicKey});
-			 userProfileResponse.$promise.then(function() {
-			 
-			 });*/
 			for (var i in datarecord.responses) {
 				var publicKey = datarecord.responses[i].userPublicKey;
 				datarecord.responses[i].imgurl = window.context + "webapi/profiles/" + publicKey + "/photo";
@@ -53,11 +41,9 @@ orderModule.controller("UserOrdersController", function($scope, $rootScope, $int
 					isComment: (!datarecord.responses[i].comment) ? false : true,
 					isAttributes: datarecord.responses[i].comment ? false : true,
 					comment: datarecord.responses[i].comment,
-					//name: datarecord.responses[i].userName,
-					mail: datarecord.responses[i].userEmail,
-					phone: datarecord.responses[i].userPhone,
 					orderId: datarecord.id,
-					userId: datarecord.responses[i].id,
+					userId: publicKey,
+					responseId: datarecord.responses[i].id,
 					approvedResponseId: datarecord.approvedResponseId,
 					orderStatus: datarecord.status,
 					status: (datarecord.approvedResponseId) ? true : false,
@@ -73,33 +59,42 @@ orderModule.controller("UserOrdersController", function($scope, $rootScope, $int
 			var template = angular.element("#userOrdersTableDetailTmpl").text();
 			var exp = $interpolate(template);
 			var context = {
-				freeDescription: datarecord.orderData
+				freeDescription: datarecord.orderData,
+				approvedResponseId: datarecord.approvedResponseId,
+				orderId: datarecord.id,
+				status: (datarecord.approvedResponseId) ? true : false,
+				orderStatus: datarecord.status
 			};
-
 			var content = exp(context);
 			content = content.replace('#responses-list', responsesContent);
 			var result = $compile(content)($scope);
 			tabsdiv.append(result);
 			$scope.$apply();
 			angular.element(tabsdiv).jqxTabs({width: "95%", height: 240});
+
 			for (var i in datarecord.responses) {
 				var publicKey = datarecord.responses[i].userPublicKey;
-				$timeout(function() {
-					
-					var userProfileResponse = usersProfileResource.getShortById({'id': publicKey});
-					console.log("%% " + publicKey);
-					userProfileResponse.$promise.then(function() {
-
-						//angular.element("#" + datarecord.responses[i].id);
-						angular.element("#" + datarecord.responses[i].id + " #name span").text(userProfileResponse.name);
-						console.log(JSON.stringify(userProfileResponse));
-					});
+				angular.element('#' + datarecord.responses[i].id).bind('isVisible', isVisible);
+				angular.element('#' + datarecord.responses[i].id).show('slow', function() {
+					angular.element(this).trigger('isVisible', [publicKey]);
 				});
-
 			}
-			console.log("--");
 		}
 	};
+	function isVisible(e, publicKey) {
+		var id = angular.element(this).attr('id');
+		var userProfileResponse = usersProfileResource.getShortById({'id': publicKey});
+		userProfileResponse.$promise.then(function() {
+			console.log(userProfileResponse.mail);
+			var name = (userProfileResponse.name) ? userProfileResponse.name : "Hidden";
+			angular.element("#" + id + " #name span").text(name);
+			var phone = (userProfileResponse.phone) ? userProfileResponse.phone : "Hidden";
+			angular.element("#" + id + " #phone span").text(phone);
+			var mail = (userProfileResponse.mail) ? userProfileResponse.mail : "Hidden";
+			angular.element("#" + id + " #mail span").text(mail);
+		});
+	}
+
 	var ordersTable = angular.element('#user-orders-table');
 	var dataAdapter = new $.jqx.dataAdapter(getSource("webapi/orders/current/withFilter", ordersTable), getAdapterFields());
 	$scope.orders = {};

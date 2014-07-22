@@ -1,36 +1,19 @@
 package com.qbit.p2p.credit.user.model;
 
 import com.qbit.p2p.credit.commons.model.Currency;
-import com.qbit.p2p.credit.commons.model.MapAdapter;
 import com.qbit.p2p.credit.money.model.serialization.CurrencyAdapter;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
-import javax.persistence.CollectionTable;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
-import javax.persistence.MapKeyColumn;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAnyElement;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
@@ -38,23 +21,6 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * @author Alexander_Sergeev
  */
 @Entity
-/*@NamedQueries({
- @NamedQuery(name = "UserPublicProfile.findByOrdersNoMoreThan",
- query = "SELECT u FROM UserPublicProfile u WHERE "
- + "(SELECT count(o) FROM OrderInfo o WHERE o.userPublicKey = u.publicKey) <= :number"),
- @NamedQuery(name = "UserPublicProfile.findByOrdersNoLessThan",
- query = "SELECT u FROM UserPublicProfile u WHERE "
- + "(SELECT count(o) FROM OrderInfo o WHERE o.userPublicKey = u.publicKey) >= :number"),
- @NamedQuery(name = "UserPublicProfile.findByRatingNoMoreThan",
- query = "SELECT u FROM UserPublicProfile u WHERE u.rating <= :rating"),
- @NamedQuery(name = "UserPublicProfile.findByRatingNoLessThan",
- query = "SELECT u FROM UserPublicProfile u WHERE u.rating >= :rating"),
- @NamedQuery(name = "UserPublicProfile.count",
- query = "SELECT count(u) FROM UserPublicProfile u")})*/
-/*@NamedQueries({
-	@NamedQuery(name = "UserPublicProfile.findByOrder",
-		query = "SELECT u FROM UserPublicProfile u, OrderInfo o WHERE "
-		+ " o.userPublicKey = u.publicKey AND o.id = :orderId")})*/
 @Access(AccessType.FIELD)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -82,20 +48,8 @@ public class UserPublicProfile implements Serializable {
 	private Statistic statistic;
 
 	private List<DataLink> phones;
-	/*@ElementCollection
-	 @MapKeyColumn(name = "name")
-	 @Column(name = "phones_value")
-	 @CollectionTable(name = "phones_map", joinColumns = @JoinColumn(name = "id"))
-	 private Map<String, String> phonesMap = new HashMap<>();*/
-
 	private List<DataLink> socialLinks;
-	/*@XmlAnyElement
-	 @XmlJavaTypeAdapter(MapAdapter.class)
-	 @ElementCollection
-	 @MapKeyColumn(name = "name")
-	 @Column(name = "links_value")
-	 @CollectionTable(name = "social_links_map", joinColumns = @JoinColumn(name = "id"))
-	 private Map<String, String> socialLinksMap = new HashMap<>();*/
+
 	private boolean passportEnabled;
 	private List<DataLink> videos;
 	private List<DataLink> namesLinks;

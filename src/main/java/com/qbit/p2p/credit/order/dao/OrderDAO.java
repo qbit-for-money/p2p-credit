@@ -28,6 +28,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
 import javax.persistence.Tuple;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -302,6 +303,9 @@ public class OrderDAO {
 
 			String sortDataField = filterCriteriaValue.getSortDataField();
 			if (sortDesc && sortDataField != null && !sortDataField.isEmpty()) {
+				if("partnersRating".equals(sortDataField)) {
+					criteria.orderBy(builder.desc(order.get(sortDataField)), builder.asc(order.get("status")));
+				}
 				criteria.orderBy(builder.desc(order.get(sortDataField)), builder.asc(order.get("status")));
 			} else if (!sortDesc && sortDataField != null && !sortDataField.isEmpty()) {
 				criteria.orderBy(builder.asc(order.get(sortDataField)), builder.asc(order.get("status")));
@@ -455,8 +459,18 @@ public class OrderDAO {
 							//subquery.where(builder.ge(fromUserPublicProfile.get("pint"),30000));
 							//valuePredicate = builder.greaterThanOrEqualTo(order.<Date>get(item.getFilterDataField()), DateUtil.stringToDate(item.getFilterValue()));
 						} else if ("responsesCount".equals(item.getFilterDataField())) {
+							//TypedQuery<String> query = entityManager.createQuery("SELECT t1.publicKey FROM UserPublicProfile t0, UserPublicProfile t1 GROUP BY t0.publicKey, t1.publicKey HAVING t0.publicKey IN (SELECT DISTINCT t2.userPublicKey FROM Respond t2 WHERE t2.orderInfo.id IN (SELECT t3.id FROM OrderInfo t3 WHERE (t3.userPublicKey = t1.publicKey) AND (t3.userPublicKey <> t0.publicKey))) AND COUNT(t0.statistic.summaryRating) >= :count - 1", String.class);
 
-							//Join<OrderInfo, Respond> secondTable = order.join("responses", JoinType.LEFT);
+							TypedQuery<String> query = entityManager.createQuery("SELECT o.id FROM OrderInfo o JOIN o.responses r GROUP BY o.id HAVING count(r) >= :count AND o.userPublicKey = :publicKey", String.class);
+							query.setParameter("count", Long.parseLong(item.getFilterValue()));
+							query.setParameter("publicKey", userPublicKey);
+							List<String> ordersId = query.getResultList();
+
+							if ((ordersId == null) || ordersId.isEmpty()) {
+								ordersId.add("");
+							}
+							valuePredicate = order.get("id").in(ordersId);
+//Join<OrderInfo, Respond> secondTable = order.join("responses", JoinType.LEFT);
 							/*builder.count(order.get("responses"));
 							
 							 Subquery<Long> subquery = criteria.subquery(Long.class);
@@ -470,15 +484,15 @@ public class OrderDAO {
 							 //subquery.where(builder.greaterThanOrEqualTo(builder.countDistinct(fromRespond.get("publicKey")), Long.parseLong(item.getFilterValue())));
 							 query.select(cb.count(u)).where(cb.in(u).value(subquery));
 							 Predicate valuePredicate1 = builder.in(order.get("userPublicKey")).value(subquery);*/
-							Expression<Collection<String>> e = order.get("responses").get("id");
-							valuePredicate = builder.greaterThanOrEqualTo(builder.count(e), Long.parseLong(item.getFilterValue()));
+							//Expression<Collection<String>> e = order.get("responses").get("id");
+							//valuePredicate = builder.greaterThanOrEqualTo(builder.count(e), Long.parseLong(item.getFilterValue()));
 						} else if ("partnersRating".equals(item.getFilterDataField())) {
 
-							TypedQuery<String> query = entityManager.createQuery("SELECT t1.publicKey FROM UserPublicProfile t0, UserPublicProfile t1 GROUP BY t0.publicKey, t1.publicKey HAVING t0.publicKey IN (SELECT DISTINCT t2.userPublicKey FROM Respond t2 WHERE t2.id IN (SELECT t3.approvedResponseId FROM OrderInfo t3 WHERE (t3.status = :status) AND (t3.userPublicKey = t1.publicKey))) AND SUM(t0.statistic.summaryRating) >= :rating - 1", String.class);
+							TypedQuery<String> query = entityManager.createNamedQuery("OrderInfo.findByPartnersRating", String.class);
 							query.setParameter("status", OrderStatus.SUCCESS);
-							System.out.println("***@@@@@ " + Long.parseLong(item.getFilterValue()));
 							query.setParameter("rating", Long.parseLong(item.getFilterValue()));
 							List<String> publicKeys = query.getResultList();
+
 							if ((publicKeys == null) || publicKeys.isEmpty()) {
 								publicKeys.add("");
 							}
@@ -616,6 +630,43 @@ public class OrderDAO {
 			criteria.where(p3);
 			Long result = entityManager.createQuery(criteria).getSingleResult();
 			return (result == null) ? 0 : result;
+		} finally {
+			entityManager.close();
+		}
+	}
+
+	public long getMaxSummaryRating() {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		try {
+			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+			CriteriaQuery<Long> criteria;
+			criteria = builder.createQuery(Long.class);
+			Root<UserPublicProfile> profile = criteria.from(UserPublicProfile.class);
+
+			Expression<Long> ex = profile.get("statistic").get("summaryRating");
+			criteria.select(builder.max(ex));
+			Long result = entityManager.createQuery(criteria).getSingleResult();
+			return (result == null) ? 0 : result;
+		} finally {
+			entityManager.close();
+		}
+	}
+
+	public void test() {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		try {
+			TypedQuery<String> query = entityManager.createQuery("SELECT max(u.statistic.summaryRating) FROM UserPublicProfile u", String.class);
+			//TypedQuery<String> query = entityManager.createQuery("SELECT t3.id FROM OrderInfo t3 WHERE (t3.userPublicKey = t1.publicKey) AND (t3.userPublicKey <> t0.publicKey)", String.class);
+			//query.setParameter("count", Long.parseLong("2"));
+			//TypedQuery<String> query = entityManager.createQuery("SELECT m.id FROM Respond m WHERE m.orderInfo.id = :ownerId", String.class);
+			//query.setParameter("ownerId", "9701");
+			//.getResultList();
+			//TypedQuery<String> query = entityManager.createQuery("SELECT t0.publicKey FROM UserPublicProfile t0, UserPublicProfile t1 GROUP BY t0.publicKey, t1.publicKey HAVING t0.publicKey IN (SELECT DISTINCT t2.userPublicKey FROM Respond t2 WHERE t2.id IN (SELECT r.id FROM OrderInfo t3 LEFT JOIN t3.responses r WHERE (t3.userPublicKey = :publicKey))) AND COUNT(t0) >= :count - 1", String.class);
+			//TypedQuery<String> query = entityManager.createQuery("SELECT COUNT(t0) FROM UserPublicProfile t0 GROUP BY t0.publicKey HAVING t0.publicKey IN (SELECT DISTINCT t2.userPublicKey FROM Respond t2 WHERE t2.id IN (SELECT r.id FROM OrderInfo t3 LEFT JOIN t3.responses r WHERE (t3.userPublicKey = :publicKey))) AND COUNT(t0) >= :count - 1", String.class);
+			//query.setParameter("count", Long.parseLong("2"));
+			//query.setParameter("publicKey", "aleksashka6666@gmail.com");
+			List<String> publicKeys = query.getResultList();
+			System.out.println("**************** " + publicKeys);
 		} finally {
 			entityManager.close();
 		}

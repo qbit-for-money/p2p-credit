@@ -1,6 +1,6 @@
 var orderModule = angular.module("order");
 
-orderModule.controller("OrdersController", function($scope, ordersResource, userProfileService, userService, $interpolate, $compile, $modal) {
+orderModule.controller("OrdersController", function($scope, ordersResource, userProfileService, usersProfileResource, userService, $interpolate, $compile, $modal) {
 
 	$scope.addResponse = function(orderId, comment) {
 		var response = {};
@@ -36,31 +36,53 @@ orderModule.controller("OrdersController", function($scope, ordersResource, user
 				}
 			}
 
-			var context = {
-				name: datarecord.userName,
-				imgurl: imgurl,
-				languages: (datarecord.userLanguages) ? datarecord.userLanguages : "",
-				currencies: (datarecord.userCurrencies) ? datarecord.userLanguages : "",
-				userurl: userurl,
-				mail: datarecord.userMail,
-				phone: datarecord.userPhone,
-				freeDescription: datarecord.orderData,
-				orderId: datarecord.id,
-				disabled: disabled,
-				//isUserOrder: (datarecord.userPublicKey === userService.get().publicKey)
-			};
-			var content = exp(context);
-			var result = $compile(content)($scope);
-			tabsdiv.append(result);
-			$scope.$apply();
-			angular.element(tabsdiv).jqxTabs({width: "95%", height: 240});
+			var publicKey = datarecord.userPublicKey;
+			var userProfileResponse = usersProfileResource.getShortById({'id': publicKey});
+			userProfileResponse.$promise.then(function() {
+				var userLanguages = "";
+				if(userProfileResponse.languages) {
+					for(var i in userProfileResponse.languages) {
+						userLanguages += userProfileResponse.languages[i].title + ", ";
+					}
+					userLanguages = userLanguages.substring(0, userLanguages.length - 2);
+				}
+				var userCurrencies = "";
+				if(userProfileResponse.currencies) {
+					for(var i in userProfileResponse.currencies) {
+						userCurrencies += userProfileResponse.currencies[i].code + ", ";
+					}
+					userCurrencies = userCurrencies.substring(0, userCurrencies.length - 2);
+				}
+				
+
+				var context = {
+					name: userProfileResponse.name,
+					imgurl: imgurl,
+					languages: userLanguages,
+					currencies: userCurrencies,
+					userurl: userurl,
+					mail: userProfileResponse.mail,
+					phone: userProfileResponse.phone,
+					freeDescription: datarecord.orderData,
+					orderId: datarecord.id,
+					disabled: disabled,
+					//isUserOrder: (datarecord.userPublicKey === userService.get().publicKey)
+				};
+				var content = exp(context);
+				var result = $compile(content)($scope);
+				tabsdiv.append(result);
+				//$scope.$apply();
+				angular.element(tabsdiv).jqxTabs({width: "95%", height: 240});
+			});
+
+
 		}
 	};
 
 
 	var dataAdapter = new $.jqx.dataAdapter(getSource("webapi/orders/withFilter", "#orders-table"), getAdapterFields());
 	angular.element("#orders-table").on("bindingComplete", function(event) {
-		
+
 	});
 	function initTable(categories, languages) {
 		angular.element("#orders-table").jqxGrid(
