@@ -15,13 +15,10 @@ import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
@@ -43,7 +40,7 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 @Entity
 @NamedQueries({
 	@NamedQuery(name = "OrderInfo.findByPartnersRating",
-			query = "SELECT t1.publicKey FROM UserPublicProfile t0, UserPublicProfile t1 GROUP BY t0.publicKey, t1.publicKey HAVING t0.publicKey IN (SELECT DISTINCT t2.userPublicKey FROM Respond t2 WHERE t2.id IN (SELECT t3.approvedResponseId FROM OrderInfo t3 WHERE (t3.status = :status) AND (t3.userPublicKey = t1.publicKey) AND (t3.userPublicKey <> t0.publicKey))) AND SUM(t0.statistic.summaryRating) >= :rating - 1 ORDER BY SUM(t0.statistic.summaryRating) ASC")})
+			query = "SELECT t1.publicKey FROM UserPublicProfile t0, UserPublicProfile t1 GROUP BY t0.publicKey, t1.publicKey HAVING t0.publicKey IN (SELECT DISTINCT t2.userPublicKey FROM Respond t2 WHERE t2.id IN (SELECT t3.approvedResponseId FROM OrderInfo t3 WHERE (t3.status = :status) AND (t3.userPublicKey = t1.publicKey) AND (t3.userPublicKey <> t0.publicKey))) AND SUM(t0.statistic.summaryRating) >= :rating ORDER BY SUM(t0.statistic.summaryRating) ASC")})
 @Access(AccessType.FIELD)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -77,11 +74,6 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 	@OneToMany(cascade = CascadeType.ALL, targetEntity = Respond.class)
 	private List<Respond> responses = new ArrayList<>();
 
-	//@OneToOne(cascade = CascadeType.ALL)
-	//@JoinTable(name = "approved_response")
-	//@JoinTable(name = "approved_response", joinColumns = @JoinColumn(name = "id"),
-	//	inverseJoinColumns = @JoinColumn(name = "id"))
-	//@JoinColumn(name="A_ID", referencedColumnName="id")
 	private String approvedResponseId;
 
 	@OneToOne(cascade = CascadeType.ALL)

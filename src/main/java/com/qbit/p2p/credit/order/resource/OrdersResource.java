@@ -16,13 +16,11 @@ import com.qbit.p2p.credit.order.model.OrderCategory;
 import com.qbit.p2p.credit.order.model.OrderInfo;
 import com.qbit.p2p.credit.order.model.OrderStatus;
 import com.qbit.p2p.credit.order.model.Respond;
-import com.qbit.p2p.credit.order.model.RespondStatus;
 import com.qbit.p2p.credit.user.dao.UserProfileDAO;
 import com.qbit.p2p.credit.user.model.Language;
 import com.qbit.p2p.credit.user.model.UserCurrency;
 import com.qbit.p2p.credit.user.model.UserPublicProfile;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -31,8 +29,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
@@ -526,7 +522,7 @@ public class OrdersResource {
 			return null;
 		}
 		OrderInfo order = orderDAO.find(responseRequest.getOrderId());
-		if (order == null) {
+		if ((order == null) || order.getUserPublicKey().equals(id)) {
 			return null;
 		}
 		if (order.getResponses() != null) {
@@ -557,7 +553,8 @@ public class OrdersResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public OrderInfo approveResponse(ResponseRequest responseRequest) {
 		OrderInfo order = orderDAO.find(responseRequest.getOrderId());
-		if (order == null) {
+		String id = AuthFilter.getUserId(request);
+		if ((order == null) || !order.getUserPublicKey().equals(id)) {
 			return null;
 		}
 		if (order.getResponses() != null) {

@@ -19,7 +19,6 @@ function getSource(path, id) {
 					{name: "givingCurrency", type: "string"},
 					{name: "duration", type: "string"},
 					{name: "reward", type: "string"},
-					//{name: "responses", type: "number"},
 					{name: "responsesCount", type: "number"},
 					{name: "responses", type: "string"},
 					{name: "status", type: "string"},
@@ -36,7 +35,7 @@ function getSource(path, id) {
 					{name: "userLanguages", type: "string"},
 					{name: "userPublicKey", type: "string"},
 					{name: "orderData", type: "string"},
-					{name: "id", type: "string"}, 
+					{name: "id", type: "string"},
 					//{name: "responseId", type: "string"}, 
 					{name: "approvedResponseId", type: "string"}
 				],
@@ -91,8 +90,10 @@ function getAdapterFields() {
 						"July", "August", "September", "October", "November", "December"];
 					newData.filterItems[i].filterValue = monthNames[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear();
 				}
+
 				if (isNumberField(data["filterdatafield" + i])) {
 					newData.filterItems[i].filterCondition = "GREATER_THAN_OR_EQUAL";
+					console.log("duration " + data["filtervalue" + i])
 				}
 			}
 			newData.sortOrder = data.sortorder;
@@ -201,6 +202,8 @@ function isNumberField(field) {
 			return true;
 		case "responsesCount":
 			return true;
+		case "duration":
+			return true;
 		default:
 			return false;
 	}
@@ -211,5 +214,4 @@ function formatDate(value) {
 	var date = new Date(dateParts[2], (dateParts[1] - 1), dateParts[0]);
 	return date;
 }
-;
 

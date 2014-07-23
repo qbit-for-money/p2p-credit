@@ -85,7 +85,6 @@ orderModule.controller("UserOrdersController", function($scope, $rootScope, $int
 		var id = angular.element(this).attr('id');
 		var userProfileResponse = usersProfileResource.getShortById({'id': publicKey});
 		userProfileResponse.$promise.then(function() {
-			console.log(userProfileResponse.mail);
 			var name = (userProfileResponse.name) ? userProfileResponse.name : "Hidden";
 			angular.element("#" + id + " #name span").text(name);
 			var phone = (userProfileResponse.phone) ? userProfileResponse.phone : "Hidden";
@@ -139,7 +138,7 @@ orderModule.controller("UserOrdersController", function($scope, $rootScope, $int
 						{text: "Languages", dataField: "languages", columntype: 'textbox', filtertype: 'checkedlist', filteritems: languages, width: '160px', sortable: false, cellclassname: cellclassname},
 						{text: "Take", dataField: "takingCurrency", filtertype: 'textbox', width: '85px', cellclassname: cellclassname},
 						{text: "Give", dataField: "givingCurrency", filtertype: 'textbox', width: '85px', cellclassname: cellclassname},
-						{text: "Duration", dataField: "duration", filtertype: 'number', width: '80px', cellclassname: cellclassname},
+						{text: "Duration", dataField: "duration", filtertype: 'textbox', width: '80px', cellclassname: cellclassname},
 						{text: "Responses", dataField: "responsesCount", filtertype: 'textbox', width: '80px', cellclassname: cellclassname},
 						{text: "Status", dataField: "status", columntype: 'textbox', filtertype: 'list', filteritems: ['OPENED', 'IN PROCESS', 'SUCCESS', 'NOT SUCCESS', 'ARBITRATION'], width: '110px', cellclassname: cellclassname},
 						{text: "Booking deadline", dataField: "endDate", filtertype: 'date', width: '120px', cellclassname: cellclassname, cellsformat: 'd'}

@@ -1,5 +1,6 @@
 package com.qbit.p2p.credit;
 
+import com.qbit.commons.auth.AuthFilter;
 import com.qbit.commons.dao.util.DAOExecutor;
 import com.qbit.commons.dao.util.DefaultDAOExecutor;
 import com.qbit.commons.env.CommonsEnv;

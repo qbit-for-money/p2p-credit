@@ -120,13 +120,17 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 					$scope.userPropertiesMap['languages'].splice(0, $scope.userPropertiesMap['languages'].length);
 				}
 				var languages = "";
+				
 				for (var i = 0; i < userProfileResponse.languages.length; i++) {
 					$scope.orderCreatingMap['orderLanguages'].push(userProfileResponse.languages[i].title);
 					$scope.userPropertiesMap['languages'].push(userProfileResponse.languages[i].title);
 					languages += (userProfileResponse.languages[i].title + ", ");
 				}
-				languages = languages.substring(0, languages.length - 2);
+				if(userProfileResponse.languages.length !== 0) {
+					languages = languages.substring(0, languages.length - 2);
+				}
 				$scope.userPropertiesMap['languagesStr'] = languages;
+				console.log($scope.userPropertiesMap['languagesStr'])
 			}
 			$scope.userPropertiesMap['currenciesEnabled'] = (userProfileResponse.currenciesEnabled === true) ? visible : notVisible;
 			$scope.userPropertiesMap['currencies'] = [];
@@ -178,8 +182,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			}
 			reloadSCEditorInstance();
 			reloadBKIscEditor();
-			$scope.isValidOrder()
-
+			$scope.isValidOrder();
 
 		});
 	}
@@ -622,8 +625,10 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		} else {
 			userPublicProfile.phoneEnabled = false;
 		}
-
-		userPublicProfile.mail = $scope.userPropertiesMap['mail'];
+		if ($scope.userPropertiesMap['mail'] && isValidEmail($scope.userPropertiesMap['mail'])) {
+			userPublicProfile.mail = $scope.userPropertiesMap['mail'];
+		}
+			
 		userPublicProfile.mailEnabled = ($scope.userPropertiesMap['mailEnabled'] === visible) ? true : false;
 		if ($scope.userPropertiesMap['personalDataEnabled'] === visible) {
 			userPublicProfile.personalDataEnabled = true;
@@ -695,6 +700,12 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		});
 		//var userPrivateProfile = {};
 	};
+
+	function isValidEmail(email) {
+		var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+		return re.test(email);
+	}
+
 	angular.element(document).on("focus", "#name", function() {
 		angular.element(this).mask("SSSSSSSSSSSSSSSSSSSSSSSSSSS",
 				{'translation': {

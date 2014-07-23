@@ -12,6 +12,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
+import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -213,11 +214,11 @@ public class UserPublicProfile implements Serializable {
 		return true;
 	}
 
-	/*
-	 public boolean isValid() {
-	 return (firstName == null || firstName.length() <= MAX_LENGTH)
-	 && (lastName == null || lastName.length() <= MAX_LENGTH)
-	 && (country == null || country.length() <= MAX_LENGTH)
+	
+	/*public boolean isValid() {
+	 return (name == null || name.length() <= MAX_LENGTH)
+	 && (mail == null || mail.length() <= MAX_LENGTH)
+	 && (phone == null || phone.length() <= MAX_LENGTH)
 	 && (city == null || city.length() <= MAX_LENGTH)
 	 && (hobby == null || hobby.length() <= MAX_LENGTH * 2);
 	 }*/

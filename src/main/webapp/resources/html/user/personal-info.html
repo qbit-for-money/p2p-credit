@@ -1,10 +1,10 @@
 <div class="panel-body">
 	<div class="container-fluid">
 		<div class="row ng-hide" ng-show="edit">
-						<div class="col-xs-12 col-md-12">
-							<alert type="'warning'"><h4 style="margin-bottom: 0px;">User photo size should be greater than 400x300 and less than 2000x2000 and have type JPG.</h4></alert>
-						</div>
-					</div>
+			<div class="col-xs-12 col-md-12">
+				<alert type="'warning'"><h4 style="margin-bottom: 0px;">User photo size should be greater than 400x300 and less than 2000x2000 and have type JPG.</h4></alert>
+			</div>
+		</div>
 		<div class="row">
 			<div class="col-xs-4 col-md-3">
 				<div class="container-fluid">
@@ -81,7 +81,7 @@
 									Mail:
 								</div>
 								<div class="input-group col-xs-7 col-md-8" ng-hide="!edit">
-									<input type="text" id="mail" ng-model="userPropertiesMap
+									<input type="email" id="mail" ng-model="userPropertiesMap
 										['mail']" class="form-control" />
 									<span class="input-group-btn">
 										<button class="btn btn-default" type="button" ng-click="changeVisible('mailEnabled')">

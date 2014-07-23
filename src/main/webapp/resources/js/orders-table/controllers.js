@@ -56,17 +56,17 @@ orderModule.controller("OrdersController", function($scope, ordersResource, user
 				
 
 				var context = {
-					name: userProfileResponse.name,
+					name: (userProfileResponse.name) ? userProfileResponse.name : "Hidden",
 					imgurl: imgurl,
-					languages: userLanguages,
-					currencies: userCurrencies,
+					languages: (userLanguages !== "") ? userLanguages : "Hidden",
+					currencies:(userCurrencies !== "") ? userCurrencies : "Hidden",
 					userurl: userurl,
-					mail: userProfileResponse.mail,
-					phone: userProfileResponse.phone,
+					mail: (userProfileResponse.mail) ? userProfileResponse.mail : "Hidden",
+					phone: (userProfileResponse.phone) ? userProfileResponse.phone : "Hidden",
 					freeDescription: datarecord.orderData,
 					orderId: datarecord.id,
 					disabled: disabled,
-					//isUserOrder: (datarecord.userPublicKey === userService.get().publicKey)
+					isUserOrder: (datarecord.userPublicKey === userService.get().publicKey)
 				};
 				var content = exp(context);
 				var result = $compile(content)($scope);
@@ -108,7 +108,7 @@ orderModule.controller("OrdersController", function($scope, ordersResource, user
 						{text: "Languages", dataField: "languages", columntype: 'textbox', filtertype: 'checkedlist', filteritems: languages, width: '150px', sortable: false, cellclassname: cellclassname},
 						{text: "Take", dataField: "takingCurrency", filtertype: 'textbox', width: '85px', cellclassname: cellclassname},
 						{text: "Give", dataField: "givingCurrency", filtertype: 'textbox', width: '85px', cellclassname: cellclassname},
-						{text: "Duration", dataField: "duration", filtertype: 'number', width: '80px', cellclassname: cellclassname},
+						{text: "Duration", dataField: "duration", filtertype: 'textbox', width: '80px', cellclassname: cellclassname},
 						{text: "Rating", dataField: "summaryRating", columntype: 'textbox', filtertype: 'textbox', width: '60px', cellclassname: cellclassname},
 						{text: "Openness rating", dataField: "opennessRating", columntype: 'textbox', filtertype: 'textbox', width: '120px', cellclassname: cellclassname},
 						{text: "Orders", dataField: "ordersSumValue", columntype: 'textbox', filtertype: 'textbox', cellclassname: cellclassname, width: '60px'},
