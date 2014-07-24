@@ -17,7 +17,9 @@ orderModule.controller("OrdersController", function($scope, ordersResource, user
 	};
 	userProfileService.getAllCategories(function(categories) {
 		userProfileService.getAllLanguages(function(languages) {
-			initTable(categories, languages);
+			userProfileService.getAllCurrencies(function(currencies) {
+				initTable(categories, languages, currencies);
+			});
 		});
 	});
 
@@ -40,26 +42,26 @@ orderModule.controller("OrdersController", function($scope, ordersResource, user
 			var userProfileResponse = usersProfileResource.getShortById({'id': publicKey});
 			userProfileResponse.$promise.then(function() {
 				var userLanguages = "";
-				if(userProfileResponse.languages) {
-					for(var i in userProfileResponse.languages) {
+				if (userProfileResponse.languages) {
+					for (var i in userProfileResponse.languages) {
 						userLanguages += userProfileResponse.languages[i].title + ", ";
 					}
 					userLanguages = userLanguages.substring(0, userLanguages.length - 2);
 				}
 				var userCurrencies = "";
-				if(userProfileResponse.currencies) {
-					for(var i in userProfileResponse.currencies) {
+				if (userProfileResponse.currencies) {
+					for (var i in userProfileResponse.currencies) {
 						userCurrencies += userProfileResponse.currencies[i].code + ", ";
 					}
 					userCurrencies = userCurrencies.substring(0, userCurrencies.length - 2);
 				}
-				
+
 
 				var context = {
 					name: (userProfileResponse.name) ? userProfileResponse.name : "Hidden",
 					imgurl: imgurl,
 					languages: (userLanguages !== "") ? userLanguages : "Hidden",
-					currencies:(userCurrencies !== "") ? userCurrencies : "Hidden",
+					currencies: (userCurrencies !== "") ? userCurrencies : "Hidden",
 					userurl: userurl,
 					mail: (userProfileResponse.mail) ? userProfileResponse.mail : "Hidden",
 					phone: (userProfileResponse.phone) ? userProfileResponse.phone : "Hidden",
@@ -80,11 +82,17 @@ orderModule.controller("OrdersController", function($scope, ordersResource, user
 	};
 
 
-	var dataAdapter = new $.jqx.dataAdapter(getSource("webapi/orders/withFilter", "#orders-table"), getAdapterFields());
-	angular.element("#orders-table").on("bindingComplete", function(event) {
+	
 
-	});
-	function initTable(categories, languages) {
+	function initTable(categories, languages, currencies) {
+		var allCurrenciesCode = [];
+		var allCurrencies = {};
+		for (var i = 0; i < currencies.length; i++) {
+				var currency = currencies[i];
+				allCurrenciesCode.push(currency.code);
+				allCurrencies[currency.code] = currency.id;
+			}
+		var dataAdapter = new $.jqx.dataAdapter(getSource("webapi/orders/withFilter", "#orders-table"), getAdapterFields(allCurrencies));
 		angular.element("#orders-table").jqxGrid(
 				{
 					theme: "bootstrap",
@@ -106,14 +114,14 @@ orderModule.controller("OrdersController", function($scope, ordersResource, user
 					columns: [
 						{text: "Categories", dataField: "categories", columntype: 'textbox', filtertype: 'checkedlist', filteritems: categories, filtercondition: 'starts_with', width: '140px', sortable: false, cellclassname: cellclassname},
 						{text: "Languages", dataField: "languages", columntype: 'textbox', filtertype: 'checkedlist', filteritems: languages, width: '150px', sortable: false, cellclassname: cellclassname},
-						{text: "Take", dataField: "takingCurrency", filtertype: 'textbox', width: '85px', cellclassname: cellclassname},
-						{text: "Give", dataField: "givingCurrency", filtertype: 'textbox', width: '85px', cellclassname: cellclassname},
+						{text: "Take", dataField: "takingCurrency", filtertype: 'list', filteritems: allCurrenciesCode, width: '85px', cellclassname: cellclassname},
+						{text: "Give", dataField: "givingCurrency", filtertype: 'list', filteritems: allCurrenciesCode, width: '85px', cellclassname: cellclassname},
 						{text: "Duration", dataField: "duration", filtertype: 'textbox', width: '80px', cellclassname: cellclassname},
-						{text: "Rating", dataField: "summaryRating", columntype: 'textbox', filtertype: 'textbox', width: '60px', cellclassname: cellclassname},
-						{text: "Openness rating", dataField: "opennessRating", columntype: 'textbox', filtertype: 'textbox', width: '120px', cellclassname: cellclassname},
-						{text: "Orders", dataField: "ordersSumValue", columntype: 'textbox', filtertype: 'textbox', cellclassname: cellclassname, width: '60px'},
-						{text: "Success value", dataField: "successValue", filtertype: 'textbox', cellclassname: cellclassname, width: '150px'},
-						{text: "Partners rating", dataField: "partnersRating", columntype: 'textbox', filtertype: 'textbox', width: '100px', cellclassname: cellclassname},
+						{text: "Rating", dataField: "summaryRating", columntype: 'textbox', filtertype: 'textbox', sortable: false, width: '60px', cellclassname: cellclassname},
+						{text: "Openness rating", dataField: "opennessRating", columntype: 'textbox', filtertype: 'textbox', sortable: false, width: '120px', cellclassname: cellclassname},
+						{text: "Orders", dataField: "ordersSumValue", columntype: 'textbox', filtertype: 'textbox', sortable: false, cellclassname: cellclassname, width: '60px'},
+						{text: "Success value", dataField: "successValue", filtertype: 'textbox', sortable: false, cellclassname: cellclassname, width: '150px'},
+						{text: "Partners rating", dataField: "partnersRating", columntype: 'textbox', sortable: false, filtertype: 'textbox', width: '100px', cellclassname: cellclassname},
 						{text: "Booking deadline", dataField: "endDate", filtertype: 'date', width: '120px', cellclassname: cellclassname, cellsformat: 'd'}
 					]
 				});

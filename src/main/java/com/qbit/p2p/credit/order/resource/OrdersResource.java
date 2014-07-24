@@ -358,7 +358,6 @@ public class OrdersResource {
 		SearchRequest ordersRequest = new SearchRequest();
 		ordersRequest.setPageNumber(0);
 		ordersRequest.setPageSize(4);
-		orderDAO.test();
 		ObjectMapper mapper = new ObjectMapper();
 		OrdersWrapper wrapper = null;
 		try {

@@ -46,14 +46,18 @@
 							<h4>{{userPropertiesMap['name']}}</h4>
 						</div>
 
-						<div class="col-xs-4 col-md-5" ng-if="edit">
+						<div class="col-xs-6 col-md-8" ng-if="edit">
 							<input type="text" id="name" class="form-control" ng-model="userPropertiesMap
 								['name']" placeholder="Name" maxlength="20"/>
 						</div>
 
-						<div class="col-xs-3 col-md-3 navbar-right"  ng-hide="!isCurrentUser">
-							<button class="btn btn-default navbar-right" ng-disabled="disabledEditButton" ng-click="editProfile()" ng-hide="edit"><span class="glyphicon glyphicon-edit"></span></button>
+						<div class="col-xs-6 col-md-3"  ng-hide="!isCurrentUser">
+							<div class="navbar-right col-xs-offset-9">
+								<button class="btn btn-default" ng-disabled="disabledEditButton" ng-click="editProfile()" ng-hide="edit"><span class="glyphicon glyphicon-edit"></span></button>
+							</div>
+						</div>
 
+						<div class="col-xs-4 col-md-3 navbar-right" ng-hide="!isCurrentUser">
 							<div class="input-group navbar-right" ng-hide="!edit">
 								<span class="btn-group">
 									<button class="btn btn-default" ng-disabled="disabledEditButton" ng-click="savePersonalPage()"><span class="glyphicon glyphicon-save"></span></button>
@@ -61,12 +65,13 @@
 								</span>
 							</div>
 						</div>
+
 					</div>
 					<div class="row">
 						<div class="col-xs-12 col-md-12"><hr></div>
 					</div>
 
-					<div id="user-attributes" class="row">
+					<div id="user-attributes" class="row col-xs-offset-0">
 						<div class="container-fluid">
 							<div class="row" ng-if="(!edit && userPropertiesMap['mail']) || edit">
 
@@ -170,10 +175,10 @@
 							</div-->
 							<div class="row" ng-if="edit">
 
-								<div class="col-xs-4 col-md-3 title-edit" ng-if="edit">
+								<div class="col-xs-6 col-md-3 title-edit" ng-if="edit">
 									Personal Data:
 								</div>
-								<div class="col-xs-7 col-md-8" ng-if="edit">
+								<div class="col-xs-5 col-md-8" ng-if="edit">
 
 									<button class="btn btn-default" style="float: right; margin-right: -15px;" type="button" ng-click="changeVisible('personalDataEnabled')">
 										<span class="glyphicon glyphicon-eye-{{userPropertiesMap['personalDataEnabled']}}"></span>
@@ -185,13 +190,13 @@
 					<div class="row">
 						<div class="col-xs-12 col-md-12"><hr></div>
 					</div>
-					<div class="row">Openness: {{ratingOpenness}}	</div>
-					<div class="row">Transactions: {{ratingTransactions}}</div>
-					<div class="row">Orders sum: {{ordersSumValue}}</div>
-					<div class="row">Transactions sum: {{transactionsSum}}</div>
-					<div class="row">Success transactions sum: {{successTransactionsSum}}</div>
-					<div class="row">All transactions sum: {{allTransactionsSum}}</div>
-					<div class="row">All success transactions sum: {{allSuccessTransactionsSum}}</div>
+					<div class="row col-xs-offset-0">Openness: {{ratingOpenness}}	</div>
+					<div class="row col-xs-offset-0">Transactions: {{ratingTransactions}}</div>
+					<div class="row col-xs-offset-0">Orders sum: {{ordersSumValue}}</div>
+					<div class="row col-xs-offset-0">Transactions sum: {{transactionsSum}}</div>
+					<div class="row col-xs-offset-0">Success transactions sum: {{successTransactionsSum}}</div>
+					<div class="row col-xs-offset-0">All transactions sum: {{allTransactionsSum}}</div>
+					<div class="row col-xs-offset-0">All success transactions sum: {{allSuccessTransactionsSum}}</div>
 				</div>
 			</div>
 		</div>
@@ -199,10 +204,10 @@
 		<div class="row" id="addition-attributes">
 			<div class="col-xs-12 col-md-12">
 				<div class="container-fluid">
-					<div class="row">
-						<div class="col-xs-3 col-md-3" style="margin-top: 1px;">Personal info</div>
+					<div class="row" ng-hide="!userPropertiesMap['personalData'] && !edit">
+						<div class="col-xs-7 col-md-3" style="margin-top: 1px;">Personal info</div>
 					</div>
-					<div class="row">
+					<div class="row" ng-hide="!userPropertiesMap['personalData'] && !edit">
 						<div class="col-xs-12 col-md-12"><hr></div>
 					</div>
 					<div class="row" style="padding-bottom: 5px;">
@@ -247,8 +252,8 @@
 							<div class="container-fluid">
 								<div class="row" style="padding-bottom: 25px;">
 									<div class="col-xs-1 col-md-1" style="margin-bottom: -26px; margin-top: 17px;" ng-hide="!editAdditional"><input type="checkbox" ng-model="userPropertiesMap['passportEnabled']"></div>
-									<div class="col-xs-7 col-md-7" style="margin-bottom: -26px; margin-top: 17px;" ng-hide="userPropertiesMap['passportEnabled'] === false">Ready to show passport</div>
-									<div class="col-xs-7 col-md-7" style="margin-bottom: -26px; margin-top: 17px;" ng-hide="userPropertiesMap['passportEnabled'] !== false">Not ready to show passport</div>
+									<div class="col-xs-11 col-md-7" style="margin-bottom: -26px; margin-top: 17px;" ng-hide="userPropertiesMap['passportEnabled'] === false">Ready to show passport</div>
+									<div class="col-xs-11 col-md-7" style="margin-bottom: -26px; margin-top: 17px;" ng-hide="userPropertiesMap['passportEnabled'] !== false">Not ready to show passport</div>
 								</div>
 								<div class="row">
 									<div class="col-xs-12 col-md-12"><hr></div>
@@ -259,10 +264,10 @@
 					<links-list links="userPropertiesMap['videos']" type="'video'" save-data="updateProfile()" current="userPropertiesMap['isCurrentUser']" edited="editAdditional"></links-list>
 					<links-list links="userPropertiesMap['names']" type="'name'" save-data="updateProfile()" current="userPropertiesMap['isCurrentUser']" edited="editAdditional"></links-list>
 
-					<div class="row">
-						<div class="col-xs-3 col-md-3" style="margin-top: 10px;">Сredit history</div>
+					<div class="row" ng-hide="!userPropertiesMap['bkiData'] && !editAdditional">
+						<div class="col-xs-8 col-md-3" style="margin-top: 10px;">Сredit history</div>
 					</div>
-					<div class="row">
+					<div class="row" ng-hide="!userPropertiesMap['bkiData'] && !editAdditional">
 						<div class="col-xs-12 col-md-12"><hr></div>
 					</div>
 

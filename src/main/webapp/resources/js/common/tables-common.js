@@ -55,7 +55,7 @@ function getSource(path, id) {
 	return source;
 }
 
-function getAdapterFields() {
+function getAdapterFields(allCurrencies) {
 	return {
 		contentType: 'application/json; charset=utf-8',
 		formatData: function(data) {
@@ -64,6 +64,9 @@ function getAdapterFields() {
 			for (var i = 0; i < data.filterscount; i++) {
 
 				if (!isInt(data["filtervalue" + i]) && isNumberField(data["filterdatafield" + i])) {
+					continue;
+				}
+				if (((data["filterdatafield" + i] === "partnersRating") || (data["filterdatafield" + i] === "responsesCount")) && (data["filtervalue" + i] === '0')) {
 					continue;
 				}
 
@@ -90,10 +93,12 @@ function getAdapterFields() {
 						"July", "August", "September", "October", "November", "December"];
 					newData.filterItems[i].filterValue = monthNames[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear();
 				}
+				if ((data["filterdatafield" + i] === "givingCurrency") || (data["filterdatafield" + i] === "takingCurrency")) {
+					newData.filterItems[i].filterValue = allCurrencies[data["filtervalue" + i]];
+				}
 
 				if (isNumberField(data["filterdatafield" + i])) {
 					newData.filterItems[i].filterCondition = "GREATER_THAN_OR_EQUAL";
-					console.log("duration " + data["filtervalue" + i])
 				}
 			}
 			newData.sortOrder = data.sortorder;
@@ -106,7 +111,6 @@ function getAdapterFields() {
 		},
 		downloadComplete: function(data, status, xhr) {
 			var orders = data.orders;
-			console.log(JSON.stringify(orders));
 			for (var i in orders) {
 				if (orders[i].order.languages !== undefined) {
 					var languagesStr = "";

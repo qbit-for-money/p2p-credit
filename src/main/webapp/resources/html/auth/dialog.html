@@ -5,7 +5,7 @@
 	<div class="container-fluid">
 		<div class="row">
 			<div class="col-xs-12 col-md-12">
-				<input id="googleRadio" type="radio" ng-model="auth" value="google" ng-change="changeAuthMode()"/>
+				<input id="googleRadio" type="radio" ng-model="auth" value="google" ng-change="changeAuthMode()" ng-hide="user || isNotCaptcha"/>
 				<label for="googleRadio" style="margin-left: 10px;">
 					<a href="{{url}}" ng-if="auth === 'google'">
 						<img src="resources/img/google-plus.png" class="img-btn google" alt="Google+"/>

@@ -16,7 +16,9 @@ orderModule.controller("UserOrdersController", function($scope, $rootScope, $int
 
 	userProfileService.getAllCategories(function(categories) {
 		userProfileService.getAllLanguages(function(languages) {
-			initTable(categories, languages);
+			userProfileService.getAllCurrencies(function(currencies) {
+				initTable(categories, languages, currencies);
+			});
 		});
 	});
 
@@ -95,7 +97,6 @@ orderModule.controller("UserOrdersController", function($scope, $rootScope, $int
 	}
 
 	var ordersTable = angular.element('#user-orders-table');
-	var dataAdapter = new $.jqx.dataAdapter(getSource("webapi/orders/current/withFilter", ordersTable), getAdapterFields());
 	$scope.orders = {};
 	ordersTable.on("bindingComplete", function(event) {
 		if ($rootScope.userOrderDetails === true) {
@@ -112,7 +113,15 @@ orderModule.controller("UserOrdersController", function($scope, $rootScope, $int
 			}
 		}
 	});
-	function initTable(categories, languages) {
+	function initTable(categories, languages, currencies) {
+		var allCurrenciesCode = [];
+		var allCurrencies = {};
+		for (var i = 0; i < currencies.length; i++) {
+				var currency = currencies[i];
+				allCurrenciesCode.push(currency.code);
+				allCurrencies[currency.code] = currency.id;
+			}
+		var dataAdapter = new $.jqx.dataAdapter(getSource("webapi/orders/current/withFilter", ordersTable), getAdapterFields(allCurrencies));
 		ordersTable.jqxGrid(
 				{
 					theme: "bootstrap",
@@ -136,8 +145,8 @@ orderModule.controller("UserOrdersController", function($scope, $rootScope, $int
 					columns: [
 						{text: "Categories", dataField: "categories", columntype: 'textbox', filtertype: 'checkedlist', filteritems: categories, filtercondition: 'starts_with', width: '160px', sortable: false, cellclassname: cellclassname},
 						{text: "Languages", dataField: "languages", columntype: 'textbox', filtertype: 'checkedlist', filteritems: languages, width: '160px', sortable: false, cellclassname: cellclassname},
-						{text: "Take", dataField: "takingCurrency", filtertype: 'textbox', width: '85px', cellclassname: cellclassname},
-						{text: "Give", dataField: "givingCurrency", filtertype: 'textbox', width: '85px', cellclassname: cellclassname},
+						{text: "Take", dataField: "takingCurrency", filtertype: 'list', filteritems: allCurrenciesCode, width: '85px', cellclassname: cellclassname},
+						{text: "Give", dataField: "givingCurrency", filtertype: 'list', filteritems: allCurrenciesCode, width: '85px', cellclassname: cellclassname},
 						{text: "Duration", dataField: "duration", filtertype: 'textbox', width: '80px', cellclassname: cellclassname},
 						{text: "Responses", dataField: "responsesCount", filtertype: 'textbox', width: '80px', cellclassname: cellclassname},
 						{text: "Status", dataField: "status", columntype: 'textbox', filtertype: 'list', filteritems: ['OPENED', 'IN PROCESS', 'SUCCESS', 'NOT SUCCESS', 'ARBITRATION'], width: '110px', cellclassname: cellclassname},

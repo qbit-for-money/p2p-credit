@@ -25,7 +25,7 @@
  */
 
 var CKBUILDER_CONFIG = {
-	skin: 'moono',
+	skin: 'moono color',
 	preset: 'full',
 	ignore: [
 		'dev',

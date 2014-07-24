@@ -112,13 +112,14 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			$scope.userPropertiesMap['phone'] = userProfileResponse.phone;
 			$scope.userPropertiesMap['phoneEnabled'] = (userProfileResponse.phoneEnabled === true) ? visible : notVisible;
 			$scope.userPropertiesMap['languagesEnabled'] = (userProfileResponse.languagesEnabled === true) ? visible : notVisible;
+			$scope.userPropertiesMap['languages'] = [];
 			if (userProfileResponse.languages) {
 				if ($scope.orderCreatingMap['orderLanguages']) {
 					$scope.orderCreatingMap['orderLanguages'].splice(0, $scope.orderCreatingMap['orderLanguages'].length);
 				}
-				if ($scope.userPropertiesMap['languages']) {
+				/*if ($scope.userPropertiesMap['languages']) {
 					$scope.userPropertiesMap['languages'].splice(0, $scope.userPropertiesMap['languages'].length);
-				}
+				}*/
 				var languages = "";
 				
 				for (var i = 0; i < userProfileResponse.languages.length; i++) {
@@ -130,7 +131,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 					languages = languages.substring(0, languages.length - 2);
 				}
 				$scope.userPropertiesMap['languagesStr'] = languages;
-				console.log($scope.userPropertiesMap['languagesStr'])
 			}
 			$scope.userPropertiesMap['currenciesEnabled'] = (userProfileResponse.currenciesEnabled === true) ? visible : notVisible;
 			$scope.userPropertiesMap['currencies'] = [];

@@ -10,12 +10,12 @@ userProfileModule.factory("userProfileService", function($rootScope, usersProfil
 			if (!currencies) {
 				return;
 			}
-			for (var i = 0; i < currencies.length; i++) {
+			/*for (var i = 0; i < currencies.length; i++) {
 				var currency = currencies[i];
 				allCurrencies.push(currency.code);
-			}
+			}*/
 			if (callback) {
-				callback(allCurrencies);
+				callback(currencies);
 			}
 		});
 	}
