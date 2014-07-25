@@ -4,8 +4,8 @@
 <div class="modal-body">
 	<div class="container-fluid">
 		<div class="row">
-			<div class="col-xs-12 col-md-12">
-				<input id="googleRadio" type="radio" ng-model="auth" value="google" ng-change="changeAuthMode()" ng-hide="user || isNotCaptcha"/>
+			<div class="col-xs-12 col-md-12" ng-hide="isNotCaptcha">
+				<input id="googleRadio" type="radio" ng-model="auth" value="google" ng-change="changeAuthMode()"/>
 				<label for="googleRadio" style="margin-left: 10px;">
 					<a href="{{url}}" ng-if="auth === 'google'">
 						<img src="resources/img/google-plus.png" class="img-btn google" alt="Google+"/>
@@ -13,6 +13,12 @@
 					<img src="resources/img/google-plus-disabled.png" class="img-btn google" alt="Google+"
 						 ng-if="auth === 'noReg'"/>
 				</label>
+			</div>
+			
+			<div class="col-xs-10 col-md-10 col-xs-offset-1 col-md-offset-1" ng-hide="!isNotCaptcha">
+				<a href="{{url}}" ng-if="auth === 'google'">
+						<img src="resources/img/google-plus.png" class="img-btn google" alt="Google+"/>
+					</a>
 			</div>
 		</div>
 		<div class="row" ng-hide="user || isNotCaptcha">
