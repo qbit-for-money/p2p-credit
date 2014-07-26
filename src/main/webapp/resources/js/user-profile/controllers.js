@@ -106,6 +106,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 	});
 	function reloadData() {
 		userProfileResponse.$promise.then(function() {
+			$scope.userPropertiesMap['publicKey'] = userProfileResponse.publicKey;
 			$scope.userPropertiesMap['name'] = userProfileResponse.name;
 			$scope.userPropertiesMap['mail'] = userProfileResponse.mail;
 			$scope.userPropertiesMap['mailEnabled'] = (userProfileResponse.mailEnabled === true) ? visible : notVisible;
@@ -183,7 +184,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			reloadSCEditorInstance();
 			reloadBKIscEditor();
 			$scope.isValidOrder();
-
+			
 		});
 	}
 

@@ -7,6 +7,7 @@ import com.qbit.commons.env.CommonsEnv;
 import com.qbit.commons.mail.MailService;
 import com.qbit.commons.user.UserDAO;
 import com.qbit.p2p.credit.env.Env;
+import com.qbit.p2p.credit.like.dao.LikeDAO;
 import com.qbit.p2p.credit.material.dao.MaterialDAO;
 import com.qbit.p2p.credit.order.dao.OrderDAO;
 import com.qbit.p2p.credit.order.resource.OrdersResource;
@@ -56,9 +57,10 @@ public class P2PCreditApp extends Application {
 		addBinding(newBinder(OrderDAO.class).to(OrderDAO.class).in(Singleton.class), configuration);
 		addBinding(newBinder(MaterialDAO.class).to(MaterialDAO.class).in(Singleton.class), configuration);
 		addBinding(newBinder(OrdersResource.class).to(OrdersResource.class).in(Singleton.class), configuration);
+		addBinding(newBinder(LikeDAO.class).to(LikeDAO.class).in(Singleton.class), configuration);
 		
 		configuration.commit();
-		//serviceLocator.createAndInitialize(OrderFlowScheduler.class);
+//		serviceLocator.createAndInitialize(OrderFlowScheduler.class);
 	}
 
 	/**

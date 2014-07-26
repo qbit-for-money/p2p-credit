@@ -43,12 +43,11 @@
 				<div class="container-fluid">
 					<div class="row">
 						<div class="col-xs-6 col-md-9 " ng-if="!edit">
-							<h4>{{userPropertiesMap['name']}}</h4>
+							<h4>{{userPropertiesMap['name']}}<div style="float: right"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="'123'" entity-field="'name'" /></div></h4>
 						</div>
 
 						<div class="col-xs-6 col-md-8" ng-if="edit">
-							<input type="text" id="name" class="form-control" ng-model="userPropertiesMap
-								['name']" placeholder="Name" maxlength="20"/>
+							<input type="text" id="name" class="form-control" ng-model="userPropertiesMap['name']" placeholder="Name" maxlength="20"/>
 						</div>
 
 						<div class="col-xs-6 col-md-3"  ng-hide="!isCurrentUser">

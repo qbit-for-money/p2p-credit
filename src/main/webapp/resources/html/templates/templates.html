@@ -11,48 +11,48 @@
 		</div>
 		<div class="col-xs-6 col-md-7" ng-if="{{isComment}}">
 
-			<div class='container-fluid'>
-				<div class='col-xs-12 col-md-12' style='margin: 3px;'>
+			<div class="container-fluid">
+				<div class="col-xs-12 col-md-12" style="margin: 3px;">
 					Comment: {{comment}}
 				</div>
 			</div>
 		</div>
 		<div class="col-xs-6 col-md-7" ng-if="{{isAttributes}}">
-			<div class='container-fluid'>
-				<div class='col-xs-12 col-md-12' style='margin: 6px;' id='name'>
+			<div class="container-fluid">
+				<div class="col-xs-12 col-md-12" style="margin: 6px;" id="name">
 					Name: <span></span>
 				</div>
 			</div>
-			<div class='container-fluid'>
-				<div class='col-xs-12 col-md-12' style='margin: 6px;' id='mail'>
+			<div class="container-fluid">
+				<div class="col-xs-12 col-md-12" style="margin: 6px;" id="mail">
 					Mail: <span></span>
 				</div>
 			</div>
-			<div class='container-fluid'>
-				<div class='col-xs-12 col-md-12' style='margin: 6px;' id='phone'>
+			<div class="container-fluid">
+				<div class="col-xs-12 col-md-12" style="margin: 6px;" id="phone">
 					Phone: <span></span>
 				</div>
 			</div>
 		</div>
 		<div class="col-xs-3 col-md-3">
-			<div class='container-fluid'>
-				<div class='col-xs-12 col-md-12' style='margin: 6px;'>
+			<div class="container-fluid">
+				<div class="col-xs-12 col-md-12" style="margin: 6px;">
 
 				</div>
 			</div>
-			<div class='container-fluid'>
-				<div class='col-xs-12 col-md-12' style='margin-top: 12px;'>
+			<div class="container-fluid">
+				<div class="col-xs-12 col-md-12" style="margin-top: 12px;">
 					<div class="navbar-right">
 						<button class="btn btn-success" type="button" ng-hide="{{status === true}}" ng-disabled="{{orderStatus !== 'OPENED'}}" ng-click="approve({{orderId}}, '{{userId}}')">
 							Yes!
 						</button>
 
-						<bs-dropdown data-menu-type="button" order-id={{orderId}} ng-hide="{{(status !== true)|| ((orderStatus === 'SUCCESS') || (orderStatus === 'NOT SUCCESS') || (orderStatus === 'ARBITRATION')) || (orderStatus === 'IN PROCESS') && (isApprovedResponse == false)}}"></bs-dropdown>
+						<bs-dropdown data-menu-type="button" order-id="{{orderId}}" ng-hide="{{(status !== true)|| ((orderStatus === 'SUCCESS') || (orderStatus === 'NOT SUCCESS') || (orderStatus === 'ARBITRATION')) || (orderStatus === 'IN PROCESS') && (isApprovedResponse == false)}}"></bs-dropdown>
 					</div>
 				</div>
 			</div>
-			<div class='container-fluid'>
-				<div class='col-xs-12 col-md-12' style='margin: 6px;'>
+			<div class="container-fluid">
+				<div class="col-xs-12 col-md-12" style="margin: 6px;">
 
 				</div>
 			</div>
@@ -63,16 +63,16 @@
 </script>
 
 <script id="userOrdersTableDetailTmpl" type="text/x-angular-tmpl">
-<ul style='margin-left: 30px;'>
+<ul style="margin-left: 30px;">
 	<li>Free description</li>
 	<li>Responses list</li>
 </ul>
-<div class='order-description container-fluid'>
-<div style='position: absolute; top: 10px; right: 49px; height: 18px;'>
+<div class="order-description container-fluid">
+<div style="position: absolute; top: 10px; right: 49px; height: 18px;">
 		<div class="row">
-			<div class='container-fluid' >
-				<div class='col-xs-12 col-md-12'>	
-						<bs-dropdown data-menu-type="button" order-id={{orderId}} ng-hide="{{(status !== true)|| ((orderStatus === 'SUCCESS') || (orderStatus === 'NOT SUCCESS') || (orderStatus === 'ARBITRATION'))}}"></bs-dropdown>
+			<div class="container-fluid">
+				<div class="col-xs-12 col-md-12">	
+					<bs-dropdown data-menu-type="button" order-id={{orderId}} ng-hide="{{(status !== true)|| ((orderStatus === 'SUCCESS') || (orderStatus === 'NOT SUCCESS') || (orderStatus === 'ARBITRATION'))}}"></bs-dropdown>
 				</div>
 			</div>
 		</div>
@@ -83,12 +83,12 @@
 		</div>
 	</div>
 </div>
-<div class='responses-list container-fluid'>
-	<div style='position: absolute; top: 10px; right: 49px; height: 18px;'>
+<div class="responses-list container-fluid">
+	<div style="position: absolute; top: 10px; right: 49px; height: 18px;">
 		<div class="row">
-			<div class='container-fluid' >
-				<div class='col-xs-12 col-md-12'>	
-						<bs-dropdown data-menu-type="button" order-id={{orderId}} ng-hide="{{(status !== true)|| ((orderStatus === 'SUCCESS') || (orderStatus === 'NOT SUCCESS') || (orderStatus === 'ARBITRATION'))}}"></bs-dropdown>
+			<div class="container-fluid">
+				<div class="col-xs-12 col-md-12">	
+					<bs-dropdown data-menu-type="button" order-id={{orderId}} ng-hide="{{(status !== true)|| ((orderStatus === 'SUCCESS') || (orderStatus === 'NOT SUCCESS') || (orderStatus === 'ARBITRATION'))}}"></bs-dropdown>
 				</div>
 			</div>
 		</div>

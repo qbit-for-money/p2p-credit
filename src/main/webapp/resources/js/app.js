@@ -12,7 +12,10 @@ angular.module("user-edit", ["ngResource"]);
 
 angular.module("navbar", ["ngResource"]);
 
-angular.module("main", ["ngRoute", "ui.bootstrap", "chieffancypants.loadingBar", "common", "user", "captcha-auth", "order", "user-profile", "user-edit", "navbar", "ui.select2"]);
+angular.module("like", ["ngResource"]);
+
+angular.module("main", ["ngRoute", "ui.bootstrap", "chieffancypants.loadingBar", "common", "user",
+	"captcha-auth", "order", "user-profile", "user-edit", "navbar", "like", "ui.select2"]);
 
 angular.module("main").config(function($routeProvider, $locationProvider) {
 	$routeProvider.when("/", {

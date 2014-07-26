@@ -116,6 +116,9 @@
 		<script type="text/javascript" src="resources/js/user-orders-table/directives.js"></script>
 
 		<script type="text/javascript" src="resources/js/navbar/controllers.js"></script>
+		
+		<script type="text/javascript" src="resources/js/like/resources.js"></script>
+		<script type="text/javascript" src="resources/js/like/directives.js"></script>
 
 		<div ng-include src="'resources/html/templates/templates.html'"></div>
 		<script type="text/javascript" src="resources/js/common/tables-common.js"></script>

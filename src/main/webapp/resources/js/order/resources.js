@@ -15,5 +15,3 @@ orderModule.factory("ordersResource", function($resource) {
 		changeStatus: {method: "POST", url: window.context + "webapi/orders/changeStatus"}
 	});
 });
-
-
