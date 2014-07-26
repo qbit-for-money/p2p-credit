@@ -15,10 +15,13 @@ import com.qbit.p2p.credit.order.model.SearchRequest;
 import com.qbit.p2p.credit.order.model.FilterOperator;
 import com.qbit.p2p.credit.order.model.OrderInfo;
 import com.qbit.p2p.credit.order.model.OrderStatus;
+import com.qbit.p2p.credit.statistics.dao.StatisticsDAO;
 import com.qbit.p2p.credit.user.dao.UserProfileDAO;
+import com.qbit.p2p.credit.statistics.model.GlobalStatistics;
 import com.qbit.p2p.credit.user.model.Language;
 import com.qbit.p2p.credit.user.model.Point2;
-import com.qbit.p2p.credit.user.model.Statistic;
+import com.qbit.p2p.credit.statistics.model.Statistics;
+import com.qbit.p2p.credit.statistics.resource.StatisticsResource;
 import com.qbit.p2p.credit.user.model.ShortProfile;
 import com.qbit.p2p.credit.user.model.UserPrivateProfile;
 import com.qbit.p2p.credit.user.model.UserPublicProfile;
@@ -119,13 +122,13 @@ public class ProfilesResource {
 
 		public boolean isValid() {
 			return imageString != null && ((imageString.isEmpty())
-				|| ((imageString.length() < MAX_STRING_LENGTH)
-				&& (startPoint.getX() >= 0) && (endPoint.getX() > 0)
-				&& (endPoint.getX() - startPoint.getX() < MAX_WIDTH)
-				&& (endPoint.getX() - startPoint.getX() > MIN_WIDTH)
-				&& (startPoint.getY() >= 0) && (endPoint.getY() > 0)
-				&& (endPoint.getY() - startPoint.getY() < MAX_HEIGHT)
-				&& (endPoint.getY() - startPoint.getY() > MIN_HEIGHT)));
+					|| ((imageString.length() < MAX_STRING_LENGTH)
+					&& (startPoint.getX() >= 0) && (endPoint.getX() > 0)
+					&& (endPoint.getX() - startPoint.getX() < MAX_WIDTH)
+					&& (endPoint.getX() - startPoint.getX() > MIN_WIDTH)
+					&& (startPoint.getY() >= 0) && (endPoint.getY() > 0)
+					&& (endPoint.getY() - startPoint.getY() < MAX_HEIGHT)
+					&& (endPoint.getY() - startPoint.getY() > MIN_HEIGHT)));
 
 		}
 
@@ -179,6 +182,12 @@ public class ProfilesResource {
 	@Inject
 	private MaterialDAO materialDAO;
 
+	@Inject
+	private StatisticsDAO statisticsDAO;
+
+	@Inject
+	private StatisticsResource statisticsResource;
+
 	@GET
 	@Path("current")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -190,7 +199,6 @@ public class ProfilesResource {
 		UserPublicProfile profile = userProfileDAO.find(userId);
 		if (profile == null) {
 			profile = userProfileDAO.create(userId);
-			profile.setStatistic(getStatistic(userId));
 			return userProfileDAO.updateUserPublicProfile(profile);
 		}
 		return profile;
@@ -266,7 +274,7 @@ public class ProfilesResource {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public UsersPublicProfilesWrapper getAll(@QueryParam("filterslength") int filterslength, @QueryParam("sortdatafield") String sortDataField,
-		@QueryParam("sortorder") String sortOrder, @QueryParam("pagenum") int pagenum, @QueryParam("pagesize") int limit) {
+			@QueryParam("sortorder") String sortOrder, @QueryParam("pagenum") int pagenum, @QueryParam("pagesize") int limit) {
 		boolean sortDesc = false;
 		if (sortOrder != null && sortOrder.equals("desc")) {
 			sortDesc = true;
@@ -278,7 +286,7 @@ public class ProfilesResource {
 	@Path("byOrder")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<UserPublicProfile> getByOrder(@QueryParam("id") String id,
-		@QueryParam("offset") int offset, @QueryParam("limit") int limit) {
+			@QueryParam("offset") int offset, @QueryParam("limit") int limit) {
 		return userProfileDAO.findByOrder(id, offset, limit);
 	}
 
@@ -292,97 +300,12 @@ public class ProfilesResource {
 		}
 		String userId = AuthFilter.getUserId(request);
 		userProfile.setPublicKey(userId);
-		userProfile.setStatistic(getStatistic(userId));
-		return userProfileDAO.updateUserPublicProfile(userProfile);
-	}
-
-	private Statistic getStatistic(String publicKey) {
-		Statistic statistic = new Statistic();
-		long openessRating = 0;
-		long transactionsRating = 0;
-		long allOrders = 0;
-		long allTransactions = 0;
-		long allSuccessTransactions = 0;
-		long allUsersTransactions = 0;
-		long allUsersSuccessTransactions = 0;
-		UserPublicProfile user = userProfileDAO.find(publicKey);
-		if (user == null) {
-			return null;
-		}
-		if ((user.getName() != null) && !user.getName().isEmpty()) {
-			openessRating = openessRating + 5;
-		}
-		if (user.isPassportEnabled()) {
-			openessRating = openessRating + 5;
-		}
-		if (user.isPersonalDataEnabled()) {
-			openessRating = openessRating + 5;
-		}
-		if (user.isMailEnabled() && (user.getMail() != null) && !user.getMail().isEmpty()) {
-			openessRating = openessRating + 5;
-		}
-		if (user.isPhoneEnabled() && (user.getPhone() != null) && !user.getPhone().isEmpty()) {
-			openessRating = openessRating + 5;
-		}
-		if ((user.getBkiData() != null) && !user.getBkiData().isEmpty()) {
-			openessRating = openessRating + 5;
-		}
-		if (user.getVideos() != null) {
-			openessRating = openessRating + user.getVideos().size() * 2;
-		}
-		if (user.getPhones() != null) {
-			openessRating = openessRating + user.getPhones().size() * 3;
-		}
-		if (user.getSocialLinks() != null) {
-			openessRating = openessRating + user.getSocialLinks().size() * 3;
-		}
-		if (user.getNamesLinks() != null) {
-			openessRating = openessRating + user.getNamesLinks().size() * 3;
-		}
-		statistic.setOpennessRating(openessRating);
-		SearchRequest filter = new SearchRequest();
-		FilterItem filterItem = new FilterItem();
-		filterItem.setFilterDataField("status");
-		filterItem.setFilterValue("SUCCESS");
-		filterItem.setFilterOperator(FilterOperator.AND);
-		filterItem.setFilterCondition(FilterCondition.EQUAL);
-		filter.setFilterItems(Arrays.asList(filterItem));
-		long successLength = orderDAO.getLengthWithFilter(publicKey, filter, null);
-
-		filterItem.setFilterValue("NOT_SUCCESS");
-		filter.setFilterItems(Arrays.asList(filterItem));
-		long notSuccessLength = orderDAO.getLengthWithFilter(publicKey, filter, null);
-		transactionsRating = successLength - notSuccessLength;
-		statistic.setTransactionsRating(transactionsRating);
-		allOrders = orderDAO.getLengthWithFilter(publicKey, null, null);
-
-		statistic.setOrdersSumValue(allOrders);
-		filterItem.setFilterCondition(FilterCondition.NOT_EQUAL);
-		filterItem.setFilterValue("OPENED");
-		filter.setFilterItems(Arrays.asList(filterItem));
-		allTransactions = orderDAO.getLengthWithFilter(publicKey, filter, null);
-
-		statistic.setTransactionsSum(allTransactions);
-		System.out.println("!! RATING: " + openessRating + " " + allTransactions);
-		statistic.setSummaryRating((long) (openessRating * env.getUserOpenessRatingFactor()) + (long) (allTransactions * env.getUserAllTransactionsFactor()));
-
-		allUsersTransactions = orderDAO.getLengthWithFilter(null, filter, null);
-
-		statistic.setAllTransactionsSum(allUsersTransactions);
-
-		filterItem.setFilterCondition(FilterCondition.EQUAL);
-		filterItem.setFilterValue("SUCCESS");
-		filter.setFilterItems(Arrays.asList(filterItem));
-		allSuccessTransactions = orderDAO.getLengthWithFilter(publicKey, filter, null);
-
-		statistic.setSuccessTransactionsSum(allSuccessTransactions);
-
-		allUsersSuccessTransactions = orderDAO.getLengthWithFilter(null, filter, null);
-
-		statistic.setAllSuccessTransactionsSum(allUsersSuccessTransactions);
-
-		return statistic;
-
+		UserPublicProfile newProfile = userProfileDAO.updateUserPublicProfile(userProfile);
+		Statistics statistics = new Statistics(userId);
+		statistics.setOpennessRating(statisticsResource.getOpenessRating(userId));
+		statistics.setSummaryRating(statisticsResource.getSummaryRating(userId));
+		statisticsDAO.setProfileRating(statistics);
+		return newProfile;
 	}
 
 	@POST
@@ -422,7 +345,7 @@ public class ProfilesResource {
 			arrayInputStream = new ByteArrayInputStream(imageByte);
 			BufferedImage bufferedImage = ImageIO.read(arrayInputStream);
 			destBufferedImage = bufferedImage.getSubimage(userPhoto.getStartPoint().getX(), userPhoto.getStartPoint().getY(),
-				userPhoto.getEndPoint().getX() - userPhoto.getStartPoint().getX(), userPhoto.getEndPoint().getY() - userPhoto.getStartPoint().getY());
+					userPhoto.getEndPoint().getX() - userPhoto.getStartPoint().getX(), userPhoto.getEndPoint().getY() - userPhoto.getStartPoint().getY());
 			if (destBufferedImage.getHeight() > UserPhotoRequest.MAX_HEIGHT || destBufferedImage.getWidth() > UserPhotoRequest.MAX_WIDTH) {
 				throw new IOException();
 			}
@@ -455,7 +378,7 @@ public class ProfilesResource {
 
 				UserPublicProfile userProfile = userProfileDAO.find(userId);
 				if ((userProfile != null) && (userProfile.getName() != null)
-					&& !userProfile.getName().isEmpty()) {
+						&& !userProfile.getName().isEmpty()) {
 					material.setAuthor(userProfile.getName());
 				}
 				if (materials.isEmpty()) {

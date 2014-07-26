@@ -106,7 +106,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 	});
 	function reloadData() {
 		userProfileResponse.$promise.then(function() {
-			$scope.userPropertiesMap['publicKey'] = userProfileResponse.publicKey;
 			$scope.userPropertiesMap['name'] = userProfileResponse.name;
 			$scope.userPropertiesMap['mail'] = userProfileResponse.mail;
 			$scope.userPropertiesMap['mailEnabled'] = (userProfileResponse.mailEnabled === true) ? visible : notVisible;
@@ -119,16 +118,16 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 					$scope.orderCreatingMap['orderLanguages'].splice(0, $scope.orderCreatingMap['orderLanguages'].length);
 				}
 				/*if ($scope.userPropertiesMap['languages']) {
-					$scope.userPropertiesMap['languages'].splice(0, $scope.userPropertiesMap['languages'].length);
-				}*/
+				 $scope.userPropertiesMap['languages'].splice(0, $scope.userPropertiesMap['languages'].length);
+				 }*/
 				var languages = "";
-				
+
 				for (var i = 0; i < userProfileResponse.languages.length; i++) {
 					$scope.orderCreatingMap['orderLanguages'].push(userProfileResponse.languages[i].title);
 					$scope.userPropertiesMap['languages'].push(userProfileResponse.languages[i].title);
 					languages += (userProfileResponse.languages[i].title + ", ");
 				}
-				if(userProfileResponse.languages.length !== 0) {
+				if (userProfileResponse.languages.length !== 0) {
 					languages = languages.substring(0, languages.length - 2);
 				}
 				$scope.userPropertiesMap['languagesStr'] = languages;
@@ -149,16 +148,21 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			$scope.userPropertiesMap['videos'] = (userProfileResponse.videos) ? userProfileResponse.videos : [];
 			$scope.userPropertiesMap['names'] = (userProfileResponse.namesLinks) ? userProfileResponse.namesLinks : [];
 			$scope.userPropertiesMap['socialLinks'] = (userProfileResponse.socialLinks) ? userProfileResponse.socialLinks : [];
-			if (userProfileResponse.statistic) {
-				$scope.ratingOpenness = userProfileResponse.statistic.opennessRating;
-				$scope.ratingTransactions = userProfileResponse.statistic.transactionsRating;
-				$scope.ordersSumValue = userProfileResponse.statistic.ordersSumValue;
-				$scope.transactionsSum = userProfileResponse.statistic.transactionsSum;
-				$scope.successTransactionsSum = userProfileResponse.statistic.successTransactionsSum;
-				$scope.allTransactionsSum = userProfileResponse.statistic.allTransactionsSum;
-				$scope.allSuccessTransactionsSum = userProfileResponse.statistic.allSuccessTransactionsSum;
-				$scope.summaryRating = userProfileResponse.statistic.summaryRating;
-			}
+			var userStatisticsResponse = usersProfileResource.getStatisticsById({'id': userPublicKeyFromPath});
+			userStatisticsResponse.$promise.then(function() {
+				$scope.ratingOpenness = userStatisticsResponse.opennessRating;
+				$scope.ratingTransactions = userStatisticsResponse.transactionsRating;
+				$scope.ordersSumValue = userStatisticsResponse.ordersSumValue;
+				$scope.transactionsSum = userStatisticsResponse.transactionsSum;
+				$scope.successTransactionsSum = userStatisticsResponse.successTransactionsSum;
+				$scope.allTransactionsSum = userStatisticsResponse.allTransactionsSum;
+				$scope.allSuccessTransactionsSum = userStatisticsResponse.allSuccessTransactionsSum;
+				$timeout(function() {
+					$scope.$apply(function() {
+						$scope.summaryRating = userStatisticsResponse.summaryRating;
+					});
+				});
+			});
 
 			$scope.userPropertiesMap['personalData'] = $sce.trustAsHtml(userProfileResponse.personalData);
 			$scope.userPropertiesMap['personalDataEnabled'] = (userProfileResponse.personalDataEnabled === true) ? visible : notVisible;
@@ -184,7 +188,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			reloadSCEditorInstance();
 			reloadBKIscEditor();
 			$scope.isValidOrder();
-			
+
 		});
 	}
 
@@ -322,8 +326,8 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		var duration = angular.element("#duration-input").jqxNumberInput('val');
 		var categories = $scope.orderCreatingMap['orderCategories'];
 		var languages = $scope.orderCreatingMap['orderLanguages'];
-		if (!data || data === "" || !$scope.isValidDateInput() || !duration || duration <= 0 || !categories
-				|| categories.length === 0 || !languages || languages.length === 0) {
+		if (!data || data === "" || !$scope.isValidDateInput() || !duration || duration < 0 || !categories
+			|| categories.length === 0 || !languages || languages.length === 0) {
 			$scope.createOrderButtonEnabled = false;
 		} else if (takingCurrency !== "None" && (!takingValue || takingValue <= 0)) {
 			$scope.createOrderButtonEnabled = false;
@@ -463,7 +467,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 
 	function reloadSCEditorInstance() {
 		if ($scope.userPropertiesMap['personalData'] && (($scope.userPropertiesMap['personalData'].toString() === "DEFAULT")
-				|| ($scope.userPropertiesMap['personalData'].toString().indexOf("<p>DEFAULT</p>") === 0))) {
+			|| ($scope.userPropertiesMap['personalData'].toString().indexOf("<p>DEFAULT</p>") === 0))) {
 			if ($scope.isCurrentUser && $scope.edit) {
 				CKEDITOR.instances.personalEditable.setData(defaultPersonalData);
 			} else if (!$scope.edit) {
@@ -491,7 +495,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 
 	function reloadBKIscEditor() {
 		if ($scope.userPropertiesMap['bkiData'] && (($scope.userPropertiesMap['bkiData'].toString() === "DEFAULT")
-				|| ($scope.userPropertiesMap['bkiData'].toString().indexOf("<p>DEFAULT</p>") === 0))) {
+			|| ($scope.userPropertiesMap['bkiData'].toString().indexOf("<p>DEFAULT</p>") === 0))) {
 			if ($scope.isCurrentUser && $scope.editAdditional) {
 				CKEDITOR.instances.bkiEditable.setData(defaultPersonalData);
 			} else if (!$scope.editAdditional) {
@@ -629,7 +633,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		if ($scope.userPropertiesMap['mail'] && isValidEmail($scope.userPropertiesMap['mail'])) {
 			userPublicProfile.mail = $scope.userPropertiesMap['mail'];
 		}
-			
+
 		userPublicProfile.mailEnabled = ($scope.userPropertiesMap['mailEnabled'] === visible) ? true : false;
 		if ($scope.userPropertiesMap['personalDataEnabled'] === visible) {
 			userPublicProfile.personalDataEnabled = true;
@@ -709,9 +713,9 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 
 	angular.element(document).on("focus", "#name", function() {
 		angular.element(this).mask("SSSSSSSSSSSSSSSSSSSSSSSSSSS",
-				{'translation': {
-						S: {pattern: /[A-Za-zА-Яа-я0-9\s]/}
-					}});
+			{'translation': {
+					S: {pattern: /[A-Za-zА-Яа-я0-9\s]/}
+				}});
 	});
 	/*angular.element(document).on("focus", "#mail", function() {
 	 angular.element(this).mask("SSSSSSSSSSSSSS",
@@ -729,11 +733,11 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		});
 		modalInstance.result.then(function() {
 		},
-				function() {
-					var ias = angular.element('#user-photo-change').imgAreaSelect({instance: true});
-					ias.setOptions({hide: true});
-					ias.update();
-				});
+			function() {
+				var ias = angular.element('#user-photo-change').imgAreaSelect({instance: true});
+				ias.setOptions({hide: true});
+				ias.update();
+			});
 	};
 	function loadImageError() {
 		$scope.showUserPhotoError = true;
@@ -751,7 +755,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			imag.onload = function() {
 
 				if ((result.indexOf("jpg") === -1)
-						&& (result.indexOf("jpeg") === -1)) {
+					&& (result.indexOf("jpeg") === -1)) {
 					$scope.photoErrorMessage = errorMessages["IMAGE_TYPE"];
 					loadImageError();
 				}

@@ -36,7 +36,7 @@ public class UserPublicProfile implements Serializable {
 	private boolean mailEnabled;
 	private String phone;
 	private boolean phoneEnabled;
-	@ManyToMany(cascade=CascadeType.ALL)
+	@ManyToMany(cascade = CascadeType.ALL)
 	private List<Language> languages;
 	private boolean languagesEnabled;
 	@XmlJavaTypeAdapter(CurrencyAdapter.class)
@@ -45,8 +45,6 @@ public class UserPublicProfile implements Serializable {
 	@Lob
 	private String personalData;
 	private boolean personalDataEnabled;
-	@Embedded
-	private Statistic statistic;
 
 	private List<DataLink> phones;
 	private List<DataLink> socialLinks;
@@ -153,14 +151,6 @@ public class UserPublicProfile implements Serializable {
 		this.currenciesEnabled = currenciesEnabled;
 	}
 
-	public Statistic getStatistic() {
-		return statistic;
-	}
-
-	public void setStatistic(Statistic statistic) {
-		this.statistic = statistic;
-	}
-
 	public boolean isPassportEnabled() {
 		return passportEnabled;
 	}
@@ -201,7 +191,6 @@ public class UserPublicProfile implements Serializable {
 		this.namesLinks = namesLinks;
 	}
 
-
 	public String getBkiData() {
 		return bkiData;
 	}
@@ -214,7 +203,6 @@ public class UserPublicProfile implements Serializable {
 		return true;
 	}
 
-	
 	/*public boolean isValid() {
 	 return (name == null || name.length() <= MAX_LENGTH)
 	 && (mail == null || mail.length() <= MAX_LENGTH)
@@ -224,6 +212,6 @@ public class UserPublicProfile implements Serializable {
 	 }*/
 	@Override
 	public String toString() {
-		return "UserPublicProfile{" + "publicKey=" + publicKey + ", name=" + name + ", mail=" + mail + ", mailEnabled=" + mailEnabled + ", phone=" + phone + ", phoneEnabled=" + phoneEnabled + ", languages=" + languages + ", languagesEnabled=" + languagesEnabled + ", currencies=" + currencies + ", currenciesEnabled=" + currenciesEnabled + ", personalData=" + personalData + ", personalDataEnabled=" + personalDataEnabled + ", statistic=" + statistic + ", phones=" + phones + ", socialLinks=" + socialLinks + ", passportEnabled=" + passportEnabled + ", videos=" + videos + ", namesLinks=" + namesLinks + ", bkiData=" + bkiData + '}';
+		return "UserPublicProfile{" + "publicKey=" + publicKey + ", name=" + name + ", mail=" + mail + ", mailEnabled=" + mailEnabled + ", phone=" + phone + ", phoneEnabled=" + phoneEnabled + ", languages=" + languages + ", languagesEnabled=" + languagesEnabled + ", currencies=" + currencies + ", currenciesEnabled=" + currenciesEnabled + ", personalData=" + personalData + ", personalDataEnabled=" + personalDataEnabled + ", phones=" + phones + ", socialLinks=" + socialLinks + ", passportEnabled=" + passportEnabled + ", videos=" + videos + ", namesLinks=" + namesLinks + ", bkiData=" + bkiData + '}';
 	}
 }

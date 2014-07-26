@@ -15,6 +15,7 @@ import com.qbit.p2p.credit.order.model.OrderInfo;
 import com.qbit.p2p.credit.order.model.OrderStatus;
 import com.qbit.p2p.credit.order.model.Respond;
 import com.qbit.p2p.credit.order.model.SearchRequest;
+import com.qbit.p2p.credit.statistics.model.Statistics;
 import com.qbit.p2p.credit.user.dao.UserProfileDAO;
 import com.qbit.p2p.credit.user.model.Language;
 import com.qbit.p2p.credit.user.model.UserPublicProfile;
@@ -55,7 +56,7 @@ public class OrderDAO {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {
 			return DAOUtil.find(entityManagerFactory.createEntityManager(),
-				OrderInfo.class, id, null);
+					OrderInfo.class, id, null);
 		} finally {
 			entityManager.close();
 		}
@@ -140,7 +141,7 @@ public class OrderDAO {
 
 			@Override
 			public OrderInfo
-				call(EntityManager entityManager) {
+					call(EntityManager entityManager) {
 				OrderInfo order = entityManager.find(OrderInfo.class, newOrder.getId());
 				if (order == null) {
 					return null;
@@ -188,7 +189,7 @@ public class OrderDAO {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {
 			return DAOUtil.find(entityManagerFactory.createEntityManager(),
-				Respond.class, id, null);
+					Respond.class, id, null);
 		} finally {
 			entityManager.close();
 		}
@@ -293,7 +294,7 @@ public class OrderDAO {
 	}
 
 	private CriteriaQuery formCriteria(CriteriaQuery criteria, CriteriaBuilder builder, Root<OrderInfo> order, CriteriaQuery<Object> select,
-		EntityType<OrderInfo> type, String userPublicKey, SearchRequest filterCriteriaValue, UserPublicProfile profile, EntityManager entityManager) {
+			EntityType<OrderInfo> type, String userPublicKey, SearchRequest filterCriteriaValue, UserPublicProfile profile, EntityManager entityManager) {
 		Predicate mainOperatorPredicate = null;
 		if ((userPublicKey != null) && !userPublicKey.isEmpty()) {
 			Expression<String> typeExpression = order.get("userPublicKey");
@@ -372,20 +373,20 @@ public class OrderDAO {
 					} else if (FilterCondition.STARTS_WITH == item.getFilterCondition()) {
 
 						valuePredicate = builder.like(
-							builder.lower(
-								order.get(
-									type.getDeclaredSingularAttribute(item.getFilterDataField(), String.class)
-								)
-							), "%" + item.getFilterValue().toLowerCase() + "%"
+								builder.lower(
+										order.get(
+												type.getDeclaredSingularAttribute(item.getFilterDataField(), String.class)
+										)
+								), "%" + item.getFilterValue().toLowerCase() + "%"
 						);
 					} else if (FilterCondition.LE == item.getFilterCondition()) {
 
 						valuePredicate = builder.like(
-							builder.lower(
-								order.get(
-									type.getDeclaredSingularAttribute(item.getFilterDataField(), String.class)
-								)
-							), "%" + item.getFilterValue().toLowerCase() + "%"
+								builder.lower(
+										order.get(
+												type.getDeclaredSingularAttribute(item.getFilterDataField(), String.class)
+										)
+								), "%" + item.getFilterValue().toLowerCase() + "%"
 						);
 					} else if (FilterCondition.LESS_THAN_OR_EQUAL == item.getFilterCondition()) {
 						if ("endDate".toLowerCase().equals(item.getFilterDataField().toLowerCase())) {
@@ -407,10 +408,10 @@ public class OrderDAO {
 						if ("endDate".toLowerCase().equals(item.getFilterDataField().toLowerCase())) {
 							valuePredicate = builder.greaterThanOrEqualTo(order.<Date>get(item.getFilterDataField()), DateUtil.stringToDate(item.getFilterValue()));
 						} else if ("summaryRating".equals(item.getFilterDataField()) || "opennessRating".equals(item.getFilterDataField())) {
-							Subquery<UserPublicProfile> subquery = criteria.subquery(UserPublicProfile.class);
-							Root fromUserPublicProfile = subquery.from(UserPublicProfile.class);
-							subquery.select(fromUserPublicProfile.get("publicKey"));
-							subquery.where(builder.greaterThanOrEqualTo(fromUserPublicProfile.join("statistic").get(item.getFilterDataField()), item.getFilterValue()));
+							Subquery<Statistics> subquery = criteria.subquery(Statistics.class);
+							Root fromStatistics = subquery.from(Statistics.class);
+							subquery.select(fromStatistics.get("id"));
+							subquery.where(builder.greaterThanOrEqualTo(fromStatistics.get(item.getFilterDataField()), item.getFilterValue()));
 							valuePredicate = builder.in(order.get("userPublicKey")).value(subquery);
 						} else if ("responsesCount".equals(item.getFilterDataField())) {
 							TypedQuery<String> query = entityManager.createQuery("SELECT o.id FROM OrderInfo o JOIN o.responses r GROUP BY o.id HAVING count(r) >= :count AND o.userPublicKey = :publicKey", String.class);
@@ -445,7 +446,7 @@ public class OrderDAO {
 					}
 					if (itemsOperatorPredicate == null) {
 						itemsOperatorPredicate = valuePredicate;
-					} else if ((item.getFilterOperator() == null) || FilterOperator.AND == item.getFilterOperator()) {
+					} else if ((item.getFilterOperator() == null) || (FilterOperator.AND == item.getFilterOperator() && !"categories".equals(item.getFilterDataField()) && !"languages".equals(item.getFilterDataField()))) {
 						itemsOperatorPredicate = builder.and(valuePredicate, itemsOperatorPredicate);
 					} else if (FilterOperator.OR == item.getFilterOperator()) {
 						itemsOperatorPredicate = builder.or(valuePredicate, itemsOperatorPredicate);
@@ -557,9 +558,9 @@ public class OrderDAO {
 			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 			CriteriaQuery<Long> criteria;
 			criteria = builder.createQuery(Long.class);
-			Root<UserPublicProfile> profile = criteria.from(UserPublicProfile.class);
+			Root<Statistics> statistics = criteria.from(Statistics.class);
 
-			Expression<Integer> ex = profile.get("statistic").get("summaryRating");
+			Expression<Integer> ex = statistics.get("summaryRating");
 			criteria.select(builder.sumAsLong(ex));
 
 			Subquery<String> usersIdSubquery = criteria.subquery(String.class);
@@ -576,7 +577,7 @@ public class OrderDAO {
 			Predicate p2 = builder.in(fromResponse.get("id")).value(subquery);
 			usersIdSubquery.where(p2);
 
-			Predicate p3 = builder.and(builder.in(profile.get("publicKey")).value(usersIdSubquery), builder.notEqual(profile.get("publicKey"), userPublicKey));
+			Predicate p3 = builder.and(builder.in(statistics.get("id")).value(usersIdSubquery), builder.notEqual(statistics.get("id"), userPublicKey));
 			criteria.where(p3);
 			Long result = entityManager.createQuery(criteria).getSingleResult();
 			return (result == null) ? 0 : result;
@@ -591,9 +592,9 @@ public class OrderDAO {
 			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 			CriteriaQuery<Long> criteria;
 			criteria = builder.createQuery(Long.class);
-			Root<UserPublicProfile> profile = criteria.from(UserPublicProfile.class);
+			Root<Statistics> statistics = criteria.from(Statistics.class);
 
-			Expression<Long> ex = profile.get("statistic").get("summaryRating");
+			Expression<Long> ex = statistics.get("summaryRating");
 			criteria.select(builder.max(ex));
 			Long result = entityManager.createQuery(criteria).getSingleResult();
 			return (result == null) ? 0 : result;

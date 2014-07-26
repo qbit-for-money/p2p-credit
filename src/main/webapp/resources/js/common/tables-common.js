@@ -9,49 +9,49 @@ var cellclassname = function(row, column, value, data) {
 };
 function getSource(path, id) {
 	var source =
-			{
-				dataType: "json",
-				dataFields: [
-					{name: "categories", type: "string"},
-					{name: "title", type: "string"},
-					{name: "languages", type: "string"},
-					{name: "takingCurrency", type: "string"},
-					{name: "givingCurrency", type: "string"},
-					{name: "duration", type: "string"},
-					{name: "reward", type: "string"},
-					{name: "responsesCount", type: "number"},
-					{name: "responses", type: "string"},
-					{name: "status", type: "string"},
-					{name: "summaryRating", type: "number"},
-					{name: "opennessRating", type: "number"},
-					{name: "ordersSumValue", type: "string"},
-					{name: "successValue", type: "string"},
-					{name: "partnersRating", type: "number"},
-					{name: "endDate", type: "date"},
-					{name: "userName", type: "string"},
-					{name: "userMail", type: "string"},
-					{name: "userPhone", type: "string"},
-					{name: "userCurrencies", type: "string"},
-					{name: "userLanguages", type: "string"},
-					{name: "userPublicKey", type: "string"},
-					{name: "orderData", type: "string"},
-					{name: "id", type: "string"},
-					//{name: "responseId", type: "string"}, 
-					{name: "approvedResponseId", type: "string"}
-				],
-				beforeprocessing: function(data) {
-					source.totalrecords = data.length;
-				},
-				sort: function() {
-					angular.element(id).jqxGrid('updatebounddata');
-				},
-				filter: function() {
-					angular.element(id).jqxGrid('updatebounddata');
-				},
-				root: "orders",
-				type: "POST",
-				url: window.context + path
-			};
+		{
+			dataType: "json",
+			dataFields: [
+				{name: "categories", type: "string"},
+				{name: "title", type: "string"},
+				{name: "languages", type: "string"},
+				{name: "takingCurrency", type: "string"},
+				{name: "givingCurrency", type: "string"},
+				{name: "duration", type: "string"},
+				{name: "reward", type: "string"},
+				{name: "responsesCount", type: "number"},
+				{name: "responses", type: "string"},
+				{name: "status", type: "string"},
+				{name: "summaryRating", type: "number"},
+				{name: "opennessRating", type: "number"},
+				{name: "ordersSumValue", type: "string"},
+				{name: "successValue", type: "string"},
+				{name: "partnersRating", type: "number"},
+				{name: "endDate", type: "date"},
+				{name: "userName", type: "string"},
+				{name: "userMail", type: "string"},
+				{name: "userPhone", type: "string"},
+				{name: "userCurrencies", type: "string"},
+				{name: "userLanguages", type: "string"},
+				{name: "userPublicKey", type: "string"},
+				{name: "orderData", type: "string"},
+				{name: "id", type: "string"},
+				//{name: "responseId", type: "string"}, 
+				{name: "approvedResponseId", type: "string"}
+			],
+			beforeprocessing: function(data) {
+				source.totalrecords = data.length;
+			},
+			sort: function() {
+				angular.element(id).jqxGrid('updatebounddata');
+			},
+			filter: function() {
+				angular.element(id).jqxGrid('updatebounddata');
+			},
+			root: "orders",
+			type: "POST",
+			url: window.context + path
+		};
 	return source;
 }
 

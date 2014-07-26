@@ -5,21 +5,19 @@ import static com.qbit.commons.dao.util.DAOUtil.invokeInTransaction;
 import com.qbit.commons.dao.util.TrCallable;
 import com.qbit.commons.user.UserDAO;
 import com.qbit.commons.user.UserInfo;
-import com.qbit.p2p.credit.commons.model.Currency;
-import com.qbit.p2p.credit.user.model.DataLink;
+import com.qbit.p2p.credit.statistics.dao.StatisticsDAO;
+import com.qbit.p2p.credit.statistics.model.GlobalStatistics;
 import com.qbit.p2p.credit.user.model.Language;
-import com.qbit.p2p.credit.user.model.Statistic;
-import com.qbit.p2p.credit.user.model.UserCurrency;
+import com.qbit.p2p.credit.statistics.model.Statistics;
 import com.qbit.p2p.credit.user.model.UserPrivateProfile;
 import com.qbit.p2p.credit.user.model.UserPublicProfile;
 import com.qbit.p2p.credit.user.model.UserType;
-import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.LockModeType;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -40,12 +38,14 @@ public class UserProfileDAO {
 
 	@Inject
 	private UserDAO userDAO;
+	@Inject
+	private StatisticsDAO statisticsDAO;
 
 	public UserPublicProfile find(String id) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {
 			return DAOUtil.find(entityManagerFactory.createEntityManager(),
-				UserPublicProfile.class, id, null);
+					UserPublicProfile.class, id, null);
 		} finally {
 			entityManager.close();
 		}
@@ -55,7 +55,7 @@ public class UserProfileDAO {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {
 			return DAOUtil.find(entityManagerFactory.createEntityManager(),
-				UserPrivateProfile.class, id, null);
+					UserPrivateProfile.class, id, null);
 		} finally {
 			entityManager.close();
 		}
@@ -100,15 +100,15 @@ public class UserProfileDAO {
 			criteria.select(builder.count(user));
 			if (filterDataField != null && query != null) {
 				criteria.where(
-					builder.or(
-						builder.like(
-							builder.lower(
-								user.get(
-									type.getDeclaredSingularAttribute(filterDataField, String.class)
+						builder.or(
+								builder.like(
+										builder.lower(
+												user.get(
+														type.getDeclaredSingularAttribute(filterDataField, String.class)
+												)
+										), "%" + query.toLowerCase() + "%"
 								)
-							), "%" + query.toLowerCase() + "%"
 						)
-					)
 				);
 			}
 
@@ -196,6 +196,8 @@ public class UserProfileDAO {
 				userPublicProfile.setPersonalData("DEFAULT");
 
 				entityManager.persist(userPublicProfile);
+				statisticsDAO.create(publicKey);
+				System.out.println("!!!!!!!!!!! " + publicKey);
 
 				return userPublicProfile;
 			}
@@ -231,7 +233,7 @@ public class UserProfileDAO {
 
 			@Override
 			public UserPublicProfile
-				call(EntityManager entityManager) {
+					call(EntityManager entityManager) {
 				UserPublicProfile userPublicProfile = entityManager.find(UserPublicProfile.class, userProfile.getPublicKey());
 				if (userPublicProfile == null) {
 					return null;
@@ -254,7 +256,6 @@ public class UserProfileDAO {
 				userPublicProfile.setPhones(userProfile.getPhones());
 				userPublicProfile.setPassportEnabled(userProfile.isPassportEnabled());
 				userPublicProfile.setBkiData(userProfile.getBkiData());
-				userPublicProfile.setStatistic(userProfile.getStatistic());
 
 				return userPublicProfile;
 			}
@@ -274,7 +275,7 @@ public class UserProfileDAO {
 
 			@Override
 			public UserPrivateProfile
-				call(EntityManager entityManager) {
+					call(EntityManager entityManager) {
 				UserPrivateProfile userPrivateProfile = entityManager.find(UserPrivateProfile.class, publicKey);
 				if (userPrivateProfile == null) {
 					return null;
@@ -288,7 +289,7 @@ public class UserProfileDAO {
 			}
 		});
 	}
-	
+
 	public Language createLanguage(final String title) {
 		if ((title == null) || title.isEmpty()) {
 			throw new IllegalArgumentException("Title is empty.");

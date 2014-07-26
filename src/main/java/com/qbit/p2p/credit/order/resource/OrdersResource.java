@@ -16,6 +16,9 @@ import com.qbit.p2p.credit.order.model.OrderCategory;
 import com.qbit.p2p.credit.order.model.OrderInfo;
 import com.qbit.p2p.credit.order.model.OrderStatus;
 import com.qbit.p2p.credit.order.model.Respond;
+import com.qbit.p2p.credit.statistics.dao.StatisticsDAO;
+import com.qbit.p2p.credit.statistics.model.Statistics;
+import com.qbit.p2p.credit.statistics.resource.StatisticsResource;
 import com.qbit.p2p.credit.user.dao.UserProfileDAO;
 import com.qbit.p2p.credit.user.model.Language;
 import com.qbit.p2p.credit.user.model.UserCurrency;
@@ -317,6 +320,12 @@ public class OrdersResource {
 	private UserProfileDAO profileDAO;
 
 	@Inject
+	private StatisticsDAO statisticsDAO;
+
+	@Inject
+	private StatisticsResource statisticsResource;
+
+	@Inject
 	private Env env;
 
 	@GET
@@ -441,14 +450,15 @@ public class OrdersResource {
 		List<OrderWrapper> ordersWrappers = new ArrayList<>();
 		for (OrderInfo order : orders) {
 			UserPublicProfile profileValue = profileDAO.find(order.getUserPublicKey());
+			Statistics statistics = statisticsResource.getById(order.getUserPublicKey());
 			//List<OrderInfo> partnersOrders = orderDAO.findWithFilter(null, ordersRequest, profile);
 
 			OrderWrapper wrapper = new OrderWrapper(order);
 			wrapper.setId(order.getId());
-			wrapper.setSummaryRating(profileValue.getStatistic().getSummaryRating());
-			wrapper.setOpennessRating(profileValue.getStatistic().getOpennessRating());
-			wrapper.setSuccessTransactionsSum(profileValue.getStatistic().getSuccessTransactionsSum());
-			wrapper.setOrdersSumValue(profileValue.getStatistic().getOrdersSumValue());
+			wrapper.setSummaryRating(statistics.getSummaryRating());
+			wrapper.setOpennessRating(statistics.getOpennessRating());
+			wrapper.setSuccessTransactionsSum(statistics.getSuccessTransactionsSum());
+			wrapper.setOrdersSumValue(statistics.getOrdersSumValue());
 			wrapper.setPartnersRating(orderDAO.getPartnersRating(order.getUserPublicKey()));
 			if (profileValue.isPhoneEnabled()) {
 				wrapper.setUserPhone(profileValue.getPhone());
@@ -460,13 +470,13 @@ public class OrdersResource {
 				wrapper.setUserCurrencies(profileValue.getCurrencies());
 			}
 			if (profileValue.isLanguagesEnabled()) {
-				if(profileValue.getLanguages() != null) {
+				if (profileValue.getLanguages() != null) {
 					List<String> userLanguages = new ArrayList<>();
-					for(Language language : profileValue.getLanguages()) {
+					for (Language language : profileValue.getLanguages()) {
 						userLanguages.add(language.getTitle());
 					}
 					wrapper.setUserLanguages(userLanguages);
-				}	
+				}
 			}
 			wrapper.setUserName(profileValue.getName());
 
@@ -508,6 +518,11 @@ public class OrdersResource {
 			return null;
 		}
 		OrderInfo o = orderDAO.create(order);
+		Statistics statistics = statisticsResource.getUserOrdersStatistics(id);
+		if (statistics != null) {
+			statisticsDAO.setUserOrdersStatistics(statistics);
+		}
+		//profileDAO.setUserOrdersStatistics(statisticsResource.getUserOrdersStatistics(id))
 		return o;
 	}
 
@@ -558,9 +573,9 @@ public class OrdersResource {
 		}
 		if (order.getResponses() != null) {
 			for (Respond respond : order.getResponses()) {
-				if (respond.getUserPublicKey().equals(responseRequest.getUserId()) && (order.getApprovedResponseId()== null)) {
+				if (respond.getUserPublicKey().equals(responseRequest.getUserId()) && (order.getApprovedResponseId() == null)) {
 					order.setApprovedResponseId(respond.getId());
-					
+
 					order.setStatus(OrderStatus.IN_PROCESS);
 					orderDAO.update(order);
 				}
@@ -568,12 +583,11 @@ public class OrdersResource {
 		}
 		return null;
 	}
-	
-	
+
 	@GET
 	@Path("response")
 	@Produces(MediaType.APPLICATION_JSON)
-		public Respond getByUser(@QueryParam("id") String id) {
+	public Respond getByUser(@QueryParam("id") String id) {
 		return orderDAO.findResponse(id);
 	}
 
@@ -597,8 +611,8 @@ public class OrdersResource {
 
 	private boolean isСompleted(OrderStatus status) {
 		return ((status == OrderStatus.SUCCESS)
-			|| (status == OrderStatus.NOT_SUCCESS)
-			|| (status == OrderStatus.ARBITRATION));
+				|| (status == OrderStatus.NOT_SUCCESS)
+				|| (status == OrderStatus.ARBITRATION));
 	}
 
 	@GET
