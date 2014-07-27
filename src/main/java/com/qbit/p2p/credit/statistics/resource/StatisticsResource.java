@@ -163,16 +163,15 @@ public class StatisticsResource {
 		FilterItem filterItem = new FilterItem();
 		filterItem.setFilterCondition(FilterCondition.NOT_EQUAL);
 		filterItem.setFilterValue("OPENED");
+		filterItem.setFilterDataField("status");
 		filter.setFilterItems(Arrays.asList(filterItem));
 		allUsersTransactions = orderDAO.getLengthWithFilter(null, filter, null);
-
 		statistics.setAllTransactionsSum(allUsersTransactions);
 
 		filterItem.setFilterCondition(FilterCondition.EQUAL);
 		filterItem.setFilterValue("SUCCESS");
 		filter.setFilterItems(Arrays.asList(filterItem));
 		allUsersSuccessTransactions = orderDAO.getLengthWithFilter(null, filter, null);
-
 		statistics.setAllSuccessTransactionsSum(allUsersSuccessTransactions);
 
 		return statistics;

@@ -24,12 +24,12 @@ public class GlobalStatistics implements Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
 	@XmlTransient
-	private final Long id = 0L;
+	private final long id = 1L;
 
 	private long allTransactionsSum;
 	private long allSuccessTransactionsSum;
 
-	public Long getId() {
+	public long getId() {
 		return id;
 	}
 

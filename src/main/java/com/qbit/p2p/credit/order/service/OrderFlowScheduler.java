@@ -56,7 +56,7 @@ public class OrderFlowScheduler {
 				statisticsDAO.maybeCreateGlobalStatistics();
 				statisticsDAO.setGlobalStatistics(statisticsResource.calculateGlobalStatistics());
 			}
-		}, env.getUpdateGlobalStatisticsPeriodSecs(), env.getUpdateGlobalStatisticsPeriodSecs(), TimeUnit.SECONDS);
+		}, env.getUpdateGlobalStatisticsPeriodSecs(), env.getUpdateGlobalStatisticsPeriodSecs(), TimeUnit.HOURS);
 	}
 
 	@PreDestroy
