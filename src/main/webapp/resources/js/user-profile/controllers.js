@@ -45,6 +45,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 	$scope.userPropertiesMap['currencies'] = [];
 	$scope.userPropertiesMap['languages'] = [];
 	$scope.createOrderButtonEnabled = false;
+	$scope.additionAttrsHidden = true;
 	$scope.currenciesSelect2Options = {
 		allowClear: true,
 		tags: allCurrencies,
@@ -155,11 +156,15 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 				$scope.ordersSumValue = userStatisticsResponse.ordersSumValue;
 				$scope.transactionsSum = userStatisticsResponse.transactionsSum;
 				$scope.successTransactionsSum = userStatisticsResponse.successTransactionsSum;
-				$scope.allTransactionsSum = userStatisticsResponse.allTransactionsSum;
-				$scope.allSuccessTransactionsSum = userStatisticsResponse.allSuccessTransactionsSum;
-				$timeout(function() {
-					$scope.$apply(function() {
-						$scope.summaryRating = userStatisticsResponse.summaryRating;
+				var globalStatisticsResponse = usersProfileResource.getGlobalStatistics();
+				globalStatisticsResponse.$promise.then(function() {
+					$scope.allTransactionsSum = globalStatisticsResponse.allTransactionsSum;
+					$scope.allSuccessTransactionsSum = globalStatisticsResponse.allSuccessTransactionsSum;
+					console.log("!! " + $scope.allTransactionsSum + " " + globalStatisticsResponse.allSuccessTransactionsSum)
+					$timeout(function() {
+						$scope.$apply(function() {
+							$scope.summaryRating = userStatisticsResponse.summaryRating;
+						});
 					});
 				});
 			});
@@ -843,4 +848,12 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			angular.element(id).collapse('show');
 		}
 	};
+
+	$scope.changeAdditionAttrsVisible = function() {
+		if ($scope.additionAttrsHidden === false) {
+			$scope.additionAttrsHidden = true;
+		} else {
+			$scope.additionAttrsHidden = false;
+		}
+	}
 });

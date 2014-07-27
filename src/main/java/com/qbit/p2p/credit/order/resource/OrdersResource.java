@@ -17,6 +17,7 @@ import com.qbit.p2p.credit.order.model.OrderInfo;
 import com.qbit.p2p.credit.order.model.OrderStatus;
 import com.qbit.p2p.credit.order.model.Respond;
 import com.qbit.p2p.credit.statistics.dao.StatisticsDAO;
+import com.qbit.p2p.credit.statistics.model.GlobalStatistics;
 import com.qbit.p2p.credit.statistics.model.Statistics;
 import com.qbit.p2p.credit.statistics.resource.StatisticsResource;
 import com.qbit.p2p.credit.user.dao.UserProfileDAO;
@@ -518,7 +519,7 @@ public class OrdersResource {
 			return null;
 		}
 		OrderInfo o = orderDAO.create(order);
-		Statistics statistics = statisticsResource.getUserOrdersStatistics(id);
+		Statistics statistics = statisticsResource.calculateUserOrdersStatistics(id);
 		if (statistics != null) {
 			statisticsDAO.setUserOrdersStatistics(statistics);
 		}

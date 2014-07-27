@@ -64,7 +64,7 @@ public class P2PCreditApp extends Application {
 		addBinding(newBinder(LikeDAO.class).to(LikeDAO.class).in(Singleton.class), configuration);
 
 		configuration.commit();
-//		serviceLocator.createAndInitialize(OrderFlowScheduler.class);
+		serviceLocator.createAndInitialize(OrderFlowScheduler.class);
 	}
 
 	/**
