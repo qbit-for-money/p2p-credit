@@ -44,6 +44,14 @@ public class StatisticsResource {
 		Statistics statistics = statisticsDAO.find(id);
 		return statistics;
 	}
+	
+	@GET
+	@Path("global")
+	@Produces(MediaType.APPLICATION_JSON)
+	public GlobalStatistics getGlobalStatistics() {
+		GlobalStatistics statistics = statisticsDAO.getGlobalStatistics();
+		return statistics;
+	}
 
 	public long getOpenessRating(String publicKey) {
 		long openessRating = 0;
@@ -98,7 +106,7 @@ public class StatisticsResource {
 				+ (long) (allTransactions * env.getUserAllTransactionsFactor());
 	}
 
-	public Statistics getUserOrdersStatistics(String publicKey) {
+	public Statistics calculateUserOrdersStatistics(String publicKey) {
 		Statistics statistic = new Statistics(publicKey);
 		long transactionsRating = 0;
 		long allOrders = 0;
@@ -147,7 +155,7 @@ public class StatisticsResource {
 		return statistic;
 	}
 
-	public GlobalStatistics getGlobalStatistics() {
+	public GlobalStatistics calculateGlobalStatistics() {
 		GlobalStatistics statistics = new GlobalStatistics();
 		SearchRequest filter = new SearchRequest();
 		long allUsersTransactions = 0;

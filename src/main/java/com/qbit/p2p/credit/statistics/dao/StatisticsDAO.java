@@ -33,6 +33,18 @@ public class StatisticsDAO {
 			entityManager.close();
 		}
 	}
+	
+	public GlobalStatistics getGlobalStatistics() {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		try {
+			System.out.println("%%% " + DAOUtil.find(entityManagerFactory.createEntityManager(),
+					GlobalStatistics.class, 0, null));
+			return DAOUtil.find(entityManagerFactory.createEntityManager(),
+					GlobalStatistics.class, 0, null);
+		} finally {
+			entityManager.close();
+		}
+	}
 
 	public Statistics create(final String publicKey) {
 		return invokeInTransaction(entityManagerFactory, new TrCallable<Statistics>() {
@@ -53,12 +65,14 @@ public class StatisticsDAO {
 		);
 	}
 
-	public GlobalStatistics maybeCreateGlobalStatistics(final String publicKey) {
+	public GlobalStatistics maybeCreateGlobalStatistics() {
 		return invokeInTransaction(entityManagerFactory, new TrCallable<GlobalStatistics>() {
 
 			@Override
 			public GlobalStatistics call(EntityManager entityManager) {
+				System.out.println("^^ ");
 				GlobalStatistics statistics = entityManager.find(GlobalStatistics.class, 0, LockModeType.PESSIMISTIC_WRITE);
+				
 				if (statistics == null) {
 					statistics = new GlobalStatistics();
 					entityManager.persist(statistics);
@@ -127,6 +141,7 @@ public class StatisticsDAO {
 				}
 				statistics.setAllTransactionsSum(globalStatistics.getAllTransactionsSum());
 				statistics.setAllSuccessTransactionsSum(globalStatistics.getAllSuccessTransactionsSum());
+				System.out.println("** " + statistics);
 				return statistics;
 			}
 		});

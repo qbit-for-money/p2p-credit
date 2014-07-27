@@ -48,6 +48,10 @@ public class Env {
 		return Integer.parseInt(properties.getProperty("lastOrders.worker.period.hours"));
 	}
 	
+	public int getUpdateGlobalStatisticsPeriodSecs() {
+		return Integer.parseInt(properties.getProperty("globalStatistics.period.hours"));
+	}
+	
 	@XmlElement
 	public double getUserOpenessRatingFactor() {
 		return Double.parseDouble(properties.getProperty("user.openessRating.factor"));

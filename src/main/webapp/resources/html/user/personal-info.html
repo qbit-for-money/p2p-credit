@@ -47,7 +47,8 @@
 						</div>
 
 						<div class="col-xs-6 col-md-8" ng-if="edit">
-							<input type="text" id="name" class="form-control" ng-model="userPropertiesMap['name']" placeholder="Name" maxlength="20"/>
+							<input type="text" id="name" class="form-control" ng-model="userPropertiesMap
+								['name']" placeholder="Name" maxlength="20"/>
 						</div>
 
 						<div class="col-xs-6 col-md-3"  ng-hide="!isCurrentUser">
@@ -78,7 +79,7 @@
 									Mail:
 								</div>
 								<div class="col-xs-7 col-md-8" ng-if="!edit && userPropertiesMap['mail']">
-									{{userPropertiesMap['mail']}}
+									{{userPropertiesMap['mail']}}<div style="float: right"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="'123'" entity-field="'mail'" /></div>
 								</div>
 
 								<div class="col-xs-4 col-md-3 title-edit" ng-hide="!edit">
@@ -100,7 +101,7 @@
 									Phone:
 								</div>
 								<div class="col-xs-7 col-md-8" ng-if="!edit && userPropertiesMap['phone']">
-									{{userPropertiesMap['phone']}}
+									{{userPropertiesMap['phone']}}<div style="float: right"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="'123'" entity-field="'phone'" /></div>
 								</div>
 
 								<div class="col-xs-4 col-md-3 title-edit" ng-hide="!edit">
@@ -121,8 +122,8 @@
 								<div class="col-xs-4 col-md-2 title" ng-if="!edit && userPropertiesMap['languages']">
 									Languages:
 								</div>
-								<div class="col-xs-7 col-md-8" ng-if="!edit && userPropertiesMap['languages']">
-									{{userPropertiesMap['languagesStr']}}
+								<div class="col-xs-7 col-md-9" ng-if="!edit && userPropertiesMap['languages']">
+									{{userPropertiesMap['languagesStr']}}<div style="float: right"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="'123'" entity-field="'languages'" /></div>
 								</div>
 								<div class="col-xs-4 col-md-3 title-edit" ng-hide="!edit">
 									Languages:
@@ -141,8 +142,8 @@
 								<div class="col-xs-4 col-md-2 title" ng-if="!edit && userPropertiesMap['currencies']">
 									Currencies:
 								</div>
-								<div class="col-xs-7 col-md-8" ng-if="!edit && userPropertiesMap['currencies']">
-									{{userPropertiesMap['currenciesStr']}}
+								<div class="col-xs-7 col-md-9" ng-if="!edit && userPropertiesMap['currencies']">
+									{{userPropertiesMap['currenciesStr']}}<div style="float: right"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="'123'" entity-field="'currensies'" /></div>
 								</div>
 
 								<div class="col-xs-4 col-md-3 title-edit" ng-hide="!edit">
@@ -199,12 +200,13 @@
 				</div>
 			</div>
 		</div>
-
-		<div class="row" id="addition-attributes">
+		<button class="btn btn-default navbar-right" ng-click="changeAdditionAttrsVisible()" ng-hide="!additionAttrsHidden"><span class="glyphicon glyphicon-arrow-down"></span></button>
+		<button class="btn btn-default navbar-right" ng-click="changeAdditionAttrsVisible()" ng-hide="additionAttrsHidden"><span class="glyphicon glyphicon-arrow-up"></span></button>
+		<div class="row" id="addition-attributes" ng-hide="additionAttrsHidden">
 			<div class="col-xs-12 col-md-12">
 				<div class="container-fluid">
 					<div class="row" ng-hide="!userPropertiesMap['personalData'] && !edit">
-						<div class="col-xs-7 col-md-3" style="margin-top: 1px;">Personal info</div>
+						<div class="col-xs-12 col-md-12" style="margin-top: 1px; margin-right:-42px;">Personal info<div style="float: right"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="'123'" entity-field="'languages'" /></div></div>
 					</div>
 					<div class="row" ng-hide="!userPropertiesMap['personalData'] && !edit">
 						<div class="col-xs-12 col-md-12"><hr></div>
@@ -240,7 +242,9 @@
 					<div class="row">
 						<div class="col-xs-12 col-md-12">
 							<div class="container-fluid">
+								<div style="float: right"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="'123'" entity-field="'socialLinks'" /></div>
 								<links-list links="userPropertiesMap['socialLinks']" type="'social-link'" save-data="updateProfile()" current="userPropertiesMap['isCurrentUser']" edited="editAdditional"></links-list>
+								<div style="float: right"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="'123'" entity-field="'phones'" /></div>
 								<links-list links="userPropertiesMap['phones']" type="'phone'" save-data="updateProfile()" current="userPropertiesMap['isCurrentUser']" edited="editAdditional"></links-list>
 							</div>
 						</div>
@@ -260,11 +264,13 @@
 							</div>
 						</div>
 					</div>
+					<div style="float: right"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="'123'" entity-field="'videos'" /></div>
 					<links-list links="userPropertiesMap['videos']" type="'video'" save-data="updateProfile()" current="userPropertiesMap['isCurrentUser']" edited="editAdditional"></links-list>
+					<div style="float: right"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="'123'" entity-field="'names'" /></div>
 					<links-list links="userPropertiesMap['names']" type="'name'" save-data="updateProfile()" current="userPropertiesMap['isCurrentUser']" edited="editAdditional"></links-list>
 
 					<div class="row" ng-hide="!userPropertiesMap['bkiData'] && !editAdditional">
-						<div class="col-xs-8 col-md-3" style="margin-top: 10px;">Сredit history</div>
+						<div class="col-xs-8 col-md-12" style="margin-top: 10px;">Сredit history<div style="float: right"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="'123'" entity-field="'bkiData'" /></div></div>
 					</div>
 					<div class="row" ng-hide="!userPropertiesMap['bkiData'] && !editAdditional">
 						<div class="col-xs-12 col-md-12"><hr></div>
