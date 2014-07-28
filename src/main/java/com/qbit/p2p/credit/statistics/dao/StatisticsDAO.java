@@ -38,9 +38,9 @@ public class StatisticsDAO {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {
 			System.out.println("%%% " + DAOUtil.find(entityManagerFactory.createEntityManager(),
-					GlobalStatistics.class, 0, null));
+					GlobalStatistics.class, 0L, null));
 			return DAOUtil.find(entityManagerFactory.createEntityManager(),
-					GlobalStatistics.class, 0, null);
+					GlobalStatistics.class, 0L, null);
 		} finally {
 			entityManager.close();
 		}
@@ -70,9 +70,7 @@ public class StatisticsDAO {
 
 			@Override
 			public GlobalStatistics call(EntityManager entityManager) {
-				System.out.println("^^ ");
-				GlobalStatistics statistics = entityManager.find(GlobalStatistics.class, 0, LockModeType.PESSIMISTIC_WRITE);
-				
+				GlobalStatistics statistics = entityManager.find(GlobalStatistics.class, 0L, LockModeType.PESSIMISTIC_WRITE);
 				if (statistics == null) {
 					statistics = new GlobalStatistics();
 					entityManager.persist(statistics);

@@ -456,10 +456,12 @@ public class OrdersResource {
 
 			OrderWrapper wrapper = new OrderWrapper(order);
 			wrapper.setId(order.getId());
-			wrapper.setSummaryRating(statistics.getSummaryRating());
-			wrapper.setOpennessRating(statistics.getOpennessRating());
-			wrapper.setSuccessTransactionsSum(statistics.getSuccessTransactionsSum());
-			wrapper.setOrdersSumValue(statistics.getOrdersSumValue());
+			if (statistics != null) {
+				wrapper.setSummaryRating(statistics.getSummaryRating());
+				wrapper.setOpennessRating(statistics.getOpennessRating());
+				wrapper.setSuccessTransactionsSum(statistics.getSuccessTransactionsSum());
+				wrapper.setOrdersSumValue(statistics.getOrdersSumValue());
+			}
 			wrapper.setPartnersRating(orderDAO.getPartnersRating(order.getUserPublicKey()));
 			if (profileValue.isPhoneEnabled()) {
 				wrapper.setUserPhone(profileValue.getPhone());
@@ -612,8 +614,8 @@ public class OrdersResource {
 
 	private boolean isСompleted(OrderStatus status) {
 		return ((status == OrderStatus.SUCCESS)
-				|| (status == OrderStatus.NOT_SUCCESS)
-				|| (status == OrderStatus.ARBITRATION));
+			|| (status == OrderStatus.NOT_SUCCESS)
+			|| (status == OrderStatus.ARBITRATION));
 	}
 
 	@GET

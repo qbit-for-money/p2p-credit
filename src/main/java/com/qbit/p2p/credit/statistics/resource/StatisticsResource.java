@@ -12,6 +12,7 @@ import com.qbit.p2p.credit.statistics.model.Statistics;
 import com.qbit.p2p.credit.user.dao.UserProfileDAO;
 import com.qbit.p2p.credit.user.model.UserPublicProfile;
 import java.util.Arrays;
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
@@ -36,6 +37,12 @@ public class StatisticsResource {
 	private OrderDAO orderDAO;
 	@Inject
 	private StatisticsDAO statisticsDAO;
+	/*@PostConstruct
+	public void init() {
+		if(statisticsDAO.getGlobalStatistics() == null) {
+			statisticsDAO.maybeCreateGlobalStatistics();
+		}
+	}*/
 
 	@GET
 	@Path("{id}")

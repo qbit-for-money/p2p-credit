@@ -301,6 +301,9 @@ public class ProfilesResource {
 		String userId = AuthFilter.getUserId(request);
 		userProfile.setPublicKey(userId);
 		UserPublicProfile newProfile = userProfileDAO.updateUserPublicProfile(userProfile);
+		if(statisticsDAO.find(userId) == null) {
+			statisticsDAO.create(userId);
+		}
 		Statistics statistics = new Statistics(userId);
 		statistics.setOpennessRating(statisticsResource.getOpenessRating(userId));
 		statistics.setSummaryRating(statisticsResource.getSummaryRating(userId));
