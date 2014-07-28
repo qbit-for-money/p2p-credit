@@ -68,7 +68,7 @@ public class LikeDAO {
 				}
 				Set<String> alreadyVotedUserPublicKeys = like.getAlreadyVotedUserPublicKeys();
 				if (!alreadyVotedUserPublicKeys.contains(userPublicKey)) {
-					like.setLikeCount(like.getLikeCount() + 1);
+					like.setDislikeCount(like.getLikeCount() + 1);
 					alreadyVotedUserPublicKeys.add(userPublicKey);
 					like.setAlreadyVotedUserPublicKeys(alreadyVotedUserPublicKeys);
 					entityManager.merge(like);

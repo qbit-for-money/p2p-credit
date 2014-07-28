@@ -139,7 +139,6 @@ public class StatisticsDAO {
 				}
 				statistics.setAllTransactionsSum(globalStatistics.getAllTransactionsSum());
 				statistics.setAllSuccessTransactionsSum(globalStatistics.getAllSuccessTransactionsSum());
-				System.out.println("** " + statistics);
 				return statistics;
 			}
 		});
