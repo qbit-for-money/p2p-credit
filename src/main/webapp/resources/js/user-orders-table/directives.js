@@ -102,3 +102,4 @@ orderModule.directive('bsDropdown', function($compile, $modal, ordersResource) {
 		}
 	};
 });
+

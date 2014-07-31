@@ -1,42 +1,35 @@
-<div class="row" style="margin-bottom: 20px;">
+<div class="row" style="margin-bottom: 10px;">
 	<div class="col-xs-offset-0 col-xs-12 col-md-offset-1 col-md-10">
-		<div ng-include src="'resources/html/order/last-orders-table.html'"></div>
+		<div ng-include src="'resources/html/order/short-search.html'"></div>
 
-		<div class="container-fluid">
-			<div class="row" style="padding-bottom: 20px;">
-				<a id="order-init"></a>
-				<div class="col-xs-3 col-md-4"></div>
-				<div class="col-xs-6 col-md-4">
-					<button class="btn btn-success btn-lg center-block button-lg credit" type="button" ng-click="goToProfile()" title="Give">
-						<span class="glyphicon glyphicon-log-in" style="top: 6px;"></span> YES! <!--span class="glyphicon glyphicon-play-circle"></span-->
+		<div class="container-fluid"  style="margin-top: -14px;">
+			<div class="row" style="padding-bottom: 20px;" id="order-init">
+				
+				<div class="col-xs-4 col-md-4" style="">
+					<button class="btn btn-default btn-lg center-block button-lg credit" type="button" ng-click="goToOrderCreating()" title="Create order">
+						<img src="resources/img/ecommerce-take-icon.png"  alt="Order"/>
 					</button>
 				</div>
-				<div class="col-xs-3 col-md-4"></div>
+				<div class="col-xs-4 col-md-4" style="">
+					<button class="btn btn-default btn-lg center-block button-lg credit" type="button" ng-click="goToOrders()" title="Search">
+						<img src="resources/img/search.png" weight="10%" alt="Search"/>
+					</button>
+				</div>
+				<div class="col-xs-4 col-md-4" style="">
+					<button class="btn btn-default btn-lg center-block button-lg credit" type="button" ng-click="goToProfile()" title="Profile">
+						<img src="resources/img/account_and_control.png" alt="Profile"/>
+					</button>
+					
+				</div>
 			</div>
 		</div>
 		<div class="container-fluid">
-			<div class="row" style="padding-bottom: 20px;">
+			<div class="row" style="padding-bottom: 5px;">
 				<div class="col-xs-12 col-md-12">
 					<p style="text-align:center" id="video-container" class="h_iframe">
 						<img class="ratio" src="http://placehold.it/16x9"/>
-						<iframe width="100%" height="100%" src="//www.youtube.com/embed/PIDx7n7fXqI?autoplay=0&showinfo=0&controls=0" frameborder="0" allowfullscreen></iframe>
+						<iframe width="100%" height="100%" src="//www.youtube.com/embed/wy04c-6DEgE?autoplay=0&showinfo=0&controls=0" frameborder="0" allowfullscreen></iframe>
 					</p>
-				</div>
-			</div>
-		</div>
-		<div class="container-fluid">
-			<div class="row" style="padding-bottom: 20px;">
-				<div class="col-xs-12 col-md-12">
-					<a id="presentation-image"></a>
-					<p style="text-align:center">&nbsp;</p>
-					<p style="text-align:center">
-						<img alt="" src="http://i952.photobucket.com/albums/ae3/speedinstock/Ultra%20racing/strut-bar-before.gif" style="width: 25%;">
-						&nbsp; &nbsp; &nbsp;
-						<img alt="" src="http://i952.photobucket.com/albums/ae3/speedinstock/Ultra%20racing/strut-bar-after.gif" style="width: 25%;">
-						&nbsp; &nbsp; &nbsp;
-						<img alt="" src="http://i952.photobucket.com/albums/ae3/speedinstock/Ultra%20racing/strut-bar-corner-before.gif" style="width: 25%;">
-					</p>
-					<p style="text-align:center">&nbsp;</p>
 				</div>
 			</div>
 		</div>

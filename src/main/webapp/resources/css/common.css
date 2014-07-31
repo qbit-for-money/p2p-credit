@@ -56,3 +56,27 @@ input[readonly], input[ng-readonly] {
 .pluso-more {
 	display: none !important;
 }
+
+#header .container-fluid {
+	background-color: #e7e7e7
+}
+
+#header .navbar-toggle {
+	background-color: white
+}
+
+#header > div > div.navbar-collapse.in {
+	background-color: whitesmoke;
+}
+
+#header > div > div.navbar-collapse {
+	background-color: #e7e7e7;
+}
+
+.sc-has-success {
+	border: 1px solid #67b168 !important;
+}
+
+.sc-has-error {
+	border: 1px solid #a94442 !important;
+}

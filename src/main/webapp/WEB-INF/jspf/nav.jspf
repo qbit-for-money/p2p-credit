@@ -1,5 +1,5 @@
 <%@ page pageEncoding="UTF-8" %>
-<nav class="navbar navbar-default" role="navigation" ng-controller="NavbarController">
+<nav class="navbar navbar-default" role="navigation" ng-controller="NavbarController" id="header">
 	<div class="container-fluid">
 		<!-- Brand and toggle get grouped for better mobile display -->
 		<div class="navbar-header" style="padding-left: 15px;">
@@ -16,12 +16,11 @@
 		<!-- Collect the nav links, forms, and other content for toggling -->
 		<div class="collapse navbar-collapse" collapse="isNavbarCollapsed">
 
-			<ul class="nav navbar-nav visible-xs" style="cursor: pointer">
+			<ul class="nav navbar-nav" style="cursor: pointer">
 				<!--li ng-class="{ active: isActive('/')}" title="Create order"><a href="#"><span class="glyphicon glyphicon-th"></span></a></li-->
-				<li title="Last orders" ng-hide="!isActive('/')"><a ng-click="gotoLastOrders()"><span class="glyphicon glyphicon-th-list"></span></a></li>
-				<li title="Init order" ng-hide="!isActive('/')"><a ng-click="gotoOrderInit()"><span class="glyphicon glyphicon-shopping-cart"></span></a></li>
-				<li title="Presentation" ng-hide="!isActive('/')"><a ng-click="gotoVideo()"><span class="glyphicon glyphicon-facetime-video"></span></a></li>
-				<li title="Presentation" ng-hide="!isActive('/')"><a ng-click="gotoImage()"><span class="glyphicon glyphicon-picture"></span></a></li>
+				<li title="Make a request" ng-class="{ active: isActive('/create-order')}"><a ng-click="goToOrderCreating()"><span class="glyphicon glyphicon-shopping-cart"></span></a></li>
+				<li title="Search orders" ng-class="{ active: isActive('/orders')}"><a ng-click="goToOrders()"><span class="glyphicon glyphicon-search"></span></a></li>
+				<li title="Profile" ng-class="{ active: isActive('/users')}"><a ng-click="goToProfile()"><span class="glyphicon glyphicon-user"></span></a></li>
 			</ul>
 
 			<%@ include file="user.jspf" %>
