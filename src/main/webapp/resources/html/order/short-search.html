@@ -24,8 +24,8 @@
 								<div class="btn-group inline pull-left" data-toggle="buttons-checkbox"> 
 									<input type="hidden" class="form-control" ui-select2="categorySelect2Options" ng-model="ordersSearchMap
 			  ['orderCategories']" id="category" data-placeholder="Category" style="width: 100%" ng-change="isValidOrder()"/>
-									<ui-dropdown on-enter="search()" data-dropdown-data="allCurrencies" preselected-item="selectedTakingCurrency" input-value="" placeholder="'Take'"></ui-dropdown>
-									<ui-dropdown on-enter="search()" data-dropdown-data="allCurrencies" preselected-item="selectedGivingCurrency" placeholder="'Give'"></ui-dropdown>
+									<ui-dropdown on-enter="search()" element-id="'taking-currency'" data-dropdown-data="allCurrencies" preselected-item="selectedTakingCurrency" input-value="takingValue" placeholder="'Take'"></ui-dropdown>
+									<ui-dropdown on-enter="search()" element-id="'giving-currency'" data-dropdown-data="allCurrencies" preselected-item="selectedGivingCurrency" input-value="givingValue" placeholder="'Give'"></ui-dropdown>
 									<button class="btn btn-primary max-width" type="button" ng-click="search()"><span class="glyphicon glyphicon-search"></span></button>
 								</div> 
 							</div> 

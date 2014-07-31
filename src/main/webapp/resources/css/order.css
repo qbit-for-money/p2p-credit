@@ -40,6 +40,10 @@ and (max-width : 797px) {
 		border-bottom-left-radius: 4px !important; 
 		border-top-left-radius: 4px !important; 
 	}
+	
+	.create-order-button {
+	font-size: 14px;
+}
 }
 
 /* Larger screens ----------- */
