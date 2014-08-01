@@ -41,6 +41,7 @@ navbarModule.controller("ShortSearchController", function($scope, $rootScope, $m
 	});
 
 	userProfileService.getAllCategories(function(categories) {
+		$scope.allCategories.splice(0, $scope.allCategories.length);
 		for (var i in categories) {
 			$scope.allCategories.push(categories[i].title);
 		}
