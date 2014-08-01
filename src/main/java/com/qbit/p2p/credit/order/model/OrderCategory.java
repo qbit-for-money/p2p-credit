@@ -5,15 +5,10 @@ import java.io.Serializable;
 import java.util.Objects;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.SecondaryTable;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -37,13 +32,16 @@ public class OrderCategory implements Identifiable<String>, Serializable {
 
 	private String title;
 	
-	boolean categoryForOrder;
+	private boolean categoryForOrder;
+	
+	private CategoryType type;
 
 	public OrderCategory() {
 	}
 
-	public OrderCategory(String title) {
+	public OrderCategory(String title, CategoryType type) {
 		this.title = title;
+		this.type = type;
 	}
 
 	@Override
@@ -72,6 +70,14 @@ public class OrderCategory implements Identifiable<String>, Serializable {
 		this.title = title;
 	}
 
+	public CategoryType getType() {
+		return type;
+	}
+
+	public void setType(CategoryType type) {
+		this.type = type;
+	}
+
 	@Override
 	public int hashCode() {
 		int hash = 3;
@@ -96,6 +102,6 @@ public class OrderCategory implements Identifiable<String>, Serializable {
 
 	@Override
 	public String toString() {
-		return "OrderCategory{" + "id=" + id + ", title=" + title + '}';
+		return "OrderCategory{" + "id=" + id + ", title=" + title + ", categoryForOrder=" + categoryForOrder + ", type=" + type + '}';
 	}
 }

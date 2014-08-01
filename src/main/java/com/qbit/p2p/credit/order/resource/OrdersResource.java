@@ -8,6 +8,7 @@ import com.qbit.p2p.credit.commons.util.DateUtil;
 import com.qbit.p2p.credit.env.Env;
 import com.qbit.p2p.credit.money.model.serialization.CurrencyAdapter;
 import com.qbit.p2p.credit.order.dao.OrderDAO;
+import com.qbit.p2p.credit.order.model.CategoryType;
 import com.qbit.p2p.credit.order.model.Comment;
 import com.qbit.p2p.credit.order.model.FilterCondition;
 import com.qbit.p2p.credit.order.model.FilterItem;
@@ -652,20 +653,20 @@ public class OrdersResource {
 	public OrderCategory createTestCategories() {
 		System.out.println("!!! TEST");
 		String c = "Кредит под процент";
-		orderDAO.createCategory(c);
+		orderDAO.createCategory(c, CategoryType.CREDIT);
 		c = "Кредит под залог";
-		orderDAO.createCategory(c);
+		orderDAO.createCategory(c, CategoryType.CREDIT);
 		c = "Кредит на образование";
-		orderDAO.createCategory(c);
+		orderDAO.createCategory(c, CategoryType.CREDIT);
 		c = "Кредит";
-		orderDAO.createCategory(c);
+		orderDAO.createCategory(c, CategoryType.CREDIT);
 		c = "Обмен";
-		orderDAO.createCategory(c);
+		orderDAO.createCategory(c, CategoryType.EXCHANGE);
 		c = "Безвозвратно";
-		orderDAO.createCategory(c);
+		orderDAO.createCategory(c, CategoryType.CREDIT);
 		c = "Без %";
-		orderDAO.createCategory(c);
+		orderDAO.createCategory(c, CategoryType.CREDIT);
 		c = "Доля";
-		return orderDAO.createCategory(c);
+		return orderDAO.createCategory(c, CategoryType.BORROW);
 	}
 }

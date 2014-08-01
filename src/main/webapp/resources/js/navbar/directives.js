@@ -11,26 +11,55 @@ navbarModule.directive('uiDropdown', function($compile, $timeout) {
 			placeholder: '=placeholder',
 			onEnter: '&onEnter',
 			inputValue: '=inputValue',
-			elementId: '=elementId'
+			elementId: '=elementId',
+			isDropdownInput: '=isDropdownInput'
 		},
 		link: function(scope, element, attrs) {
-			scope.bSelectedItem = scope.selectedItem;
+			//scope.bSelectedItem = scope.selectedItem;
+			scope.inputText = "";
 			var html = '';
-			html += '<div class="input-group" id="{{elementId}}"><input type="text" class="form-control" ng-model="inputValue" ng-change="onChangeInput()" placeholder="{{placeholder}}">';
-			html += '<div class="input-group-btn ui-dropdown-button"><button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Action <span class="caret"></span></button>'
+			html += '<div class="input-group" id="{{elementId}}"><input type="number" class="form-control" ng-model="inputValue" ng-change="onChangeInput()" placeholder="{{placeholder}}">';
+			html += '<div class="input-group-btn ui-dropdown-button"><button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="li-item">Action</span> <b class="caret"></b></button>';
 
-			html += '<ul class="dropdown-menu dropdown-menu-right"><li ng-repeat="item in items"><a tabindex="-1" data-ng-click="selectVal(item)" style="cursor:pointer">{{item}}</a></li></ul></div>';
+			html += '<ul class="dropdown-menu dropdown-menu-left" style="right: 0; left: auto;"><li ng-repeat="item in items"><a tabindex="-1" data-ng-click="selectVal(item)" style="cursor:pointer">{{item}}</a></li><li ng-hide="!isDropdownInput"><input type="text" class="dropdown-input" placeholder=" Other.." ng-model="inputText"/></li></ul></div>';
 			element.append($compile(html)(scope));
 
+			if (scope.isDropdownInput === true) {
+				angular.element(element).find('.dropdown-input').on("click", function(e) {
+					e.stopPropagation();
+				});
+
+				angular.element(element).find('.dropdown-input').on("blur", function(e) {
+
+					
+					
+					$timeout(function() {
+						scope.$apply(function() {
+							scope.selectedItem = scope.inputText;
+							scope.inputText = "";
+							if (scope.selectedItem !== "") {
+						$('button.dropdown-toggle', element).html('<b class="caret"></b> <span class="li-item">' + scope.selectedItem + '</span>');
+					}
+						});
+					});
+				});
+			}
+
+
 			scope.selectVal = function(item) {
-				switch (attrs.menuType) {
-					case "button":
-						$('button.button-label', element).html(item);
-						break;
-					default:
-						$('button.dropdown-toggle', element).html('<b class="caret"></b> <span class="item">' + item + '</span>');
-						break;
+				if (angular.element(scope.elementId + " .input-text").is(":focus")) {
+
+				} else {
+					switch (attrs.menuType) {
+						case "button":
+							$('button.button-label', element).html(item);
+							break;
+						default:
+							$('button.dropdown-toggle', element).html('<b class="caret"></b> <span class="li-item">' + item + '</span>');
+							break;
+					}
 				}
+
 				scope.selectedItem = item;
 				if (scope.doSelect) {
 					scope.doSelect({
@@ -39,7 +68,7 @@ navbarModule.directive('uiDropdown', function($compile, $timeout) {
 				}
 			};
 
-			scope.selectVal(scope.bSelectedItem);
+			scope.selectVal(scope.selectedItem);
 			element.bind("keypress", function(event) {
 				if (event.which === 13) {
 					scope.onEnter();

@@ -7,6 +7,7 @@ import com.qbit.commons.user.UserDAO;
 import com.qbit.commons.user.UserInfo;
 import com.qbit.p2p.credit.commons.model.Currency;
 import com.qbit.p2p.credit.commons.util.DateUtil;
+import com.qbit.p2p.credit.order.model.CategoryType;
 import com.qbit.p2p.credit.order.model.FilterCondition;
 import com.qbit.p2p.credit.order.model.FilterItem;
 import com.qbit.p2p.credit.order.model.FilterOperator;
@@ -195,7 +196,7 @@ public class OrderDAO {
 		}
 	}
 
-	public OrderCategory createCategory(final String title) {
+	public OrderCategory createCategory(final String title, final CategoryType type) {
 		if ((title == null) || title.isEmpty()) {
 			throw new IllegalArgumentException("Title is empty.");
 		}
@@ -204,7 +205,7 @@ public class OrderDAO {
 			@Override
 			public OrderCategory call(EntityManager entityManager) {
 
-				OrderCategory category = new OrderCategory(title);
+				OrderCategory category = new OrderCategory(title, type);
 				category.setCategoryForOrder(false);
 				entityManager.persist(category);
 				return category;

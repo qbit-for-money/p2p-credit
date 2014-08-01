@@ -81,10 +81,10 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 
 	@ManyToMany(cascade = CascadeType.ALL)
 	private List<Language> languages;
-	@XmlJavaTypeAdapter(CurrencyAdapter.class)
-	private Currency givingCurrency;
-	@XmlJavaTypeAdapter(CurrencyAdapter.class)
-	private Currency takingCurrency;
+	//@XmlJavaTypeAdapter(CurrencyAdapter.class)
+	private String givingCurrency;
+	//@XmlJavaTypeAdapter(CurrencyAdapter.class)
+	private String takingCurrency;
 	@Column(precision = 10, scale = 3)
 	private BigDecimal takingValue;
 	@Column(precision = 10, scale = 3)
@@ -163,19 +163,19 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 		this.languages = languages;
 	}
 
-	public Currency getGivingCurrency() {
+	public String getGivingCurrency() {
 		return givingCurrency;
 	}
 
-	public void setGivingCurrency(Currency givingCurrency) {
+	public void setGivingCurrency(String givingCurrency) {
 		this.givingCurrency = givingCurrency;
 	}
 
-	public Currency getTakingCurrency() {
+	public String getTakingCurrency() {
 		return takingCurrency;
 	}
 
-	public void setTakingCurrency(Currency takingCurrency) {
+	public void setTakingCurrency(String takingCurrency) {
 		this.takingCurrency = takingCurrency;
 	}
 

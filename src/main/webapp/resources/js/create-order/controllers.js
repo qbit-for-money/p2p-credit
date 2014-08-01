@@ -1,12 +1,17 @@
 var orderModule = angular.module("order");
 
 orderModule.controller("CreateOrderController", function($scope, $rootScope, $timeout, userProfileService, $window, ordersResource) {
+	var creditInitData = "&nbsp; I want to take credit..";
+	var borrowInitData = " &nbsp; I want to invest..";
+	var exchangeInitData = "&nbsp; I want to exchange..";
 	$scope.allCategories = [];
+	var categoriesMap = {};
 	$scope.allCurrencies = [];
 	$scope.allCurrenciesWithPercent = [];
-	$scope.selectedGivingCurrency = "RUR";
-	$scope.selectedTakingCurrency = "RUR";
-	$scope.takingValue = "";
+	$scope.currency = {};
+	$scope.currency.selectedGivingCurrency = "RUR";
+	$scope.currency.selectedTakingCurrency = "RUR";
+	$scope.takingValue = "10";
 	$scope.givingValue = "";
 	$scope.durationValue = "";
 	$scope.durationTypes = ["Hours", "Days"];
@@ -27,6 +32,8 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 		'simple_tags': true,
 		maximumSelectionSize: 20,
 		maximumInputLength: 20,
+		formatResult: formatResult,
+		//formatSelection: formatSelection,
 		createSearchChoice: function(term, data) {
 			if ($(data).filter(function() {
 				return this.text.localeCompare(term) === 0;
@@ -35,6 +42,21 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 			}
 		}
 	};
+
+	function formatSelection(item) {
+		return item.text;
+	}
+	function formatResult(item) {
+		$timeout(function() {
+			angular.element("span[type='CREDIT']").parent().addClass("credit-row");
+			angular.element("span[type='BORROW']").parent().addClass("borrow-row");
+			angular.element("span[type='EXCHANGE']").parent().addClass("exchange-row");
+		});
+		if (!item.id) {
+			return item.text;
+		}
+		return "<span type='" + categoriesMap[item.text] + "'>" + item.text + "</span>";
+	}
 
 	initDeadline();
 
@@ -48,20 +70,23 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 			$scope.allCurrencies.push(currency.code);
 			$scope.allCurrenciesWithPercent.push(currency.code);
 		}
-		$scope.allCurrenciesWithPercent.unshift("%");
-	});
-
-	userProfileService.getAllCategories(function(categories) {
-		for (var i in categories) {
-			$scope.allCategories.push(categories[i].title);
-		}
-		$scope.creditInit();
+		$scope.allCurrencies.splice(0, 1);
 	});
 
 	function initDeadline() {
 		var date = new Date();
 		var newDate = new Date(new Date(date).setMonth(date.getMonth() + 3));
 		$scope.deadline = newDate.toISOString().substring(0, 10);
+	}
+
+	function initCategories() {
+		userProfileService.getAllCategories(function(categories) {
+			for (var i in categories) {
+				$scope.allCategories.push(categories[i].title);
+				categoriesMap[categories[i].title] = categories[i].type;
+			}
+			$scope.creditInit();
+		});
 	}
 
 	function initOrderckEditor() {
@@ -73,6 +98,7 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 						$scope.scEditor.orderDataInitialized = true;
 						CKEDITOR.instances.orderDataEditable.setData("");
 						$scope.validateDescription();
+						initCategories();
 					},
 					change: function(evt) {
 						$scope.isValidOrder();
@@ -107,9 +133,8 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 		} else {
 			setError("#order-duration input");
 		}
-		console.log($scope.deadline)
-		if (takingValue && (takingValue !== "")
-				&& givingValue && (givingValue !== "")
+		if (takingValue && (takingValue !== "") && isNumber(takingValue) 
+				&& givingValue && (givingValue !== "") && isNumber(givingValue) 
 				&& durationValue && (durationValue !== "")
 				&& data && (data !== "")
 				&& $scope.orderCreatingMap['orderCategories'] && ($scope.orderCreatingMap['orderCategories'].length !== 0)
@@ -165,8 +190,12 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 	};
 
 	$scope.creditInit = function() {
-		$scope.selectedGivingCurrency = "%";
-		$scope.selectedTakingCurrency = "RUR";
+		$scope.currency.selectedGivingCurrency = "%";
+		$scope.currency.selectedTakingCurrency = "RUR";
+		$scope.takingValue = 1000;
+		$scope.givingValue = 10;
+		$scope.durationValue = 10;
+		CKEDITOR.instances.orderDataEditable.setData(creditInitData);
 		$scope.orderCreatingMap['orderCategories'].splice(0, $scope.orderCreatingMap['orderCategories'].length);
 		$scope.orderCreatingMap['orderCategories'].push($scope.allCategories[3]);
 		$scope.isCreditInit = true;
@@ -178,8 +207,12 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 	};
 
 	$scope.borrowInit = function() {
-		$scope.selectedGivingCurrency = "RUR";
-		$scope.selectedTakingCurrency = "%";
+		$scope.currency.selectedGivingCurrency = "BTC";
+		$scope.currency.selectedTakingCurrency = "%";
+		$scope.takingValue = 10;
+		$scope.givingValue = 1000;
+		$scope.durationValue = 10;
+		CKEDITOR.instances.orderDataEditable.setData(borrowInitData);
 		$scope.orderCreatingMap['orderCategories'].splice(0, $scope.orderCreatingMap['orderCategories'].length);
 		$scope.orderCreatingMap['orderCategories'].push($scope.allCategories[7]);
 		$scope.isCreditInit = false;
@@ -192,8 +225,12 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 	};
 
 	$scope.exchangeInit = function() {
-		$scope.selectedGivingCurrency = "BTC";
-		$scope.selectedTakingCurrency = "RUR";
+		$scope.currency.selectedGivingCurrency = "BTC";
+		$scope.currency.selectedTakingCurrency = "RUR";
+		$scope.takingValue = 2000;
+		$scope.givingValue = 0.1;
+		$scope.durationValue = 0;
+		CKEDITOR.instances.orderDataEditable.setData(exchangeInitData);
 		$scope.orderCreatingMap['orderCategories'].splice(0, $scope.orderCreatingMap['orderCategories'].length);
 		$scope.orderCreatingMap['orderCategories'].push($scope.allCategories[4]);
 		$scope.isCreditInit = true;
@@ -208,20 +245,29 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 		if (!$scope.isValidOrder()) {
 			return;
 		}
+		var orderInfo = {};
 		var data = CKEDITOR.instances.orderDataEditable.getData();
 		var givingValue = angular.element("#giving-order-currency input").val();
 		var takingValue = angular.element("#taking-order-currency input").val();
 		var durationValue = angular.element("#order-duration input").val();
-		var orderInfo = {};
+		var takingCurrency = $scope.currency.selectedTakingCurrency;
+		var givingCurrency = $scope.currency.selectedGivingCurrency;
+
 		orderInfo.orderData = data;
 		orderInfo.endDate = $scope.deadline;
-		orderInfo.takingCurrency = currenciesMap[$scope.selectedTakingCurrency];
+		if (currenciesMap[takingCurrency]) {
+			orderInfo.takingCurrency = currenciesMap[takingCurrency];
+		} else {
+			orderInfo.takingCurrency = takingCurrency;
+		}
 		orderInfo.takingValue = takingValue;
 		//addItems($scope.userPropertiesMap['currencies'], takingCurrency);
-
-		orderInfo.givingCurrency = currenciesMap[$scope.selectedGivingCurrency];
+		if (currenciesMap[givingCurrency]) {
+			orderInfo.givingCurrency = currenciesMap[givingCurrency];
+		} else {
+			orderInfo.givingCurrency = givingCurrency;
+		}
 		orderInfo.givingValue = givingValue;
-		//addItems($scope.userPropertiesMap['currencies'], givingCurrency);
 
 		orderInfo.duration = durationValue;
 		var durationType = $scope.selectedDurationType;
@@ -241,6 +287,10 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 			console.log(JSON.stringify(orderResponse))
 		});
 	};
+
+	function isNumber(n) {
+		return !isNaN(parseFloat(n)) && isFinite(n);
+	}
 });
 
 
