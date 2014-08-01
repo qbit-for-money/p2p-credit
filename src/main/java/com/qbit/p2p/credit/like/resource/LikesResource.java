@@ -35,6 +35,7 @@ public class LikesResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public LikeS get(@PathParam("type") String entityType, @PathParam("id") String entityId,  @PathParam("field") String entityField)
 			throws ClassNotFoundException {
+		//System.out.println(likeDAO.find(new EntityPartId(entityType, entityId, entityField)));
 		return likeDAO.find(new EntityPartId(entityType, entityId, entityField));
 	}
 	

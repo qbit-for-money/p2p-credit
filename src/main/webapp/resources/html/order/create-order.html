@@ -1,0 +1,131 @@
+<div class="panel-body">
+	<div class="container-fluid">
+		<div class="row">
+			<div class="hidden-xs hidden-sm col-md-1"></div>
+			<div class="col-xs-12 col-md-10">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="hidden-xs hidden-sm col-md-1">
+							<button class="btn btn-default btn-lg max-width" style="width: 60px;" type="button" ng-click="goBack()"><span class="glyphicon glyphicon-chevron-left"></span></button>
+						</div>
+						<div class="hidden-xs hidden-sm col-md-2"></div>
+						<div class="col-xs-12 col-md-9">								
+							<div class="btn-group btn-group-justified" data-toggle="buttons">
+								<label class="btn btn-default btn-lg credit-row" ng-class="{'active': !isBorrowInit}">
+									<input type="radio" name="year" value="0" ng-click="creditInit()" checked="checked"><span class="hidden-xs hidden-sm">Займ</span><span class="hidden-md hidden-lg glyphicon glyphicon-arrow-left center"></span>
+								</label>
+								<label class="btn btn-default btn-lg exchange-row" ng-class="{'active': isBorrowInit && isCreditInit}">
+									<input type="radio" name="year" value="1" ng-click="exchangeInit()"><span class="hidden-xs hidden-sm">Обмен</span><span class="hidden-md hidden-lg glyphicon glyphicon-transfer center"></span>
+								</label>
+								<label class="btn btn-default btn-lg borrow-row" ng-class="{'active': !isCreditInit}">
+									<input type="radio" name="year" value="2" ng-click="borrowInit()"><span class="hidden-xs hidden-sm">Инвестиция</span><span class="hidden-md hidden-lg glyphicon glyphicon-arrow-right center"></span>
+								</label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="hidden-xs hidden-sm col-md-1"></div>
+		</div>
+		<div class="row">
+			<div class="hidden-xs hidden-sm col-md-1"></div>
+			<div class="col-xs-12 col-md-10"><hr></div>
+			<div class="hidden-xs hidden-sm col-md-1"></div>
+		</div>
+		<div class="row">
+			<div class="hidden-xs hidden-sm col-md-1"></div>
+			<div class="col-xs-12 col-md-10" id="order-attributes">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-xs-4 col-md-3 title-edit">
+							Booking deadline:
+						</div>
+						<div class="col-xs-8 col-md-9" ng-class="{'has-success': deadline && (deadline.length !== 0), 'has-error': !deadline || (deadline.length === 0)}">
+							<input type="date" id="deadline" ng-model="deadline" class="form-control" ng-change="isValidOrder()">
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-4 col-md-3 title-edit">
+							Category:
+						</div>
+						<div class="col-xs-8 col-md-9" ng-class="{'has-success': orderCreatingMap['orderCategories'] && (orderCreatingMap['orderCategories'].length !== 0), 'has-error': !orderCreatingMap['orderCategories'] || (orderCreatingMap['orderCategories'].length === 0)}">
+							<input type="hidden" class="form-control" ui-select2="categorySelect2Options" ng-model="orderCreatingMap
+								['orderCategories']" id="category" data-placeholder="Pick a category" style="width: 100%" ng-change="isValidOrder()"/>
+						</div>
+					</div>
+					<div class="row" ng-if="!isBorrowInit || (isBorrowInit && isCreditInit)">
+
+						<div class="col-xs-4 col-md-3 title-edit">
+							Take:
+						</div>
+
+						<div class="col-xs-8 col-md-9">
+							<ui-dropdown on-enter="" is-dropdown-input="true" element-id="'taking-order-currency'" on-change-input="isValidOrder()" data-dropdown-data="allCurrencies" preselected-item="currency.selectedTakingCurrency" input-value="takingValue" placeholder="'Take'"></ui-dropdown>
+						</div>
+
+					</div>	
+					<div class="row" ng-if="!isBorrowInit">
+						<div class="col-xs-4 col-md-3 title-edit">
+							Give:
+						</div>
+						<div class="col-xs-8 col-md-9">
+							<ui-dropdown on-enter="" is-dropdown-input="true" element-id="'giving-order-currency'" on-change-input="isValidOrder()" data-dropdown-data="allCurrenciesWithPercent" preselected-item="currency.selectedGivingCurrency" input-value="givingValue" placeholder="'Give'"></ui-dropdown>
+						</div>
+					</div>
+					<div class="row" ng-if="!isCreditInit || (isBorrowInit && isCreditInit)">
+						<div class="col-xs-4 col-md-3 title-edit">
+							Give:
+						</div>
+						<div class="col-xs-8 col-md-9">
+							<ui-dropdown on-enter="" is-dropdown-input="true" element-id="'giving-order-currency'" on-change-input="isValidOrder()" data-dropdown-data="allCurrencies" preselected-item="currency.selectedGivingCurrency" input-value="givingValue" placeholder="'Give'"></ui-dropdown>
+						</div>
+					</div>
+
+					<div class="row" ng-if="!isCreditInit">
+
+						<div class="col-xs-4 col-md-3 title-edit">
+							Take:
+						</div>
+
+						<div class="col-xs-8 col-md-9">
+							<ui-dropdown on-enter="" is-dropdown-input="true" element-id="'taking-order-currency'" on-change-input="isValidOrder()" data-dropdown-data="allCurrenciesWithPercent" preselected-item="currency.selectedTakingCurrency" input-value="takingValue" placeholder="'Take'"></ui-dropdown>
+						</div>
+
+					</div>
+					<div class="row">
+						<div class="col-xs-4 col-md-3 title-edit">
+							Duration:
+						</div>
+						<div class="col-xs-8 col-md-9">
+							<ui-dropdown on-enter="" element-id="'order-duration'" on-change-input="isValidOrder()" data-dropdown-data="durationTypes" preselected-item="selectedDurationType" input-value="durationValue" placeholder="'Duration'"></ui-dropdown>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-4 col-md-3 title-edit">
+							Description:
+						</div>
+						<div class="col-xs-8 col-md-9">
+							<div id="orderDataEditable"  contenteditable="true" ng-blur="decreaseDescriptionSize()" ng-focus="increaseDescriptionSize()" placeholder="Description">
+							</div>
+						</div>
+					</div>
+
+
+					<div class="row" style="margin-top: 30px;">
+						<div class="col-xs-6 col-sm-6 col-md-6">
+							<button class="btn btn-danger btn-lg create-order-button" type="button" ng-click="goBack()">
+								<span class="glyphicon glyphicon-chevron-left"></span> Cancel
+							</button>
+						</div>
+						<div class="col-xs-6 col-sm-6 col-md-6">
+							<button class="btn btn-success btn-lg create-order-button" type="button" ng-click="createOrder()" ng-disabled="!createOrderButtonEnabled">
+								Create order
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="hidden-xs hidden-sm col-md-1"></div>
+		</div>
+	</div>
+</div>

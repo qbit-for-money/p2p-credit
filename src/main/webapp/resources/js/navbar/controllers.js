@@ -1,27 +1,25 @@
 var navbarModule = angular.module("navbar");
 
-navbarModule.controller("NavbarController", function($scope, $location) {
+navbarModule.controller("NavbarController", function($scope, $location, navbarService) {
+	$scope.isNavbarCollapsed = true;
+	if (typeof String.prototype.startsWith !== 'function') {
+		String.prototype.startsWith = function(str) {
+			return this.indexOf(str) === 0;
+		};
+	}
 	$scope.isActive = function(viewLocation) {
-		return viewLocation === $location.path();
+		return $location.path().startsWith(viewLocation);
+	};
+
+	$scope.goToProfile = function() {
+		navbarService.goToProfile();
 	};
 	
-	$scope.gotoOrderInit = function() {
-		$location.hash("order-init");
-		$anchorScroll();
+	$scope.goToOrderCreating = function() {
+		navbarService.goToOrderCreating();
 	};
 	
-	$scope.gotoLastOrders = function() {
-		$location.hash("last-orders-table");
-		$anchorScroll();
-	};
-	
-	$scope.gotoVideo = function() {
-		$location.hash("video-container");
-		$anchorScroll();
-	};
-	
-	$scope.gotoImage = function() {
-		$location.hash("presentation-image");
-		$anchorScroll();
+	$scope.goToOrders = function() {
+		navbarService.goToOrders();
 	};
 });

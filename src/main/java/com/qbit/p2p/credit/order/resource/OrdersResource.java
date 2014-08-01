@@ -4,12 +4,11 @@ import com.qbit.p2p.credit.order.model.SearchRequest;
 import com.qbit.commons.auth.AuthFilter;
 import static com.qbit.commons.rest.util.RESTUtil.toDate;
 import com.qbit.p2p.credit.commons.model.Currency;
-import com.qbit.p2p.credit.commons.util.DateUtil;
 import com.qbit.p2p.credit.env.Env;
 import com.qbit.p2p.credit.money.model.serialization.CurrencyAdapter;
 import com.qbit.p2p.credit.order.dao.OrderDAO;
+import com.qbit.p2p.credit.order.model.CategoryType;
 import com.qbit.p2p.credit.order.model.Comment;
-import com.qbit.p2p.credit.order.model.FilterCondition;
 import com.qbit.p2p.credit.order.model.FilterItem;
 import com.qbit.p2p.credit.order.model.FilterOperator;
 import com.qbit.p2p.credit.order.model.OrderCategory;
@@ -17,22 +16,16 @@ import com.qbit.p2p.credit.order.model.OrderInfo;
 import com.qbit.p2p.credit.order.model.OrderStatus;
 import com.qbit.p2p.credit.order.model.Respond;
 import com.qbit.p2p.credit.statistics.dao.StatisticsDAO;
-import com.qbit.p2p.credit.statistics.model.GlobalStatistics;
 import com.qbit.p2p.credit.statistics.model.Statistics;
-import com.qbit.p2p.credit.statistics.resource.StatisticsResource;
+import com.qbit.p2p.credit.statistics.service.StatisticsService;
 import com.qbit.p2p.credit.user.dao.UserProfileDAO;
 import com.qbit.p2p.credit.user.model.Language;
-import com.qbit.p2p.credit.user.model.UserCurrency;
 import com.qbit.p2p.credit.user.model.UserPublicProfile;
-import java.io.File;
-import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
@@ -43,14 +36,12 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlList;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * @author Alexander_Sergeev
@@ -114,8 +105,8 @@ public class OrdersResource {
 		private String id;
 		private long summaryRating;
 		private long opennessRating;
-		private long ordersSumValue;
-		private long successTransactionsSum;
+		private long ordersValue;
+		private long successTransactionsCount;
 		private long partnersRating;
 		private String successValue;
 		private String userName;
@@ -164,20 +155,20 @@ public class OrdersResource {
 			this.opennessRating = opennessRating;
 		}
 
-		public long getOrdersSumValue() {
-			return ordersSumValue;
+		public long getOrdersValue() {
+			return ordersValue;
 		}
 
-		public void setOrdersSumValue(long ordersSumValue) {
-			this.ordersSumValue = ordersSumValue;
+		public void setOrdersValue(long ordersValue) {
+			this.ordersValue = ordersValue;
 		}
 
-		public long getSuccessTransactionsSum() {
-			return successTransactionsSum;
+		public long getSuccessTransactionsCount() {
+			return successTransactionsCount;
 		}
 
-		public void setSuccessTransactionsSum(long successTransactionsSum) {
-			this.successTransactionsSum = successTransactionsSum;
+		public void setSuccessTransactionsCount(long successTransactionsCount) {
+			this.successTransactionsCount = successTransactionsCount;
 		}
 
 		public long getPartnersRating() {
@@ -238,12 +229,12 @@ public class OrdersResource {
 
 		@Override
 		public String toString() {
-			return "OrderWrapper{" + "order=" + order + ", summaryRating=" + summaryRating + ", opennessRating=" + opennessRating + ", ordersSumValue=" + ordersSumValue + ", successTransactionsSum=" + successTransactionsSum + ", partnersRating=" + partnersRating + ", successValue=" + successValue + ", userName=" + userName + ", userPhone=" + userPhone + ", userCurrencies=" + userCurrencies + ", userLanguages=" + userLanguages + '}';
+			return "OrderWrapper{" + "order=" + order + ", id=" + id + ", summaryRating=" + summaryRating + ", opennessRating=" + opennessRating + ", ordersValue=" + ordersValue + ", successTransactionsCount=" + successTransactionsCount + ", partnersRating=" + partnersRating + ", successValue=" + successValue + ", userName=" + userName + ", userPhone=" + userPhone + ", userMail=" + userMail + ", userCurrencies=" + userCurrencies + ", userLanguages=" + userLanguages + '}';
 		}
 	}
 
 	@XmlRootElement
-	public static class ResponseRequest {
+	public static class RespondCreationRequest {
 
 		private String orderId;
 		private String comment;
@@ -280,7 +271,7 @@ public class OrdersResource {
 	}
 
 	@XmlRootElement
-	public static class OrderStatusRequest {
+	public static class OrderChangeStatusRequest {
 
 		private String orderId;
 		private String comment;
@@ -324,10 +315,7 @@ public class OrdersResource {
 	private StatisticsDAO statisticsDAO;
 
 	@Inject
-	private StatisticsResource statisticsResource;
-
-	@Inject
-	private Env env;
+	private StatisticsService statisticsService;
 
 	@GET
 	@Path("active")
@@ -340,42 +328,6 @@ public class OrdersResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<OrderInfo> getByTimestamp(@QueryParam("creationDate") String creationDateStr, @QueryParam("offset") int offset, @QueryParam("limit") int limit) throws ParseException {
 		return orderDAO.findByUserAndTimestamp(AuthFilter.getUserId(request), toDate(creationDateStr), offset, limit);
-	}
-
-	@POST
-	@Path("last")
-	@Produces(MediaType.APPLICATION_JSON)
-	public OrdersWrapper getLast(SearchRequest ordersRequest) {
-		writeLastOrders();
-		return readLastOrders();
-	}
-
-	public void writeLastOrders() {
-		SearchRequest ordersRequest = new SearchRequest();
-		ordersRequest.setPageNumber(0);
-		ordersRequest.setPageSize(4);
-		OrdersWrapper wrapper = getOrdersFromDB(ordersRequest, null);
-		wrapper.setLength(4);
-		ObjectMapper mapper = new ObjectMapper();
-		try {
-			mapper.writeValue(new File(env.getLastOrdersPathFolder() + "LAST_ORDERS.json"), wrapper);
-		} catch (IOException ex) {
-			throw new WebApplicationException(ex);
-		}
-	}
-
-	private OrdersWrapper readLastOrders() {
-		SearchRequest ordersRequest = new SearchRequest();
-		ordersRequest.setPageNumber(0);
-		ordersRequest.setPageSize(4);
-		ObjectMapper mapper = new ObjectMapper();
-		OrdersWrapper wrapper = null;
-		try {
-			wrapper = mapper.readValue(new File(env.getLastOrdersPathFolder() + "LAST_ORDERS.json"), OrdersWrapper.class);
-		} catch (IOException ex) {
-			throw new WebApplicationException(ex);
-		}
-		return wrapper;
 	}
 
 	@POST
@@ -418,7 +370,6 @@ public class OrdersResource {
 		if (AuthFilter.getUserId(request) != null) {
 			profile = profileDAO.find(AuthFilter.getUserId(request));
 		}
-
 		return getOrdersFromDB(ordersRequest, profile);
 	}
 
@@ -437,13 +388,6 @@ public class OrdersResource {
 		openedOrders.setFilterOperator(FilterOperator.AND);
 		ordersRequest.getFilterItems().add(openedOrders);
 
-		FilterItem greaterThanCurrentDate = new FilterItem();
-		greaterThanCurrentDate.setFilterDataField("endDate");
-		greaterThanCurrentDate.setFilterValue(DateUtil.dateToString(new Date()));
-		greaterThanCurrentDate.setFilterCondition(FilterCondition.GREATER_THAN_OR_EQUAL);
-		greaterThanCurrentDate.setFilterOperator(FilterOperator.AND);
-		ordersRequest.getFilterItems().add(greaterThanCurrentDate);
-
 		List<OrderInfo> orders = orderDAO.findWithFilter(null, ordersRequest, profile);
 
 		long length = orderDAO.getLengthWithFilter(null, ordersRequest, profile);
@@ -451,15 +395,17 @@ public class OrdersResource {
 		List<OrderWrapper> ordersWrappers = new ArrayList<>();
 		for (OrderInfo order : orders) {
 			UserPublicProfile profileValue = profileDAO.find(order.getUserPublicKey());
-			Statistics statistics = statisticsResource.getById(order.getUserPublicKey());
+			Statistics statistics = statisticsDAO.find(order.getUserPublicKey());
 			//List<OrderInfo> partnersOrders = orderDAO.findWithFilter(null, ordersRequest, profile);
 
 			OrderWrapper wrapper = new OrderWrapper(order);
 			wrapper.setId(order.getId());
-			wrapper.setSummaryRating(statistics.getSummaryRating());
-			wrapper.setOpennessRating(statistics.getOpennessRating());
-			wrapper.setSuccessTransactionsSum(statistics.getSuccessTransactionsSum());
-			wrapper.setOrdersSumValue(statistics.getOrdersSumValue());
+			if (statistics != null) {
+				wrapper.setSummaryRating(statistics.getSummaryRating());
+				wrapper.setOpennessRating(statistics.getOpennessRating());
+				wrapper.setSuccessTransactionsCount(statistics.getSuccessTransactionsCount());
+				wrapper.setOrdersValue(statistics.getOrdersValue());
+			}
 			wrapper.setPartnersRating(orderDAO.getPartnersRating(order.getUserPublicKey()));
 			if (profileValue.isPhoneEnabled()) {
 				wrapper.setUserPhone(profileValue.getPhone());
@@ -519,24 +465,23 @@ public class OrdersResource {
 			return null;
 		}
 		OrderInfo o = orderDAO.create(order);
-		Statistics statistics = statisticsResource.calculateUserOrdersStatistics(id);
+		Statistics statistics = statisticsService.calculateUserOrdersStatistics(id);
 		if (statistics != null) {
-			statisticsDAO.setUserOrdersStatistics(statistics);
+			statisticsDAO.updateUserOrdersStatistics(statistics);
 		}
-		//profileDAO.setUserOrdersStatistics(statisticsResource.getUserOrdersStatistics(id))
 		return o;
 	}
 
-	@POST
-	@Path("addResponse")
+	@PUT
+	@Path("respond")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public OrderInfo addResponse(ResponseRequest responseRequest) {
+	public OrderInfo createRespond(RespondCreationRequest respondRequest) {
 		String id = AuthFilter.getUserId(request);
-		if ((responseRequest == null) || (responseRequest.getOrderId() == null) || responseRequest.getOrderId().isEmpty()) {
+		if ((respondRequest == null) || (respondRequest.getOrderId() == null) || respondRequest.getOrderId().isEmpty()) {
 			return null;
 		}
-		OrderInfo order = orderDAO.find(responseRequest.getOrderId());
+		OrderInfo order = orderDAO.find(respondRequest.getOrderId());
 		if ((order == null) || order.getUserPublicKey().equals(id)) {
 			return null;
 		}
@@ -551,7 +496,7 @@ public class OrdersResource {
 		Respond respond = new Respond();
 		respond.setUserPublicKey(id);
 		respond.setCreationDate(new Date());
-		respond.setComment(responseRequest.getComment());
+		respond.setComment(respondRequest.getComment());
 		List<Respond> responses = order.getResponses();
 		if (responses == null) {
 			responses = new ArrayList<>();
@@ -563,19 +508,19 @@ public class OrdersResource {
 	}
 
 	@POST
-	@Path("approveResponse")
+	@Path("respond")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public OrderInfo approveResponse(ResponseRequest responseRequest) {
-		OrderInfo order = orderDAO.find(responseRequest.getOrderId());
+	public OrderInfo approveRespond(RespondCreationRequest respondRequest) {
+		OrderInfo order = orderDAO.find(respondRequest.getOrderId());
 		String id = AuthFilter.getUserId(request);
 		if ((order == null) || !order.getUserPublicKey().equals(id)) {
 			return null;
 		}
 		if (order.getResponses() != null) {
 			for (Respond respond : order.getResponses()) {
-				if (respond.getUserPublicKey().equals(responseRequest.getUserId()) && (order.getApprovedResponseId() == null)) {
-					order.setApprovedResponseId(respond.getId());
+				if (respond.getUserPublicKey().equals(respondRequest.getUserId()) && (order.getApprovedRespondId() == null)) {
+					order.setApprovedRespondId(respond.getId());
 
 					order.setStatus(OrderStatus.IN_PROCESS);
 					orderDAO.update(order);
@@ -586,17 +531,17 @@ public class OrdersResource {
 	}
 
 	@GET
-	@Path("response")
+	@Path("respond")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Respond getByUser(@QueryParam("id") String id) {
+	public Respond getRespondByUser(@QueryParam("id") String id) {
 		return orderDAO.findResponse(id);
 	}
 
 	@POST
-	@Path("changeStatus")
+	@Path("status")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public OrderInfo changeOrderStatus(OrderStatusRequest statusRequest) {
+	public OrderInfo changeOrderStatus(OrderChangeStatusRequest statusRequest) {
 		OrderInfo order = orderDAO.find(statusRequest.getOrderId());
 		if (order == null) {
 			return null;
@@ -612,8 +557,8 @@ public class OrdersResource {
 
 	private boolean isСompleted(OrderStatus status) {
 		return ((status == OrderStatus.SUCCESS)
-				|| (status == OrderStatus.NOT_SUCCESS)
-				|| (status == OrderStatus.ARBITRATION));
+			|| (status == OrderStatus.NOT_SUCCESS)
+			|| (status == OrderStatus.ARBITRATION));
 	}
 
 	@GET
@@ -624,46 +569,24 @@ public class OrdersResource {
 	}
 
 	@GET
-	@Path("test")
-	@Produces(MediaType.APPLICATION_JSON)
-	public OrderInfo createTest() {
-		Random rand = new Random();
-		OrderInfo order = new OrderInfo();
-		String userId = AuthFilter.getUserId(request);
-		order.setUserPublicKey(userId);
-		order.setCreationDate(new Date());
-		order.setEndDate(new Date());
-
-		UserCurrency c1 = new UserCurrency(Currency.BITCOIN, 10, 500);
-		order.setOrderData("DEFAULT");
-
-		List<String> l = new ArrayList<>();
-		Collections.addAll(l, "English", "Arabic");
-		//order.setLanguages(l);
-
-		return orderDAO.create(order);
-	}
-
-	@GET
 	@Path("test-category")
 	@Produces(MediaType.APPLICATION_JSON)
 	public OrderCategory createTestCategories() {
-		System.out.println("!!! TEST");
 		String c = "Кредит под процент";
-		orderDAO.createCategory(c);
+		orderDAO.createCategory(c, CategoryType.CREDIT);
 		c = "Кредит под залог";
-		orderDAO.createCategory(c);
+		orderDAO.createCategory(c, CategoryType.CREDIT);
 		c = "Кредит на образование";
-		orderDAO.createCategory(c);
+		orderDAO.createCategory(c, CategoryType.CREDIT);
 		c = "Кредит";
-		orderDAO.createCategory(c);
+		orderDAO.createCategory(c, CategoryType.CREDIT);
 		c = "Обмен";
-		orderDAO.createCategory(c);
+		orderDAO.createCategory(c, CategoryType.EXCHANGE);
 		c = "Безвозвратно";
-		orderDAO.createCategory(c);
+		orderDAO.createCategory(c, CategoryType.CREDIT);
 		c = "Без %";
-		orderDAO.createCategory(c);
+		orderDAO.createCategory(c, CategoryType.CREDIT);
 		c = "Доля";
-		return orderDAO.createCategory(c);
+		return orderDAO.createCategory(c, CategoryType.BORROW);
 	}
 }

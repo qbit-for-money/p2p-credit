@@ -6,18 +6,14 @@ import com.qbit.commons.dao.util.TrCallable;
 import com.qbit.commons.user.UserDAO;
 import com.qbit.commons.user.UserInfo;
 import com.qbit.p2p.credit.statistics.dao.StatisticsDAO;
-import com.qbit.p2p.credit.statistics.model.GlobalStatistics;
 import com.qbit.p2p.credit.user.model.Language;
-import com.qbit.p2p.credit.statistics.model.Statistics;
-import com.qbit.p2p.credit.user.model.UserPrivateProfile;
+import com.qbit.p2p.credit.user.model.DataLink;
 import com.qbit.p2p.credit.user.model.UserPublicProfile;
-import com.qbit.p2p.credit.user.model.UserType;
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.LockModeType;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -45,17 +41,7 @@ public class UserProfileDAO {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {
 			return DAOUtil.find(entityManagerFactory.createEntityManager(),
-					UserPublicProfile.class, id, null);
-		} finally {
-			entityManager.close();
-		}
-	}
-
-	public UserPrivateProfile findPrivateProfile(String id) {
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		try {
-			return DAOUtil.find(entityManagerFactory.createEntityManager(),
-					UserPrivateProfile.class, id, null);
+				UserPublicProfile.class, id, null);
 		} finally {
 			entityManager.close();
 		}
@@ -100,15 +86,15 @@ public class UserProfileDAO {
 			criteria.select(builder.count(user));
 			if (filterDataField != null && query != null) {
 				criteria.where(
-						builder.or(
-								builder.like(
-										builder.lower(
-												user.get(
-														type.getDeclaredSingularAttribute(filterDataField, String.class)
-												)
-										), "%" + query.toLowerCase() + "%"
+					builder.or(
+						builder.like(
+							builder.lower(
+								user.get(
+									type.getDeclaredSingularAttribute(filterDataField, String.class)
 								)
+							), "%" + query.toLowerCase() + "%"
 						)
+					)
 				);
 			}
 
@@ -149,39 +135,6 @@ public class UserProfileDAO {
 		}
 	}
 
-	public List<UserPublicProfile> findByType(UserType type, int offset, int limit) {
-		if (type == null) {
-			throw new IllegalArgumentException();
-		}
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		try {
-			TypedQuery<UserPublicProfile> query = entityManager.createNamedQuery("UserPublicProfile.findByType", UserPublicProfile.class);
-			query.setParameter("type", type);
-			query.setFirstResult(offset);
-			query.setMaxResults(limit);
-			return query.getResultList();
-		} finally {
-			entityManager.close();
-		}
-	}
-
-	public List<UserPublicProfile> findByOrder(String orderId, int offset, int limit) {
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		try {
-			String queryName;
-			queryName = "UserPublicProfile.findByOrder";
-
-			TypedQuery<UserPublicProfile> query = entityManager.createNamedQuery(queryName, UserPublicProfile.class);
-
-			query.setParameter("orderId", orderId);
-			query.setFirstResult(offset);
-			query.setMaxResults(limit);
-			return query.getResultList();
-		} finally {
-			entityManager.close();
-		}
-	}
-
 	public UserPublicProfile create(final String publicKey) {
 		return invokeInTransaction(entityManagerFactory, new TrCallable<UserPublicProfile>() {
 
@@ -197,35 +150,13 @@ public class UserProfileDAO {
 
 				entityManager.persist(userPublicProfile);
 				statisticsDAO.create(publicKey);
-				System.out.println("!!!!!!!!!!! " + publicKey);
-
 				return userPublicProfile;
 			}
 		}
 		);
 	}
 
-	public UserPrivateProfile createUserPrivateProfile(final String publicKey) {
-		return invokeInTransaction(entityManagerFactory, new TrCallable<UserPrivateProfile>() {
-
-			@Override
-			public UserPrivateProfile call(EntityManager entityManager) {
-				UserInfo user = userDAO.find(publicKey);
-				if (user == null) {
-					throw new WebApplicationException();
-				}
-				UserPrivateProfile userPrivateProfile = new UserPrivateProfile();
-				userPrivateProfile.setPublicKey(publicKey);
-
-				entityManager.persist(userPrivateProfile);
-
-				return userPrivateProfile;
-			}
-		}
-		);
-	}
-
-	public UserPublicProfile updateUserPublicProfile(final UserPublicProfile userProfile) {
+	public UserPublicProfile updateUserMainAttributes(final UserPublicProfile userProfile) {
 		if (userProfile == null) {
 			throw new IllegalArgumentException();
 		}
@@ -233,12 +164,11 @@ public class UserProfileDAO {
 
 			@Override
 			public UserPublicProfile
-					call(EntityManager entityManager) {
+				call(EntityManager entityManager) {
 				UserPublicProfile userPublicProfile = entityManager.find(UserPublicProfile.class, userProfile.getPublicKey());
 				if (userPublicProfile == null) {
 					return null;
 				}
-
 				userPublicProfile.setName(userProfile.getName());
 				userPublicProfile.setMail(userProfile.getMail());
 				userPublicProfile.setMailEnabled(userProfile.isMailEnabled());
@@ -250,42 +180,88 @@ public class UserProfileDAO {
 				userPublicProfile.setCurrenciesEnabled(userProfile.isCurrenciesEnabled());
 				userPublicProfile.setPersonalData(userProfile.getPersonalData());
 				userPublicProfile.setPersonalDataEnabled(userProfile.isPersonalDataEnabled());
-				userPublicProfile.setSocialLinks(userProfile.getSocialLinks());
-				userPublicProfile.setVideos(userProfile.getVideos());
-				userPublicProfile.setNamesLinks(userProfile.getNamesLinks());
-				userPublicProfile.setPhones(userProfile.getPhones());
-				userPublicProfile.setPassportEnabled(userProfile.isPassportEnabled());
-				userPublicProfile.setBkiData(userProfile.getBkiData());
+				
+				return userPublicProfile;
+			}
+		});
+	}
+	
+	public UserPublicProfile updateUserSocialLinks(final List<DataLink> socialLinks, final String publicKey) {
+		if ((publicKey == null) && publicKey.isEmpty()) {
+			throw new IllegalArgumentException();
+		}
+		return invokeInTransaction(entityManagerFactory, new TrCallable<UserPublicProfile>() {
+
+			@Override
+			public UserPublicProfile
+				call(EntityManager entityManager) {
+				UserPublicProfile userPublicProfile = entityManager.find(UserPublicProfile.class, publicKey);
+				if (userPublicProfile == null) {
+					return null;
+				}
+				userPublicProfile.setSocialLinks(socialLinks);
 
 				return userPublicProfile;
 			}
 		});
 	}
-
-	public UserPrivateProfile updateUserPrivateProfile(UserPrivateProfile userProfile) {
-		if (userProfile == null) {
+	
+	public UserPublicProfile updateUserVideos(final List<DataLink> videos, final String publicKey) {
+		if ((publicKey == null) && publicKey.isEmpty()) {
 			throw new IllegalArgumentException();
 		}
-		return updateUserPrivateProfile(userProfile.getPublicKey(), userProfile.getPhone(), userProfile.isPhoneEnabled(), userProfile.isPhoneVisible());
-
-	}
-
-	public UserPrivateProfile updateUserPrivateProfile(final String publicKey, final String phone, final boolean phoneEnabled, final boolean phoneVisible) {
-		return invokeInTransaction(entityManagerFactory, new TrCallable<UserPrivateProfile>() {
+		return invokeInTransaction(entityManagerFactory, new TrCallable<UserPublicProfile>() {
 
 			@Override
-			public UserPrivateProfile
-					call(EntityManager entityManager) {
-				UserPrivateProfile userPrivateProfile = entityManager.find(UserPrivateProfile.class, publicKey);
-				if (userPrivateProfile == null) {
+			public UserPublicProfile
+				call(EntityManager entityManager) {
+				UserPublicProfile userPublicProfile = entityManager.find(UserPublicProfile.class, publicKey);
+				if (userPublicProfile == null) {
 					return null;
 				}
+				userPublicProfile.setVideos(videos);
 
-				userPrivateProfile.setPhone(phone);
-				userPrivateProfile.setPhoneEnabled(phoneEnabled);
-				userPrivateProfile.setPhoneVisible(phoneVisible);
+				return userPublicProfile;
+			}
+		});
+	}
+	
+	public UserPublicProfile updatePassportEnabled(final boolean isPassportEnabled, final String publicKey) {
+		if ((publicKey == null) && publicKey.isEmpty()) {
+			throw new IllegalArgumentException();
+		}
+		return invokeInTransaction(entityManagerFactory, new TrCallable<UserPublicProfile>() {
 
-				return userPrivateProfile;
+			@Override
+			public UserPublicProfile
+				call(EntityManager entityManager) {
+				UserPublicProfile userPublicProfile = entityManager.find(UserPublicProfile.class, publicKey);
+				if (userPublicProfile == null) {
+					return null;
+				}
+				userPublicProfile.setPassportEnabled(isPassportEnabled);
+
+				return userPublicProfile;
+			}
+		});
+	}
+	
+	public UserPublicProfile updateUserBkiData(final String bkiData, final String publicKey) {
+		if ((publicKey == null) && publicKey.isEmpty()) {
+			throw new IllegalArgumentException();
+		}
+		return invokeInTransaction(entityManagerFactory, new TrCallable<UserPublicProfile>() {
+
+			@Override
+			public UserPublicProfile
+				call(EntityManager entityManager) {
+				UserPublicProfile userPublicProfile = entityManager.find(UserPublicProfile.class, publicKey);
+				if (userPublicProfile == null) {
+					return null;
+				}
+				userPublicProfile.setBkiData(bkiData);
+
+				return userPublicProfile;
 			}
 		});
 	}
@@ -300,7 +276,7 @@ public class UserProfileDAO {
 			public Language call(EntityManager entityManager) {
 
 				Language language = new Language(title);
-				language.setWithoutParent(true);
+				language.setCustom(true);
 				entityManager.persist(language);
 				return language;
 			}
@@ -314,7 +290,7 @@ public class UserProfileDAO {
 			CriteriaQuery<Language> criteria = builder.createQuery(Language.class);
 			Root<Language> language = criteria.from(Language.class);
 			criteria.select(language);
-			criteria.where(builder.equal(language.get("withoutParent"), "t"));
+			criteria.where(builder.equal(language.get("custom"), "t"));
 			TypedQuery<Language> query = entityManager.createQuery(criteria);
 			return query.getResultList();
 		} finally {

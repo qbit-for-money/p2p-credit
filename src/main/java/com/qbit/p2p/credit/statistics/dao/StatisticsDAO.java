@@ -37,8 +37,10 @@ public class StatisticsDAO {
 	public GlobalStatistics getGlobalStatistics() {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {
+			System.out.println("%%% " + DAOUtil.find(entityManagerFactory.createEntityManager(),
+					GlobalStatistics.class, 0L, null));
 			return DAOUtil.find(entityManagerFactory.createEntityManager(),
-					GlobalStatistics.class, 1L, null);
+					GlobalStatistics.class, 0L, null);
 		} finally {
 			entityManager.close();
 		}
@@ -54,7 +56,6 @@ public class StatisticsDAO {
 					throw new WebApplicationException();
 				}
 				Statistics statistics = new Statistics(publicKey);
-
 				entityManager.persist(statistics);
 
 				return statistics;
@@ -63,22 +64,7 @@ public class StatisticsDAO {
 		);
 	}
 
-	public GlobalStatistics maybeCreateGlobalStatistics() {
-		return invokeInTransaction(entityManagerFactory, new TrCallable<GlobalStatistics>() {
-
-			@Override
-			public GlobalStatistics call(EntityManager entityManager) {
-				GlobalStatistics statistics = entityManager.find(GlobalStatistics.class, 1L, LockModeType.PESSIMISTIC_WRITE);
-				if (statistics == null) {
-					statistics = new GlobalStatistics();
-					entityManager.persist(statistics);
-				}
-				return statistics;
-			}
-		});
-	}
-
-	public Statistics setProfileRating(final Statistics userStatistics) {
+	public Statistics updateProfileRating(final Statistics userStatistics) {
 		if (userStatistics == null) {
 			throw new IllegalArgumentException();
 		}
@@ -89,40 +75,38 @@ public class StatisticsDAO {
 					call(EntityManager entityManager) {
 				Statistics statistics = entityManager.find(Statistics.class, userStatistics.getId(), LockModeType.PESSIMISTIC_WRITE);
 				if (statistics == null) {
-					return null;
+					statistics = new Statistics(userStatistics.getId());
 				}
 				statistics.setOpennessRating(userStatistics.getOpennessRating());
 				statistics.setSummaryRating(userStatistics.getSummaryRating());
-				return statistics;
+				return entityManager.merge(statistics);
 			}
 		});
 	}
 
-	public Statistics setUserOrdersStatistics(final Statistics userStatistics) {
+	public Statistics updateUserOrdersStatistics(final Statistics userStatistics) {
 		if (userStatistics == null) {
 			throw new IllegalArgumentException();
 		}
 		return invokeInTransaction(entityManagerFactory, new TrCallable<Statistics>() {
-
 			@Override
 			public Statistics
 					call(EntityManager entityManager) {
 				Statistics statistics = entityManager.find(Statistics.class, userStatistics.getId(), LockModeType.PESSIMISTIC_WRITE);
 				if (statistics == null) {
-					return null;
+					statistics = new Statistics(userStatistics.getId());
 				}
-
-				statistics.setOrdersSumValue(userStatistics.getOrdersSumValue());
-				statistics.setSuccessTransactionsSum(userStatistics.getSuccessTransactionsSum());
-				statistics.setTransactionsSum(userStatistics.getTransactionsSum());
+				statistics.setOrdersValue(userStatistics.getOrdersValue());
+				statistics.setSuccessTransactionsCount(userStatistics.getSuccessTransactionsCount());
+				statistics.setTransactionsCount(userStatistics.getTransactionsCount());
 				statistics.setTransactionsRating(userStatistics.getTransactionsRating());
 				statistics.setSummaryRating(userStatistics.getSummaryRating());
-				return statistics;
+				return entityManager.merge(statistics);
 			}
 		});
 	}
 
-	public GlobalStatistics setGlobalStatistics(final GlobalStatistics globalStatistics) {
+	public GlobalStatistics updateGlobalStatistics(final GlobalStatistics globalStatistics) {
 		if (globalStatistics == null) {
 			throw new IllegalArgumentException();
 		}
@@ -133,11 +117,11 @@ public class StatisticsDAO {
 					call(EntityManager entityManager) {
 				GlobalStatistics statistics = entityManager.find(GlobalStatistics.class, globalStatistics.getId(), LockModeType.PESSIMISTIC_WRITE);
 				if (statistics == null) {
-					return null;
+					statistics = new GlobalStatistics();
 				}
-				statistics.setAllTransactionsSum(globalStatistics.getAllTransactionsSum());
-				statistics.setAllSuccessTransactionsSum(globalStatistics.getAllSuccessTransactionsSum());
-				return statistics;
+				statistics.setAllTransactionsCount(globalStatistics.getAllTransactionsCount());
+				statistics.setAllSuccessTransactionsCount(globalStatistics.getAllSuccessTransactionsCount());
+				return entityManager.merge(statistics);
 			}
 		});
 	}

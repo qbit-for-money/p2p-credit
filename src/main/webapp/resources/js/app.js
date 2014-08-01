@@ -10,7 +10,7 @@ angular.module("user-profile", ["ngResource", "ngSanitize"]);
 
 angular.module("user-edit", ["ngResource"]);
 
-angular.module("navbar", ["ngResource"]);
+angular.module("navbar", ["ngResource", "common"]);
 
 angular.module("like", ["ngResource"]);
 
@@ -24,11 +24,11 @@ angular.module("main").config(function($routeProvider, $locationProvider) {
 	}).when("/users/:id", {
 		templateUrl: "resources/html/user/user.html",
 		controller: "UserProfileController"
-	}).when("/credit", {
-		templateUrl: "resources/html/order/credit.html",
-		controller: "CreditController"
-	}).when("/borrow", {
-		templateUrl: "resources/html/order/borrow.html",
+	}).when("/create-order", {
+		templateUrl: "resources/html/order/create-order.html",
+		controller: "CreateOrderController"
+	}).when("/orders", {
+		templateUrl: "resources/html/order/orders-table.html",
 		controller: "BorrowController"
 	}).otherwise({redirectTo: "/"});
 }).run(function($rootScope, $location) {

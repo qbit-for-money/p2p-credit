@@ -14,4 +14,5 @@ CKEDITOR.editorConfig = function( config ) {
 	config.youtube_older = false;
 	config.youtube_privacy = false;
 	config.allowedContent = true;
+	//config.extraPlugins = 'confighelper';
 };

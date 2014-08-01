@@ -14,7 +14,7 @@ orderModule.controller("UserOrdersController", function($scope, $rootScope, $int
 		});
 	};
 
-	userProfileService.getAllCategories(function(categories) {
+	userProfileService.getAllCategoriesTitle(function(categories) {
 		userProfileService.getAllLanguages(function(languages) {
 			userProfileService.getAllCurrencies(function(currencies) {
 				initTable(categories, languages, currencies);

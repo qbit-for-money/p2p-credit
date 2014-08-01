@@ -158,19 +158,16 @@ select.custom {
 	border-color: #3c763d;
 }
 
-.credit-row
-{
-	background-color: #ffe5e9;
-}
-.borrow-row
-{
-	background-color: #e5fff4;
-}
-.exchange-row
-{
-	background-color: #f8f8f8;
-}
-
 .static-position {
 	position: static !important;
+}
+
+.profile-like {
+	float: right;
+	margin-right: 15px;
+}
+
+.like-count {
+	color: black;
+	background-color: #e5e5e5;
 }

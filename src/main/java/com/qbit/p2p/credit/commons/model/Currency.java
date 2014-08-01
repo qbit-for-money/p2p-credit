@@ -4,6 +4,7 @@ package com.qbit.p2p.credit.commons.model;
  * @author Alexander_Sergeev
  */
 public enum Currency {
+	PERCENT("%", 100),
 	RUR("RUR", 400), 
 	YANDEX_RUR("Yandex RUR", 400), 
 	WEBMONEY_RUR("WebMoney RUR", 400), 

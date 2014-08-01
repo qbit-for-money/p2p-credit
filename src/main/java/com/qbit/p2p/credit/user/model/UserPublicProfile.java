@@ -46,12 +46,10 @@ public class UserPublicProfile implements Serializable {
 	private String personalData;
 	private boolean personalDataEnabled;
 
-	private List<DataLink> phones;
 	private List<DataLink> socialLinks;
 
 	private boolean passportEnabled;
 	private List<DataLink> videos;
-	private List<DataLink> namesLinks;
 	@Lob
 	private String bkiData;
 
@@ -159,14 +157,6 @@ public class UserPublicProfile implements Serializable {
 		this.passportEnabled = passportEnabled;
 	}
 
-	public List<DataLink> getPhones() {
-		return phones;
-	}
-
-	public void setPhones(List<DataLink> phones) {
-		this.phones = phones;
-	}
-
 	public List<DataLink> getSocialLinks() {
 		return socialLinks;
 	}
@@ -183,14 +173,6 @@ public class UserPublicProfile implements Serializable {
 		this.videos = videos;
 	}
 
-	public List<DataLink> getNamesLinks() {
-		return namesLinks;
-	}
-
-	public void setNamesLinks(List<DataLink> namesLinks) {
-		this.namesLinks = namesLinks;
-	}
-
 	public String getBkiData() {
 		return bkiData;
 	}
@@ -204,14 +186,14 @@ public class UserPublicProfile implements Serializable {
 	}
 
 	/*public boolean isValid() {
-	 return (name == null || name.length() <= MAX_LENGTH)
-	 && (mail == null || mail.length() <= MAX_LENGTH)
-	 && (phone == null || phone.length() <= MAX_LENGTH)
-	 && (city == null || city.length() <= MAX_LENGTH)
-	 && (hobby == null || hobby.length() <= MAX_LENGTH * 2);
-	 }*/
+	return (name == null || name.length() <= MAX_LENGTH)
+	&& (mail == null || mail.length() <= MAX_LENGTH)
+	&& (phone == null || phone.length() <= MAX_LENGTH)
+	&& (city == null || city.length() <= MAX_LENGTH)
+	&& (hobby == null || hobby.length() <= MAX_LENGTH * 2);
+	}*/
 	@Override
 	public String toString() {
-		return "UserPublicProfile{" + "publicKey=" + publicKey + ", name=" + name + ", mail=" + mail + ", mailEnabled=" + mailEnabled + ", phone=" + phone + ", phoneEnabled=" + phoneEnabled + ", languages=" + languages + ", languagesEnabled=" + languagesEnabled + ", currencies=" + currencies + ", currenciesEnabled=" + currenciesEnabled + ", personalData=" + personalData + ", personalDataEnabled=" + personalDataEnabled + ", phones=" + phones + ", socialLinks=" + socialLinks + ", passportEnabled=" + passportEnabled + ", videos=" + videos + ", namesLinks=" + namesLinks + ", bkiData=" + bkiData + '}';
+		return "UserPublicProfile{" + "publicKey=" + publicKey + ", name=" + name + ", mail=" + mail + ", mailEnabled=" + mailEnabled + ", phone=" + phone + ", phoneEnabled=" + phoneEnabled + ", languages=" + languages + ", languagesEnabled=" + languagesEnabled + ", currencies=" + currencies + ", currenciesEnabled=" + currenciesEnabled + ", personalData=" + personalData + ", personalDataEnabled=" + personalDataEnabled + ", socialLinks=" + socialLinks + ", passportEnabled=" + passportEnabled + ", videos=" + videos + ", bkiData=" + bkiData + '}';
 	}
 }

@@ -35,3 +35,7 @@ commonModule.factory("delayedProxy", function($timeout) {
 		return proxy;
 	};
 });
+
+commonModule.factory("getRandBinary", function() {
+	return Math.floor(Math.random() * 2);
+});

@@ -13,10 +13,6 @@
 		<link rel="stylesheet" type="text/css" href="resources/lib/select2-3.5.0/select2.css">
 		<link rel="stylesheet" type="text/css" href="resources/lib/select2-3.5.0/select2-bootstrap.css">
 
-		<link rel="stylesheet" href="resources/lib/jqwidgets/jqwidgets/styles/jqx.base.css" type="text/css" />
-		<link rel="stylesheet" href="resources/lib/jqwidgets/jqwidgets/styles/jqx.arctic.css" type="text/css" />
-		<link rel="stylesheet" href="resources/lib/jqwidgets/jqwidgets/styles/jqx.bootstrap.css" type="text/css" />
-
 		<link rel="stylesheet" type="text/css" href="resources/css/common.css">
 		<link rel="stylesheet" type="text/css" href="resources/css/auth-dialog.css">
 		<link rel="stylesheet" type="text/css" href="resources/css/order.css">
@@ -54,32 +50,7 @@
 		<script type="text/javascript" src="resources/lib/bootstrap/core/js/ui-bootstrap-tpls-0.10.0.min.js"></script>
 		<script type="text/javascript" src="resources/lib/bootstrap/accordion/bootstrap-collapse.js"></script>
 		<script type="text/javascript" src="resources/lib/bootstrap/datepicker/js/bootstrap-datepicker.js"></script> 
-		<script type="text/javascript" src="resources/lib/imgareaselect/scripts/jquery.imgareaselect.pack.js"></script>
-
-		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxcore.js"></script>
-		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxdata.js"></script>
-		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxbuttons.js"></script>
-		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxscrollbar.js"></script>
-		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxgrid.js"></script>
-		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxgrid.selection.js"></script>
-		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxgrid.pager.js"></script>
-		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxgrid.sort.js"></script>
-		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxgrid.filter.js"></script>
-		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxgrid.columnsresize.js"></script> 
-		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxgrid.columnsreorder.js"></script>
-		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxcheckbox.js"></script>
-		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxtabs.js"></script>
-		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxmenu.js"></script>
-		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxchart.js"></script>
-		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxlistbox.js"></script> 
-		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxdropdownlist.js"></script> 
-		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxtooltip.js"></script> 
-		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxinput.js"></script> 
-		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxmaskedinput.js"></script> 
-		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxnumberinput.js"></script> 
-		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxslider.js"></script> 
-		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxdatetimeinput.js"></script> 
-		<script type="text/javascript" src="resources/lib/jqwidgets/jqwidgets/jqxcalendar.js"></script>  
+		<script type="text/javascript" src="resources/lib/imgareaselect/scripts/jquery.imgareaselect.pack.js"></script> 
 
 		<script type="text/javascript">
 			// Global constants
@@ -103,7 +74,8 @@
 		<script type="text/javascript" src="resources/js/order/controllers.js"></script>
 		<script type="text/javascript" src="resources/js/order/resources.js"></script>
 		<script type="text/javascript" src="resources/js/orders-table/controllers.js"></script>
-		<script type="text/javascript" src="resources/js/last-orders-table/controllers.js"></script>
+		
+		<script type="text/javascript" src="resources/js/create-order/controllers.js"></script>
 
 		<script type="text/javascript" src="resources/lib/imgareaselect/scripts/upload.js"></script>
 		
@@ -116,9 +88,13 @@
 		<script type="text/javascript" src="resources/js/user-orders-table/directives.js"></script>
 
 		<script type="text/javascript" src="resources/js/navbar/controllers.js"></script>
+		<script type="text/javascript" src="resources/js/navbar/directives.js"></script>
+		<script type="text/javascript" src="resources/js/navbar/services.js"></script>
 		
 		<script type="text/javascript" src="resources/js/like/resources.js"></script>
 		<script type="text/javascript" src="resources/js/like/directives.js"></script>
+		
+		<script type="text/javascript" src="resources/js/short-search/controllers.js"></script>
 
 		<div ng-include src="'resources/html/templates/templates.html'"></div>
 		<script type="text/javascript" src="resources/js/common/tables-common.js"></script>

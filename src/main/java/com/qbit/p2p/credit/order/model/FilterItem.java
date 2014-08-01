@@ -1,10 +1,13 @@
 package com.qbit.p2p.credit.order.model;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 
 /**
  * @author Alexander_Sergeev
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class FilterItem {
 
 	@XmlElement(required = true)

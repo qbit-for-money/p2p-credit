@@ -6,7 +6,7 @@ import com.qbit.commons.dao.util.TrCallable;
 import com.qbit.commons.user.UserDAO;
 import com.qbit.commons.user.UserInfo;
 import com.qbit.p2p.credit.commons.model.Currency;
-import com.qbit.p2p.credit.commons.util.DateUtil;
+import com.qbit.p2p.credit.order.model.CategoryType;
 import com.qbit.p2p.credit.order.model.FilterCondition;
 import com.qbit.p2p.credit.order.model.FilterItem;
 import com.qbit.p2p.credit.order.model.FilterOperator;
@@ -28,6 +28,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.LockModeType;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -95,17 +96,6 @@ public class OrderDAO {
 		}
 	}
 
-	public Long findMedianVolumeOfSuccess() {
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		try {
-			TypedQuery<Long> query = entityManager.createNamedQuery("OrderInfo.findMedianVolumeOfSuccess", Long.class);
-			query.setParameter("status", OrderStatus.SUCCESS);
-			return query.getSingleResult();
-		} finally {
-			entityManager.close();
-		}
-	}
-
 	public OrderInfo create(final OrderInfo orderInfo) {
 		if ((orderInfo == null) || !orderInfo.isValid()) {
 			throw new IllegalArgumentException("Order is null or not valid.");
@@ -123,7 +113,7 @@ public class OrderDAO {
 					orderInfo.setCategories(new ArrayList<OrderCategory>());
 				}
 				for (OrderCategory category : orderCategories) {
-					category.setCategoryForOrder(true);
+					category.setCustom(true);
 				}
 				orderInfo.setStatus(OrderStatus.OPENED);
 				orderInfo.setCreationDate(new Date());
@@ -142,7 +132,7 @@ public class OrderDAO {
 			@Override
 			public OrderInfo
 					call(EntityManager entityManager) {
-				OrderInfo order = entityManager.find(OrderInfo.class, newOrder.getId());
+				OrderInfo order = entityManager.find(OrderInfo.class, newOrder.getId(), LockModeType.PESSIMISTIC_WRITE);
 				if (order == null) {
 					return null;
 				}
@@ -150,12 +140,6 @@ public class OrderDAO {
 				List<OrderCategory> orderCategories = order.getCategories();
 				if (orderCategories == null) {
 					order.setCategories(new ArrayList<OrderCategory>());
-				}
-
-				for (OrderCategory category : newOrder.getCategories()) {
-					if (categories.contains(category)) {
-						//category.setId(categories.get(categories.indexOf(category)).getId());
-					}
 				}
 				order.setDuration(newOrder.getDuration());
 				order.setDurationType(newOrder.getDurationType());
@@ -177,8 +161,8 @@ public class OrderDAO {
 				order.setTakingValue(newOrder.getTakingValue());
 				order.setUserPublicKey(newOrder.getUserPublicKey());
 				order.setComment(newOrder.getComment());
-				if (newOrder.getApprovedResponseId() != null) {
-					order.setApprovedResponseId(newOrder.getApprovedResponseId());
+				if (newOrder.getApprovedRespondId() != null) {
+					order.setApprovedRespondId(newOrder.getApprovedRespondId());
 				}
 				return order;
 			}
@@ -195,7 +179,7 @@ public class OrderDAO {
 		}
 	}
 
-	public OrderCategory createCategory(final String title) {
+	public OrderCategory createCategory(final String title, final CategoryType type) {
 		if ((title == null) || title.isEmpty()) {
 			throw new IllegalArgumentException("Title is empty.");
 		}
@@ -204,8 +188,8 @@ public class OrderDAO {
 			@Override
 			public OrderCategory call(EntityManager entityManager) {
 
-				OrderCategory category = new OrderCategory(title);
-				category.setCategoryForOrder(false);
+				OrderCategory category = new OrderCategory(title, type);
+				category.setCustom(false);
 				entityManager.persist(category);
 				return category;
 			}
@@ -219,7 +203,7 @@ public class OrderDAO {
 			CriteriaQuery<OrderCategory> criteria = builder.createQuery(OrderCategory.class);
 			Root<OrderCategory> category = criteria.from(OrderCategory.class);
 			criteria.select(category);
-			criteria.where(builder.equal(category.get("categoryForOrder"), "f"));
+			criteria.where(builder.equal(category.get("custom"), "f"));
 			TypedQuery<OrderCategory> query = entityManager.createQuery(criteria);
 			List<OrderCategory> c = query.getResultList();
 			return c;
@@ -312,7 +296,7 @@ public class OrderDAO {
 			Predicate takingCurrencyPredicate = null;
 			Predicate givingCurrencyPredicate = null;
 
-			for (FilterItem item : filterItems) {
+			/*for (FilterItem item : filterItems) {
 				if ((item.getFilterDataField() != null) && (item.getFilterValue() != null)) {
 					Predicate valuePredicate = null;
 					if ((item.getFilterCondition() == null) || (FilterCondition.EQUAL == item.getFilterCondition())) {
@@ -371,15 +355,6 @@ public class OrderDAO {
 							valuePredicate = builder.notEqual(order.get(item.getFilterDataField()), item.getFilterValue());
 						}
 					} else if (FilterCondition.STARTS_WITH == item.getFilterCondition()) {
-
-						valuePredicate = builder.like(
-								builder.lower(
-										order.get(
-												type.getDeclaredSingularAttribute(item.getFilterDataField(), String.class)
-										)
-								), "%" + item.getFilterValue().toLowerCase() + "%"
-						);
-					} else if (FilterCondition.LE == item.getFilterCondition()) {
 
 						valuePredicate = builder.like(
 								builder.lower(
@@ -452,7 +427,7 @@ public class OrderDAO {
 						itemsOperatorPredicate = builder.or(valuePredicate, itemsOperatorPredicate);
 					}
 				}
-			}
+			}*/
 			if (languagesPredicate != null) {
 				if (mainOperatorPredicate == null) {
 					mainOperatorPredicate = languagesPredicate;
