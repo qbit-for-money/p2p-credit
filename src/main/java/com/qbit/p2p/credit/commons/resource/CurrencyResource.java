@@ -1,4 +1,4 @@
-package com.qbit.p2p.credit.user.resource;
+package com.qbit.p2p.credit.commons.resource;
 
 import com.qbit.p2p.credit.commons.model.Currency;
 import com.qbit.p2p.credit.money.model.serialization.CurrencyAdapter;
@@ -57,16 +57,16 @@ public class CurrencyResource {
 		}
 	}
 
-	@GET
+	/*@GET
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public CurrencyWrapper get(@PathParam("id") String id) {
 		return new CurrencyWrapper(Currency.valueOf(id));
-	}
+	}*/
 
-	@GET
+	/*@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public CurrencyListWrapper findAll() {
 		return new CurrencyListWrapper(EnumSet.copyOf(Arrays.asList(Currency.values())));
-	}
+	}*/
 }

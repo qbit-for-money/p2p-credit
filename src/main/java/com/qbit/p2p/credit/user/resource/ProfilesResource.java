@@ -7,23 +7,17 @@ import com.qbit.p2p.credit.commons.model.Currency;
 import com.qbit.p2p.credit.env.Env;
 import com.qbit.p2p.credit.material.dao.MaterialDAO;
 import com.qbit.p2p.credit.material.model.MaterialType;
-import com.qbit.p2p.credit.material.model.Materials;
+import com.qbit.p2p.credit.material.model.Material;
 import com.qbit.p2p.credit.order.dao.OrderDAO;
-import com.qbit.p2p.credit.order.model.FilterCondition;
-import com.qbit.p2p.credit.order.model.FilterItem;
-import com.qbit.p2p.credit.order.model.SearchRequest;
-import com.qbit.p2p.credit.order.model.FilterOperator;
 import com.qbit.p2p.credit.order.model.OrderInfo;
 import com.qbit.p2p.credit.order.model.OrderStatus;
 import com.qbit.p2p.credit.statistics.dao.StatisticsDAO;
 import com.qbit.p2p.credit.user.dao.UserProfileDAO;
-import com.qbit.p2p.credit.statistics.model.GlobalStatistics;
 import com.qbit.p2p.credit.user.model.Language;
-import com.qbit.p2p.credit.user.model.Point2;
+import com.qbit.p2p.credit.commons.model.Point2;
 import com.qbit.p2p.credit.statistics.model.Statistics;
-import com.qbit.p2p.credit.statistics.resource.StatisticsResource;
+import com.qbit.p2p.credit.statistics.service.StatisticsService;
 import com.qbit.p2p.credit.user.model.ShortProfile;
-import com.qbit.p2p.credit.user.model.UserPrivateProfile;
 import com.qbit.p2p.credit.user.model.UserPublicProfile;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -31,7 +25,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -122,13 +115,13 @@ public class ProfilesResource {
 
 		public boolean isValid() {
 			return imageString != null && ((imageString.isEmpty())
-					|| ((imageString.length() < MAX_STRING_LENGTH)
-					&& (startPoint.getX() >= 0) && (endPoint.getX() > 0)
-					&& (endPoint.getX() - startPoint.getX() < MAX_WIDTH)
-					&& (endPoint.getX() - startPoint.getX() > MIN_WIDTH)
-					&& (startPoint.getY() >= 0) && (endPoint.getY() > 0)
-					&& (endPoint.getY() - startPoint.getY() < MAX_HEIGHT)
-					&& (endPoint.getY() - startPoint.getY() > MIN_HEIGHT)));
+				|| ((imageString.length() < MAX_STRING_LENGTH)
+				&& (startPoint.getX() >= 0) && (endPoint.getX() > 0)
+				&& (endPoint.getX() - startPoint.getX() < MAX_WIDTH)
+				&& (endPoint.getX() - startPoint.getX() > MIN_WIDTH)
+				&& (startPoint.getY() >= 0) && (endPoint.getY() > 0)
+				&& (endPoint.getY() - startPoint.getY() < MAX_HEIGHT)
+				&& (endPoint.getY() - startPoint.getY() > MIN_HEIGHT)));
 
 		}
 
@@ -186,7 +179,7 @@ public class ProfilesResource {
 	private StatisticsDAO statisticsDAO;
 
 	@Inject
-	private StatisticsResource statisticsResource;
+	private StatisticsService statisticsService;
 
 	@GET
 	@Path("current")
@@ -199,25 +192,8 @@ public class ProfilesResource {
 		UserPublicProfile profile = userProfileDAO.find(userId);
 		if (profile == null) {
 			profile = userProfileDAO.create(userId);
-			return userProfileDAO.updateUserPublicProfile(profile);
 		}
 		return profile;
-	}
-
-	@GET
-	@Path("current/private")
-	@Produces(MediaType.APPLICATION_JSON)
-	public UserPrivateProfile getPrivateProfile() {
-		String userId = AuthFilter.getUserId(request);
-		if (!userId.contains("@")) {
-			return null;
-		}
-		UserPrivateProfile user = userProfileDAO.findPrivateProfile(userId);
-		if (user == null) {
-			user = userProfileDAO.createUserPrivateProfile(userId);
-		}
-
-		return user;
 	}
 
 	@GET
@@ -242,7 +218,7 @@ public class ProfilesResource {
 	@GET
 	@Path("short/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public ShortProfile getTupleById(@PathParam("id") String id) {
+	public ShortProfile getShortById(@PathParam("id") String id) {
 		UserPublicProfile user = userProfileDAO.find(id);
 		if (user == null) {
 			return null;
@@ -274,20 +250,12 @@ public class ProfilesResource {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public UsersPublicProfilesWrapper getAll(@QueryParam("filterslength") int filterslength, @QueryParam("sortdatafield") String sortDataField,
-			@QueryParam("sortorder") String sortOrder, @QueryParam("pagenum") int pagenum, @QueryParam("pagesize") int limit) {
+		@QueryParam("sortorder") String sortOrder, @QueryParam("pagenum") int pagenum, @QueryParam("pagesize") int limit) {
 		boolean sortDesc = false;
 		if (sortOrder != null && sortOrder.equals("desc")) {
 			sortDesc = true;
 		}
 		return new UsersPublicProfilesWrapper(userProfileDAO.findAll(sortDataField, sortDesc, pagenum * limit, limit), userProfileDAO.length());
-	}
-
-	@GET
-	@Path("byOrder")
-	@Produces(MediaType.APPLICATION_JSON)
-	public List<UserPublicProfile> getByOrder(@QueryParam("id") String id,
-			@QueryParam("offset") int offset, @QueryParam("limit") int limit) {
-		return userProfileDAO.findByOrder(id, offset, limit);
 	}
 
 	@POST
@@ -300,25 +268,19 @@ public class ProfilesResource {
 		}
 		String userId = AuthFilter.getUserId(request);
 		userProfile.setPublicKey(userId);
-		UserPublicProfile newProfile = userProfileDAO.updateUserPublicProfile(userProfile);
-		if(statisticsDAO.find(userId) == null) {
+		userProfileDAO.updateUserSocialLinks(userProfile.getSocialLinks(), userId);
+		userProfileDAO.updateUserVideos(userProfile.getVideos(), userId);
+		userProfileDAO.updateUserBkiData(userProfile.getBkiData(), userId);
+		userProfileDAO.updatePassportEnabled(userProfile.isPassportEnabled(), userId);
+		UserPublicProfile newProfile = userProfileDAO.updateUserMainAttributes(userProfile);
+		if (statisticsDAO.find(userId) == null) {
 			statisticsDAO.create(userId);
 		}
 		Statistics statistics = new Statistics(userId);
-		statistics.setOpennessRating(statisticsResource.getOpenessRating(userId));
-		statistics.setSummaryRating(statisticsResource.getSummaryRating(userId));
-		statisticsDAO.setProfileRating(statistics);
+		statistics.setOpennessRating(statisticsService.getOpenessRating(userId));
+		statistics.setSummaryRating(statisticsService.getSummaryRating(userId));
+		statisticsDAO.updateProfileRating(statistics);
 		return newProfile;
-	}
-
-	@POST
-	@Path("current/private")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public UserPrivateProfile updatePrivateProfile(UserPrivateProfile userProfile) {
-		String userId = AuthFilter.getUserId(request);
-		userProfile.setPublicKey(userId);
-		return userProfileDAO.updateUserPrivateProfile(userProfile);
 	}
 
 	@PUT
@@ -347,8 +309,9 @@ public class ProfilesResource {
 
 			arrayInputStream = new ByteArrayInputStream(imageByte);
 			BufferedImage bufferedImage = ImageIO.read(arrayInputStream);
+			Point2 newPosition = userPhoto.getEndPoint().subtraction(userPhoto.getStartPoint());
 			destBufferedImage = bufferedImage.getSubimage(userPhoto.getStartPoint().getX(), userPhoto.getStartPoint().getY(),
-					userPhoto.getEndPoint().getX() - userPhoto.getStartPoint().getX(), userPhoto.getEndPoint().getY() - userPhoto.getStartPoint().getY());
+				newPosition.getX(), newPosition.getY());
 			if (destBufferedImage.getHeight() > UserPhotoRequest.MAX_HEIGHT || destBufferedImage.getWidth() > UserPhotoRequest.MAX_WIDTH) {
 				throw new IOException();
 			}
@@ -366,10 +329,10 @@ public class ProfilesResource {
 		if (destBufferedImage != null) {
 			try {
 				ImageIO.write(destBufferedImage, "jpeg", userPhotoFile);
-				Materials material;
-				List<Materials> materials = materialDAO.findByUserAndType(userId, MaterialType.USER_PHOTO, 0, 1);
+				Material material;
+				List<Material> materials = materialDAO.findByUserAndType(userId, MaterialType.USER_PHOTO, 0, 1);
 				if (materials.isEmpty()) {
-					material = new Materials();
+					material = new Material();
 					material.setUserId(userId);
 					material.setTitle("User Photo");
 					material.setType(MaterialType.USER_PHOTO);
@@ -378,18 +341,9 @@ public class ProfilesResource {
 					material = materials.get(0);
 				}
 				material.setPhysicalSize(userPhotoFile.length());
-
-				UserPublicProfile userProfile = userProfileDAO.find(userId);
-				if ((userProfile != null) && (userProfile.getName() != null)
-						&& !userProfile.getName().isEmpty()) {
-					material.setAuthor(userProfile.getName());
-				}
 				if (materials.isEmpty()) {
 					materialDAO.create(material);
-				} else {
-					materialDAO.update(material);
 				}
-
 			} catch (IOException e) {
 				throw new WebApplicationException(e);
 			}
@@ -400,7 +354,7 @@ public class ProfilesResource {
 	@Path("{id}/photo")
 	@Produces("image/jpeg")
 	public byte[] getUserPhoto(@PathParam("id") String userId) {
-		List<Materials> materials = materialDAO.findByUserAndType(userId, MaterialType.USER_PHOTO, 0, 1);
+		List<Material> materials = materialDAO.findByUserAndType(userId, MaterialType.USER_PHOTO, 0, 1);
 
 		String imageName = EncryptionUtil.getMD5(userId);
 		BufferedImage bufferedImage;
@@ -460,7 +414,7 @@ public class ProfilesResource {
 			user.setCurrencies(c);
 			user.setCurrenciesEnabled(true);
 
-			userProfileDAO.updateUserPublicProfile(user);
+			//userProfileDAO.updateUserPublicProfile(user);
 
 			OrderInfo order = new OrderInfo();
 			order.setUserPublicKey(user.getPublicKey());

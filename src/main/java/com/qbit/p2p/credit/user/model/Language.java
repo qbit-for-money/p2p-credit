@@ -30,7 +30,7 @@ public class Language implements Identifiable<String>, Serializable {
 	
 	private String title;
 	
-	private boolean withoutParent;
+	private boolean custom;
 
 	public Language() {
 	}
@@ -56,16 +56,16 @@ public class Language implements Identifiable<String>, Serializable {
 		this.title = title;
 	}
 
-	public boolean isWithoutParent() {
-		return withoutParent;
+	public boolean isCustom() {
+		return custom;
 	}
 
-	public void setWithoutParent(boolean withoutParent) {
-		this.withoutParent = withoutParent;
+	public void setCustom(boolean custom) {
+		this.custom = custom;
 	}
 
 	@Override
 	public String toString() {
-		return "Language{" + "id=" + id + ", title=" + title + '}';
+		return "Language{" + "id=" + id + ", title=" + title + ", isCustom=" + custom + '}';
 	}
 }

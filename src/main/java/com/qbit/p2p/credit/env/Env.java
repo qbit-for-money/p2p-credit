@@ -36,30 +36,30 @@ public class Env {
 	
 	@XmlElement
 	public String getUserPhotoPathFolder() {
-		return properties.getProperty("user.photo.pathFolder");
+		return properties.getProperty("user.photo.path.folder");
 	}
 	
 	@XmlElement
 	public String getLastOrdersPathFolder() {
-		return properties.getProperty("lastOrders.pathFolder");
+		return properties.getProperty("last.orders.path.folder");
 	}
 	
-	public int getUpdateLastOrdersPeriodSecs() {
-		return Integer.parseInt(properties.getProperty("lastOrders.worker.period.hours"));
+	public int getUpdateLastOrdersWorkerPeriodHours() {
+		return Integer.parseInt(properties.getProperty("last.orders.worker.period.hours"));
 	}
 	
-	public int getUpdateGlobalStatisticsPeriodSecs() {
-		return Integer.parseInt(properties.getProperty("globalStatistics.period.hours"));
-	}
-	
-	@XmlElement
-	public double getUserOpenessRatingFactor() {
-		return Double.parseDouble(properties.getProperty("user.openessRating.factor"));
+	public int getUpdateGlobalStatisticsWorkerPeriodHours() {
+		return Integer.parseInt(properties.getProperty("global.statistics.worker.period.hours"));
 	}
 	
 	@XmlElement
-	public double getUserAllTransactionsFactor() {
-		return Double.parseDouble(properties.getProperty("user.allTransactions.factor"));
+	public double getUserRatingOpenessFactor() {
+		return Double.parseDouble(properties.getProperty("user.rating.openess.factor"));
+	}
+	
+	@XmlElement
+	public double getUserRatingTransactionsFactor() {
+		return Double.parseDouble(properties.getProperty("user.rating.transactions.factor"));
 	}
 	
 	

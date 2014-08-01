@@ -23,9 +23,9 @@ public class Statistics implements Serializable {
 	private String id;
 	private long opennessRating;
 	private long transactionsRating;
-	private long ordersSumValue;
-	private long transactionsSum;
-	private long successTransactionsSum;
+	private long ordersValue;
+	private long transactionsCount;
+	private long successTransactionsCount;
 	private long summaryRating;
 
 	public Statistics() {
@@ -59,28 +59,28 @@ public class Statistics implements Serializable {
 		this.transactionsRating = transactionsRating;
 	}
 
-	public long getOrdersSumValue() {
-		return ordersSumValue;
+	public long getOrdersValue() {
+		return ordersValue;
 	}
 
-	public void setOrdersSumValue(long ordersSumValue) {
-		this.ordersSumValue = ordersSumValue;
+	public void setOrdersValue(long ordersValue) {
+		this.ordersValue = ordersValue;
 	}
 
-	public long getTransactionsSum() {
-		return transactionsSum;
+	public long getTransactionsCount() {
+		return transactionsCount;
 	}
 
-	public void setTransactionsSum(long transactionsSum) {
-		this.transactionsSum = transactionsSum;
+	public void setTransactionsCount(long transactionsCount) {
+		this.transactionsCount = transactionsCount;
 	}
 
-	public long getSuccessTransactionsSum() {
-		return successTransactionsSum;
+	public long getSuccessTransactionsCount() {
+		return successTransactionsCount;
 	}
 
-	public void setSuccessTransactionsSum(long successTransactionsSum) {
-		this.successTransactionsSum = successTransactionsSum;
+	public void setSuccessTransactionsCount(long successTransactionsCount) {
+		this.successTransactionsCount = successTransactionsCount;
 	}
 
 	public long getSummaryRating() {
@@ -93,6 +93,6 @@ public class Statistics implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Statistics{" + "id=" + id + ", opennessRating=" + opennessRating + ", transactionsRating=" + transactionsRating + ", ordersSumValue=" + ordersSumValue + ", transactionsSum=" + transactionsSum + ", successTransactionsSum=" + successTransactionsSum + ", summaryRating=" + summaryRating + '}';
+		return "Statistics{" + "id=" + id + ", opennessRating=" + opennessRating + ", transactionsRating=" + transactionsRating + ", ordersSumValue=" + ordersValue + ", transactionsSum=" + transactionsCount + ", successTransactionsSum=" + successTransactionsCount + ", summaryRating=" + summaryRating + '}';
 	}
 }

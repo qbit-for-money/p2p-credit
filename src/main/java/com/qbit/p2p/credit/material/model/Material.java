@@ -19,26 +19,24 @@ import javax.xml.bind.annotation.XmlTransient;
  */
 @Entity
 @NamedQueries({
-	@NamedQuery(name = "Materials.findByUser",
-			query = "SELECT m FROM Materials m WHERE m.userId = :userId"),
-	@NamedQuery(name = "Materials.findByUserAndType",
-			query = "SELECT m FROM Materials m WHERE m.userId = :userId AND m.type = :type")})
+	@NamedQuery(name = "Material.findByUser",
+			query = "SELECT m FROM Material m WHERE m.userId = :userId"),
+	@NamedQuery(name = "Material.findByUserAndType",
+			query = "SELECT m FROM Material m WHERE m.userId = :userId AND m.type = :type")})
 @Access(AccessType.FIELD)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Materials implements Serializable {
+public class Material implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@XmlTransient
 	private String id;
-
 	private String userId;
 	private String title;
-	private String author;
 	private String description;
 	private long physicalSize;
-	private ExternalMaterials externalMaterials;
+	private ExternalMaterial externalMaterials;
 	private MaterialType type;
 
 	public String getId() {
@@ -65,14 +63,6 @@ public class Materials implements Serializable {
 		this.title = title;
 	}
 
-	public String getAuthor() {
-		return author;
-	}
-
-	public void setAuthor(String author) {
-		this.author = author;
-	}
-
 	public String getDescription() {
 		return description;
 	}
@@ -89,11 +79,11 @@ public class Materials implements Serializable {
 		this.physicalSize = physicalSize;
 	}
 
-	public ExternalMaterials getExternalMaterials() {
+	public ExternalMaterial getExternalMaterials() {
 		return externalMaterials;
 	}
 
-	public void setExternalMaterials(ExternalMaterials externalMaterials) {
+	public void setExternalMaterials(ExternalMaterial externalMaterials) {
 		this.externalMaterials = externalMaterials;
 	}
 
@@ -107,6 +97,6 @@ public class Materials implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Materials{" + "id=" + id + ", userId=" + userId + ", title=" + title + ", author=" + author + ", description=" + description + ", physicalSize=" + physicalSize + ", externalMaterials=" + externalMaterials + ", type=" + type + '}';
+		return "Material{" + "id=" + id + ", userId=" + userId + ", title=" + title + ", description=" + description + ", physicalSize=" + physicalSize + ", externalMaterials=" + externalMaterials + ", type=" + type + '}';
 	}
 }

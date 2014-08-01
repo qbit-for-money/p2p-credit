@@ -26,31 +26,31 @@ public class GlobalStatistics implements Serializable {
 	@XmlTransient
 	private final Long id = 0L;
 
-	private long allTransactionsSum;
-	private long allSuccessTransactionsSum;
+	private long allTransactionsCount;
+	private long allSuccessTransactionsCount;
 
 	public Long getId() {
 		return id;
 	}
 
-	public long getAllTransactionsSum() {
-		return allTransactionsSum;
+	public long getAllTransactionsCount() {
+		return allTransactionsCount;
 	}
 
-	public void setAllTransactionsSum(long allTransactionsSum) {
-		this.allTransactionsSum = allTransactionsSum;
+	public void setAllTransactionsCount(long allTransactionsCount) {
+		this.allTransactionsCount = allTransactionsCount;
 	}
 
-	public long getAllSuccessTransactionsSum() {
-		return allSuccessTransactionsSum;
+	public long getAllSuccessTransactionsCount() {
+		return allSuccessTransactionsCount;
 	}
 
-	public void setAllSuccessTransactionsSum(long allSuccessTransactionsSum) {
-		this.allSuccessTransactionsSum = allSuccessTransactionsSum;
+	public void setAllSuccessTransactionsCount(long allSuccessTransactionsCount) {
+		this.allSuccessTransactionsCount = allSuccessTransactionsCount;
 	}
 
 	@Override
 	public String toString() {
-		return "GlobalStatistics{" + "id=" + id + ", allTransactionsSum=" + allTransactionsSum + ", allSuccessTransactionsSum=" + allSuccessTransactionsSum + '}';
+		return "GlobalStatistics{" + "id=" + id + ", allTransactionsSum=" + allTransactionsCount + ", allSuccessTransactionsSum=" + allSuccessTransactionsCount + '}';
 	}
 }

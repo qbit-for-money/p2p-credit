@@ -74,7 +74,6 @@
 		<script type="text/javascript" src="resources/js/order/controllers.js"></script>
 		<script type="text/javascript" src="resources/js/order/resources.js"></script>
 		<script type="text/javascript" src="resources/js/orders-table/controllers.js"></script>
-		<script type="text/javascript" src="resources/js/last-orders-table/controllers.js"></script>
 		
 		<script type="text/javascript" src="resources/js/create-order/controllers.js"></script>
 

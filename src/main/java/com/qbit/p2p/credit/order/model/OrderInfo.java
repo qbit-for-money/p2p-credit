@@ -40,7 +40,11 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 @Entity
 @NamedQueries({
 	@NamedQuery(name = "OrderInfo.findByPartnersRating",
-			query = "SELECT t1.id FROM Statistics t0, Statistics t1 GROUP BY t0.id, t1.id HAVING t0.id IN (SELECT DISTINCT t2.userPublicKey FROM Respond t2 WHERE t2.id IN (SELECT t3.approvedResponseId FROM OrderInfo t3 WHERE (t3.status = :status) AND (t3.userPublicKey = t1.id) AND (t3.userPublicKey <> t0.id))) AND SUM(t0.summaryRating) >= :rating")})
+		query = "SELECT t1.id FROM Statistics t0, Statistics t1 GROUP BY t0.id, t1.id HAVING t0.id IN (SELECT DISTINCT t2.userPublicKey FROM Respond t2 WHERE t2.id IN (SELECT t3.approvedRespondId FROM OrderInfo t3 WHERE (t3.status = :status) AND (t3.userPublicKey = t1.id) AND (t3.userPublicKey <> t0.id))) AND SUM(t0.summaryRating) >= :rating"),
+	@NamedQuery(name = "OrderInfo.findByUser",
+		query = "SELECT o FROM OrderInfo o WHERE o.userPublicKey = :userPublicKey"),
+	@NamedQuery(name = "OrderInfo.findByUserAndTimestamp",
+		query = "SELECT o FROM OrderInfo o WHERE o.userPublicKey = :userPublicKey AND o.creationDate = :creationDate")})
 @Access(AccessType.FIELD)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -74,16 +78,14 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 	@OneToMany(cascade = CascadeType.ALL, targetEntity = Respond.class)
 	private List<Respond> responses = new ArrayList<>();
 
-	private String approvedResponseId;
+	private String approvedRespondId;
 
 	@OneToOne(cascade = CascadeType.ALL)
 	private Comment comment;
 
 	@ManyToMany(cascade = CascadeType.ALL)
 	private List<Language> languages;
-	//@XmlJavaTypeAdapter(CurrencyAdapter.class)
 	private String givingCurrency;
-	//@XmlJavaTypeAdapter(CurrencyAdapter.class)
 	private String takingCurrency;
 	@Column(precision = 10, scale = 3)
 	private BigDecimal takingValue;
@@ -147,12 +149,12 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 		this.categories = categories;
 	}
 
-	public String getApprovedResponseId() {
-		return approvedResponseId;
+	public String getApprovedRespondId() {
+		return approvedRespondId;
 	}
 
-	public void setApprovedResponseId(String approvedResponseId) {
-		this.approvedResponseId = approvedResponseId;
+	public void setApprovedRespondId(String approvedRespondId) {
+		this.approvedRespondId = approvedRespondId;
 	}
 
 	public List<Language> getLanguages() {
@@ -237,18 +239,18 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 
 	public boolean isValid() {
 		return (endDate != null)
-				&& (duration != 0)
-				&& (durationType != null)
-				&& (userPublicKey != null)
-				&& !userPublicKey.isEmpty()
-				&& (categories != null)
-				&& (languages != null)
-				&& (takingCurrency != null || givingCurrency != null)
-				&& (!BigDecimal.ZERO.equals(takingValue) || !BigDecimal.ZERO.equals(givingValue));
+			&& (duration != 0)
+			&& (durationType != null)
+			&& (userPublicKey != null)
+			&& !userPublicKey.isEmpty()
+			&& (categories != null)
+			&& (languages != null)
+			&& (takingCurrency != null || givingCurrency != null)
+			&& (!BigDecimal.ZERO.equals(takingValue) || !BigDecimal.ZERO.equals(givingValue));
 	}
 
 	@Override
 	public String toString() {
-		return "OrderInfo{" + "id=" + id + ", creationDate=" + creationDate + ", endDate=" + endDate + ", duration=" + duration + ", durationType=" + durationType + ", userPublicKey=" + userPublicKey + ", categories=" + categories + ", orderData=" + orderData + ", status=" + status + ", responses=" + responses + ", approvedResponseId=" + approvedResponseId + ", comment=" + comment + ", languages=" + languages + ", givingCurrency=" + givingCurrency + ", takingCurrency=" + takingCurrency + ", takingValue=" + takingValue + ", givingValue=" + givingValue + '}';
+		return "OrderInfo{" + "id=" + id + ", creationDate=" + creationDate + ", endDate=" + endDate + ", duration=" + duration + ", durationType=" + durationType + ", userPublicKey=" + userPublicKey + ", categories=" + categories + ", orderData=" + orderData + ", status=" + status + ", responses=" + responses + ", approvedResponseId=" + approvedRespondId + ", comment=" + comment + ", languages=" + languages + ", givingCurrency=" + givingCurrency + ", takingCurrency=" + takingCurrency + ", takingValue=" + takingValue + ", givingValue=" + givingValue + '}';
 	}
 }

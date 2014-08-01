@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * @author Alexander_Sergeev
  */
-public class ExternalMaterials implements Serializable {
+public class ExternalMaterial implements Serializable {
 
 	private String link;
 

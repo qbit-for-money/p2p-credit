@@ -1,6 +1,6 @@
 var navbarModule = angular.module("navbar");
 
-navbarModule.controller("ShortSearchController", function($scope, $rootScope, $modal, $location, usersResource, userService, usersProfileResource, currencyResource, categoriesResource, ordersResource, fileReader, $timeout, $sce, authService, userProfileService, languagesResource) {
+navbarModule.controller("ShortSearchController", function($scope, $rootScope, userProfileService, getRandBinary, authService) {
 	$scope.allCategories = [];
 	$scope.allCurrencies = [];
 	$scope.selectedGivingCurrency = "RUR";
@@ -45,7 +45,7 @@ navbarModule.controller("ShortSearchController", function($scope, $rootScope, $m
 		for (var i in categories) {
 			$scope.allCategories.push(categories[i].title);
 		}
-		if(getRandBinary() === 1) {
+		if (getRandBinary === 1) {
 			creditInit();
 		} else {
 			borrowInit();
@@ -56,12 +56,18 @@ navbarModule.controller("ShortSearchController", function($scope, $rootScope, $m
 		console.log(JSON.stringify($scope.ordersSearchMap['orderCategories']))
 		console.log($scope.selectedGivingCurrency + " " + $scope.givingValue)
 		console.log($scope.selectedTakingCurrency + " " + $scope.takingValue)
-
-		/*if (!$rootScope.user || ($rootScope.user.publicKey.indexOf("@") === -1)) {
+		$rootScope.searchRequest = {};
+		$rootScope.searchRequest.orderCategories = $scope.ordersSearchMap['orderCategories'];
+		$rootScope.searchRequest.selectedGivingCurrency = $scope.selectedGivingCurrency;
+		$rootScope.searchRequest.givingValue = $scope.givingValue;
+		$rootScope.searchRequest.selectedTakingCurrency = $scope.selectedTakingCurrency;
+		$rootScope.searchRequest.takingValue = $scope.takingValue;
+		
+		if (!$rootScope.user || ($rootScope.user.publicKey.indexOf("@") === -1)) {
 		 authService.openAuthDialog(false, true, window.context + "#/orders");
 		 } else {
 		 window.location.href = window.context + "#/orders";
-		 }*/
+		 }
 	};
 
 	function creditInit() {
@@ -72,10 +78,6 @@ navbarModule.controller("ShortSearchController", function($scope, $rootScope, $m
 	function borrowInit() {
 		$scope.givingValue = 1000;
 		$scope.ordersSearchMap['orderCategories'].push($scope.allCategories[0]);
-	}
-
-	function getRandBinary() {
-		return Math.floor(Math.random() * 2);
 	}
 });
 

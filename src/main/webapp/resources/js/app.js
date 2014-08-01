@@ -10,7 +10,7 @@ angular.module("user-profile", ["ngResource", "ngSanitize"]);
 
 angular.module("user-edit", ["ngResource"]);
 
-angular.module("navbar", ["ngResource"]);
+angular.module("navbar", ["ngResource", "common"]);
 
 angular.module("like", ["ngResource"]);
 

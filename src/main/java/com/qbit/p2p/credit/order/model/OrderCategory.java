@@ -32,7 +32,7 @@ public class OrderCategory implements Identifiable<String>, Serializable {
 
 	private String title;
 	
-	private boolean categoryForOrder;
+	private boolean custom;
 	
 	private CategoryType type;
 
@@ -53,14 +53,13 @@ public class OrderCategory implements Identifiable<String>, Serializable {
 		this.id = id;
 	}
 
-	public boolean isCategoryForOrder() {
-		return categoryForOrder;
+	public boolean isCustom() {
+		return custom;
 	}
 
-	public void setCategoryForOrder(boolean categoryForOrder) {
-		this.categoryForOrder = categoryForOrder;
+	public void setCustom(boolean custom) {
+		this.custom = custom;
 	}
-
 
 	public String getTitle() {
 		return title;
@@ -102,6 +101,6 @@ public class OrderCategory implements Identifiable<String>, Serializable {
 
 	@Override
 	public String toString() {
-		return "OrderCategory{" + "id=" + id + ", title=" + title + ", categoryForOrder=" + categoryForOrder + ", type=" + type + '}';
+		return "OrderCategory{" + "id=" + id + ", title=" + title + ", custom=" + custom + ", type=" + type + '}';
 	}
 }

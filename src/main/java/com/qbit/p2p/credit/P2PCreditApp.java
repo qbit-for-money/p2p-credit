@@ -1,6 +1,5 @@
 package com.qbit.p2p.credit;
 
-import com.qbit.commons.auth.AuthFilter;
 import com.qbit.commons.dao.util.DAOExecutor;
 import com.qbit.commons.dao.util.DefaultDAOExecutor;
 import com.qbit.commons.env.CommonsEnv;
@@ -10,10 +9,9 @@ import com.qbit.p2p.credit.env.Env;
 import com.qbit.p2p.credit.like.dao.LikeDAO;
 import com.qbit.p2p.credit.material.dao.MaterialDAO;
 import com.qbit.p2p.credit.order.dao.OrderDAO;
-import com.qbit.p2p.credit.order.resource.OrdersResource;
 import com.qbit.p2p.credit.order.service.OrderFlowScheduler;
 import com.qbit.p2p.credit.statistics.dao.StatisticsDAO;
-import com.qbit.p2p.credit.statistics.resource.StatisticsResource;
+import com.qbit.p2p.credit.statistics.service.StatisticsService;
 import com.qbit.p2p.credit.user.dao.UserProfileDAO;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -58,9 +56,8 @@ public class P2PCreditApp extends Application {
 		addBinding(newBinder(UserProfileDAO.class).to(UserProfileDAO.class).in(Singleton.class), configuration);
 		addBinding(newBinder(OrderDAO.class).to(OrderDAO.class).in(Singleton.class), configuration);
 		addBinding(newBinder(MaterialDAO.class).to(MaterialDAO.class).in(Singleton.class), configuration);
-		addBinding(newBinder(OrdersResource.class).to(OrdersResource.class).in(Singleton.class), configuration);
 		addBinding(newBinder(StatisticsDAO.class).to(StatisticsDAO.class).in(Singleton.class), configuration);
-		addBinding(newBinder(StatisticsResource.class).to(StatisticsResource.class).in(Singleton.class), configuration);
+		addBinding(newBinder(StatisticsService.class).to(StatisticsService.class).in(Singleton.class), configuration);
 		addBinding(newBinder(LikeDAO.class).to(LikeDAO.class).in(Singleton.class), configuration);
 
 		configuration.commit();
