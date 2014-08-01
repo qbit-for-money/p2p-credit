@@ -33,7 +33,6 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 		maximumSelectionSize: 20,
 		maximumInputLength: 20,
 		formatResult: formatResult,
-		//formatSelection: formatSelection,
 		createSearchChoice: function(term, data) {
 			if ($(data).filter(function() {
 				return this.text.localeCompare(term) === 0;
@@ -43,9 +42,6 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 		}
 	};
 
-	function formatSelection(item) {
-		return item.text;
-	}
 	function formatResult(item) {
 		$timeout(function() {
 			angular.element("span[type='CREDIT']").parent().addClass("credit-row");
