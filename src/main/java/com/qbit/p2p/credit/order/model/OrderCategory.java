@@ -6,13 +6,10 @@ import java.util.Objects;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * @author Alexander_Sergeev
@@ -26,11 +23,7 @@ public class OrderCategory implements Identifiable<String>, Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@XmlTransient
-	private String id;
-
-	private String title;
+	private String code;
 	
 	private boolean custom;
 	
@@ -39,18 +32,18 @@ public class OrderCategory implements Identifiable<String>, Serializable {
 	public OrderCategory() {
 	}
 
-	public OrderCategory(String title, CategoryType type) {
-		this.title = title;
+	public OrderCategory(String code, CategoryType type) {
+		this.code = code;
 		this.type = type;
 	}
 
 	@Override
 	public String getId() {
-		return id;
+		return code;
 	}
 
-	public void setId(String id) {
-		this.id = id;
+	public String getCode() {
+		return code;
 	}
 
 	public boolean isCustom() {
@@ -59,14 +52,6 @@ public class OrderCategory implements Identifiable<String>, Serializable {
 
 	public void setCustom(boolean custom) {
 		this.custom = custom;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
 	}
 
 	public CategoryType getType() {
@@ -79,8 +64,10 @@ public class OrderCategory implements Identifiable<String>, Serializable {
 
 	@Override
 	public int hashCode() {
-		int hash = 3;
-		hash = 97 * hash + Objects.hashCode(this.title);
+		int hash = 7;
+		hash = 13 * hash + Objects.hashCode(this.code);
+		hash = 13 * hash + (this.custom ? 1 : 0);
+		hash = 13 * hash + Objects.hashCode(this.type);
 		return hash;
 	}
 
@@ -93,7 +80,13 @@ public class OrderCategory implements Identifiable<String>, Serializable {
 			return false;
 		}
 		final OrderCategory other = (OrderCategory) obj;
-		if (!Objects.equals(this.title, other.title)) {
+		if (!Objects.equals(this.code, other.code)) {
+			return false;
+		}
+		if (this.custom != other.custom) {
+			return false;
+		}
+		if (this.type != other.type) {
 			return false;
 		}
 		return true;
@@ -101,6 +94,6 @@ public class OrderCategory implements Identifiable<String>, Serializable {
 
 	@Override
 	public String toString() {
-		return "OrderCategory{" + "id=" + id + ", title=" + title + ", custom=" + custom + ", type=" + type + '}';
+		return "OrderCategory{" + "code=" + code + ", custom=" + custom + ", type=" + type + '}';
 	}
 }

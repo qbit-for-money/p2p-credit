@@ -6,15 +6,15 @@ import com.qbit.commons.dao.util.TrCallable;
 import com.qbit.commons.user.UserDAO;
 import com.qbit.commons.user.UserInfo;
 import com.qbit.p2p.credit.commons.model.Currency;
-import com.qbit.p2p.credit.order.model.CategoryType;
+import com.qbit.p2p.credit.order.model.FilterCondition;
 import com.qbit.p2p.credit.order.model.FilterItem;
+import com.qbit.p2p.credit.order.model.FilterOperator;
 import com.qbit.p2p.credit.order.model.OrderCategory;
 import com.qbit.p2p.credit.order.model.OrderInfo;
 import com.qbit.p2p.credit.order.model.OrderStatus;
 import com.qbit.p2p.credit.order.model.Respond;
 import com.qbit.p2p.credit.order.model.SearchRequest;
 import com.qbit.p2p.credit.statistics.model.Statistics;
-import com.qbit.p2p.credit.user.dao.UserProfileDAO;
 import com.qbit.p2p.credit.user.model.Language;
 import com.qbit.p2p.credit.user.model.UserPublicProfile;
 import java.util.ArrayList;
@@ -31,6 +31,7 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
@@ -46,9 +47,6 @@ public class OrderDAO {
 
 	@Inject
 	private EntityManagerFactory entityManagerFactory;
-
-	@Inject
-	private UserProfileDAO profileDAO;
 
 	public OrderInfo find(String id) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
@@ -105,16 +103,9 @@ public class OrderDAO {
 				if (userInfo == null) {
 					return null;
 				}
-				List<OrderCategory> orderCategories = orderInfo.getCategories();
-				if (orderCategories == null) {
-					orderInfo.setCategories(new ArrayList<OrderCategory>());
-				}
-				for (OrderCategory category : orderCategories) {
-					category.setCustom(true);
-				}
 				orderInfo.setStatus(OrderStatus.OPENED);
 				orderInfo.setCreationDate(new Date());
-				entityManager.persist(orderInfo);
+				entityManager.merge(orderInfo);
 				return orderInfo;
 			}
 		});
@@ -133,7 +124,6 @@ public class OrderDAO {
 				if (order == null) {
 					return null;
 				}
-				List<OrderCategory> categories = findAllCategories();
 				List<OrderCategory> orderCategories = order.getCategories();
 				if (orderCategories == null) {
 					order.setCategories(new ArrayList<OrderCategory>());
@@ -166,7 +156,7 @@ public class OrderDAO {
 		});
 	}
 
-	public Respond findResponse(String id) {
+	public Respond findRespond(String id) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {
 			return DAOUtil.find(entityManagerFactory.createEntityManager(),
@@ -176,38 +166,7 @@ public class OrderDAO {
 		}
 	}
 
-	public OrderCategory createCategory(final String title, final CategoryType type) {
-		if ((title == null) || title.isEmpty()) {
-			throw new IllegalArgumentException("Title is empty.");
-		}
-		return invokeInTransaction(entityManagerFactory, new TrCallable<OrderCategory>() {
-
-			@Override
-			public OrderCategory call(EntityManager entityManager) {
-
-				OrderCategory category = new OrderCategory(title, type);
-				category.setCustom(false);
-				entityManager.persist(category);
-				return category;
-			}
-		});
-	}
-
-	public List<OrderCategory> findAllCategories() {
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		try {
-			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-			CriteriaQuery<OrderCategory> criteria = builder.createQuery(OrderCategory.class);
-			Root<OrderCategory> category = criteria.from(OrderCategory.class);
-			criteria.select(category);
-			criteria.where(builder.equal(category.get("custom"), "f"));
-			TypedQuery<OrderCategory> query = entityManager.createQuery(criteria);
-			List<OrderCategory> c = query.getResultList();
-			return c;
-		} finally {
-			entityManager.close();
-		}
-	}
+	
 
 	public List<OrderInfo> findWithFilter(String userPublicKey, SearchRequest filterCriteriaValue, UserPublicProfile profile) {
 		boolean sortDesc = false;
@@ -297,7 +256,7 @@ public class OrderDAO {
 			Predicate takingCurrencyPredicate = null;
 			Predicate givingCurrencyPredicate = null;
 
-			/*for (FilterItem item : filterItems) {
+			for (FilterItem item : filterItems) {
 				if ((item.getFilterDataField() != null) && (item.getFilterValue() != null)) {
 					Predicate valuePredicate = null;
 					if ((item.getFilterCondition() == null) || (FilterCondition.EQUAL == item.getFilterCondition())) {
@@ -428,7 +387,7 @@ public class OrderDAO {
 						itemsOperatorPredicate = builder.or(valuePredicate, itemsOperatorPredicate);
 					}
 				}
-			}*/
+			}
 			if (languagesPredicate != null) {
 				if (mainOperatorPredicate == null) {
 					mainOperatorPredicate = languagesPredicate;

@@ -4,8 +4,7 @@ import com.qbit.p2p.credit.order.model.SearchRequest;
 import com.qbit.commons.auth.AuthFilter;
 import static com.qbit.commons.rest.util.RESTUtil.toDate;
 import com.qbit.p2p.credit.commons.model.Currency;
-import com.qbit.p2p.credit.env.Env;
-import com.qbit.p2p.credit.money.model.serialization.CurrencyAdapter;
+import com.qbit.p2p.credit.order.dao.OrderCategoryDAO;
 import com.qbit.p2p.credit.order.dao.OrderDAO;
 import com.qbit.p2p.credit.order.model.CategoryType;
 import com.qbit.p2p.credit.order.model.Comment;
@@ -38,10 +37,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlList;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * @author Alexander_Sergeev
@@ -50,254 +45,14 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @Singleton
 public class OrdersResource {
 
-	@XmlRootElement
-	public static class CategoriesWrapper {
-
-		@XmlElement
-		@XmlList
-		private List<OrderCategory> categories;
-
-		public CategoriesWrapper() {
-		}
-
-		public CategoriesWrapper(List<OrderCategory> categories) {
-			this.categories = categories;
-		}
-
-		public List<OrderCategory> getCategories() {
-			return categories;
-		}
-	}
-
-	@XmlRootElement
-	public static class OrdersWrapper {
-
-		@XmlElement
-		@XmlList
-		private List<OrderWrapper> orders;
-		@XmlElement
-		long length;
-
-		public OrdersWrapper() {
-		}
-
-		public OrdersWrapper(List<OrderWrapper> orders, long length) {
-			this.orders = orders;
-			this.length = length;
-		}
-
-		public List<OrderWrapper> getOrders() {
-			return orders;
-		}
-
-		public long getLength() {
-			return length;
-		}
-
-		public void setLength(long length) {
-			this.length = length;
-		}
-	}
-
-	public static class OrderWrapper {
-
-		private OrderInfo order;
-		private String id;
-		private long opennessRating;
-		private long ordersValue;
-		private long successTransactionsCount;
-		private long partnersRating;
-		private String successValue;
-		private String userName;
-		private String userPhone;
-		private String userMail;
-		@XmlJavaTypeAdapter(CurrencyAdapter.class)
-		private List<Currency> userCurrencies;
-		private List<String> userLanguages;
-
-		public OrderWrapper() {
-		}
-
-		public OrderWrapper(OrderInfo order) {
-			this.order = order;
-		}
-
-		public OrderInfo getOrder() {
-			return order;
-		}
-
-		public void setOrder(OrderInfo order) {
-			this.order = order;
-		}
-
-		public String getId() {
-			return id;
-		}
-
-		public void setId(String id) {
-			this.id = id;
-		}
-
-		public long getOpennessRating() {
-			return opennessRating;
-		}
-
-		public void setOpennessRating(long opennessRating) {
-			this.opennessRating = opennessRating;
-		}
-
-		public long getOrdersValue() {
-			return ordersValue;
-		}
-
-		public void setOrdersValue(long ordersValue) {
-			this.ordersValue = ordersValue;
-		}
-
-		public long getSuccessTransactionsCount() {
-			return successTransactionsCount;
-		}
-
-		public void setSuccessTransactionsCount(long successTransactionsCount) {
-			this.successTransactionsCount = successTransactionsCount;
-		}
-
-		public long getPartnersRating() {
-			return partnersRating;
-		}
-
-		public void setPartnersRating(long partnersRating) {
-			this.partnersRating = partnersRating;
-		}
-
-		public String getSuccessValue() {
-			return successValue;
-		}
-
-		public void setSuccessValue(String successValue) {
-			this.successValue = successValue;
-		}
-
-		public String getUserName() {
-			return userName;
-		}
-
-		public void setUserName(String userName) {
-			this.userName = userName;
-		}
-
-		public String getUserPhone() {
-			return userPhone;
-		}
-
-		public void setUserPhone(String userPhone) {
-			this.userPhone = userPhone;
-		}
-
-		public List<Currency> getUserCurrencies() {
-			return userCurrencies;
-		}
-
-		public void setUserCurrencies(List<Currency> userCurrencies) {
-			this.userCurrencies = userCurrencies;
-		}
-
-		public List<String> getUserLanguages() {
-			return userLanguages;
-		}
-
-		public void setUserLanguages(List<String> userLanguages) {
-			this.userLanguages = userLanguages;
-		}
-
-		public String getUserMail() {
-			return userMail;
-		}
-
-		public void setUserMail(String userMail) {
-			this.userMail = userMail;
-		}
-
-		@Override
-		public String toString() {
-			return "OrderWrapper{" + "order=" + order + ", id=" + id + ", opennessRating=" + opennessRating + ", ordersValue=" + ordersValue + ", successTransactionsCount=" + successTransactionsCount + ", partnersRating=" + partnersRating + ", successValue=" + successValue + ", userName=" + userName + ", userPhone=" + userPhone + ", userMail=" + userMail + ", userCurrencies=" + userCurrencies + ", userLanguages=" + userLanguages + '}';
-		}
-	}
-
-	@XmlRootElement
-	public static class RespondCreationRequest {
-
-		private String orderId;
-		private String comment;
-		private String userId;
-
-		public String getOrderId() {
-			return orderId;
-		}
-
-		public void setOrderId(String orderId) {
-			this.orderId = orderId;
-		}
-
-		public String getComment() {
-			return comment;
-		}
-
-		public void setComment(String comment) {
-			this.comment = comment;
-		}
-
-		public String getUserId() {
-			return userId;
-		}
-
-		public void setUserId(String userId) {
-			this.userId = userId;
-		}
-
-		@Override
-		public String toString() {
-			return "ResponseRequest{" + "orderId=" + orderId + ", comment=" + comment + ", userId=" + userId + '}';
-		}
-	}
-
-	@XmlRootElement
-	public static class OrderChangeStatusRequest {
-
-		private String orderId;
-		private String comment;
-		private OrderStatus status;
-
-		public String getOrderId() {
-			return orderId;
-		}
-
-		public void setOrderId(String orderId) {
-			this.orderId = orderId;
-		}
-
-		public String getComment() {
-			return comment;
-		}
-
-		public void setComment(String comment) {
-			this.comment = comment;
-		}
-
-		public OrderStatus getStatus() {
-			return status;
-		}
-
-		public void setStatus(OrderStatus status) {
-			this.status = status;
-		}
-	}
-
 	@Context
 	private HttpServletRequest request;
 
 	@Inject
 	private OrderDAO orderDAO;
+
+	@Inject
+	private OrderCategoryDAO categoryDAO;
 
 	@Inject
 	private UserProfileDAO profileDAO;
@@ -346,8 +101,6 @@ public class OrdersResource {
 			wrapper.setId(order.getId());
 			ordersWrappers.add(wrapper);
 		}
-
-		System.out.println(ordersWrappers);
 		return new OrdersWrapper(ordersWrappers, length);
 	}
 
@@ -523,7 +276,7 @@ public class OrdersResource {
 	@Path("respond")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Respond getRespondByUser(@QueryParam("id") String id) {
-		return orderDAO.findResponse(id);
+		return orderDAO.findRespond(id);
 	}
 
 	@POST
@@ -546,15 +299,15 @@ public class OrdersResource {
 
 	private boolean isСompleted(OrderStatus status) {
 		return ((status == OrderStatus.SUCCESS)
-			|| (status == OrderStatus.NOT_SUCCESS)
-			|| (status == OrderStatus.ARBITRATION));
+				|| (status == OrderStatus.NOT_SUCCESS)
+				|| (status == OrderStatus.ARBITRATION));
 	}
 
 	@GET
 	@Path("categories")
 	@Produces(MediaType.APPLICATION_JSON)
 	public CategoriesWrapper getOrdersCategories() {
-		return new CategoriesWrapper(orderDAO.findAllCategories());
+		return new CategoriesWrapper(categoryDAO.findAllCategories());
 	}
 
 	@GET
@@ -562,20 +315,20 @@ public class OrdersResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public OrderCategory createTestCategories() {
 		String c = "Кредит под процент";
-		orderDAO.createCategory(c, CategoryType.CREDIT);
+		categoryDAO.createCategory(c, CategoryType.CREDIT);
 		c = "Кредит под залог";
-		orderDAO.createCategory(c, CategoryType.CREDIT);
+		categoryDAO.createCategory(c, CategoryType.CREDIT);
 		c = "Кредит на образование";
-		orderDAO.createCategory(c, CategoryType.CREDIT);
+		categoryDAO.createCategory(c, CategoryType.CREDIT);
 		c = "Кредит";
-		orderDAO.createCategory(c, CategoryType.CREDIT);
+		categoryDAO.createCategory(c, CategoryType.CREDIT);
 		c = "Обмен";
-		orderDAO.createCategory(c, CategoryType.EXCHANGE);
+		categoryDAO.createCategory(c, CategoryType.EXCHANGE);
 		c = "Безвозвратно";
-		orderDAO.createCategory(c, CategoryType.CREDIT);
+		categoryDAO.createCategory(c, CategoryType.CREDIT);
 		c = "Без %";
-		orderDAO.createCategory(c, CategoryType.CREDIT);
+		categoryDAO.createCategory(c, CategoryType.CREDIT);
 		c = "Доля";
-		return orderDAO.createCategory(c, CategoryType.BORROW);
+		return categoryDAO.createCategory(c, CategoryType.BORROW);
 	}
 }
