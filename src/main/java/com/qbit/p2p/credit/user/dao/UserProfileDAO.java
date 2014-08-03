@@ -5,8 +5,6 @@ import static com.qbit.commons.dao.util.DAOUtil.invokeInTransaction;
 import com.qbit.commons.dao.util.TrCallable;
 import com.qbit.commons.user.UserDAO;
 import com.qbit.commons.user.UserInfo;
-import com.qbit.p2p.credit.statistics.dao.StatisticsDAO;
-import com.qbit.p2p.credit.user.model.Language;
 import com.qbit.p2p.credit.user.model.DataLink;
 import com.qbit.p2p.credit.user.model.UserPublicProfile;
 import java.util.List;
@@ -34,14 +32,12 @@ public class UserProfileDAO {
 
 	@Inject
 	private UserDAO userDAO;
-	@Inject
-	private StatisticsDAO statisticsDAO;
 
 	public UserPublicProfile find(String id) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {
 			return DAOUtil.find(entityManagerFactory.createEntityManager(),
-				UserPublicProfile.class, id, null);
+					UserPublicProfile.class, id, null);
 		} finally {
 			entityManager.close();
 		}
@@ -52,20 +48,19 @@ public class UserProfileDAO {
 		try {
 			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 			CriteriaQuery<UserPublicProfile> criteria = builder.createQuery(UserPublicProfile.class);
-
-			Root<UserPublicProfile> user = criteria.from(UserPublicProfile.class);
-			criteria.select(user);
-
-			if (sortDesc && sortDataField != null && !sortDataField.isEmpty()) {
-				criteria.orderBy(builder.desc(user.get(sortDataField)));
-			} else if (!sortDesc && sortDataField != null && !sortDataField.isEmpty()) {
-				criteria.orderBy(builder.asc(user.get(sortDataField)));
+			Root<UserPublicProfile> userSelection = criteria.from(UserPublicProfile.class);
+			criteria.select(userSelection);
+			if ((sortDataField != null) && !sortDataField.isEmpty()) {
+				if (sortDesc) {
+					criteria.orderBy(builder.desc(userSelection.get(sortDataField)));
+				} else {
+					criteria.orderBy(builder.asc(userSelection.get(sortDataField)));
+				}
 			}
 			TypedQuery<UserPublicProfile> query = entityManager.createQuery(criteria);
 			query.setFirstResult(offset);
 			query.setMaxResults(limit);
-			List<UserPublicProfile> allUsers = query.getResultList();
-			return allUsers;
+			return query.getResultList();
 		} finally {
 			entityManager.close();
 		}
@@ -86,15 +81,15 @@ public class UserProfileDAO {
 			criteria.select(builder.count(user));
 			if (filterDataField != null && query != null) {
 				criteria.where(
-					builder.or(
-						builder.like(
-							builder.lower(
-								user.get(
-									type.getDeclaredSingularAttribute(filterDataField, String.class)
+						builder.or(
+								builder.like(
+										builder.lower(
+												user.get(
+														type.getDeclaredSingularAttribute(filterDataField, String.class)
+												)
+										), "%" + query.toLowerCase() + "%"
 								)
-							), "%" + query.toLowerCase() + "%"
 						)
-					)
 				);
 			}
 
@@ -140,20 +135,18 @@ public class UserProfileDAO {
 
 			@Override
 			public UserPublicProfile call(EntityManager entityManager) {
-				UserInfo user = userDAO.find(publicKey);
-				if (user == null) {
-					throw new WebApplicationException();
+				UserPublicProfile userPublicProfile = entityManager.find(UserPublicProfile.class, publicKey);
+				if (userPublicProfile == null) {
+					UserInfo user = userDAO.find(publicKey);
+					if (user == null) {
+						throw new WebApplicationException();
+					}
+					userPublicProfile = new UserPublicProfile(publicKey);
 				}
-				UserPublicProfile userPublicProfile = new UserPublicProfile();
-				userPublicProfile.setPublicKey(publicKey);
-				userPublicProfile.setPersonalData("DEFAULT");
-
-				entityManager.persist(userPublicProfile);
-				statisticsDAO.create(publicKey);
+				entityManager.merge(userPublicProfile);
 				return userPublicProfile;
 			}
-		}
-		);
+		});
 	}
 
 	public UserPublicProfile updateUserMainAttributes(final UserPublicProfile userProfile) {
@@ -163,8 +156,7 @@ public class UserProfileDAO {
 		return invokeInTransaction(entityManagerFactory, new TrCallable<UserPublicProfile>() {
 
 			@Override
-			public UserPublicProfile
-				call(EntityManager entityManager) {
+			public UserPublicProfile call(EntityManager entityManager) {
 				UserPublicProfile userPublicProfile = entityManager.find(UserPublicProfile.class, userProfile.getPublicKey());
 				if (userPublicProfile == null) {
 					return null;
@@ -180,121 +172,64 @@ public class UserProfileDAO {
 				userPublicProfile.setCurrenciesEnabled(userProfile.isCurrenciesEnabled());
 				userPublicProfile.setPersonalData(userProfile.getPersonalData());
 				userPublicProfile.setPersonalDataEnabled(userProfile.isPersonalDataEnabled());
-				
 				return userPublicProfile;
 			}
 		});
 	}
-	
-	public UserPublicProfile updateUserSocialLinks(final List<DataLink> socialLinks, final String publicKey) {
-		if ((publicKey == null) && publicKey.isEmpty()) {
+
+	public UserPublicProfile updateUserSocialLinks(final String publicKey, final List<DataLink> socialLinks) {
+		if ((publicKey == null) || publicKey.isEmpty()) {
 			throw new IllegalArgumentException();
 		}
 		return invokeInTransaction(entityManagerFactory, new TrCallable<UserPublicProfile>() {
 
 			@Override
 			public UserPublicProfile
-				call(EntityManager entityManager) {
+					call(EntityManager entityManager) {
 				UserPublicProfile userPublicProfile = entityManager.find(UserPublicProfile.class, publicKey);
 				if (userPublicProfile == null) {
 					return null;
 				}
 				userPublicProfile.setSocialLinks(socialLinks);
-
 				return userPublicProfile;
 			}
 		});
 	}
-	
-	public UserPublicProfile updateUserVideos(final List<DataLink> videos, final String publicKey) {
-		if ((publicKey == null) && publicKey.isEmpty()) {
+
+	public UserPublicProfile updateUserVideos(final String publicKey, final List<DataLink> videos) {
+		if ((publicKey == null) || publicKey.isEmpty()) {
 			throw new IllegalArgumentException();
 		}
 		return invokeInTransaction(entityManagerFactory, new TrCallable<UserPublicProfile>() {
 
 			@Override
-			public UserPublicProfile
-				call(EntityManager entityManager) {
+			public UserPublicProfile call(EntityManager entityManager) {
 				UserPublicProfile userPublicProfile = entityManager.find(UserPublicProfile.class, publicKey);
 				if (userPublicProfile == null) {
 					return null;
 				}
 				userPublicProfile.setVideos(videos);
-
 				return userPublicProfile;
 			}
 		});
 	}
-	
-	public UserPublicProfile updatePassportEnabled(final boolean isPassportEnabled, final String publicKey) {
-		if ((publicKey == null) && publicKey.isEmpty()) {
+
+	public UserPublicProfile updatePassportEnabled(final String publicKey, final boolean isPassportEnabled) {
+		if ((publicKey == null) || publicKey.isEmpty()) {
 			throw new IllegalArgumentException();
 		}
 		return invokeInTransaction(entityManagerFactory, new TrCallable<UserPublicProfile>() {
 
 			@Override
 			public UserPublicProfile
-				call(EntityManager entityManager) {
+					call(EntityManager entityManager) {
 				UserPublicProfile userPublicProfile = entityManager.find(UserPublicProfile.class, publicKey);
 				if (userPublicProfile == null) {
 					return null;
 				}
 				userPublicProfile.setPassportEnabled(isPassportEnabled);
-
 				return userPublicProfile;
 			}
 		});
-	}
-	
-	public UserPublicProfile updateUserBkiData(final String bkiData, final String publicKey) {
-		if ((publicKey == null) && publicKey.isEmpty()) {
-			throw new IllegalArgumentException();
-		}
-		return invokeInTransaction(entityManagerFactory, new TrCallable<UserPublicProfile>() {
-
-			@Override
-			public UserPublicProfile
-				call(EntityManager entityManager) {
-				UserPublicProfile userPublicProfile = entityManager.find(UserPublicProfile.class, publicKey);
-				if (userPublicProfile == null) {
-					return null;
-				}
-				userPublicProfile.setBkiData(bkiData);
-
-				return userPublicProfile;
-			}
-		});
-	}
-
-	public Language createLanguage(final String title) {
-		if ((title == null) || title.isEmpty()) {
-			throw new IllegalArgumentException("Title is empty.");
-		}
-		return invokeInTransaction(entityManagerFactory, new TrCallable<Language>() {
-
-			@Override
-			public Language call(EntityManager entityManager) {
-
-				Language language = new Language(title);
-				language.setCustom(true);
-				entityManager.persist(language);
-				return language;
-			}
-		});
-	}
-
-	public List<Language> findAllLanguages() {
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		try {
-			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-			CriteriaQuery<Language> criteria = builder.createQuery(Language.class);
-			Root<Language> language = criteria.from(Language.class);
-			criteria.select(language);
-			criteria.where(builder.equal(language.get("custom"), "t"));
-			TypedQuery<Language> query = entityManager.createQuery(criteria);
-			return query.getResultList();
-		} finally {
-			entityManager.close();
-		}
 	}
 }

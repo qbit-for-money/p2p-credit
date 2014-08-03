@@ -3,12 +3,18 @@ package com.qbit.p2p.credit.user.model;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.persistence.Embeddable;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Alexander_Sergeev
  */
 @Embeddable
-public class DataLink  implements Serializable {
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
+public class DataLink implements Serializable {
+
 	private String title;
 	private String link;
 	private String id;

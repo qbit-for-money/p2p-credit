@@ -2,16 +2,14 @@ package com.qbit.p2p.credit.user.model;
 
 import com.qbit.commons.model.Identifiable;
 import java.io.Serializable;
+import java.util.Objects;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * @author Alexander_Sergeev
@@ -21,39 +19,28 @@ import javax.xml.bind.annotation.XmlTransient;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Language implements Identifiable<String>, Serializable {
+	
 	private static final long serialVersionUID = 1L;
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@XmlTransient
-	private String id;
-	
-	private String title;
+	private String code;
 	
 	private boolean custom;
 
 	public Language() {
 	}
 
-	public Language(String title) {
-		this.title = title;
+	public Language(String code) {
+		this.code = code;
 	}
 
 	@Override
 	public String getId() {
-		return id;
+		return code;
 	}
 
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
+	public String getCode() {
+		return code;
 	}
 
 	public boolean isCustom() {
@@ -65,7 +52,33 @@ public class Language implements Identifiable<String>, Serializable {
 	}
 
 	@Override
+	public int hashCode() {
+		int hash = 7;
+		hash = 71 * hash + Objects.hashCode(this.code);
+		hash = 71 * hash + (this.custom ? 1 : 0);
+		return hash;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final Language other = (Language) obj;
+		if (!Objects.equals(this.code, other.code)) {
+			return false;
+		}
+		if (this.custom != other.custom) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
 	public String toString() {
-		return "Language{" + "id=" + id + ", title=" + title + ", isCustom=" + custom + '}';
+		return "Language{" + "code=" + code + ", custom=" + custom + '}';
 	}
 }

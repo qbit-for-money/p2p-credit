@@ -17,7 +17,6 @@
 		<link rel="stylesheet" type="text/css" href="resources/css/auth-dialog.css">
 		<link rel="stylesheet" type="text/css" href="resources/css/order.css">
 		<link rel="stylesheet" type="text/css" href="resources/css/user.css">
-		<script type="text/javascript" src="resources/lib/ckeditor/ckeditor.js"></script>
 	</head>
 	<body class="default">
 		<!--div class="container" ng-if="user === null" ng-controller="AuthDialogOpeningController">
@@ -35,6 +34,12 @@
 			<p>&copy; Bitgates 2014</p>
 		</div>
 
+		<script type="text/javascript">
+			// Global constants
+			window.context = "${context}";
+
+		</script>
+                        
 		<script type="text/javascript" src="resources/lib/pluso/pluso.js"></script>
 		<script type="text/javascript" src="resources/lib/jquery/jquery-2.1.0.min.js"></script>
 		<script type="text/javascript" src="resources/lib/jquery/jquery.mask.min.js"></script>
@@ -52,11 +57,6 @@
 		<script type="text/javascript" src="resources/lib/bootstrap/datepicker/js/bootstrap-datepicker.js"></script> 
 		<script type="text/javascript" src="resources/lib/imgareaselect/scripts/jquery.imgareaselect.pack.js"></script> 
 
-		<script type="text/javascript">
-			// Global constants
-			window.context = "${context}";
-
-		</script>
 		<script type="text/javascript" src="resources/js/app.js"></script>
 
 		<script type="text/javascript" src="resources/js/common/resources.js"></script>
@@ -97,6 +97,7 @@
 		<script type="text/javascript" src="resources/js/short-search/controllers.js"></script>
 
 		<div ng-include src="'resources/html/templates/templates.html'"></div>
+		
 		<script type="text/javascript" src="resources/js/common/tables-common.js"></script>
 	</body>
 </html>

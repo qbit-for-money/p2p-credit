@@ -43,7 +43,7 @@ public class StatisticsResource {
 	@Path("global")
 	@Produces(MediaType.APPLICATION_JSON)
 	public GlobalStatistics getGlobalStatistics() {
-		GlobalStatistics statistics = statisticsDAO.getGlobalStatistics();
+		GlobalStatistics statistics = statisticsDAO.findGlobal();
 		return statistics;
 	}
 }
