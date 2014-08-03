@@ -8,7 +8,6 @@ import javax.persistence.Id;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * @author Alexander_Sergeev
@@ -21,12 +20,12 @@ public class Statistics implements Serializable {
 
 	@Id
 	private String id;
+	
 	private long opennessRating;
-	private long transactionsRating;
+	private long ordersRating;
 	private long ordersValue;
-	private long transactionsCount;
-	private long successTransactionsCount;
-	private long summaryRating;
+	private long ordersCount;
+	private long successOrdersCount;
 
 	public Statistics() {
 	}
@@ -51,12 +50,12 @@ public class Statistics implements Serializable {
 		this.opennessRating = opennessRating;
 	}
 
-	public long getTransactionsRating() {
-		return transactionsRating;
+	public long getOrdersRating() {
+		return ordersRating;
 	}
 
-	public void setTransactionsRating(long transactionsRating) {
-		this.transactionsRating = transactionsRating;
+	public void setOrdersRating(long ordersRating) {
+		this.ordersRating = ordersRating;
 	}
 
 	public long getOrdersValue() {
@@ -67,32 +66,24 @@ public class Statistics implements Serializable {
 		this.ordersValue = ordersValue;
 	}
 
-	public long getTransactionsCount() {
-		return transactionsCount;
+	public long getOrdersCount() {
+		return ordersCount;
 	}
 
-	public void setTransactionsCount(long transactionsCount) {
-		this.transactionsCount = transactionsCount;
+	public void setOrdersCount(long ordersCount) {
+		this.ordersCount = ordersCount;
 	}
 
-	public long getSuccessTransactionsCount() {
-		return successTransactionsCount;
+	public long getSuccessOrdersCount() {
+		return successOrdersCount;
 	}
 
-	public void setSuccessTransactionsCount(long successTransactionsCount) {
-		this.successTransactionsCount = successTransactionsCount;
-	}
-
-	public long getSummaryRating() {
-		return summaryRating;
-	}
-
-	public void setSummaryRating(long summaryRating) {
-		this.summaryRating = summaryRating;
+	public void setSuccessOrdersCount(long successOrdersCount) {
+		this.successOrdersCount = successOrdersCount;
 	}
 
 	@Override
 	public String toString() {
-		return "Statistics{" + "id=" + id + ", opennessRating=" + opennessRating + ", transactionsRating=" + transactionsRating + ", ordersSumValue=" + ordersValue + ", transactionsSum=" + transactionsCount + ", successTransactionsSum=" + successTransactionsCount + ", summaryRating=" + summaryRating + '}';
+		return "Statistics{" + "id=" + id + ", opennessRating=" + opennessRating + ", ordersRating=" + ordersRating + ", ordersValue=" + ordersValue + ", ordersCount=" + ordersCount + ", successOrdersCount=" + successOrdersCount + '}';
 	}
 }

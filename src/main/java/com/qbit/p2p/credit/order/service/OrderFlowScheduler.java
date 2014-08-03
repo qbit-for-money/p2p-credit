@@ -1,8 +1,6 @@
 package com.qbit.p2p.credit.order.service;
 
 import com.qbit.p2p.credit.env.Env;
-import com.qbit.p2p.credit.order.resource.OrdersResource;
-import com.qbit.p2p.credit.statistics.dao.StatisticsDAO;
 import com.qbit.p2p.credit.statistics.service.StatisticsService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -23,8 +21,6 @@ public class OrderFlowScheduler {
 	private Env env;
 	@Inject
 	private StatisticsService statisticsService;
-	@Inject
-	private StatisticsDAO statisticsDAO;
 	
 	private ScheduledExecutorService executorService;
 
@@ -43,7 +39,7 @@ public class OrderFlowScheduler {
 
 			@Override
 			public void run() {
-				statisticsDAO.updateGlobalStatistics(statisticsService.calculateGlobalStatistics());
+				statisticsService.recalculateGlobalStatistics();
 			}
 		}, env.getUpdateGlobalStatisticsWorkerPeriodHours(), env.getUpdateGlobalStatisticsWorkerPeriodHours(), TimeUnit.HOURS);
 	}

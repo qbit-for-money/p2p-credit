@@ -7,12 +7,10 @@ import java.util.List;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
-import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -27,10 +25,9 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class UserPublicProfile implements Serializable {
 
-	private static final int MAX_LENGTH = 37;
-
 	@Id
 	private String publicKey;
+	
 	private String name;
 	private String mail;
 	private boolean mailEnabled;
@@ -47,11 +44,15 @@ public class UserPublicProfile implements Serializable {
 	private boolean personalDataEnabled;
 
 	private List<DataLink> socialLinks;
-
 	private boolean passportEnabled;
 	private List<DataLink> videos;
-	@Lob
-	private String bkiData;
+
+	public UserPublicProfile() {
+	}
+
+	public UserPublicProfile(String publicKey) {
+		this.publicKey = publicKey;
+	}
 
 	public String getPublicKey() {
 		return publicKey;
@@ -172,28 +173,9 @@ public class UserPublicProfile implements Serializable {
 	public void setVideos(List<DataLink> videos) {
 		this.videos = videos;
 	}
-
-	public String getBkiData() {
-		return bkiData;
-	}
-
-	public void setBkiData(String bkiData) {
-		this.bkiData = bkiData;
-	}
-
-	public boolean isValid() {
-		return true;
-	}
-
-	/*public boolean isValid() {
-	return (name == null || name.length() <= MAX_LENGTH)
-	&& (mail == null || mail.length() <= MAX_LENGTH)
-	&& (phone == null || phone.length() <= MAX_LENGTH)
-	&& (city == null || city.length() <= MAX_LENGTH)
-	&& (hobby == null || hobby.length() <= MAX_LENGTH * 2);
-	}*/
+	
 	@Override
 	public String toString() {
-		return "UserPublicProfile{" + "publicKey=" + publicKey + ", name=" + name + ", mail=" + mail + ", mailEnabled=" + mailEnabled + ", phone=" + phone + ", phoneEnabled=" + phoneEnabled + ", languages=" + languages + ", languagesEnabled=" + languagesEnabled + ", currencies=" + currencies + ", currenciesEnabled=" + currenciesEnabled + ", personalData=" + personalData + ", personalDataEnabled=" + personalDataEnabled + ", socialLinks=" + socialLinks + ", passportEnabled=" + passportEnabled + ", videos=" + videos + ", bkiData=" + bkiData + '}';
+		return "UserPublicProfile{" + "publicKey=" + publicKey + ", name=" + name + ", mail=" + mail + ", mailEnabled=" + mailEnabled + ", phone=" + phone + ", phoneEnabled=" + phoneEnabled + ", languages=" + languages + ", languagesEnabled=" + languagesEnabled + ", currencies=" + currencies + ", currenciesEnabled=" + currenciesEnabled + ", personalData=" + personalData + ", personalDataEnabled=" + personalDataEnabled + ", socialLinks=" + socialLinks + ", passportEnabled=" + passportEnabled + ", videos=" + videos + '}';
 	}
 }

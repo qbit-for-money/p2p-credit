@@ -103,7 +103,6 @@ public class OrdersResource {
 
 		private OrderInfo order;
 		private String id;
-		private long summaryRating;
 		private long opennessRating;
 		private long ordersValue;
 		private long successTransactionsCount;
@@ -137,14 +136,6 @@ public class OrdersResource {
 
 		public void setId(String id) {
 			this.id = id;
-		}
-
-		public long getSummaryRating() {
-			return summaryRating;
-		}
-
-		public void setSummaryRating(long summaryRating) {
-			this.summaryRating = summaryRating;
 		}
 
 		public long getOpennessRating() {
@@ -229,7 +220,7 @@ public class OrdersResource {
 
 		@Override
 		public String toString() {
-			return "OrderWrapper{" + "order=" + order + ", id=" + id + ", summaryRating=" + summaryRating + ", opennessRating=" + opennessRating + ", ordersValue=" + ordersValue + ", successTransactionsCount=" + successTransactionsCount + ", partnersRating=" + partnersRating + ", successValue=" + successValue + ", userName=" + userName + ", userPhone=" + userPhone + ", userMail=" + userMail + ", userCurrencies=" + userCurrencies + ", userLanguages=" + userLanguages + '}';
+			return "OrderWrapper{" + "order=" + order + ", id=" + id + ", opennessRating=" + opennessRating + ", ordersValue=" + ordersValue + ", successTransactionsCount=" + successTransactionsCount + ", partnersRating=" + partnersRating + ", successValue=" + successValue + ", userName=" + userName + ", userPhone=" + userPhone + ", userMail=" + userMail + ", userCurrencies=" + userCurrencies + ", userLanguages=" + userLanguages + '}';
 		}
 	}
 
@@ -347,7 +338,7 @@ public class OrdersResource {
 
 		orders = orderDAO.findWithFilter(userId, ordersRequest, profile);
 
-		long length = orderDAO.getLengthWithFilter(userId, ordersRequest, profile);
+		long length = orderDAO.lengthWithFilter(userId, ordersRequest, profile);
 
 		List<OrderWrapper> ordersWrappers = new ArrayList<>();
 		for (OrderInfo order : orders) {
@@ -390,7 +381,7 @@ public class OrdersResource {
 
 		List<OrderInfo> orders = orderDAO.findWithFilter(null, ordersRequest, profile);
 
-		long length = orderDAO.getLengthWithFilter(null, ordersRequest, profile);
+		long length = orderDAO.lengthWithFilter(null, ordersRequest, profile);
 
 		List<OrderWrapper> ordersWrappers = new ArrayList<>();
 		for (OrderInfo order : orders) {
@@ -401,9 +392,8 @@ public class OrdersResource {
 			OrderWrapper wrapper = new OrderWrapper(order);
 			wrapper.setId(order.getId());
 			if (statistics != null) {
-				wrapper.setSummaryRating(statistics.getSummaryRating());
 				wrapper.setOpennessRating(statistics.getOpennessRating());
-				wrapper.setSuccessTransactionsCount(statistics.getSuccessTransactionsCount());
+				wrapper.setSuccessTransactionsCount(statistics.getSuccessOrdersCount());
 				wrapper.setOrdersValue(statistics.getOrdersValue());
 			}
 			wrapper.setPartnersRating(orderDAO.getPartnersRating(order.getUserPublicKey()));
@@ -420,7 +410,7 @@ public class OrdersResource {
 				if (profileValue.getLanguages() != null) {
 					List<String> userLanguages = new ArrayList<>();
 					for (Language language : profileValue.getLanguages()) {
-						userLanguages.add(language.getTitle());
+						userLanguages.add(language.getCode());
 					}
 					wrapper.setUserLanguages(userLanguages);
 				}
@@ -443,7 +433,7 @@ public class OrdersResource {
 					item.setFilterOperator(FilterOperator.AND);
 
 					filter.setFilterItems(Arrays.asList(item, currencyItem));
-					ordersSuccessSize = orderDAO.getLengthWithFilter(profileValue.getPublicKey(), filter, null);
+					ordersSuccessSize = orderDAO.lengthWithFilter(profileValue.getPublicKey(), filter, null);
 					ordersSuccessSizeSum += (currency.getCode() + ": " + ordersSuccessSize + " / ");
 				}
 				ordersSuccessSizeSum = ordersSuccessSizeSum.substring(0, ordersSuccessSizeSum.length() - 3);
@@ -458,18 +448,17 @@ public class OrdersResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public OrderInfo create(OrderInfo order) {
-		String id = AuthFilter.getUserId(request);
-		order.setUserPublicKey(id);
-
+		String userId = AuthFilter.getUserId(request);
+		if (userId == null) {
+			return null;
+		}
+		order.setUserPublicKey(userId);
 		if (!order.isValid()) {
 			return null;
 		}
-		OrderInfo o = orderDAO.create(order);
-		Statistics statistics = statisticsService.calculateUserOrdersStatistics(id);
-		if (statistics != null) {
-			statisticsDAO.updateUserOrdersStatistics(statistics);
-		}
-		return o;
+		OrderInfo newOrder = orderDAO.create(order);
+		statisticsService.recalculateUserOrdersStatistics(userId);
+		return newOrder;
 	}
 
 	@PUT

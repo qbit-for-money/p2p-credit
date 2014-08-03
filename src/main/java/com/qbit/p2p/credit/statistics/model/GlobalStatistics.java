@@ -4,8 +4,6 @@ import java.io.Serializable;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -26,31 +24,31 @@ public class GlobalStatistics implements Serializable {
 	@XmlTransient
 	private final Long id = 0L;
 
-	private long allTransactionsCount;
-	private long allSuccessTransactionsCount;
+	private long allOrdersCount;
+	private long allSuccessOrdersCount;
 
 	public Long getId() {
 		return id;
 	}
 
-	public long getAllTransactionsCount() {
-		return allTransactionsCount;
+	public long getAllOrdersCount() {
+		return allOrdersCount;
 	}
 
-	public void setAllTransactionsCount(long allTransactionsCount) {
-		this.allTransactionsCount = allTransactionsCount;
+	public void setAllOrdersCount(long allOrdersCount) {
+		this.allOrdersCount = allOrdersCount;
 	}
 
-	public long getAllSuccessTransactionsCount() {
-		return allSuccessTransactionsCount;
+	public long getAllSuccessOrdersCount() {
+		return allSuccessOrdersCount;
 	}
 
-	public void setAllSuccessTransactionsCount(long allSuccessTransactionsCount) {
-		this.allSuccessTransactionsCount = allSuccessTransactionsCount;
+	public void setAllSuccessOrdersCount(long allSuccessOrdersCount) {
+		this.allSuccessOrdersCount = allSuccessOrdersCount;
 	}
 
 	@Override
 	public String toString() {
-		return "GlobalStatistics{" + "id=" + id + ", allTransactionsSum=" + allTransactionsCount + ", allSuccessTransactionsSum=" + allSuccessTransactionsCount + '}';
+		return "GlobalStatistics{" + "id=" + id + ", allOrdersCount=" + allOrdersCount + ", allSuccessOrdersCount=" + allSuccessOrdersCount + '}';
 	}
 }

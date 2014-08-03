@@ -32,19 +32,16 @@ public class Material implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@XmlTransient
 	private String id;
+	
 	private String userId;
+	private MaterialType type;
 	private String title;
 	private String description;
 	private long physicalSize;
 	private ExternalMaterial externalMaterials;
-	private MaterialType type;
 
 	public String getId() {
 		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
 	}
 
 	public String getUserId() {
@@ -53,6 +50,14 @@ public class Material implements Serializable {
 
 	public void setUserId(String userId) {
 		this.userId = userId;
+	}
+
+	public MaterialType getType() {
+		return type;
+	}
+
+	public void setType(MaterialType type) {
+		this.type = type;
 	}
 
 	public String getTitle() {
@@ -85,14 +90,6 @@ public class Material implements Serializable {
 
 	public void setExternalMaterials(ExternalMaterial externalMaterials) {
 		this.externalMaterials = externalMaterials;
-	}
-
-	public MaterialType getType() {
-		return type;
-	}
-
-	public void setType(MaterialType type) {
-		this.type = type;
 	}
 
 	@Override

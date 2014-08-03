@@ -36,22 +36,6 @@ public class MaterialDAO {
 		}
 	}
 	
-	public List<Material> findByOrder(String orderId, int offset, int limit) {
-		if ((orderId == null) || orderId.isEmpty()) {
-			return Collections.emptyList();
-		}
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		try {
-			TypedQuery<Material> query = entityManager.createNamedQuery("Materials.findByOrder", Material.class);
-			query.setParameter("orderId", orderId);
-			query.setFirstResult(offset);
-			query.setMaxResults(limit);
-			return query.getResultList();
-		} finally {
-			entityManager.close();
-		}
-	}
-	
 	public List<Material> findByUser(String userId, int offset, int limit) {
 		if ((userId == null) || userId.isEmpty()) {
 			return Collections.emptyList();
@@ -69,7 +53,7 @@ public class MaterialDAO {
 	}
 	
 	public List<Material> findByUserAndType(String userId, MaterialType materialType, int offset, int limit) {
-		if ((userId == null) || userId.isEmpty() || materialType == null) {
+		if ((userId == null) || userId.isEmpty() || (materialType == null)) {
 			return Collections.emptyList();
 		}
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
@@ -85,12 +69,12 @@ public class MaterialDAO {
 		}
 	}
 	
-	public Material create(Material materials) {
-		if (materials == null) {
+	public Material create(Material material) {
+		if ((material == null) || (material.getUserId() == null)) {
 			throw new IllegalArgumentException("Material is NULL.");
 		}
-		return create(materials.getUserId(), materials.getType(), materials.getTitle(), materials.getDescription(),
-				materials.getPhysicalSize(), materials.getExternalMaterials());
+		return create(material.getUserId(), material.getType(), material.getTitle(), material.getDescription(),
+				material.getPhysicalSize(), material.getExternalMaterials());
 	}
 
 	public Material create(final String userId, final MaterialType type, final String title, final String description,

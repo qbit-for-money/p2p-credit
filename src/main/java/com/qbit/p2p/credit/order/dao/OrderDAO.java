@@ -7,9 +7,7 @@ import com.qbit.commons.user.UserDAO;
 import com.qbit.commons.user.UserInfo;
 import com.qbit.p2p.credit.commons.model.Currency;
 import com.qbit.p2p.credit.order.model.CategoryType;
-import com.qbit.p2p.credit.order.model.FilterCondition;
 import com.qbit.p2p.credit.order.model.FilterItem;
-import com.qbit.p2p.credit.order.model.FilterOperator;
 import com.qbit.p2p.credit.order.model.OrderCategory;
 import com.qbit.p2p.credit.order.model.OrderInfo;
 import com.qbit.p2p.credit.order.model.OrderStatus;
@@ -33,7 +31,6 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
@@ -256,8 +253,12 @@ public class OrderDAO {
 			entityManager.close();
 		}
 	}
+	
+	public long lengthWithFilter(SearchRequest filterCriteriaValue) {
+		return lengthWithFilter(null, filterCriteriaValue, null);
+	}
 
-	public long getLengthWithFilter(String userPublicKey, SearchRequest filterCriteriaValue, UserPublicProfile profile) {
+	public long lengthWithFilter(String userPublicKey, SearchRequest filterCriteriaValue, UserPublicProfile profile) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {
 			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
@@ -475,7 +476,7 @@ public class OrderDAO {
 			Predicate operatorPredicate = null;
 			Expression<Collection<String>> languages = order.get("languages").get("title");
 			for (Language language : userLanguages) {
-				Predicate containsLanguages = builder.isMember(language.getTitle(), languages);
+				Predicate containsLanguages = builder.isMember(language.getCode(), languages);
 				if (operatorPredicate == null) {
 					operatorPredicate = containsLanguages;
 				} else {

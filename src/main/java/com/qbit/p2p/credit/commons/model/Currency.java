@@ -13,6 +13,7 @@ public enum Currency {
 	
 	private final String code;
 	private final int maxValue;
+	
 	private Currency(String code, int maxValue) {
 		this.code = code;
 		this.maxValue = maxValue;

@@ -39,15 +39,6 @@ public class Env {
 		return properties.getProperty("user.photo.path.folder");
 	}
 	
-	@XmlElement
-	public String getLastOrdersPathFolder() {
-		return properties.getProperty("last.orders.path.folder");
-	}
-	
-	public int getUpdateLastOrdersWorkerPeriodHours() {
-		return Integer.parseInt(properties.getProperty("last.orders.worker.period.hours"));
-	}
-	
 	public int getUpdateGlobalStatisticsWorkerPeriodHours() {
 		return Integer.parseInt(properties.getProperty("global.statistics.worker.period.hours"));
 	}
@@ -61,6 +52,5 @@ public class Env {
 	public double getUserRatingTransactionsFactor() {
 		return Double.parseDouble(properties.getProperty("user.rating.transactions.factor"));
 	}
-	
 	
 }
