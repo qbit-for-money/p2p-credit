@@ -499,17 +499,17 @@ public class OrderDAO {
 			criteria.select(builder.sumAsLong(ex));
 
 			Subquery<String> usersIdSubquery = criteria.subquery(String.class);
-			Root fromResponse = criteria.from(Respond.class);
-			usersIdSubquery.select(fromResponse.get("userPublicKey")).distinct(true);
+			Root fromRespond = criteria.from(Respond.class);
+			usersIdSubquery.select(fromRespond.get("userPublicKey")).distinct(true);
 
 			Subquery<String> subquery = usersIdSubquery.subquery(String.class);
 			Root fromOrderInfo = subquery.from(OrderInfo.class);
-			subquery.select(fromOrderInfo.get("approvedResponseId"));
+			subquery.select(fromOrderInfo.get("approvedRespondId"));
 
 			Predicate p1 = builder.and(builder.equal(fromOrderInfo.get("userPublicKey"), userPublicKey), builder.equal(fromOrderInfo.get("status"), OrderStatus.SUCCESS));
 			subquery.where(p1);
 
-			Predicate p2 = builder.in(fromResponse.get("id")).value(subquery);
+			Predicate p2 = builder.in(fromRespond.get("id")).value(subquery);
 			usersIdSubquery.where(p2);
 
 			Predicate p3 = builder.and(builder.in(statistics.get("id")).value(usersIdSubquery), builder.notEqual(statistics.get("id"), userPublicKey));
