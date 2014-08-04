@@ -1,29 +1,21 @@
 package com.qbit.p2p.credit.order.resource;
 
-import com.qbit.p2p.credit.commons.model.Currency;
-import com.qbit.p2p.credit.money.model.serialization.CurrencyAdapter;
 import com.qbit.p2p.credit.order.model.OrderInfo;
-import java.util.List;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import com.qbit.p2p.credit.statistics.model.Statistics;
+import com.qbit.p2p.credit.user.model.ShortProfile;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 
 /**
  * @author Alexander_Sergeev
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class OrderWrapper {
 
 	private OrderInfo order;
-	private String id;
-	private long opennessRating;
-	private long ordersValue;
-	private long successTransactionsCount;
+	private ShortProfile shortProfile;
+	private Statistics statistics;
 	private long partnersRating;
-	private String successValue;
-	private String userName;
-	private String userPhone;
-	private String userMail;
-	@XmlJavaTypeAdapter(CurrencyAdapter.class)
-	private List<Currency> userCurrencies;
-	private List<String> userLanguages;
 
 	public OrderWrapper() {
 	}
@@ -40,36 +32,20 @@ public class OrderWrapper {
 		this.order = order;
 	}
 
-	public String getId() {
-		return id;
+	public ShortProfile getShortProfile() {
+		return shortProfile;
 	}
 
-	public void setId(String id) {
-		this.id = id;
+	public void setShortProfile(ShortProfile shortProfile) {
+		this.shortProfile = shortProfile;
 	}
 
-	public long getOpennessRating() {
-		return opennessRating;
+	public Statistics getStatistics() {
+		return statistics;
 	}
 
-	public void setOpennessRating(long opennessRating) {
-		this.opennessRating = opennessRating;
-	}
-
-	public long getOrdersValue() {
-		return ordersValue;
-	}
-
-	public void setOrdersValue(long ordersValue) {
-		this.ordersValue = ordersValue;
-	}
-
-	public long getSuccessTransactionsCount() {
-		return successTransactionsCount;
-	}
-
-	public void setSuccessTransactionsCount(long successTransactionsCount) {
-		this.successTransactionsCount = successTransactionsCount;
+	public void setStatistics(Statistics statistics) {
+		this.statistics = statistics;
 	}
 
 	public long getPartnersRating() {
@@ -80,56 +56,8 @@ public class OrderWrapper {
 		this.partnersRating = partnersRating;
 	}
 
-	public String getSuccessValue() {
-		return successValue;
-	}
-
-	public void setSuccessValue(String successValue) {
-		this.successValue = successValue;
-	}
-
-	public String getUserName() {
-		return userName;
-	}
-
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-
-	public String getUserPhone() {
-		return userPhone;
-	}
-
-	public void setUserPhone(String userPhone) {
-		this.userPhone = userPhone;
-	}
-
-	public List<Currency> getUserCurrencies() {
-		return userCurrencies;
-	}
-
-	public void setUserCurrencies(List<Currency> userCurrencies) {
-		this.userCurrencies = userCurrencies;
-	}
-
-	public List<String> getUserLanguages() {
-		return userLanguages;
-	}
-
-	public void setUserLanguages(List<String> userLanguages) {
-		this.userLanguages = userLanguages;
-	}
-
-	public String getUserMail() {
-		return userMail;
-	}
-
-	public void setUserMail(String userMail) {
-		this.userMail = userMail;
-	}
-
 	@Override
 	public String toString() {
-		return "OrderWrapper{" + "order=" + order + ", id=" + id + ", opennessRating=" + opennessRating + ", ordersValue=" + ordersValue + ", successTransactionsCount=" + successTransactionsCount + ", partnersRating=" + partnersRating + ", successValue=" + successValue + ", userName=" + userName + ", userPhone=" + userPhone + ", userMail=" + userMail + ", userCurrencies=" + userCurrencies + ", userLanguages=" + userLanguages + '}';
+		return "OrderWrapper{" + "order=" + order + ", shortProfile=" + shortProfile + ", statistics=" + statistics + ", partnersRating=" + partnersRating + '}';
 	}
 }

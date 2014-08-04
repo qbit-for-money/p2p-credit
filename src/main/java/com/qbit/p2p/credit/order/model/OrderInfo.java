@@ -38,11 +38,9 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 @Entity
 @NamedQueries({
 	@NamedQuery(name = "OrderInfo.findByPartnersRating",
-		query = "SELECT t1.id FROM Statistics t0, Statistics t1 GROUP BY t0.id, t1.id HAVING t0.id IN (SELECT DISTINCT t2.userPublicKey FROM Respond t2 WHERE t2.id IN (SELECT t3.approvedRespondId FROM OrderInfo t3 WHERE (t3.status = :status) AND (t3.userPublicKey = t1.id) AND (t3.userPublicKey <> t0.id))) AND SUM(t0.summaryRating) >= :rating"),
+		query = "SELECT t1.id FROM Statistics t0, Statistics t1 GROUP BY t0.id, t1.id HAVING t0.id IN (SELECT DISTINCT t2.userPublicKey FROM Respond t2 WHERE t2.id IN (SELECT t3.approvedRespondId FROM OrderInfo t3 WHERE (t3.status = :status) AND (t3.userId = t1.id) AND (t3.userId <> t0.id))) AND SUM(t0.opennessRating * :openessFactor + t0.ordersRating * :transactionsFactor) >= :rating"),
 	@NamedQuery(name = "OrderInfo.findByUser",
-		query = "SELECT o FROM OrderInfo o WHERE o.userPublicKey = :userPublicKey"),
-	@NamedQuery(name = "OrderInfo.findByUserAndTimestamp",
-		query = "SELECT o FROM OrderInfo o WHERE o.userPublicKey = :userPublicKey AND o.creationDate = :creationDate")})
+		query = "SELECT o FROM OrderInfo o WHERE o.userPublicKey = :userPublicKey")})
 @Access(AccessType.FIELD)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -53,66 +51,49 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@XmlTransient
 	private String id;
+	private String userId;
+	private OrderStatus status;
+	@Column(precision = 10, scale = 3)
+	private BigDecimal incomingAmount;
+	private String incomingCurrency;
+	@Column(precision = 10, scale = 3)
+	private BigDecimal outcomingAmout;
+	private String outcomingCurrency;
 	@XmlJavaTypeAdapter(DateAdapter.class)
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date creationDate;
 	@XmlJavaTypeAdapter(DateAdapter.class)
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date endDate;
+	private Date bookingDeadline;
 	private int duration;
 	private DurationType durationType;
 
-	private String userPublicKey;
-
 	@ManyToMany(cascade = CascadeType.ALL)
-	private List<OrderCategory> categories;
+	private List<Category> categories;
+	@ManyToMany(cascade = CascadeType.ALL)
+	private List<Language> languages;
 	@Lob
 	private String orderData;
 
-	private OrderStatus status;
-
 	@OneToMany(cascade = CascadeType.ALL, targetEntity = Respond.class)
 	private List<Respond> responses = new ArrayList<>();
-
 	private String approvedRespondId;
 
 	@OneToOne(cascade = CascadeType.ALL)
 	private Comment comment;
-
-	@ManyToMany(cascade = CascadeType.ALL)
-	private List<Language> languages;
-	private String givingCurrency;
-	private String takingCurrency;
-	@Column(precision = 10, scale = 3)
-	private BigDecimal takingValue;
-	@Column(precision = 10, scale = 3)
-	private BigDecimal givingValue;
 
 	@Override
 	public String getId() {
 		return id;
 	}
 
-	public void setId(String id) {
-		this.id = id;
+	public String getUserId() {
+		return userId;
 	}
 
-	public Date getCreationDate() {
-		return creationDate;
-	}
-
-	public void setCreationDate(Date creationDate) {
-		this.creationDate = creationDate;
-	}
-
-	public String getUserPublicKey() {
-		return userPublicKey;
-	}
-
-	public void setUserPublicKey(String userPublicKey) {
-		this.userPublicKey = userPublicKey;
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 	public OrderStatus getStatus() {
@@ -123,12 +104,60 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 		this.status = status;
 	}
 
-	public Date getEndDate() {
-		return endDate;
+	public BigDecimal getIncomingAmount() {
+		return incomingAmount;
 	}
 
-	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
+	public void setIncomingAmount(BigDecimal incomingAmount) {
+		if (incomingAmount != null) {
+			this.incomingAmount = incomingAmount.setScale(3, RoundingMode.HALF_UP);
+		} else {
+			this.incomingAmount = null;
+		}
+	}
+
+	public String getIncomingCurrency() {
+		return incomingCurrency;
+	}
+
+	public void setIncomingCurrency(String incomingCurrency) {
+		this.incomingCurrency = incomingCurrency;
+	}
+
+	public BigDecimal getOutcomingAmout() {
+		return outcomingAmout;
+	}
+
+	public void setOutcomingAmout(BigDecimal outcomingAmout) {
+		if (outcomingAmout != null) {
+			this.outcomingAmout = outcomingAmout.setScale(3, RoundingMode.HALF_UP);
+		} else {
+			this.outcomingAmout = null;
+		}
+	}
+
+	public String getOutcomingCurrency() {
+		return outcomingCurrency;
+	}
+
+	public void setOutcomingCurrency(String outcomingCurrency) {
+		this.outcomingCurrency = outcomingCurrency;
+	}
+
+	public Date getCreationDate() {
+		return creationDate;
+	}
+
+	public void setCreationDate(Date creationDate) {
+		this.creationDate = creationDate;
+	}
+
+	public Date getBookingDeadline() {
+		return bookingDeadline;
+	}
+
+	public void setBookingDeadline(Date bookingDeadline) {
+		this.bookingDeadline = bookingDeadline;
 	}
 
 	public int getDuration() {
@@ -139,20 +168,20 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 		this.duration = duration;
 	}
 
-	public List<OrderCategory> getCategories() {
+	public DurationType getDurationType() {
+		return durationType;
+	}
+
+	public void setDurationType(DurationType durationType) {
+		this.durationType = durationType;
+	}
+
+	public List<Category> getCategories() {
 		return categories;
 	}
 
-	public void setCategories(List<OrderCategory> categories) {
+	public void setCategories(List<Category> categories) {
 		this.categories = categories;
-	}
-
-	public String getApprovedRespondId() {
-		return approvedRespondId;
-	}
-
-	public void setApprovedRespondId(String approvedRespondId) {
-		this.approvedRespondId = approvedRespondId;
 	}
 
 	public List<Language> getLanguages() {
@@ -161,46 +190,6 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 
 	public void setLanguages(List<Language> languages) {
 		this.languages = languages;
-	}
-
-	public String getGivingCurrency() {
-		return givingCurrency;
-	}
-
-	public void setGivingCurrency(String givingCurrency) {
-		this.givingCurrency = givingCurrency;
-	}
-
-	public String getTakingCurrency() {
-		return takingCurrency;
-	}
-
-	public void setTakingCurrency(String takingCurrency) {
-		this.takingCurrency = takingCurrency;
-	}
-
-	public BigDecimal getTakingValue() {
-		return takingValue;
-	}
-
-	public void setTakingValue(BigDecimal takingValue) {
-		if (takingValue != null) {
-			this.takingValue = takingValue.setScale(3, RoundingMode.HALF_UP);
-		} else {
-			this.takingValue = null;
-		}
-	}
-
-	public BigDecimal getGivingValue() {
-		return givingValue;
-	}
-
-	public void setGivingValue(BigDecimal givingValue) {
-		if (givingValue != null) {
-			this.givingValue = givingValue.setScale(3, RoundingMode.HALF_UP);
-		} else {
-			this.givingValue = null;
-		}
 	}
 
 	public String getOrderData() {
@@ -219,12 +208,12 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 		this.responses = responses;
 	}
 
-	public DurationType getDurationType() {
-		return durationType;
+	public String getApprovedRespondId() {
+		return approvedRespondId;
 	}
 
-	public void setDurationType(DurationType durationType) {
-		this.durationType = durationType;
+	public void setApprovedRespondId(String approvedRespondId) {
+		this.approvedRespondId = approvedRespondId;
 	}
 
 	public Comment getComment() {
@@ -236,19 +225,19 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 	}
 
 	public boolean isValid() {
-		return (endDate != null)
+		return (bookingDeadline != null)
 			&& (duration >= 0)
 			&& (durationType != null)
-			&& (userPublicKey != null)
-			&& !userPublicKey.isEmpty()
+			&& (userId != null)
+			&& !userId.isEmpty()
 			&& (categories != null)
 			&& (languages != null)
-			&& (takingCurrency != null || givingCurrency != null)
-			&& (!BigDecimal.ZERO.equals(takingValue) || !BigDecimal.ZERO.equals(givingValue));
+			&& (incomingCurrency != null || outcomingCurrency != null)
+			&& (!BigDecimal.ZERO.equals(incomingAmount) || !BigDecimal.ZERO.equals(outcomingAmout));
 	}
 
 	@Override
 	public String toString() {
-		return "OrderInfo{" + "id=" + id + ", creationDate=" + creationDate + ", endDate=" + endDate + ", duration=" + duration + ", durationType=" + durationType + ", userPublicKey=" + userPublicKey + ", categories=" + categories + ", orderData=" + orderData + ", status=" + status + ", responses=" + responses + ", approvedResponseId=" + approvedRespondId + ", comment=" + comment + ", languages=" + languages + ", givingCurrency=" + givingCurrency + ", takingCurrency=" + takingCurrency + ", takingValue=" + takingValue + ", givingValue=" + givingValue + '}';
+		return "OrderInfo{" + "id=" + id + ", userId=" + userId + ", status=" + status + ", incomingAmount=" + incomingAmount + ", incomingCurrency=" + incomingCurrency + ", outcomingAmout=" + outcomingAmout + ", outcomingCurrency=" + outcomingCurrency + ", creationDate=" + creationDate + ", bookingDeadline=" + bookingDeadline + ", duration=" + duration + ", durationType=" + durationType + ", categories=" + categories + ", languages=" + languages + ", orderData=" + orderData + ", responses=" + responses + ", approvedRespondId=" + approvedRespondId + ", comment=" + comment + '}';
 	}
 }

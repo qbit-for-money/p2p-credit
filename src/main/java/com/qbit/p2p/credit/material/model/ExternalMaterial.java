@@ -1,10 +1,13 @@
 package com.qbit.p2p.credit.material.model;
 
 import java.io.Serializable;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 
 /**
  * @author Alexander_Sergeev
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ExternalMaterial implements Serializable {
 
 	private String link;

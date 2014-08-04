@@ -26,7 +26,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 public class UserPublicProfile implements Serializable {
 
 	@Id
-	private String publicKey;
+	private String userId;
 	
 	private String name;
 	private String mail;
@@ -50,16 +50,12 @@ public class UserPublicProfile implements Serializable {
 	public UserPublicProfile() {
 	}
 
-	public UserPublicProfile(String publicKey) {
-		this.publicKey = publicKey;
+	public UserPublicProfile(String userId) {
+		this.userId = userId;
 	}
 
-	public String getPublicKey() {
-		return publicKey;
-	}
-
-	public void setPublicKey(String publicKey) {
-		this.publicKey = publicKey;
+	public String getUserId() {
+		return userId;
 	}
 
 	public String getName() {
@@ -173,9 +169,9 @@ public class UserPublicProfile implements Serializable {
 	public void setVideos(List<DataLink> videos) {
 		this.videos = videos;
 	}
-	
+
 	@Override
 	public String toString() {
-		return "UserPublicProfile{" + "publicKey=" + publicKey + ", name=" + name + ", mail=" + mail + ", mailEnabled=" + mailEnabled + ", phone=" + phone + ", phoneEnabled=" + phoneEnabled + ", languages=" + languages + ", languagesEnabled=" + languagesEnabled + ", currencies=" + currencies + ", currenciesEnabled=" + currenciesEnabled + ", personalData=" + personalData + ", personalDataEnabled=" + personalDataEnabled + ", socialLinks=" + socialLinks + ", passportEnabled=" + passportEnabled + ", videos=" + videos + '}';
+		return "UserPublicProfile{" + "userId=" + userId + ", name=" + name + ", mail=" + mail + ", mailEnabled=" + mailEnabled + ", phone=" + phone + ", phoneEnabled=" + phoneEnabled + ", languages=" + languages + ", languagesEnabled=" + languagesEnabled + ", currencies=" + currencies + ", currenciesEnabled=" + currenciesEnabled + ", personalData=" + personalData + ", personalDataEnabled=" + personalDataEnabled + ", socialLinks=" + socialLinks + ", passportEnabled=" + passportEnabled + ", videos=" + videos + '}';
 	}
 }

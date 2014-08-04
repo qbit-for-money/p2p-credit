@@ -16,7 +16,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ShortProfile implements Serializable {
 	
-	private String publicKey;
+	private String userId;
 	private String name;
 	private String mail;
 	private String phone;
@@ -28,7 +28,7 @@ public class ShortProfile implements Serializable {
 	}
 	
 	public ShortProfile(UserPublicProfile profile) {
-		publicKey = profile.getPublicKey();
+		userId = profile.getUserId();
 		name = profile.getName();
 		if (profile.isMailEnabled()) {
 			mail = profile.getMail();
@@ -44,12 +44,12 @@ public class ShortProfile implements Serializable {
 		}
 	}
 
-	public String getPublicKey() {
-		return publicKey;
+	public String getUserId() {
+		return userId;
 	}
 
-	public void setPublicKey(String publicKey) {
-		this.publicKey = publicKey;
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 	public String getName() {
@@ -94,6 +94,6 @@ public class ShortProfile implements Serializable {
 
 	@Override
 	public String toString() {
-		return "ShortProfile{" + "publicKey=" + publicKey + ", name=" + name + ", mail=" + mail + ", phone=" + phone + ", languages=" + languages + ", currencies=" + currencies + '}';
+		return "ShortProfile{" + "userId=" + userId + ", name=" + name + ", mail=" + mail + ", phone=" + phone + ", languages=" + languages + ", currencies=" + currencies + '}';
 	}
 }

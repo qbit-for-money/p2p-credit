@@ -18,7 +18,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Access(AccessType.FIELD)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class OrderCategory implements Identifiable<String>, Serializable {
+public class Category implements Identifiable<String>, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -29,10 +29,10 @@ public class OrderCategory implements Identifiable<String>, Serializable {
 	
 	private CategoryType type;
 
-	public OrderCategory() {
+	public Category() {
 	}
 
-	public OrderCategory(String code, CategoryType type) {
+	public Category(String code, CategoryType type) {
 		this.code = code;
 		this.type = type;
 	}
@@ -79,7 +79,7 @@ public class OrderCategory implements Identifiable<String>, Serializable {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		final OrderCategory other = (OrderCategory) obj;
+		final Category other = (Category) obj;
 		if (!Objects.equals(this.code, other.code)) {
 			return false;
 		}

@@ -1,9 +1,7 @@
 package com.qbit.p2p.credit.user.resource;
 
 import com.qbit.commons.auth.AuthFilter;
-import com.qbit.p2p.credit.statistics.dao.StatisticsDAO;
 import com.qbit.p2p.credit.user.dao.UserProfileDAO;
-import com.qbit.p2p.credit.statistics.model.Statistics;
 import com.qbit.p2p.credit.statistics.service.StatisticsService;
 import com.qbit.p2p.credit.user.model.ShortProfile;
 import com.qbit.p2p.credit.user.model.UserPublicProfile;
@@ -54,8 +52,8 @@ public class UserProfilesResource {
 	@GET
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public UserPublicProfile getById(@PathParam("id") String id) {
-		UserPublicProfile profile = userProfileDAO.find(id);
+	public UserPublicProfile getById(@PathParam("id") String userId) {
+		UserPublicProfile profile = userProfileDAO.find(userId);
 		if (profile == null) {
 			return null;
 		}
@@ -74,8 +72,8 @@ public class UserProfilesResource {
 	@GET
 	@Path("{id}/short")
 	@Produces(MediaType.APPLICATION_JSON)
-	public ShortProfile getShortById(@PathParam("id") String id) {
-		UserPublicProfile profile = userProfileDAO.find(id);
+	public ShortProfile getShortById(@PathParam("id") String userId) {
+		UserPublicProfile profile = userProfileDAO.find(userId);
 		if (profile == null) {
 			return null;
 		}
@@ -97,12 +95,10 @@ public class UserProfilesResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public UserPublicProfile updateUserMainAttributes(UserPublicProfile userProfile) {
 		String userId = AuthFilter.getUserId(request);
-		if ((userId == null) || (userProfile == null) || !userId.equals(userProfile.getPublicKey())) {
+		if ((userId == null) || (userProfile == null) || !userId.equals(userProfile.getUserId())) {
 			throw new IllegalArgumentException();
 		}
-		
 		UserPublicProfile newProfile = userProfileDAO.updateUserMainAttributes(userProfile);
-		
 		statisticsService.recalculateOpenessRating(userId);
 		
 		return newProfile;
@@ -114,12 +110,10 @@ public class UserProfilesResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public UserPublicProfile updateUserSocialLinks(UserPublicProfile userProfile) {
 		String userId = AuthFilter.getUserId(request);
-		if ((userId == null) || (userProfile == null) || !userId.equals(userProfile.getPublicKey())) {
+		if ((userId == null) || (userProfile == null) || !userId.equals(userProfile.getUserId())) {
 			throw new IllegalArgumentException();
 		}
-		
 		UserPublicProfile newProfile = userProfileDAO.updateUserSocialLinks(userId, userProfile.getSocialLinks());
-		
 		statisticsService.recalculateOpenessRating(userId);
 		
 		return newProfile;
@@ -131,12 +125,10 @@ public class UserProfilesResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public UserPublicProfile updateUserVideos(UserPublicProfile userProfile) {
 		String userId = AuthFilter.getUserId(request);
-		if ((userId == null) || (userProfile == null) || !userId.equals(userProfile.getPublicKey())) {
+		if ((userId == null) || (userProfile == null) || !userId.equals(userProfile.getUserId())) {
 			throw new IllegalArgumentException();
 		}
-		
 		UserPublicProfile newProfile = userProfileDAO.updateUserVideos(userId, userProfile.getSocialLinks());
-		
 		statisticsService.recalculateOpenessRating(userId);
 		
 		return newProfile;
@@ -148,12 +140,10 @@ public class UserProfilesResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public UserPublicProfile updatePassportEnabled(UserPublicProfile userProfile) {
 		String userId = AuthFilter.getUserId(request);
-		if ((userId == null) || (userProfile == null) || !userId.equals(userProfile.getPublicKey())) {
+		if ((userId == null) || (userProfile == null) || !userId.equals(userProfile.getUserId())) {
 			throw new IllegalArgumentException();
 		}
-		
 		UserPublicProfile newProfile = userProfileDAO.updatePassportEnabled(userId, userProfile.isPassportEnabled());
-		
 		statisticsService.recalculateOpenessRating(userId);
 		
 		return newProfile;

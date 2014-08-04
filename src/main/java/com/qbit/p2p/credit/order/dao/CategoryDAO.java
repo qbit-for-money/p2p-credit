@@ -3,7 +3,7 @@ package com.qbit.p2p.credit.order.dao;
 import static com.qbit.commons.dao.util.DAOUtil.invokeInTransaction;
 import com.qbit.commons.dao.util.TrCallable;
 import com.qbit.p2p.credit.order.model.CategoryType;
-import com.qbit.p2p.credit.order.model.OrderCategory;
+import com.qbit.p2p.credit.order.model.Category;
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -17,24 +17,24 @@ import javax.persistence.criteria.CriteriaQuery;
  * @author Alexander_Sergeev
  */
 @Singleton
-public class OrderCategoryDAO {
+public class CategoryDAO {
 
 	@Inject
 	private EntityManagerFactory entityManagerFactory;
 
-	public OrderCategory createCategory(final String code, final CategoryType type) {
-		if ((code == null) || code.isEmpty()) {
-			throw new IllegalArgumentException("Code is empty.");
+	public Category createCategory(final String code, final CategoryType type) {
+		if ((code == null) || code.isEmpty() || type == null) {
+			throw new IllegalArgumentException("Category is not valid.");
 		}
-		return invokeInTransaction(entityManagerFactory, new TrCallable<OrderCategory>() {
+		return invokeInTransaction(entityManagerFactory, new TrCallable<Category>() {
 
 			@Override
-			public OrderCategory call(EntityManager entityManager) {
-				OrderCategory category = entityManager.find(OrderCategory.class, code);
+			public Category call(EntityManager entityManager) {
+				Category category = entityManager.find(Category.class, code);
 				if (category != null) {
 					return category;
 				}
-				category = new OrderCategory(code, type);
+				category = new Category(code, type);
 				category.setCustom(true);
 				entityManager.merge(category);
 				return category;
@@ -42,15 +42,15 @@ public class OrderCategoryDAO {
 		});
 	}
 
-	public List<OrderCategory> findAllCategories() {
+	public List<Category> findAllCategories() {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {
 			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-			CriteriaQuery<OrderCategory> criteria = builder.createQuery(OrderCategory.class);
-			criteria.select(criteria.from(OrderCategory.class));
+			CriteriaQuery<Category> criteria = builder.createQuery(Category.class);
+			criteria.select(criteria.from(Category.class));
 			//criteria.where(builder.equal(category.get("custom"), "t"));
-			TypedQuery<OrderCategory> query = entityManager.createQuery(criteria);
-			List<OrderCategory> c = query.getResultList();
+			TypedQuery<Category> query = entityManager.createQuery(criteria);
+			List<Category> c = query.getResultList();
 			return c;
 		} finally {
 			entityManager.close();

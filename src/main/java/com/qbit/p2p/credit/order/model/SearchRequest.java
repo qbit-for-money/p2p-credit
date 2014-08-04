@@ -1,6 +1,8 @@
 package com.qbit.p2p.credit.order.model;
 
 import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlList;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -9,16 +11,18 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Alexander_Sergeev
  */
 @XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class SearchRequest {
+
 	@XmlElement
 	@XmlList
 	private List<FilterItem> filterItems;
-	private String sortOrder;
+	private SortOrder sortOrder;
+	private String sortDataField;
 	private int pageNumber;
 	private int pageSize;
 	private int recordstartindex;
 	private int recordendindex;
-	private String sortDataField;
 
 	public List<FilterItem> getFilterItems() {
 		return filterItems;
@@ -26,6 +30,22 @@ public class SearchRequest {
 
 	public void setFilterItems(List<FilterItem> filterItems) {
 		this.filterItems = filterItems;
+	}
+
+	public SortOrder getSortOrder() {
+		return sortOrder;
+	}
+
+	public void setSortOrder(SortOrder sortOrder) {
+		this.sortOrder = sortOrder;
+	}
+
+	public String getSortDataField() {
+		return sortDataField;
+	}
+
+	public void setSortDataField(String sortDataField) {
+		this.sortDataField = sortDataField;
 	}
 
 	public int getPageSize() {
@@ -52,28 +72,12 @@ public class SearchRequest {
 		this.recordendindex = recordendindex;
 	}
 
-	public String getSortOrder() {
-		return sortOrder;
-	}
-
-	public void setSortOrder(String sortOrder) {
-		this.sortOrder = sortOrder;
-	}
-
 	public int getPageNumber() {
 		return pageNumber;
 	}
 
 	public void setPageNumber(int pageNumber) {
 		this.pageNumber = pageNumber;
-	}
-
-	public String getSortDataField() {
-		return sortDataField;
-	}
-
-	public void setSortDataField(String sortDataField) {
-		this.sortDataField = sortDataField;
 	}
 
 	@Override

@@ -130,18 +130,18 @@ public class UserProfileDAO {
 		}
 	}
 
-	public UserPublicProfile create(final String publicKey) {
+	public UserPublicProfile create(final String userId) {
 		return invokeInTransaction(entityManagerFactory, new TrCallable<UserPublicProfile>() {
 
 			@Override
 			public UserPublicProfile call(EntityManager entityManager) {
-				UserPublicProfile userPublicProfile = entityManager.find(UserPublicProfile.class, publicKey);
+				UserPublicProfile userPublicProfile = entityManager.find(UserPublicProfile.class, userId);
 				if (userPublicProfile == null) {
-					UserInfo user = userDAO.find(publicKey);
+					UserInfo user = userDAO.find(userId);
 					if (user == null) {
 						throw new WebApplicationException();
 					}
-					userPublicProfile = new UserPublicProfile(publicKey);
+					userPublicProfile = new UserPublicProfile(userId);
 				}
 				entityManager.merge(userPublicProfile);
 				return userPublicProfile;
@@ -157,7 +157,7 @@ public class UserProfileDAO {
 
 			@Override
 			public UserPublicProfile call(EntityManager entityManager) {
-				UserPublicProfile userPublicProfile = entityManager.find(UserPublicProfile.class, userProfile.getPublicKey());
+				UserPublicProfile userPublicProfile = entityManager.find(UserPublicProfile.class, userProfile.getUserId());
 				if (userPublicProfile == null) {
 					return null;
 				}
@@ -177,8 +177,8 @@ public class UserProfileDAO {
 		});
 	}
 
-	public UserPublicProfile updateUserSocialLinks(final String publicKey, final List<DataLink> socialLinks) {
-		if ((publicKey == null) || publicKey.isEmpty()) {
+	public UserPublicProfile updateUserSocialLinks(final String userId, final List<DataLink> socialLinks) {
+		if ((userId == null) || userId.isEmpty()) {
 			throw new IllegalArgumentException();
 		}
 		return invokeInTransaction(entityManagerFactory, new TrCallable<UserPublicProfile>() {
@@ -186,7 +186,7 @@ public class UserProfileDAO {
 			@Override
 			public UserPublicProfile
 					call(EntityManager entityManager) {
-				UserPublicProfile userPublicProfile = entityManager.find(UserPublicProfile.class, publicKey);
+				UserPublicProfile userPublicProfile = entityManager.find(UserPublicProfile.class, userId);
 				if (userPublicProfile == null) {
 					return null;
 				}
@@ -196,15 +196,15 @@ public class UserProfileDAO {
 		});
 	}
 
-	public UserPublicProfile updateUserVideos(final String publicKey, final List<DataLink> videos) {
-		if ((publicKey == null) || publicKey.isEmpty()) {
+	public UserPublicProfile updateUserVideos(final String userId, final List<DataLink> videos) {
+		if ((userId == null) || userId.isEmpty()) {
 			throw new IllegalArgumentException();
 		}
 		return invokeInTransaction(entityManagerFactory, new TrCallable<UserPublicProfile>() {
 
 			@Override
 			public UserPublicProfile call(EntityManager entityManager) {
-				UserPublicProfile userPublicProfile = entityManager.find(UserPublicProfile.class, publicKey);
+				UserPublicProfile userPublicProfile = entityManager.find(UserPublicProfile.class, userId);
 				if (userPublicProfile == null) {
 					return null;
 				}
@@ -214,8 +214,8 @@ public class UserProfileDAO {
 		});
 	}
 
-	public UserPublicProfile updatePassportEnabled(final String publicKey, final boolean isPassportEnabled) {
-		if ((publicKey == null) || publicKey.isEmpty()) {
+	public UserPublicProfile updatePassportEnabled(final String userId, final boolean isPassportEnabled) {
+		if ((userId == null) || userId.isEmpty()) {
 			throw new IllegalArgumentException();
 		}
 		return invokeInTransaction(entityManagerFactory, new TrCallable<UserPublicProfile>() {
@@ -223,7 +223,7 @@ public class UserProfileDAO {
 			@Override
 			public UserPublicProfile
 					call(EntityManager entityManager) {
-				UserPublicProfile userPublicProfile = entityManager.find(UserPublicProfile.class, publicKey);
+				UserPublicProfile userPublicProfile = entityManager.find(UserPublicProfile.class, userId);
 				if (userPublicProfile == null) {
 					return null;
 				}

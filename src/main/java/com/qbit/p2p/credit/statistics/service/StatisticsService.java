@@ -64,7 +64,7 @@ public class StatisticsService {
 			openessRating += user.getSocialLinks().size() * SOCIAL_LINKS_RATING;
 		}
 		
-		statisticsDAO.updateOpennessRating(user.getPublicKey(), openessRating);
+		statisticsDAO.updateOpennessRating(user.getUserId(), openessRating);
 		
 		return openessRating;
 	}
@@ -82,10 +82,10 @@ public class StatisticsService {
 		filterItem.setFilterCondition(FilterCondition.EQUAL);
 		filterItem.setFilterValue("SUCCESS");
 		filter.setFilterItems(Arrays.asList(filterItem));
-		long successLength = orderDAO.lengthWithFilter(publicKey, filter, null);
+		long successLength = orderDAO.lengthWithFilter(publicKey, filter);
 		filterItem.setFilterValue("NOT_SUCCESS");
 		filter.setFilterItems(Arrays.asList(filterItem));
-		long notSuccessLength = orderDAO.lengthWithFilter(publicKey, filter, null);
+		long notSuccessLength = orderDAO.lengthWithFilter(publicKey, filter);
 		statistics.setOrdersRating(successLength - notSuccessLength);
 		
 		statistics.setOrdersValue(0); // TODO
@@ -95,7 +95,7 @@ public class StatisticsService {
 		filterItem.setFilterCondition(FilterCondition.NOT_EQUAL);
 		filterItem.setFilterValue("OPENED");
 		filter.setFilterItems(Arrays.asList(filterItem));
-		long transactionsCount = orderDAO.lengthWithFilter(publicKey, filter, null);
+		long transactionsCount = orderDAO.lengthWithFilter(publicKey, filter);
 		statistics.setOrdersCount(transactionsCount);
 
 		filterItem = new FilterItem();
@@ -103,7 +103,7 @@ public class StatisticsService {
 		filterItem.setFilterCondition(FilterCondition.EQUAL);
 		filterItem.setFilterValue("SUCCESS");
 		filter.setFilterItems(Arrays.asList(filterItem));
-		long allSuccessTransactions = orderDAO.lengthWithFilter(publicKey, filter, null);
+		long allSuccessTransactions = orderDAO.lengthWithFilter(publicKey, filter);
 		statistics.setSuccessOrdersCount(allSuccessTransactions);
 
 		statisticsDAO.updateUserOrdersStatistics(statistics);

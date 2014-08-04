@@ -34,11 +34,10 @@ public class Respond implements Identifiable<String>, Serializable {
 	@ManyToOne(optional=false)
 	@JoinColumn(name="ORDERINFO_ID",referencedColumnName="ID")
 	private OrderInfo orderInfo;
-	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private String id;
-	private String userPublicKey;
+	private String userId;
 	@XmlJavaTypeAdapter(DateAdapter.class)
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date creationDate;
@@ -62,12 +61,12 @@ public class Respond implements Identifiable<String>, Serializable {
 		this.orderInfo = orderInfo;
 	}
 
-	public String getUserPublicKey() {
-		return userPublicKey;
+	public String getUserId() {
+		return userId;
 	}
 
-	public void setUserPublicKey(String userPublicKey) {
-		this.userPublicKey = userPublicKey;
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 	public Date getCreationDate() {
@@ -110,6 +109,6 @@ public class Respond implements Identifiable<String>, Serializable {
 
 	@Override
 	public String toString() {
-		return "Respond{" + "orderInfo=" + orderInfo + ", id=" + id + ", userPublicKey=" + userPublicKey + ", creationDate=" + creationDate + ", comment=" + comment + '}';
+		return "Respond{" + "orderInfo=" + orderInfo + ", id=" + id + ", userId=" + userId + ", creationDate=" + creationDate + ", comment=" + comment + '}';
 	}
 }

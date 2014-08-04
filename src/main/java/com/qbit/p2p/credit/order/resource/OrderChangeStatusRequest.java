@@ -1,12 +1,15 @@
 package com.qbit.p2p.credit.order.resource;
 
 import com.qbit.p2p.credit.order.model.OrderStatus;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Alexander_Sergeev
  */
 @XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class OrderChangeStatusRequest {
 
 	private String orderId;
@@ -35,5 +38,10 @@ public class OrderChangeStatusRequest {
 
 	public void setStatus(OrderStatus status) {
 		this.status = status;
+	}
+
+	@Override
+	public String toString() {
+		return "OrderChangeStatusRequest{" + "orderId=" + orderId + ", comment=" + comment + ", status=" + status + '}';
 	}
 }

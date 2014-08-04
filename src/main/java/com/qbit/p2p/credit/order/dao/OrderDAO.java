@@ -9,7 +9,7 @@ import com.qbit.p2p.credit.commons.model.Currency;
 import com.qbit.p2p.credit.order.model.FilterCondition;
 import com.qbit.p2p.credit.order.model.FilterItem;
 import com.qbit.p2p.credit.order.model.FilterOperator;
-import com.qbit.p2p.credit.order.model.OrderCategory;
+import com.qbit.p2p.credit.order.model.Category;
 import com.qbit.p2p.credit.order.model.OrderInfo;
 import com.qbit.p2p.credit.order.model.OrderStatus;
 import com.qbit.p2p.credit.order.model.Respond;
@@ -17,6 +17,8 @@ import com.qbit.p2p.credit.order.model.SearchRequest;
 import com.qbit.p2p.credit.statistics.model.Statistics;
 import com.qbit.p2p.credit.user.model.Language;
 import com.qbit.p2p.credit.user.model.UserPublicProfile;
+import com.qbit.p2p.credit.user.dao.UserProfileDAO;
+import com.qbit.p2p.credit.env.Env;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -48,44 +50,16 @@ public class OrderDAO {
 	@Inject
 	private EntityManagerFactory entityManagerFactory;
 
+	@Inject
+	private Env env;
+	@Inject
+	private UserProfileDAO profileDAO;
+
 	public OrderInfo find(String id) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {
 			return DAOUtil.find(entityManagerFactory.createEntityManager(),
-					OrderInfo.class, id, null);
-		} finally {
-			entityManager.close();
-		}
-	}
-
-	public List<OrderInfo> findByUser(String userPublicKey, int offset, int limit) {
-		if ((userPublicKey == null) || userPublicKey.isEmpty()) {
-			return Collections.emptyList();
-		}
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		try {
-			TypedQuery<OrderInfo> query = entityManager.createNamedQuery("OrderInfo.findByUser", OrderInfo.class);
-			query.setParameter("userPublicKey", userPublicKey);
-			query.setFirstResult(offset);
-			query.setMaxResults(limit);
-			return query.getResultList();
-		} finally {
-			entityManager.close();
-		}
-	}
-
-	public List<OrderInfo> findByUserAndTimestamp(String userPublicKey, Date creationDate, int offset, int limit) {
-		if ((userPublicKey == null) || userPublicKey.isEmpty() || (creationDate == null)) {
-			throw new IllegalArgumentException();
-		}
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		try {
-			TypedQuery<OrderInfo> query = entityManager.createNamedQuery("OrderInfo.findByUserAndTimestamp", OrderInfo.class);
-			query.setParameter("userPublicKey", userPublicKey);
-			query.setParameter("creationDate", creationDate);
-			query.setFirstResult(offset);
-			query.setMaxResults(limit);
-			return query.getResultList();
+				OrderInfo.class, id, null);
 		} finally {
 			entityManager.close();
 		}
@@ -99,7 +73,7 @@ public class OrderDAO {
 
 			@Override
 			public OrderInfo call(EntityManager entityManager) {
-				UserInfo userInfo = UserDAO.findAndLock(entityManager, orderInfo.getUserPublicKey());
+				UserInfo userInfo = UserDAO.findAndLock(entityManager, orderInfo.getUserId());
 				if (userInfo == null) {
 					return null;
 				}
@@ -119,20 +93,20 @@ public class OrderDAO {
 
 			@Override
 			public OrderInfo
-					call(EntityManager entityManager) {
+				call(EntityManager entityManager) {
 				OrderInfo order = entityManager.find(OrderInfo.class, newOrder.getId(), LockModeType.PESSIMISTIC_WRITE);
 				if (order == null) {
 					return null;
 				}
-				List<OrderCategory> orderCategories = order.getCategories();
+				List<Category> orderCategories = order.getCategories();
 				if (orderCategories == null) {
-					order.setCategories(new ArrayList<OrderCategory>());
+					order.setCategories(new ArrayList<Category>());
 				}
 				order.setDuration(newOrder.getDuration());
 				order.setDurationType(newOrder.getDurationType());
-				order.setEndDate(newOrder.getEndDate());
-				order.setGivingCurrency(newOrder.getGivingCurrency());
-				order.setGivingValue(newOrder.getGivingValue());
+				order.setBookingDeadline(newOrder.getBookingDeadline());
+				order.setOutcomingCurrency(newOrder.getOutcomingCurrency());
+				order.setOutcomingAmout(newOrder.getOutcomingAmout());
 				order.setLanguages(newOrder.getLanguages());
 				order.setOrderData(newOrder.getOrderData());
 				if (order.getResponses() == null) {
@@ -144,9 +118,9 @@ public class OrderDAO {
 					}
 				}
 				order.setStatus(newOrder.getStatus());
-				order.setTakingCurrency(newOrder.getTakingCurrency());
-				order.setTakingValue(newOrder.getTakingValue());
-				order.setUserPublicKey(newOrder.getUserPublicKey());
+				order.setIncomingCurrency(newOrder.getIncomingCurrency());
+				order.setIncomingAmount(newOrder.getIncomingAmount());
+				order.setUserId(newOrder.getUserId());
 				order.setComment(newOrder.getComment());
 				if (newOrder.getApprovedRespondId() != null) {
 					order.setApprovedRespondId(newOrder.getApprovedRespondId());
@@ -160,17 +134,16 @@ public class OrderDAO {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {
 			return DAOUtil.find(entityManagerFactory.createEntityManager(),
-					Respond.class, id, null);
+				Respond.class, id, null);
 		} finally {
 			entityManager.close();
 		}
 	}
 
-	
+	public List<OrderInfo> findWithFilter(String userId, SearchRequest searchRequest) {
 
-	public List<OrderInfo> findWithFilter(String userPublicKey, SearchRequest filterCriteriaValue, UserPublicProfile profile) {
 		boolean sortDesc = false;
-		if ((filterCriteriaValue != null) && filterCriteriaValue.getSortOrder() != null && filterCriteriaValue.getSortOrder().equals("desc")) {
+		if ((searchRequest != null) && searchRequest.getSortOrder() != null && searchRequest.getSortOrder().equals("desc")) {
 			sortDesc = true;
 		}
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
@@ -182,9 +155,9 @@ public class OrderDAO {
 			criteria = builder.createQuery(OrderInfo.class);
 			Root<OrderInfo> order = criteria.from(OrderInfo.class);
 			criteria.select(order).distinct(true);
-			criteria = formCriteria(criteria, builder, order, type, userPublicKey, filterCriteriaValue, profile, entityManager);
+			criteria = formCriteria(userId, criteria, builder, order, type, searchRequest, entityManager);
 
-			String sortDataField = filterCriteriaValue.getSortDataField();
+			String sortDataField = searchRequest.getSortDataField();
 			if (sortDesc && sortDataField != null && !sortDataField.isEmpty()) {
 				if ("partnersRating".equals(sortDataField)) {
 					criteria.orderBy(builder.desc(order.get(sortDataField)), builder.asc(order.get("status")));
@@ -197,27 +170,27 @@ public class OrderDAO {
 			} else if (!sortDesc && sortDataField != null && !sortDataField.isEmpty()) {
 				criteria.orderBy(builder.asc(order.get(sortDataField)), builder.asc(order.get("status")));
 			} else {
-				if ((userPublicKey != null) && !userPublicKey.isEmpty()) {
+				if ((userId != null) && !userId.isEmpty()) {
 					criteria.orderBy(builder.asc(order.get("status")), builder.desc(order.get("creationDate")));
 				} else {
 					criteria.orderBy(builder.asc(order.get("status")), builder.desc(order.get("creationDate")));
 				}
 			}
 			TypedQuery<OrderInfo> query = entityManager.createQuery(criteria);
-			query.setFirstResult(filterCriteriaValue.getPageNumber() * filterCriteriaValue.getPageSize());
-			query.setMaxResults(filterCriteriaValue.getPageSize());
+			query.setFirstResult(searchRequest.getPageNumber() * searchRequest.getPageSize());
+			query.setMaxResults(searchRequest.getPageSize());
 			List<OrderInfo> orders = query.getResultList();
 			return orders;
 		} finally {
 			entityManager.close();
 		}
 	}
-	
+
 	public long lengthWithFilter(SearchRequest filterCriteriaValue) {
-		return lengthWithFilter(null, filterCriteriaValue, null);
+		return lengthWithFilter(null, filterCriteriaValue);
 	}
 
-	public long lengthWithFilter(String userPublicKey, SearchRequest filterCriteriaValue, UserPublicProfile profile) {
+	public long lengthWithFilter(String userId, SearchRequest searchRequest) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {
 			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
@@ -229,7 +202,7 @@ public class OrderDAO {
 			Root<OrderInfo> order = criteria.from(OrderInfo.class);
 
 			criteria.select(builder.countDistinct(order));
-			criteria = formCriteria(criteria, builder, order, type, userPublicKey, filterCriteriaValue, profile, entityManager);
+			criteria = formCriteria(userId, criteria, builder, order, type, searchRequest, entityManager);
 
 			return (Long) entityManager.createQuery(criteria).getSingleResult();
 		} finally {
@@ -237,15 +210,14 @@ public class OrderDAO {
 		}
 	}
 
-	private CriteriaQuery formCriteria(CriteriaQuery criteria, CriteriaBuilder builder, Root<OrderInfo> order,
-			EntityType<OrderInfo> type, String userPublicKey, SearchRequest filterCriteriaValue, UserPublicProfile profile, EntityManager entityManager) {
+	private CriteriaQuery formCriteria(String userId, CriteriaQuery criteria, CriteriaBuilder builder, Root<OrderInfo> order,
+		EntityType<OrderInfo> type, SearchRequest searchRequest, EntityManager entityManager) {
 		Predicate mainOperatorPredicate = null;
-		if ((userPublicKey != null) && !userPublicKey.isEmpty()) {
-			Expression<String> typeExpression = order.get("userPublicKey");
-			mainOperatorPredicate = builder.equal(typeExpression, userPublicKey);
+		if ((searchRequest != null) && (searchRequest.getFilterItems() == null)) {
+			searchRequest.setFilterItems(new ArrayList<FilterItem>());
 		}
 
-		List<FilterItem> filterItems = (filterCriteriaValue != null) ? filterCriteriaValue.getFilterItems() : null;
+		List<FilterItem> filterItems = (searchRequest != null) ? searchRequest.getFilterItems() : null;
 
 		if (filterItems != null && !filterItems.isEmpty()) {
 
@@ -260,6 +232,23 @@ public class OrderDAO {
 				if ((item.getFilterDataField() != null) && (item.getFilterValue() != null)) {
 					Predicate valuePredicate = null;
 					if ((item.getFilterCondition() == null) || (FilterCondition.EQUAL == item.getFilterCondition())) {
+						if ("userId".equals(item.getFilterDataField()) && "CURRENT".equals(item.getFilterValue())) {
+							if ((userId != null) && !userId.isEmpty() && !userId.contains("@")) {
+								Expression<String> typeExpression = order.get("userId");
+								valuePredicate = builder.equal(typeExpression, userId);
+								if(mainOperatorPredicate == null) {
+									mainOperatorPredicate = valuePredicate;
+								} else {
+									mainOperatorPredicate = builder.and(valuePredicate, mainOperatorPredicate);
+								}	
+							}
+							valuePredicate = builder.equal(order.get(item.getFilterDataField()), OrderStatus.valueOf(item.getFilterValue()));
+							if (statusesPredicate == null) {
+								statusesPredicate = valuePredicate;
+							} else {
+								statusesPredicate = builder.or(valuePredicate, statusesPredicate);
+							}
+						}
 						if ("status".equals(item.getFilterDataField())) {
 							valuePredicate = builder.equal(order.get(item.getFilterDataField()), OrderStatus.valueOf(item.getFilterValue()));
 							if (statusesPredicate == null) {
@@ -317,11 +306,11 @@ public class OrderDAO {
 					} else if (FilterCondition.STARTS_WITH == item.getFilterCondition()) {
 
 						valuePredicate = builder.like(
-								builder.lower(
-										order.get(
-												type.getDeclaredSingularAttribute(item.getFilterDataField(), String.class)
-										)
-								), "%" + item.getFilterValue().toLowerCase() + "%"
+							builder.lower(
+								order.get(
+									type.getDeclaredSingularAttribute(item.getFilterDataField(), String.class)
+								)
+							), "%" + item.getFilterValue().toLowerCase() + "%"
 						);
 					} else if (FilterCondition.LESS_THAN_OR_EQUAL == item.getFilterCondition()) {
 						if ("endDate".toLowerCase().equals(item.getFilterDataField().toLowerCase())) {
@@ -349,9 +338,9 @@ public class OrderDAO {
 							subquery.where(builder.greaterThanOrEqualTo(fromStatistics.get(item.getFilterDataField()), item.getFilterValue()));
 							valuePredicate = builder.in(order.get("userPublicKey")).value(subquery);
 						} else if ("responsesCount".equals(item.getFilterDataField())) {
-							TypedQuery<String> query = entityManager.createQuery("SELECT o.id FROM OrderInfo o JOIN o.responses r GROUP BY o.id HAVING count(r) >= :count AND o.userPublicKey = :publicKey", String.class);
+							TypedQuery<String> query = entityManager.createQuery("SELECT o.id FROM OrderInfo o JOIN o.responses r GROUP BY o.id HAVING count(r) >= :count AND o.userId = :userId", String.class);
 							query.setParameter("count", Long.parseLong(item.getFilterValue()));
-							query.setParameter("publicKey", userPublicKey);
+							query.setParameter("userId", userId);
 							List<String> ordersId = query.getResultList();
 
 							if ((ordersId == null) || ordersId.isEmpty()) {
@@ -363,6 +352,8 @@ public class OrderDAO {
 							TypedQuery<String> query = entityManager.createNamedQuery("OrderInfo.findByPartnersRating", String.class);
 							query.setParameter("status", OrderStatus.SUCCESS);
 							query.setParameter("rating", Long.parseLong(item.getFilterValue()));
+							query.setParameter("openessFactor", env.getUserRatingOpenessFactor());
+							query.setParameter("transactionsFactor", env.getUserRatingTransactionsFactor());
 							List<String> publicKeys = query.getResultList();
 
 							if ((publicKeys == null) || publicKeys.isEmpty()) {
@@ -430,6 +421,7 @@ public class OrderDAO {
 				mainOperatorPredicate = builder.and(itemsOperatorPredicate, mainOperatorPredicate);
 			}
 		}
+		UserPublicProfile profile = profileDAO.find(userId);
 		List<Language> userLanguages = (profile != null) ? profile.getLanguages() : null;
 		if (userLanguages != null && !userLanguages.isEmpty()) {
 			Predicate operatorPredicate = null;
