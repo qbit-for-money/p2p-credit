@@ -236,11 +236,11 @@ public class OrderDAO {
 							if ((userId != null) && !userId.isEmpty() && !userId.contains("@")) {
 								Expression<String> typeExpression = order.get("userId");
 								valuePredicate = builder.equal(typeExpression, userId);
-								if(mainOperatorPredicate == null) {
+								if (mainOperatorPredicate == null) {
 									mainOperatorPredicate = valuePredicate;
 								} else {
 									mainOperatorPredicate = builder.and(valuePredicate, mainOperatorPredicate);
-								}	
+								}
 							}
 							valuePredicate = builder.equal(order.get(item.getFilterDataField()), OrderStatus.valueOf(item.getFilterValue()));
 							if (statusesPredicate == null) {
@@ -313,7 +313,7 @@ public class OrderDAO {
 							), "%" + item.getFilterValue().toLowerCase() + "%"
 						);
 					} else if (FilterCondition.LESS_THAN_OR_EQUAL == item.getFilterCondition()) {
-						if ("endDate".toLowerCase().equals(item.getFilterDataField().toLowerCase())) {
+						if ("bookingDeadline".toLowerCase().equals(item.getFilterDataField().toLowerCase())) {
 
 							valuePredicate = builder.lessThanOrEqualTo(order.<Date>get(item.getFilterDataField()), DateUtil.stringToDate(item.getFilterValue()));
 
@@ -321,7 +321,7 @@ public class OrderDAO {
 							valuePredicate = builder.lessThanOrEqualTo(order.<String>get(item.getFilterDataField()), item.getFilterValue());
 						}
 					} else if (FilterCondition.LESS_THAN == item.getFilterCondition()) {
-						if ("endDate".toLowerCase().equals(item.getFilterDataField().toLowerCase())) {
+						if ("bookingDeadline".toLowerCase().equals(item.getFilterDataField().toLowerCase())) {
 
 							valuePredicate = builder.lessThan(order.<Date>get(item.getFilterDataField()), DateUtil.stringToDate(item.getFilterValue()));
 
@@ -329,7 +329,7 @@ public class OrderDAO {
 							valuePredicate = builder.lessThan(order.<String>get(item.getFilterDataField()), item.getFilterValue());
 						}
 					} else if (FilterCondition.GREATER_THAN_OR_EQUAL == item.getFilterCondition()) {
-						if ("endDate".toLowerCase().equals(item.getFilterDataField().toLowerCase())) {
+						if ("bookingDeadline".toLowerCase().equals(item.getFilterDataField().toLowerCase())) {
 							valuePredicate = builder.greaterThanOrEqualTo(order.<Date>get(item.getFilterDataField()), DateUtil.stringToDate(item.getFilterValue()));
 						} else if ("summaryRating".equals(item.getFilterDataField()) || "opennessRating".equals(item.getFilterDataField())) {
 							Subquery<Statistics> subquery = criteria.subquery(Statistics.class);
@@ -364,7 +364,7 @@ public class OrderDAO {
 							valuePredicate = builder.greaterThanOrEqualTo(order.<String>get(item.getFilterDataField()), item.getFilterValue());
 						}
 					} else if (FilterCondition.GREATER_THAN == item.getFilterCondition()) {
-						if ("endDate".toLowerCase().equals(item.getFilterDataField().toLowerCase())) {
+						if ("bookingDeadline".toLowerCase().equals(item.getFilterDataField().toLowerCase())) {
 							valuePredicate = builder.greaterThan(order.<Date>get(item.getFilterDataField()), DateUtil.stringToDate(item.getFilterValue()));
 						} else {
 							valuePredicate = builder.greaterThan(order.<String>get(item.getFilterDataField()), item.getFilterValue());
