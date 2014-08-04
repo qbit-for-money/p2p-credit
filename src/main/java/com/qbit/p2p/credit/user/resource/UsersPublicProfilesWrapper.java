@@ -13,9 +13,9 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 public class UsersPublicProfilesWrapper implements Serializable {
-	
+
 	@XmlElement
-    @XmlList
+	@XmlList
 	private List<UserPublicProfile> users;
 	@XmlElement
 	private long length;
@@ -35,5 +35,5 @@ public class UsersPublicProfilesWrapper implements Serializable {
 	public Number getLength() {
 		return length;
 	}
-    
+
 }

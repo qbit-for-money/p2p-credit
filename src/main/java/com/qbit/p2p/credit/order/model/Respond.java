@@ -29,11 +29,11 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Respond implements Identifiable<String>, Serializable {
+	private static final long serialVersionUID = 1L;
+	
 	@ManyToOne(optional=false)
 	@JoinColumn(name="ORDERINFO_ID",referencedColumnName="ID")
 	private OrderInfo orderInfo;
-
-	private static final long serialVersionUID = 1L;
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)

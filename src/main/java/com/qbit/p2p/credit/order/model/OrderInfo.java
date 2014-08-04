@@ -1,9 +1,7 @@
 package com.qbit.p2p.credit.order.model;
 
 import com.qbit.commons.model.Identifiable;
-import com.qbit.p2p.credit.commons.model.Currency;
 import com.qbit.p2p.credit.commons.model.DateAdapter;
-import com.qbit.p2p.credit.money.model.serialization.CurrencyAdapter;
 import com.qbit.p2p.credit.user.model.Language;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -239,7 +237,7 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 
 	public boolean isValid() {
 		return (endDate != null)
-			&& (duration != 0)
+			&& (duration >= 0)
 			&& (durationType != null)
 			&& (userPublicKey != null)
 			&& !userPublicKey.isEmpty()

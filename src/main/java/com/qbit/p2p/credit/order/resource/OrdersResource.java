@@ -170,10 +170,10 @@ public class OrdersResource {
 			}
 			wrapper.setUserName(profileValue.getName());
 
-			String ordersSuccessSizeSum = "";
+			String ordersSuccessCountSum = "";
 			if ((profileValue.getCurrencies() != null) && !profileValue.getCurrencies().isEmpty()) {
 				for (Currency currency : profileValue.getCurrencies()) {
-					long ordersSuccessSize = 0;
+					long ordersSuccessCount = 0;
 					SearchRequest filter = new SearchRequest();
 					FilterItem item = new FilterItem();
 					item.setFilterDataField("status");
@@ -186,12 +186,12 @@ public class OrdersResource {
 					item.setFilterOperator(FilterOperator.AND);
 
 					filter.setFilterItems(Arrays.asList(item, currencyItem));
-					ordersSuccessSize = orderDAO.lengthWithFilter(profileValue.getPublicKey(), filter, null);
-					ordersSuccessSizeSum += (currency.getCode() + ": " + ordersSuccessSize + " / ");
+					ordersSuccessCount = orderDAO.lengthWithFilter(profileValue.getPublicKey(), filter, null);
+					ordersSuccessCountSum += (currency.getCode() + ": " + ordersSuccessCount + " / ");
 				}
-				ordersSuccessSizeSum = ordersSuccessSizeSum.substring(0, ordersSuccessSizeSum.length() - 3);
+				ordersSuccessCountSum = ordersSuccessCountSum.substring(0, ordersSuccessCountSum.length() - 3);
 			}
-			wrapper.setSuccessValue(ordersSuccessSizeSum);
+			wrapper.setSuccessValue(ordersSuccessCountSum);
 			ordersWrappers.add(wrapper);
 		}
 		return new OrdersWrapper(ordersWrappers, length);

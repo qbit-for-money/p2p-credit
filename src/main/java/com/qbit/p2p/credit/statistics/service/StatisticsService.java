@@ -75,7 +75,7 @@ public class StatisticsService {
 			return null;
 		}
 		
-		Statistics statistic = new Statistics(publicKey);
+		Statistics statistics = new Statistics(publicKey);
 		SearchRequest filter = new SearchRequest();
 		FilterItem filterItem = new FilterItem();
 		filterItem.setFilterDataField("status");
@@ -86,9 +86,9 @@ public class StatisticsService {
 		filterItem.setFilterValue("NOT_SUCCESS");
 		filter.setFilterItems(Arrays.asList(filterItem));
 		long notSuccessLength = orderDAO.lengthWithFilter(publicKey, filter, null);
-		statistic.setOrdersRating(successLength - notSuccessLength);
+		statistics.setOrdersRating(successLength - notSuccessLength);
 		
-		statistic.setOrdersValue(0); // TODO
+		statistics.setOrdersValue(0); // TODO
 
 		filterItem = new FilterItem();
 		filterItem.setFilterDataField("status");
@@ -96,7 +96,7 @@ public class StatisticsService {
 		filterItem.setFilterValue("OPENED");
 		filter.setFilterItems(Arrays.asList(filterItem));
 		long transactionsCount = orderDAO.lengthWithFilter(publicKey, filter, null);
-		statistic.setOrdersCount(transactionsCount);
+		statistics.setOrdersCount(transactionsCount);
 
 		filterItem = new FilterItem();
 		filterItem.setFilterDataField("status");
@@ -104,11 +104,11 @@ public class StatisticsService {
 		filterItem.setFilterValue("SUCCESS");
 		filter.setFilterItems(Arrays.asList(filterItem));
 		long allSuccessTransactions = orderDAO.lengthWithFilter(publicKey, filter, null);
-		statistic.setSuccessOrdersCount(allSuccessTransactions);
+		statistics.setSuccessOrdersCount(allSuccessTransactions);
 
-		statisticsDAO.updateUserOrdersStatistics(statistic);
+		statisticsDAO.updateUserOrdersStatistics(statistics);
 		
-		return statistic;
+		return statistics;
 	}
 
 	public GlobalStatistics recalculateGlobalStatistics() {

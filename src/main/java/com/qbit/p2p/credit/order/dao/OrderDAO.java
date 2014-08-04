@@ -181,8 +181,8 @@ public class OrderDAO {
 
 			criteria = builder.createQuery(OrderInfo.class);
 			Root<OrderInfo> order = criteria.from(OrderInfo.class);
-			CriteriaQuery<Object> select = criteria.select(order).distinct(true);
-			criteria = formCriteria(criteria, builder, order, select, type, userPublicKey, filterCriteriaValue, profile, entityManager);
+			criteria.select(order).distinct(true);
+			criteria = formCriteria(criteria, builder, order, type, userPublicKey, filterCriteriaValue, profile, entityManager);
 
 			String sortDataField = filterCriteriaValue.getSortDataField();
 			if (sortDesc && sortDataField != null && !sortDataField.isEmpty()) {
@@ -228,8 +228,8 @@ public class OrderDAO {
 
 			Root<OrderInfo> order = criteria.from(OrderInfo.class);
 
-			CriteriaQuery<Object> select = criteria.select(builder.countDistinct(order));
-			criteria = formCriteria(criteria, builder, order, select, type, userPublicKey, filterCriteriaValue, profile, entityManager);
+			criteria.select(builder.countDistinct(order));
+			criteria = formCriteria(criteria, builder, order, type, userPublicKey, filterCriteriaValue, profile, entityManager);
 
 			return (Long) entityManager.createQuery(criteria).getSingleResult();
 		} finally {
@@ -237,7 +237,7 @@ public class OrderDAO {
 		}
 	}
 
-	private CriteriaQuery formCriteria(CriteriaQuery criteria, CriteriaBuilder builder, Root<OrderInfo> order, CriteriaQuery<Object> select,
+	private CriteriaQuery formCriteria(CriteriaQuery criteria, CriteriaBuilder builder, Root<OrderInfo> order,
 			EntityType<OrderInfo> type, String userPublicKey, SearchRequest filterCriteriaValue, UserPublicProfile profile, EntityManager entityManager) {
 		Predicate mainOperatorPredicate = null;
 		if ((userPublicKey != null) && !userPublicKey.isEmpty()) {

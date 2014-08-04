@@ -8,7 +8,6 @@ likeModule.directive("likeButtons", function($compile, likesResource, $timeout, 
 		},
 		link: function(scope, element, attrs) {
 			scope.userPublicKeyFromPath = $location.$$path.replace("/users/", "");
-			//scope.currentUser = $rootScope.user;
 
 			if ($rootScope.user && (scope.userPublicKeyFromPath === $rootScope.user.publicKey)) {
 				scope.isCurrentUser = true;
