@@ -72,7 +72,7 @@ public class StatisticsService {
 	public Statistics recalculateUserOrdersStatistics(String userId) {
 		UserPublicProfile user = userProfileDAO.find(userId);
 		if (user == null) {
-			return null;
+			throw new WebApplicationException();
 		}
 		
 		Statistics statistics = new Statistics(userId);
@@ -134,5 +134,14 @@ public class StatisticsService {
 		statisticsDAO.updateGlobalStatistics(statistics);
 		
 		return statistics;
+	}
+	public long recalculatePartnersRating(String userId) {
+		UserPublicProfile user = userProfileDAO.find(userId);
+		if (user == null) {
+			throw new WebApplicationException();
+		}
+		long partnersRating = statisticsDAO.calculatePartnersRating(userId);
+		statisticsDAO.updatePartnersRating(userId, partnersRating);
+		return partnersRating;
 	}
 }

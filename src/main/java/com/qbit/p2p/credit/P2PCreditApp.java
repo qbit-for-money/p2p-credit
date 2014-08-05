@@ -10,6 +10,7 @@ import com.qbit.p2p.credit.like.dao.LikeDAO;
 import com.qbit.p2p.credit.material.dao.MaterialDAO;
 import com.qbit.p2p.credit.order.dao.CategoryDAO;
 import com.qbit.p2p.credit.order.dao.OrderDAO;
+import com.qbit.p2p.credit.order.dao.OrderFlowDAO;
 import com.qbit.p2p.credit.order.resource.CategoriesResource;
 import com.qbit.p2p.credit.order.resource.ResponsesResource;
 import com.qbit.p2p.credit.order.service.OrderFlowScheduler;
@@ -60,6 +61,7 @@ public class P2PCreditApp extends Application {
 		addBinding(newBinder(UserProfileDAO.class).to(UserProfileDAO.class).in(Singleton.class), configuration);
 		addBinding(newBinder(LanguageDAO.class).to(LanguageDAO.class).in(Singleton.class), configuration);
 		addBinding(newBinder(OrderDAO.class).to(OrderDAO.class).in(Singleton.class), configuration);
+		addBinding(newBinder(OrderFlowDAO.class).to(OrderFlowDAO.class).in(Singleton.class), configuration);
 		addBinding(newBinder(CategoryDAO.class).to(CategoryDAO.class).in(Singleton.class), configuration);
 		addBinding(newBinder(CategoriesResource.class).to(CategoriesResource.class).in(Singleton.class), configuration);
 		addBinding(newBinder(ResponsesResource.class).to(ResponsesResource.class).in(Singleton.class), configuration);

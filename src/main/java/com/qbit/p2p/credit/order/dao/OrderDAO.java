@@ -9,10 +9,8 @@ import com.qbit.p2p.credit.commons.model.Currency;
 import com.qbit.p2p.credit.order.model.FilterCondition;
 import com.qbit.p2p.credit.order.model.FilterItem;
 import com.qbit.p2p.credit.order.model.FilterOperator;
-import com.qbit.p2p.credit.order.model.Category;
 import com.qbit.p2p.credit.order.model.OrderInfo;
 import com.qbit.p2p.credit.order.model.OrderStatus;
-import com.qbit.p2p.credit.order.model.Respond;
 import com.qbit.p2p.credit.order.model.SearchRequest;
 import com.qbit.p2p.credit.statistics.model.Statistics;
 import com.qbit.p2p.credit.user.model.Language;
@@ -22,7 +20,6 @@ import com.qbit.p2p.credit.env.Env;
 import com.qbit.p2p.credit.order.model.SortOrder;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import javax.inject.Inject;
@@ -33,14 +30,12 @@ import javax.persistence.LockModeType;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 import javax.persistence.metamodel.EntityType;
-import javax.ws.rs.WebApplicationException;
 
 /**
  *
@@ -100,10 +95,7 @@ public class OrderDAO {
 				if (order == null) {
 					return null;
 				}
-				List<Category> orderCategories = order.getCategories();
-				if (orderCategories == null) {
-					order.setCategories(new ArrayList<Category>());
-				}
+				order.setCategories(newOrder.getCategories());
 				order.setDuration(newOrder.getDuration());
 				order.setDurationType(newOrder.getDurationType());
 				order.setBookingDeadline(newOrder.getBookingDeadline());
@@ -123,45 +115,6 @@ public class OrderDAO {
 		});
 	}
 
-	public OrderInfo addRespond(final Respond respond, final String orderId) {
-		if (respond == null) {
-			throw new IllegalArgumentException();
-		}
-		return invokeInTransaction(entityManagerFactory, new TrCallable<OrderInfo>() {
-
-			@Override
-			public OrderInfo
-				call(EntityManager entityManager) {
-				OrderInfo order = entityManager.find(OrderInfo.class, orderId, LockModeType.PESSIMISTIC_WRITE);
-				if ((order == null) || order.getUserId().equals(respond.getUserId())) {
-					return null;
-				}
-				if (order.getResponses() != null) {
-					for (Respond orderRespond : order.getResponses()) {
-						if (orderRespond.getUserId().equals(respond.getUserId())) {
-							return null;
-						}
-					}
-				} else {
-					order.setResponses(new ArrayList<Respond>());
-				}
-				order.getResponses().add(respond);
-				entityManager.merge(order);
-				return order;
-			}
-		});
-	}
-
-	public Respond findRespond(String id) {
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		try {
-			return DAOUtil.find(entityManagerFactory.createEntityManager(),
-				Respond.class, id, null);
-		} finally {
-			entityManager.close();
-		}
-	}
-
 	public List<OrderInfo> findWithFilter(String userId, SearchRequest searchRequest) {
 
 		boolean sortDesc = false;
@@ -172,24 +125,21 @@ public class OrderDAO {
 		try {
 			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 			CriteriaQuery criteria;
-			EntityType<OrderInfo> type = entityManager.getMetamodel().entity(OrderInfo.class);
 
 			criteria = builder.createQuery(OrderInfo.class);
 			Root<OrderInfo> order = criteria.from(OrderInfo.class);
 			criteria.select(order).distinct(true);
-			criteria = formCriteria(userId, criteria, builder, order, type, searchRequest, entityManager);
+			criteria = formCriteria(userId, criteria, builder, order, searchRequest, entityManager);
 
 			String sortDataField = searchRequest.getSortDataField();
-			if (sortDesc && sortDataField != null && !sortDataField.isEmpty()) {
-				criteria.orderBy(builder.desc(order.get(sortDataField)), builder.asc(order.get("status")));
-			} else if (!sortDesc && sortDataField != null && !sortDataField.isEmpty()) {
-				criteria.orderBy(builder.asc(order.get(sortDataField)), builder.asc(order.get("status")));
-			} else {
-				if ((userId != null) && !userId.isEmpty()) {
-					criteria.orderBy(builder.asc(order.get("status")), builder.desc(order.get("creationDate")));
+			if (sortDataField != null && !sortDataField.isEmpty()) {
+				if (sortDesc) {
+					criteria.orderBy(builder.desc(order.get(sortDataField)), builder.asc(order.get("status")));
 				} else {
-					criteria.orderBy(builder.asc(order.get("status")), builder.desc(order.get("creationDate")));
+					criteria.orderBy(builder.asc(order.get(sortDataField)), builder.asc(order.get("status")));
 				}
+			} else {
+				criteria.orderBy(builder.asc(order.get("status")), builder.desc(order.get("creationDate")));
 			}
 			TypedQuery<OrderInfo> query = entityManager.createQuery(criteria);
 			query.setFirstResult(searchRequest.getPageNumber() * searchRequest.getPageSize());
@@ -210,14 +160,14 @@ public class OrderDAO {
 		try {
 			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 			CriteriaQuery criteria;
-			EntityType<OrderInfo> type = entityManager.getMetamodel().entity(OrderInfo.class);
+			
 
 			criteria = builder.createQuery(Long.class);
 
 			Root<OrderInfo> order = criteria.from(OrderInfo.class);
 
 			criteria.select(builder.countDistinct(order));
-			criteria = formCriteria(userId, criteria, builder, order, type, searchRequest, entityManager);
+			criteria = formCriteria(userId, searchRequest, entityManager, criteria, builder);
 
 			return (Long) entityManager.createQuery(criteria).getSingleResult();
 		} finally {
@@ -225,8 +175,8 @@ public class OrderDAO {
 		}
 	}
 
-	private CriteriaQuery formCriteria(String userId, CriteriaQuery criteria, CriteriaBuilder builder, Root<OrderInfo> order,
-		EntityType<OrderInfo> type, SearchRequest searchRequest, EntityManager entityManager) {
+	private CriteriaQuery formCriteria(String userId, SearchRequest searchRequest, EntityManager entityManager, CriteriaQuery criteria, CriteriaBuilder builder) {
+		Root<OrderInfo> order = criteria.from(OrderInfo.class);
 		Predicate mainOperatorPredicate = null;
 		if ((searchRequest != null) && (searchRequest.getFilterItems() == null)) {
 			searchRequest.setFilterItems(new ArrayList<FilterItem>());
@@ -319,7 +269,7 @@ public class OrderDAO {
 							valuePredicate = builder.notEqual(order.get(item.getFilterDataField()), item.getFilterValue());
 						}
 					} else if (FilterCondition.STARTS_WITH == item.getFilterCondition()) {
-
+						EntityType<OrderInfo> type = entityManager.getMetamodel().entity(OrderInfo.class);
 						valuePredicate = builder.like(
 							builder.lower(
 								order.get(
@@ -489,111 +439,5 @@ public class OrderDAO {
 			criteria.where(mainOperatorPredicate);
 		}
 		return criteria;
-	}
-
-	public int changeStatus(OrderInfo newOrder, String orderId, String userId) {
-		OrderInfo order = find(orderId);
-		if (!newOrder.getUserId().equals(userId) || !isValidNewOrderStatus(order.getStatus(), newOrder.getStatus())) {
-			return 0;
-		}
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		try {
-			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-			CriteriaUpdate<OrderInfo> update = builder.createCriteriaUpdate(OrderInfo.class);
-			Root<OrderInfo> root = update.from(OrderInfo.class);
-			if (OrderStatus.IN_PROCESS == newOrder.getStatus()) {
-				update.set("approvedUserId", newOrder.getApprovedUserId());
-			}
-			update.set("status", newOrder.getStatus());
-			update.where(builder.equal(root.get("id"), newOrder.getId()));
-			int numberOfEntities = entityManager.createQuery(update).executeUpdate();
-
-			CriteriaUpdate<Statistics> updateStatistics = builder.createCriteriaUpdate(Statistics.class);
-			Root<Statistics> statisticsRoot = updateStatistics.from(Statistics.class);
-			updateStatistics.set("partnersRating", getPartnersRating(newOrder.getUserId()));
-			updateStatistics.where(builder.equal(statisticsRoot.get("id"), newOrder.getUserId()));
-			entityManager.createQuery(updateStatistics).executeUpdate();
-
-			if (OrderStatus.SUCCESS == newOrder.getStatus()) {
-				CriteriaUpdate<Statistics> updatePartnersStatistics = builder.createCriteriaUpdate(Statistics.class);
-				Root<Statistics> partnersStatisticsRoot = updatePartnersStatistics.from(Statistics.class);
-				updatePartnersStatistics.set("partnersRating", getPartnersRating(newOrder.getApprovedUserId()));
-				updatePartnersStatistics.where(builder.equal(partnersStatisticsRoot.get("id"), newOrder.getApprovedUserId()));
-				entityManager.createQuery(updatePartnersStatistics).executeUpdate();
-			}
-			return numberOfEntities;
-		} finally {
-			entityManager.close();
-		}
-	}
-
-	public long getPartnersRating(String userPublicKey) {
-		if ((userPublicKey == null) || userPublicKey.isEmpty()) {
-			throw new WebApplicationException();
-		}
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		try {
-			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-			CriteriaQuery<Long> criteria;
-			criteria = builder.createQuery(Long.class);
-			Root<Statistics> statistics = criteria.from(Statistics.class);
-
-			Expression<Integer> ex = statistics.get("summaryRating");
-			criteria.select(builder.sumAsLong(ex));
-
-			Subquery<String> usersIdSubquery = criteria.subquery(String.class);
-			Root fromRespond = criteria.from(Respond.class);
-			usersIdSubquery.select(fromRespond.get("userPublicKey")).distinct(true);
-
-			Subquery<String> subquery = usersIdSubquery.subquery(String.class);
-			Root fromOrderInfo = subquery.from(OrderInfo.class);
-			subquery.select(fromOrderInfo.get("approvedRespondId"));
-
-			Predicate p1 = builder.and(builder.equal(fromOrderInfo.get("userPublicKey"), userPublicKey), builder.equal(fromOrderInfo.get("status"), OrderStatus.SUCCESS));
-			subquery.where(p1);
-
-			Predicate p2 = builder.in(fromRespond.get("id")).value(subquery);
-			usersIdSubquery.where(p2);
-
-			Predicate p3 = builder.and(builder.in(statistics.get("id")).value(usersIdSubquery), builder.notEqual(statistics.get("id"), userPublicKey));
-			criteria.where(p3);
-			Long result = entityManager.createQuery(criteria).getSingleResult();
-			return (result == null) ? 0 : result;
-		} finally {
-			entityManager.close();
-		}
-	}
-
-	public long getMaxSummaryRating() {
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		try {
-			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-			CriteriaQuery<Long> criteria;
-			criteria = builder.createQuery(Long.class);
-			Root<Statistics> statistics = criteria.from(Statistics.class);
-
-			Expression<Long> ex = statistics.get("summaryRating");
-			criteria.select(builder.max(ex));
-			Long result = entityManager.createQuery(criteria).getSingleResult();
-			return (result == null) ? 0 : result;
-		} finally {
-			entityManager.close();
-		}
-	}
-
-	private boolean isValidNewOrderStatus(OrderStatus oldStatus, OrderStatus newStatus) {
-		if (newStatus == oldStatus) {
-			return false;
-		}
-		if ((OrderStatus.IN_PROCESS == oldStatus) && (OrderStatus.OPENED == newStatus)) {
-			return false;
-		}
-		return !isСompleted(oldStatus);
-	}
-
-	private boolean isСompleted(OrderStatus status) {
-		return ((status == OrderStatus.SUCCESS)
-			|| (status == OrderStatus.NOT_SUCCESS)
-			|| (status == OrderStatus.ARBITRATION));
 	}
 }
