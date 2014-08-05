@@ -64,8 +64,8 @@ public class ResponsesResource {
 				if (respond.getUserId().equals(respondRequest.getUserId()) && (order.getApprovedUserId() == null)) {
 					order.setApprovedUserId(respond.getUserId());
 					order.setStatus(OrderStatus.IN_PROCESS);
-					orderDAO.changeStatus(order, order.getId(), order.getUserId());
-					return order;
+					int numberOfEntities = orderDAO.changeStatus(order, order.getId(), order.getUserId());
+					return (numberOfEntities == 0) ? null : order;
 				}
 			}
 		}
