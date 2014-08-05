@@ -251,7 +251,7 @@ public class OrderDAO {
 			Predicate givingCurrencyPredicate = null;
 
 			for (FilterItem item : filterItems) {
-				/*if ((item.getFilterDataField() != null) && (item.getFilterValue() != null)) {
+				if ((item.getFilterDataField() != null) && (item.getFilterValue() != null)) {
 					Predicate valuePredicate = null;
 					if ((item.getFilterCondition() == null) || (FilterCondition.EQUAL == item.getFilterCondition())) {
 						if ("userId".equals(item.getFilterDataField()) && "CURRENT".equals(item.getFilterValue())) {
@@ -399,7 +399,7 @@ public class OrderDAO {
 					} else if (FilterOperator.OR == item.getFilterOperator()) {
 						itemsOperatorPredicate = builder.or(valuePredicate, itemsOperatorPredicate);
 					}
-				}*/
+				}
 			}
 			if (languagesPredicate != null) {
 				if (mainOperatorPredicate == null) {
