@@ -15,7 +15,6 @@ public class OrderWrapper {
 	private OrderInfo order;
 	private ShortProfile shortProfile;
 	private Statistics statistics;
-	private long partnersRating;
 
 	public OrderWrapper() {
 	}
@@ -48,16 +47,8 @@ public class OrderWrapper {
 		this.statistics = statistics;
 	}
 
-	public long getPartnersRating() {
-		return partnersRating;
-	}
-
-	public void setPartnersRating(long partnersRating) {
-		this.partnersRating = partnersRating;
-	}
-
 	@Override
 	public String toString() {
-		return "OrderWrapper{" + "order=" + order + ", shortProfile=" + shortProfile + ", statistics=" + statistics + ", partnersRating=" + partnersRating + '}';
+		return "OrderWrapper{" + "order=" + order + ", shortProfile=" + shortProfile + ", statistics=" + statistics + '}';
 	}
 }

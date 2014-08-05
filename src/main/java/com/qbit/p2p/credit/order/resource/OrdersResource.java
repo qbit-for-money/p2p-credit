@@ -5,7 +5,6 @@ import com.qbit.commons.auth.AuthFilter;
 import com.qbit.p2p.credit.order.dao.OrderDAO;
 import com.qbit.p2p.credit.order.model.Comment;
 import com.qbit.p2p.credit.order.model.OrderInfo;
-import com.qbit.p2p.credit.order.model.OrderStatus;
 import com.qbit.p2p.credit.statistics.service.StatisticsService;
 import java.util.List;
 import javax.inject.Inject;

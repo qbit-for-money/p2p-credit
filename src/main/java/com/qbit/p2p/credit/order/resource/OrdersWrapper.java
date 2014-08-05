@@ -1,10 +1,8 @@
 package com.qbit.p2p.credit.order.resource;
 
-import com.qbit.p2p.credit.order.dao.OrderDAO;
 import com.qbit.p2p.credit.order.model.OrderInfo;
 import com.qbit.p2p.credit.statistics.dao.StatisticsDAO;
 import com.qbit.p2p.credit.statistics.model.Statistics;
-import com.qbit.p2p.credit.user.model.UserPublicProfile;
 import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
@@ -28,8 +26,6 @@ public class OrdersWrapper {
 	private long length;
 	@Inject
 	private StatisticsDAO statisticsDAO;
-	@Inject
-	private OrderDAO orderDAO;
 
 	public OrdersWrapper() {
 	}
@@ -40,7 +36,6 @@ public class OrdersWrapper {
 			OrderWrapper wrapper = new OrderWrapper(order);
 			Statistics statistics = statisticsDAO.find(order.getUserId());
 			wrapper.setStatistics(statistics);
-			wrapper.setPartnersRating(orderDAO.getPartnersRating(order.getUserId()));
 			orderWrappers.add(wrapper);
 		}
 		this.length = length;

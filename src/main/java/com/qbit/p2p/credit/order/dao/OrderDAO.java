@@ -137,8 +137,8 @@ public class OrderDAO {
 					return null;
 				}
 				if (order.getResponses() != null) {
-					for (Respond orderResponse : order.getResponses()) {
-						if (orderResponse.getUserId().equals(respond.getUserId())) {
+					for (Respond orderRespond : order.getResponses()) {
+						if (orderRespond.getUserId().equals(respond.getUserId())) {
 							return null;
 						}
 					}
