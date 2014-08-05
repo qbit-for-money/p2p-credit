@@ -19,6 +19,7 @@ import com.qbit.p2p.credit.user.model.Language;
 import com.qbit.p2p.credit.user.model.UserPublicProfile;
 import com.qbit.p2p.credit.user.dao.UserProfileDAO;
 import com.qbit.p2p.credit.env.Env;
+import com.qbit.p2p.credit.order.model.SortOrder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -32,6 +33,7 @@ import javax.persistence.LockModeType;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
@@ -109,22 +111,42 @@ public class OrderDAO {
 				order.setOutcomingAmout(newOrder.getOutcomingAmout());
 				order.setLanguages(newOrder.getLanguages());
 				order.setOrderData(newOrder.getOrderData());
-				if (order.getResponses() == null) {
-					order.setResponses(new ArrayList<Respond>());
-				}
-				for (Respond r : newOrder.getResponses()) {
-					if (!order.getResponses().contains(r)) {
-						order.getResponses().add(r);
-					}
-				}
+				order.setResponses(newOrder.getResponses());
 				order.setStatus(newOrder.getStatus());
 				order.setIncomingCurrency(newOrder.getIncomingCurrency());
 				order.setIncomingAmount(newOrder.getIncomingAmount());
 				order.setUserId(newOrder.getUserId());
 				order.setComment(newOrder.getComment());
-				if (newOrder.getApprovedRespondId() != null) {
-					order.setApprovedRespondId(newOrder.getApprovedRespondId());
+				order.setApprovedUserId(newOrder.getApprovedUserId());
+				return order;
+			}
+		});
+	}
+
+	public OrderInfo addRespond(final Respond respond, final String orderId) {
+		if (respond == null) {
+			throw new IllegalArgumentException();
+		}
+		return invokeInTransaction(entityManagerFactory, new TrCallable<OrderInfo>() {
+
+			@Override
+			public OrderInfo
+				call(EntityManager entityManager) {
+				OrderInfo order = entityManager.find(OrderInfo.class, orderId, LockModeType.PESSIMISTIC_WRITE);
+				if ((order == null) || order.getUserId().equals(respond.getUserId())) {
+					return null;
 				}
+				if (order.getResponses() != null) {
+					for (Respond orderResponse : order.getResponses()) {
+						if (orderResponse.getUserId().equals(respond.getUserId())) {
+							return null;
+						}
+					}
+				} else {
+					order.setResponses(new ArrayList<Respond>());
+				}
+				order.getResponses().add(respond);
+				entityManager.merge(order);
 				return order;
 			}
 		});
@@ -143,7 +165,7 @@ public class OrderDAO {
 	public List<OrderInfo> findWithFilter(String userId, SearchRequest searchRequest) {
 
 		boolean sortDesc = false;
-		if ((searchRequest != null) && searchRequest.getSortOrder() != null && searchRequest.getSortOrder().equals("desc")) {
+		if ((searchRequest != null) && searchRequest.getSortOrder() != null && searchRequest.getSortOrder() == SortOrder.DESC) {
 			sortDesc = true;
 		}
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
@@ -476,6 +498,42 @@ public class OrderDAO {
 		return criteria;
 	}
 
+	public int changeStatus(OrderInfo newOrder, String orderId, String userId) {
+		OrderInfo order = find(orderId);
+		if (!newOrder.getUserId().equals(userId) || !isValidNewOrderStatus(order.getStatus(), newOrder.getStatus())) {
+			return 0;
+		}
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		try {
+			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+			CriteriaUpdate<OrderInfo> update = builder.createCriteriaUpdate(OrderInfo.class);
+			Root<OrderInfo> root = update.from(OrderInfo.class);
+			if (OrderStatus.IN_PROCESS == newOrder.getStatus()) {
+				update.set("approvedUserId", newOrder.getApprovedUserId());
+			}
+			update.set("status", newOrder.getStatus());
+			update.where(builder.equal(root.get("id"), newOrder.getId()));
+			int numberOfEntities = entityManager.createQuery(update).executeUpdate();
+
+			CriteriaUpdate<Statistics> updateStatistics = builder.createCriteriaUpdate(Statistics.class);
+			Root<Statistics> statisticsRoot = updateStatistics.from(Statistics.class);
+			updateStatistics.set("partnersRating", getPartnersRating(newOrder.getUserId()));
+			updateStatistics.where(builder.equal(statisticsRoot.get("id"), newOrder.getUserId()));
+			entityManager.createQuery(updateStatistics).executeUpdate();
+			
+			if (OrderStatus.SUCCESS == newOrder.getStatus()) {
+				CriteriaUpdate<Statistics> updatePartnersStatistics = builder.createCriteriaUpdate(Statistics.class);
+				Root<Statistics> partnersStatisticsRoot = updatePartnersStatistics.from(Statistics.class);
+				updatePartnersStatistics.set("partnersRating", getPartnersRating(newOrder.getApprovedUserId()));
+				updatePartnersStatistics.where(builder.equal(partnersStatisticsRoot.get("id"), newOrder.getApprovedUserId()));
+				entityManager.createQuery(updatePartnersStatistics).executeUpdate();
+			}
+			return numberOfEntities;
+		} finally {
+			entityManager.close();
+		}
+	}
+
 	public long getPartnersRating(String userPublicKey) {
 		if ((userPublicKey == null) || userPublicKey.isEmpty()) {
 			throw new WebApplicationException();
@@ -528,5 +586,21 @@ public class OrderDAO {
 		} finally {
 			entityManager.close();
 		}
+	}
+
+	private boolean isValidNewOrderStatus(OrderStatus oldStatus, OrderStatus newStatus) {
+		if (newStatus == oldStatus) {
+			return false;
+		}
+		if ((OrderStatus.IN_PROCESS == oldStatus) && (OrderStatus.OPENED == newStatus)) {
+			return false;
+		}
+		return !isСompleted(oldStatus);
+	}
+
+	private boolean isСompleted(OrderStatus status) {
+		return ((status == OrderStatus.SUCCESS)
+			|| (status == OrderStatus.NOT_SUCCESS)
+			|| (status == OrderStatus.ARBITRATION));
 	}
 }

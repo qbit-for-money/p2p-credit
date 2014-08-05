@@ -69,23 +69,23 @@ public class StatisticsService {
 		return openessRating;
 	}
 
-	public Statistics recalculateUserOrdersStatistics(String publicKey) {
-		UserPublicProfile user = userProfileDAO.find(publicKey);
+	public Statistics recalculateUserOrdersStatistics(String userId) {
+		UserPublicProfile user = userProfileDAO.find(userId);
 		if (user == null) {
 			return null;
 		}
 		
-		Statistics statistics = new Statistics(publicKey);
+		Statistics statistics = new Statistics(userId);
 		SearchRequest filter = new SearchRequest();
 		FilterItem filterItem = new FilterItem();
 		filterItem.setFilterDataField("status");
 		filterItem.setFilterCondition(FilterCondition.EQUAL);
 		filterItem.setFilterValue("SUCCESS");
 		filter.setFilterItems(Arrays.asList(filterItem));
-		long successLength = orderDAO.lengthWithFilter(publicKey, filter);
+		long successLength = orderDAO.lengthWithFilter(userId, filter);
 		filterItem.setFilterValue("NOT_SUCCESS");
 		filter.setFilterItems(Arrays.asList(filterItem));
-		long notSuccessLength = orderDAO.lengthWithFilter(publicKey, filter);
+		long notSuccessLength = orderDAO.lengthWithFilter(userId, filter);
 		statistics.setOrdersRating(successLength - notSuccessLength);
 		
 		statistics.setOrdersValue(0); // TODO
@@ -95,7 +95,7 @@ public class StatisticsService {
 		filterItem.setFilterCondition(FilterCondition.NOT_EQUAL);
 		filterItem.setFilterValue("OPENED");
 		filter.setFilterItems(Arrays.asList(filterItem));
-		long transactionsCount = orderDAO.lengthWithFilter(publicKey, filter);
+		long transactionsCount = orderDAO.lengthWithFilter(userId, filter);
 		statistics.setOrdersCount(transactionsCount);
 
 		filterItem = new FilterItem();
@@ -103,7 +103,7 @@ public class StatisticsService {
 		filterItem.setFilterCondition(FilterCondition.EQUAL);
 		filterItem.setFilterValue("SUCCESS");
 		filter.setFilterItems(Arrays.asList(filterItem));
-		long allSuccessTransactions = orderDAO.lengthWithFilter(publicKey, filter);
+		long allSuccessTransactions = orderDAO.lengthWithFilter(userId, filter);
 		statistics.setSuccessOrdersCount(allSuccessTransactions);
 
 		statisticsDAO.updateUserOrdersStatistics(statistics);

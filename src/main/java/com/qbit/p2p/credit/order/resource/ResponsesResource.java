@@ -38,33 +38,15 @@ public class ResponsesResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public OrderInfo createRespond(RespondCreationRequest respondRequest) {
-		String id = AuthFilter.getUserId(request);
+		String userId = AuthFilter.getUserId(request);
 		if ((respondRequest == null) || (respondRequest.getOrderId() == null) || respondRequest.getOrderId().isEmpty()) {
 			return null;
 		}
-		OrderInfo order = orderDAO.find(respondRequest.getOrderId());
-		if ((order == null) || order.getUserId().equals(id)) {
-			return null;
-		}
-		if (order.getResponses() != null) {
-			for (Respond orderResponse : order.getResponses()) {
-				if (orderResponse.getUserId().equals(id)) {
-					return null;
-				}
-			}
-		}
-
 		Respond respond = new Respond();
-		respond.setUserId(id);
+		respond.setUserId(userId);
 		respond.setCreationDate(new Date());
 		respond.setComment(respondRequest.getComment());
-		List<Respond> responses = order.getResponses();
-		if (responses == null) {
-			responses = new ArrayList<>();
-			order.setResponses(responses);
-		}
-		responses.add(respond);
-		OrderInfo o = orderDAO.update(order);
+		OrderInfo o = orderDAO.addRespond(respond, respondRequest.getOrderId());
 		return o;
 	}
 
@@ -79,11 +61,10 @@ public class ResponsesResource {
 		}
 		if (order.getResponses() != null) {
 			for (Respond respond : order.getResponses()) {
-				if (respond.getUserId().equals(respondRequest.getUserId()) && (order.getApprovedRespondId() == null)) {
-					order.setApprovedRespondId(respond.getId());
-
+				if (respond.getUserId().equals(respondRequest.getUserId()) && (order.getApprovedUserId() == null)) {
+					order.setApprovedUserId(respond.getUserId());
 					order.setStatus(OrderStatus.IN_PROCESS);
-					orderDAO.update(order);
+					orderDAO.changeStatus(order, order.getId(), order.getUserId());
 				}
 			}
 		}

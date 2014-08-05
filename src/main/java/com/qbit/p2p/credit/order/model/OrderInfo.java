@@ -28,7 +28,6 @@ import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
@@ -38,9 +37,7 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 @Entity
 @NamedQueries({
 	@NamedQuery(name = "OrderInfo.findByPartnersRating",
-		query = "SELECT t1.id FROM Statistics t0, Statistics t1 GROUP BY t0.id, t1.id HAVING t0.id IN (SELECT DISTINCT t2.userPublicKey FROM Respond t2 WHERE t2.id IN (SELECT t3.approvedRespondId FROM OrderInfo t3 WHERE (t3.status = :status) AND (t3.userId = t1.id) AND (t3.userId <> t0.id))) AND SUM(t0.opennessRating * :openessFactor + t0.ordersRating * :transactionsFactor) >= :rating"),
-	@NamedQuery(name = "OrderInfo.findByUser",
-		query = "SELECT o FROM OrderInfo o WHERE o.userPublicKey = :userPublicKey")})
+		query = "SELECT t1.id FROM Statistics t0, Statistics t1 GROUP BY t0.id, t1.id HAVING t0.id IN (SELECT DISTINCT t2.userId FROM Respond t2 WHERE t2.id IN (SELECT t3.approvedRespondId FROM OrderInfo t3 WHERE (t3.status = :status) AND (t3.userId = t1.id) AND (t3.userId <> t0.id))) AND SUM(t0.opennessRating * :openessFactor + t0.ordersRating * :transactionsFactor) >= :rating")})
 @Access(AccessType.FIELD)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -78,7 +75,7 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 
 	@OneToMany(cascade = CascadeType.ALL, targetEntity = Respond.class)
 	private List<Respond> responses = new ArrayList<>();
-	private String approvedRespondId;
+	private String approvedUserId;
 
 	@OneToOne(cascade = CascadeType.ALL)
 	private Comment comment;
@@ -208,12 +205,12 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 		this.responses = responses;
 	}
 
-	public String getApprovedRespondId() {
-		return approvedRespondId;
+	public String getApprovedUserId() {
+		return approvedUserId;
 	}
 
-	public void setApprovedRespondId(String approvedRespondId) {
-		this.approvedRespondId = approvedRespondId;
+	public void setApprovedUserId(String approvedUserId) {
+		this.approvedUserId = approvedUserId;
 	}
 
 	public Comment getComment() {
@@ -238,6 +235,6 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 
 	@Override
 	public String toString() {
-		return "OrderInfo{" + "id=" + id + ", userId=" + userId + ", status=" + status + ", incomingAmount=" + incomingAmount + ", incomingCurrency=" + incomingCurrency + ", outcomingAmout=" + outcomingAmout + ", outcomingCurrency=" + outcomingCurrency + ", creationDate=" + creationDate + ", bookingDeadline=" + bookingDeadline + ", duration=" + duration + ", durationType=" + durationType + ", categories=" + categories + ", languages=" + languages + ", orderData=" + orderData + ", responses=" + responses + ", approvedRespondId=" + approvedRespondId + ", comment=" + comment + '}';
+		return "OrderInfo{" + "id=" + id + ", userId=" + userId + ", status=" + status + ", incomingAmount=" + incomingAmount + ", incomingCurrency=" + incomingCurrency + ", outcomingAmout=" + outcomingAmout + ", outcomingCurrency=" + outcomingCurrency + ", creationDate=" + creationDate + ", bookingDeadline=" + bookingDeadline + ", duration=" + duration + ", durationType=" + durationType + ", categories=" + categories + ", languages=" + languages + ", orderData=" + orderData + ", responses=" + responses + ", approvedUserId=" + approvedUserId + ", comment=" + comment + '}';
 	}
 }

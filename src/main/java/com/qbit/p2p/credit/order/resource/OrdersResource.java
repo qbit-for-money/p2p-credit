@@ -65,36 +65,15 @@ public class OrdersResource {
 	@Path("status")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public OrderInfo changeOrderStatus(OrderChangeStatusRequest statusRequest) {
-		OrderInfo order = orderDAO.find(statusRequest.getOrderId());
-		if (order == null) {
-			return null;
-		}
-		String id = AuthFilter.getUserId(request);
-		if (!order.getUserId().equals(id) || !isValidNewOrderStatus(order.getStatus(), statusRequest.getStatus())) {
-			return null;
-		}
+	public int changeOrderStatus(OrderChangeStatusRequest statusRequest) {
+		OrderInfo order = new OrderInfo();
+		
+		String userId = AuthFilter.getUserId(request);
+		
 		order.setStatus(statusRequest.getStatus());
 		order.setComment(new Comment(statusRequest.getComment()));
-		return orderDAO.update(order);
+		return orderDAO.changeStatus(order, statusRequest.getOrderId(), userId);
 	}
 
-	private boolean isValidNewOrderStatus(OrderStatus oldStatus, OrderStatus newStatus) {
-		if (newStatus == oldStatus) {
-			return false;
-		}
-		if ((OrderStatus.IN_PROCESS == oldStatus) && (OrderStatus.OPENED == newStatus)) {
-			return false;
-		}
-		if (isСompleted(oldStatus)) {
-			return false;
-		}
-		return true;
-	}
 	
-	private boolean isСompleted(OrderStatus status) {
-		return ((status == OrderStatus.SUCCESS)
-			|| (status == OrderStatus.NOT_SUCCESS)
-			|| (status == OrderStatus.ARBITRATION));
-	}
 }

@@ -49,7 +49,7 @@ public class UserProfilesResource {
 		return profile;
 	}
 
-	@GET
+	/*@GET
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public UserPublicProfile getById(@PathParam("id") String userId) {
@@ -67,7 +67,7 @@ public class UserProfilesResource {
 			profile.setPersonalData(null);
 		}
 		return profile;
-	}
+	}*/
 
 	@GET
 	@Path("{id}/short")

@@ -26,7 +26,7 @@ public class Statistics implements Serializable {
 	private long ordersValue;
 	private long ordersCount;
 	private long successOrdersCount;
-
+	private long partnersRating;
 	public Statistics() {
 	}
 
@@ -80,6 +80,14 @@ public class Statistics implements Serializable {
 
 	public void setSuccessOrdersCount(long successOrdersCount) {
 		this.successOrdersCount = successOrdersCount;
+	}
+
+	public long getPartnersRating() {
+		return partnersRating;
+	}
+
+	public void setPartnersRating(long partnersRating) {
+		this.partnersRating = partnersRating;
 	}
 
 	@Override
