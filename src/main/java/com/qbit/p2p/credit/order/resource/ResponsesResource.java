@@ -65,6 +65,7 @@ public class ResponsesResource {
 					order.setApprovedUserId(respond.getUserId());
 					order.setStatus(OrderStatus.IN_PROCESS);
 					orderDAO.changeStatus(order, order.getId(), order.getUserId());
+					return order;
 				}
 			}
 		}

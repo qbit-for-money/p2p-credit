@@ -35,9 +35,9 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
  * @author Alexander_Sergeev
  */
 @Entity
-@NamedQueries({
-	@NamedQuery(name = "OrderInfo.findByPartnersRating",
-		query = "SELECT t1.id FROM Statistics t0, Statistics t1 GROUP BY t0.id, t1.id HAVING t0.id IN (SELECT DISTINCT t2.userId FROM Respond t2 WHERE t2.id IN (SELECT t3.approvedRespondId FROM OrderInfo t3 WHERE (t3.status = :status) AND (t3.userId = t1.id) AND (t3.userId <> t0.id))) AND SUM(t0.opennessRating * :openessFactor + t0.ordersRating * :transactionsFactor) >= :rating")})
+//@NamedQueries({
+//	@NamedQuery(name = "OrderInfo.findByPartnersRating",
+//		query = "SELECT t1.id FROM Statistics t0, Statistics t1 GROUP BY t0.id, t1.id HAVING t0.id IN (SELECT DISTINCT t2.userId FROM Respond t2 WHERE t2.id IN (SELECT t3.approvedRespondId FROM OrderInfo t3 WHERE (t3.status = :status) AND (t3.userId = t1.id) AND (t3.userId <> t0.id))) AND SUM(t0.opennessRating * :openessFactor + t0.ordersRating * :transactionsFactor) >= :rating")})
 @Access(AccessType.FIELD)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)

@@ -105,11 +105,11 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 		}
 	}
 
-	initOrderckEditor();
+	//initOrderckEditor();
 
 	$scope.isValidOrder = function() {
 
-		var data = CKEDITOR.instances.orderDataEditable.getData();
+		//var data = CKEDITOR.instances.orderDataEditable.getData();
 
 		var givingValue = angular.element("#giving-order-currency input").val();
 		var takingValue = angular.element("#taking-order-currency input").val();
@@ -132,7 +132,7 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 		if (takingValue && (takingValue !== "") && isNumber(takingValue) 
 				&& givingValue && (givingValue !== "") && isNumber(givingValue) 
 				&& durationValue && (durationValue !== "")
-				&& data && (data !== "")
+				//&& data && (data !== "")
 				&& $scope.orderCreatingMap['orderCategories'] && ($scope.orderCreatingMap['orderCategories'].length !== 0)
 				&& $scope.deadline && ($scope.deadline !== "")) {
 			$timeout(function() {
