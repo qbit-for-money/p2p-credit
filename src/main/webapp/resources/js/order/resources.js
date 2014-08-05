@@ -1,7 +1,7 @@
 var orderModule = angular.module("order");
 
 orderModule.factory("categoriesResource", function($resource) {
-	return $resource(window.context + "webapi/orders/categories", {}, {
+	return $resource(window.context + "webapi/categories", {}, {
 		findAll: {method: "GET"}
 	});
 });

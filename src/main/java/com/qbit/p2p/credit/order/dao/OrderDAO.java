@@ -181,14 +181,7 @@ public class OrderDAO {
 
 			String sortDataField = searchRequest.getSortDataField();
 			if (sortDesc && sortDataField != null && !sortDataField.isEmpty()) {
-				if ("partnersRating".equals(sortDataField)) {
-					criteria.orderBy(builder.desc(order.get(sortDataField)), builder.asc(order.get("status")));
-				}
-				if ("rating".equals(sortDataField)) {
-					criteria.orderBy(builder.desc(order.get(sortDataField)), builder.asc(order.get("status")));
-				} else {
-					criteria.orderBy(builder.desc(order.get(sortDataField)), builder.asc(order.get("status")));
-				}
+				criteria.orderBy(builder.desc(order.get(sortDataField)), builder.asc(order.get("status")));
 			} else if (!sortDesc && sortDataField != null && !sortDataField.isEmpty()) {
 				criteria.orderBy(builder.asc(order.get(sortDataField)), builder.asc(order.get("status")));
 			} else {
@@ -520,7 +513,7 @@ public class OrderDAO {
 			updateStatistics.set("partnersRating", getPartnersRating(newOrder.getUserId()));
 			updateStatistics.where(builder.equal(statisticsRoot.get("id"), newOrder.getUserId()));
 			entityManager.createQuery(updateStatistics).executeUpdate();
-			
+
 			if (OrderStatus.SUCCESS == newOrder.getStatus()) {
 				CriteriaUpdate<Statistics> updatePartnersStatistics = builder.createCriteriaUpdate(Statistics.class);
 				Root<Statistics> partnersStatisticsRoot = updatePartnersStatistics.from(Statistics.class);

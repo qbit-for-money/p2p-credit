@@ -22,6 +22,7 @@ userProfileModule.factory("userProfileService", function($rootScope, usersProfil
 			if (!categories) {
 				return;
 			}
+			console.log(JSON.stringify(categories))
 			if (callback) {
 				callback(categories);
 			}
@@ -32,7 +33,7 @@ userProfileModule.factory("userProfileService", function($rootScope, usersProfil
 		getAllCategories(function(categories) {
 			var allCategories = [];
 			for (var i in categories) {
-				allCategories.push(categories[i].title);
+				allCategories.push(categories[i].code);
 			}
 			if (callback) {
 				callback(allCategories);

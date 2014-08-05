@@ -41,6 +41,7 @@
 		</script>
                         
 		<script type="text/javascript" src="resources/lib/pluso/pluso.js"></script>
+		<script type="text/javascript" src="resources/lib/tinymce/js/tinymce/tinymce.min.js"></script>
 		<script type="text/javascript" src="resources/lib/jquery/jquery-2.1.0.min.js"></script>
 		<script type="text/javascript" src="resources/lib/jquery/jquery.mask.min.js"></script>
 		<script type="text/javascript" src="resources/lib/select2-3.5.0/select2.min.js"></script>

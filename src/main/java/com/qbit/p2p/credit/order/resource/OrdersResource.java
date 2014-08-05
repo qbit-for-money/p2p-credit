@@ -51,6 +51,7 @@ public class OrdersResource {
 		if (userId == null) {
 			return null;
 		}
+		System.out.println("## " + order);
 		order.setUserId(userId);
 		if (!order.isValid()) {
 			return null;
@@ -72,7 +73,5 @@ public class OrdersResource {
 		order.setStatus(statusRequest.getStatus());
 		order.setComment(new Comment(statusRequest.getComment()));
 		return orderDAO.changeStatus(order, statusRequest.getOrderId(), userId);
-	}
-
-	
+	}	
 }

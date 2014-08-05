@@ -78,13 +78,13 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 	function initCategories() {
 		userProfileService.getAllCategories(function(categories) {
 			for (var i in categories) {
-				$scope.allCategories.push(categories[i].title);
-				categoriesMap[categories[i].title] = categories[i].type;
+				$scope.allCategories.push(categories[i].code);
+				categoriesMap[categories[i].code] = categories[i].type;
 			}
 			$scope.creditInit();
 		});
 	}
-
+initCategories();
 	function initOrderckEditor() {
 		if (!$scope.scEditor.orderDataInitialized) {
 			CKEDITOR.disableAutoInline = true;
@@ -191,7 +191,7 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 		$scope.takingValue = 1000;
 		$scope.givingValue = 10;
 		$scope.durationValue = 10;
-		CKEDITOR.instances.orderDataEditable.setData(creditInitData);
+		//CKEDITOR.instances.orderDataEditable.setData(creditInitData);
 		$scope.orderCreatingMap['orderCategories'].splice(0, $scope.orderCreatingMap['orderCategories'].length);
 		$scope.orderCreatingMap['orderCategories'].push($scope.allCategories[3]);
 		$scope.isCreditInit = true;
@@ -208,7 +208,7 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 		$scope.takingValue = 10;
 		$scope.givingValue = 1000;
 		$scope.durationValue = 10;
-		CKEDITOR.instances.orderDataEditable.setData(borrowInitData);
+		//CKEDITOR.instances.orderDataEditable.setData(borrowInitData);
 		$scope.orderCreatingMap['orderCategories'].splice(0, $scope.orderCreatingMap['orderCategories'].length);
 		$scope.orderCreatingMap['orderCategories'].push($scope.allCategories[7]);
 		$scope.isCreditInit = false;
@@ -242,15 +242,15 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 			return;
 		}
 		var orderInfo = {};
-		var data = CKEDITOR.instances.orderDataEditable.getData();
+		//var data = CKEDITOR.instances.orderDataEditable.getData();
 		var givingValue = angular.element("#giving-order-currency input").val();
 		var takingValue = angular.element("#taking-order-currency input").val();
 		var durationValue = angular.element("#order-duration input").val();
 		var takingCurrency = $scope.currency.selectedTakingCurrency;
 		var givingCurrency = $scope.currency.selectedGivingCurrency;
 
-		orderInfo.orderData = data;
-		orderInfo.endDate = $scope.deadline;
+		//orderInfo.orderData = data;
+		orderInfo.bookingDeadline = $scope.deadline;
 		if (currenciesMap[takingCurrency]) {
 			orderInfo.takingCurrency = currenciesMap[takingCurrency];
 		} else {
@@ -275,7 +275,7 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 		orderInfo.categories = [];
 		for (var i in $scope.orderCreatingMap['orderCategories']) {
 			orderInfo.categories[i] = {};
-			orderInfo.categories[i].title = $scope.orderCreatingMap['orderCategories'][i];
+			orderInfo.categories[i].code = $scope.orderCreatingMap['orderCategories'][i];
 		}
 
 		var orderResponse = ordersResource.create({}, orderInfo);

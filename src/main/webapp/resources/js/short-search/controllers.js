@@ -43,7 +43,7 @@ navbarModule.controller("ShortSearchController", function($scope, $rootScope, us
 	userProfileService.getAllCategories(function(categories) {
 		$scope.allCategories.splice(0, $scope.allCategories.length);
 		for (var i in categories) {
-			$scope.allCategories.push(categories[i].title);
+			$scope.allCategories.push(categories[i].code);
 		}
 		if (getRandBinary === 1) {
 			creditInit();
