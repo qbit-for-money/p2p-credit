@@ -6,6 +6,6 @@ package com.qbit.p2p.credit.order.model;
 public class StringArrayValueProvider implements ValueProvider {
 	@Override
 	public String[] get(String value) {
-		return value.split(",");
+		return value.split(", ");
 	}
 }

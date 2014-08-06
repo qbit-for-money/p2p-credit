@@ -86,7 +86,7 @@ public class OrderFlowDAO {
 			if (OrderStatus.IN_PROCESS == status) {
 				update.set("approvedUserId", partnerId);
 			}
-			if(counteragentStatus != null) {
+			if (counteragentStatus != null) {
 				update.set("status", counteragentStatus);
 			} else {
 				update.set("status", status);

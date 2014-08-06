@@ -204,11 +204,11 @@ public class OrderDAO {
 	}
 
 	private CriteriaQuery formCriteria(String userId, SearchRequest searchRequest, EntityManager entityManager, CriteriaQuery criteria, CriteriaBuilder builder) {
-		if ((searchRequest != null) && (searchRequest.getFilterItems() == null)) {
+		if ((searchRequest == null) || (searchRequest.getFilterItems() == null)) {
 			return criteria;
 		}
 		Root<OrderInfo> order = criteria.from(OrderInfo.class);
-		List<FilterItem> filterItems = (searchRequest != null) ? searchRequest.getFilterItems() : null;
+		List<FilterItem> filterItems = searchRequest.getFilterItems();
 		Predicate prevPredicate = null;
 		for (FilterItem item : filterItems) {
 			if ((item.getFilterDataField() == null) || (item.getFilterValue() == null)) {
@@ -238,11 +238,6 @@ public class OrderDAO {
 								predicate = builder.or(containsItems, predicate);
 							}
 						}
-					} else {
-						if (valueProvider instanceof Comparable) {
-							Expression<Collection<Comparable>> comparableExpression = order.get(item.getFilterDataField());
-							predicate = builder.isMember((Comparable) valueProvider.get(item.getFilterValue()), comparableExpression);
-						}
 					}
 				case EQUAL:
 					if ("userId".equals(item.getFilterDataField()) && "CURRENT".equals(item.getFilterValue())) {
@@ -262,9 +257,7 @@ public class OrderDAO {
 					predicate = builder.like(
 						builder.lower(
 							order.get(
-								type.getDeclaredSingularAttribute(item.getFilterDataField(), String.class)
-							)
-						), "%" + item.getFilterValue().toLowerCase() + "%"
+								type.getDeclaredSingularAttribute(item.getFilterDataField(), String.class))), item.getFilterValue().toLowerCase() + "%"
 					);
 					break;
 				case LESS_THAN_OR_EQUAL:
