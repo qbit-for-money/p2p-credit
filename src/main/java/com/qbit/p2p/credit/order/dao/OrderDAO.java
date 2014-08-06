@@ -5,23 +5,25 @@ import static com.qbit.commons.dao.util.DAOUtil.invokeInTransaction;
 import com.qbit.commons.dao.util.TrCallable;
 import com.qbit.commons.user.UserDAO;
 import com.qbit.commons.user.UserInfo;
-import com.qbit.p2p.credit.commons.model.Currency;
-import com.qbit.p2p.credit.order.model.FilterCondition;
 import com.qbit.p2p.credit.order.model.FilterItem;
-import com.qbit.p2p.credit.order.model.FilterOperator;
 import com.qbit.p2p.credit.order.model.OrderInfo;
 import com.qbit.p2p.credit.order.model.OrderStatus;
 import com.qbit.p2p.credit.order.model.SearchRequest;
-import com.qbit.p2p.credit.statistics.model.Statistics;
-import com.qbit.p2p.credit.user.model.Language;
-import com.qbit.p2p.credit.user.model.UserPublicProfile;
 import com.qbit.p2p.credit.user.dao.UserProfileDAO;
 import com.qbit.p2p.credit.env.Env;
+import com.qbit.p2p.credit.order.model.DateValueProvider;
+import com.qbit.p2p.credit.order.model.IntegerValueProvider;
+import com.qbit.p2p.credit.order.model.OrderStatusArrayValueProvider;
+import com.qbit.p2p.credit.order.model.OrderStatusValueProvider;
 import com.qbit.p2p.credit.order.model.SortOrder;
-import java.util.ArrayList;
+import com.qbit.p2p.credit.order.model.StringArrayValueProvider;
+import com.qbit.p2p.credit.order.model.StringValueProvider;
+import com.qbit.p2p.credit.order.model.ValueProvider;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
@@ -31,10 +33,8 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Subquery;
 import javax.persistence.metamodel.EntityType;
 
 /**
@@ -51,6 +51,33 @@ public class OrderDAO {
 	private Env env;
 	@Inject
 	private UserProfileDAO profileDAO;
+
+	private static final Map<String, ValueProvider> VALUE_PROVIDERS_MAP;
+	private static final Map<String, String> EXPRESSION_PROVIDERS_MAP;
+
+	static {
+		ValueProvider stringValueProvider = new StringValueProvider();
+		ValueProvider integerValueProvider = new IntegerValueProvider();
+		ValueProvider dateValueProvider = new DateValueProvider();
+		ValueProvider stringArrayValueProvider = new StringArrayValueProvider();
+		ValueProvider orderStatusArrayValueProvider = new OrderStatusArrayValueProvider();
+		VALUE_PROVIDERS_MAP = new HashMap<>();
+		VALUE_PROVIDERS_MAP.put("status", new OrderStatusValueProvider());
+		VALUE_PROVIDERS_MAP.put("takingCurrency", stringValueProvider);
+		VALUE_PROVIDERS_MAP.put("givingCurrency", stringValueProvider);
+		VALUE_PROVIDERS_MAP.put("partnersRating", integerValueProvider);
+		VALUE_PROVIDERS_MAP.put("languages", stringArrayValueProvider);
+		VALUE_PROVIDERS_MAP.put("categories", stringArrayValueProvider);
+		VALUE_PROVIDERS_MAP.put("bookingDeadline", dateValueProvider);
+		VALUE_PROVIDERS_MAP.put("summaryRating", integerValueProvider);
+		VALUE_PROVIDERS_MAP.put("responsesCount", integerValueProvider);
+		VALUE_PROVIDERS_MAP.put("partnersRating", integerValueProvider);
+		VALUE_PROVIDERS_MAP.put("statuses", orderStatusArrayValueProvider);
+
+		EXPRESSION_PROVIDERS_MAP = new HashMap<>();
+		EXPRESSION_PROVIDERS_MAP.put("languages", "code");
+		EXPRESSION_PROVIDERS_MAP.put("categories", "code");
+	}
 
 	public OrderInfo find(String id) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
@@ -129,7 +156,7 @@ public class OrderDAO {
 			criteria = builder.createQuery(OrderInfo.class);
 			Root<OrderInfo> order = criteria.from(OrderInfo.class);
 			criteria.select(order).distinct(true);
-			criteria = formCriteria(userId, criteria, builder, order, searchRequest, entityManager);
+			criteria = formCriteria(userId, searchRequest, entityManager, criteria, builder);
 
 			String sortDataField = searchRequest.getSortDataField();
 			if (sortDataField != null && !sortDataField.isEmpty()) {
@@ -160,7 +187,6 @@ public class OrderDAO {
 		try {
 			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 			CriteriaQuery criteria;
-			
 
 			criteria = builder.createQuery(Long.class);
 
@@ -176,267 +202,106 @@ public class OrderDAO {
 	}
 
 	private CriteriaQuery formCriteria(String userId, SearchRequest searchRequest, EntityManager entityManager, CriteriaQuery criteria, CriteriaBuilder builder) {
-		Root<OrderInfo> order = criteria.from(OrderInfo.class);
-		Predicate mainOperatorPredicate = null;
 		if ((searchRequest != null) && (searchRequest.getFilterItems() == null)) {
-			searchRequest.setFilterItems(new ArrayList<FilterItem>());
+			return criteria;
 		}
-
+		Root<OrderInfo> order = criteria.from(OrderInfo.class);
 		List<FilterItem> filterItems = (searchRequest != null) ? searchRequest.getFilterItems() : null;
+		Predicate prevPredicate = null;
+		for (FilterItem item : filterItems) {
+			if ((item.getFilterDataField() == null) || (item.getFilterValue() == null)) {
+				continue;
+			}
 
-		if (filterItems != null && !filterItems.isEmpty()) {
-
-			Predicate itemsOperatorPredicate = null;
-			Predicate languagesPredicate = null;
-			Predicate categoriesPredicate = null;
-			Predicate statusesPredicate = null;
-			Predicate takingCurrencyPredicate = null;
-			Predicate givingCurrencyPredicate = null;
-
-			for (FilterItem item : filterItems) {
-				if ((item.getFilterDataField() != null) && (item.getFilterValue() != null)) {
-					Predicate valuePredicate = null;
-					if ((item.getFilterCondition() == null) || (FilterCondition.EQUAL == item.getFilterCondition())) {
-						if ("userId".equals(item.getFilterDataField()) && "CURRENT".equals(item.getFilterValue())) {
-							if ((userId != null) && !userId.isEmpty() && !userId.contains("@")) {
-								Expression<String> typeExpression = order.get("userId");
-								valuePredicate = builder.equal(typeExpression, userId);
-								if (mainOperatorPredicate == null) {
-									mainOperatorPredicate = valuePredicate;
-								} else {
-									mainOperatorPredicate = builder.and(valuePredicate, mainOperatorPredicate);
-								}
-							}
-							valuePredicate = builder.equal(order.get(item.getFilterDataField()), OrderStatus.valueOf(item.getFilterValue()));
-							if (statusesPredicate == null) {
-								statusesPredicate = valuePredicate;
+			Predicate predicate = null;
+			Expression<?> expression = order.get(item.getFilterDataField());
+			ValueProvider valueProvider = VALUE_PROVIDERS_MAP.get(item.getFilterDataField());
+			String pathExpression = EXPRESSION_PROVIDERS_MAP.get(item.getFilterDataField());
+			switch (item.getFilterCondition()) {
+				case IS_MEMBER:
+					Expression<Collection<String>> itemsExpression;
+					if ((pathExpression != null) && !pathExpression.isEmpty()) {
+						itemsExpression = order.get(item.getFilterDataField()).get(pathExpression);
+					} else {
+						itemsExpression = order.get(item.getFilterDataField());
+					}
+					if (valueProvider instanceof StringArrayValueProvider) {
+						StringArrayValueProvider stringArrayValueProvider = (StringArrayValueProvider) valueProvider;
+						String[] itemsValues = stringArrayValueProvider.get(item.getFilterValue());
+						for (String itemValue : itemsValues) {
+							Predicate containsItems = builder.isMember(itemValue, itemsExpression);
+							if (predicate == null) {
+								predicate = containsItems;
 							} else {
-								statusesPredicate = builder.or(valuePredicate, statusesPredicate);
+								predicate = builder.or(containsItems, predicate);
 							}
 						}
-						if ("status".equals(item.getFilterDataField())) {
-							valuePredicate = builder.equal(order.get(item.getFilterDataField()), OrderStatus.valueOf(item.getFilterValue()));
-							if (statusesPredicate == null) {
-								statusesPredicate = valuePredicate;
-							} else {
-								statusesPredicate = builder.or(valuePredicate, statusesPredicate);
-							}
-						} else if ("takingCurrency".equals(item.getFilterDataField())) {
-							valuePredicate = builder.equal(order.get(item.getFilterDataField()), Currency.valueOf(item.getFilterValue()));
-							if (takingCurrencyPredicate == null) {
-								takingCurrencyPredicate = valuePredicate;
-							} else {
-								takingCurrencyPredicate = builder.or(valuePredicate, takingCurrencyPredicate);
-							}
-						} else if ("givingCurrency".equals(item.getFilterDataField())) {
-							valuePredicate = builder.equal(order.get(item.getFilterDataField()), Currency.valueOf(item.getFilterValue()));
-							if (givingCurrencyPredicate == null) {
-								givingCurrencyPredicate = valuePredicate;
-							} else {
-								givingCurrencyPredicate = builder.or(valuePredicate, givingCurrencyPredicate);
-							}
-						} else if ("partnersRating".equals(item.getFilterDataField()) || "success".equals(item.getFilterDataField())) {
-							Path<Integer> field = order.get(item.getFilterDataField());
-							valuePredicate = builder.equal(field, Integer.valueOf(item.getFilterValue()));
-						} else if ("languages".equals(item.getFilterDataField())) {
-							Expression<Collection<String>> languages = order.get("languages").get("title");
-							String language = item.getFilterValue();
-							Predicate containsLanguages = builder.isMember(language, languages);
-
-							if (languagesPredicate == null) {
-								languagesPredicate = containsLanguages;
-							} else {
-								languagesPredicate = builder.or(containsLanguages, languagesPredicate);
-							}
-
-						} else if ("categories".equals(item.getFilterDataField())) {
-							Expression<Collection<String>> categories = order.get("categories").get("title");
-							String category = item.getFilterValue();
-							Predicate containsCategories = builder.isMember(category, categories);
-
-							if (categoriesPredicate == null) {
-								categoriesPredicate = containsCategories;
-							} else {
-								categoriesPredicate = builder.or(containsCategories, categoriesPredicate);
-							}
-						} else {
-							valuePredicate = builder.equal(order.get(item.getFilterDataField()), item.getFilterValue());
-						}
-					} else if (FilterCondition.NOT_EQUAL == item.getFilterCondition()) {
-						if ("status".equals(item.getFilterDataField())) {
-							valuePredicate = builder.notEqual(order.get(item.getFilterDataField()), OrderStatus.valueOf(item.getFilterValue()));
-						} else {
-							valuePredicate = builder.notEqual(order.get(item.getFilterDataField()), item.getFilterValue());
-						}
-					} else if (FilterCondition.STARTS_WITH == item.getFilterCondition()) {
-						EntityType<OrderInfo> type = entityManager.getMetamodel().entity(OrderInfo.class);
-						valuePredicate = builder.like(
-							builder.lower(
-								order.get(
-									type.getDeclaredSingularAttribute(item.getFilterDataField(), String.class)
-								)
-							), "%" + item.getFilterValue().toLowerCase() + "%"
-						);
-					} else if (FilterCondition.LESS_THAN_OR_EQUAL == item.getFilterCondition()) {
-						if ("bookingDeadline".toLowerCase().equals(item.getFilterDataField().toLowerCase())) {
-
-							valuePredicate = builder.lessThanOrEqualTo(order.<Date>get(item.getFilterDataField()), DateUtil.stringToDate(item.getFilterValue()));
-
-						} else {
-							valuePredicate = builder.lessThanOrEqualTo(order.<String>get(item.getFilterDataField()), item.getFilterValue());
-						}
-					} else if (FilterCondition.LESS_THAN == item.getFilterCondition()) {
-						if ("bookingDeadline".toLowerCase().equals(item.getFilterDataField().toLowerCase())) {
-
-							valuePredicate = builder.lessThan(order.<Date>get(item.getFilterDataField()), DateUtil.stringToDate(item.getFilterValue()));
-
-						} else {
-							valuePredicate = builder.lessThan(order.<String>get(item.getFilterDataField()), item.getFilterValue());
-						}
-					} else if (FilterCondition.GREATER_THAN_OR_EQUAL == item.getFilterCondition()) {
-						if ("bookingDeadline".toLowerCase().equals(item.getFilterDataField().toLowerCase())) {
-							valuePredicate = builder.greaterThanOrEqualTo(order.<Date>get(item.getFilterDataField()), DateUtil.stringToDate(item.getFilterValue()));
-						} else if ("summaryRating".equals(item.getFilterDataField()) || "opennessRating".equals(item.getFilterDataField())) {
-							Subquery<Statistics> subquery = criteria.subquery(Statistics.class);
-							Root fromStatistics = subquery.from(Statistics.class);
-							subquery.select(fromStatistics.get("id"));
-							subquery.where(builder.greaterThanOrEqualTo(fromStatistics.get(item.getFilterDataField()), item.getFilterValue()));
-							valuePredicate = builder.in(order.get("userPublicKey")).value(subquery);
-						} else if ("responsesCount".equals(item.getFilterDataField())) {
-							TypedQuery<String> query = entityManager.createQuery("SELECT o.id FROM OrderInfo o JOIN o.responses r GROUP BY o.id HAVING count(r) >= :count AND o.userId = :userId", String.class);
-							query.setParameter("count", Long.parseLong(item.getFilterValue()));
-							query.setParameter("userId", userId);
-							List<String> ordersId = query.getResultList();
-
-							if ((ordersId == null) || ordersId.isEmpty()) {
-								ordersId.add("");
-							}
-							valuePredicate = order.get("id").in(ordersId);
-						} else if ("partnersRating".equals(item.getFilterDataField())) {
-
-							TypedQuery<String> query = entityManager.createNamedQuery("OrderInfo.findByPartnersRating", String.class);
-							query.setParameter("status", OrderStatus.SUCCESS);
-							query.setParameter("rating", Long.parseLong(item.getFilterValue()));
-							query.setParameter("openessFactor", env.getUserRatingOpenessFactor());
-							query.setParameter("transactionsFactor", env.getUserRatingTransactionsFactor());
-							List<String> publicKeys = query.getResultList();
-
-							if ((publicKeys == null) || publicKeys.isEmpty()) {
-								publicKeys.add("");
-							}
-							valuePredicate = order.get("userPublicKey").in(publicKeys);
-						} else {
-							valuePredicate = builder.greaterThanOrEqualTo(order.<String>get(item.getFilterDataField()), item.getFilterValue());
-						}
-					} else if (FilterCondition.GREATER_THAN == item.getFilterCondition()) {
-						if ("bookingDeadline".toLowerCase().equals(item.getFilterDataField().toLowerCase())) {
-							valuePredicate = builder.greaterThan(order.<Date>get(item.getFilterDataField()), DateUtil.stringToDate(item.getFilterValue()));
-						} else {
-							valuePredicate = builder.greaterThan(order.<String>get(item.getFilterDataField()), item.getFilterValue());
+					} else {
+						if (valueProvider instanceof Comparable) {
+							Expression<Collection<Comparable>> comparableExpression = order.get(item.getFilterDataField());
+							predicate = builder.isMember((Comparable) valueProvider.get(item.getFilterValue()), comparableExpression);
 						}
 					}
-					if (itemsOperatorPredicate == null) {
-						itemsOperatorPredicate = valuePredicate;
-					} else if ((item.getFilterOperator() == null) || (FilterOperator.AND == item.getFilterOperator() && !"categories".equals(item.getFilterDataField()) && !"languages".equals(item.getFilterDataField()))) {
-						itemsOperatorPredicate = builder.and(valuePredicate, itemsOperatorPredicate);
-					} else if (FilterOperator.OR == item.getFilterOperator()) {
-						itemsOperatorPredicate = builder.or(valuePredicate, itemsOperatorPredicate);
+				case EQUAL:
+					if ("userId".equals(item.getFilterDataField()) && "CURRENT".equals(item.getFilterValue())) {
+						if ((userId != null) && !userId.isEmpty() && userId.contains("@")) {
+							Expression<String> userIdExpression = order.get("userId");
+							predicate = builder.equal(userIdExpression, userId);
+						}
+					} else {
+						predicate = builder.equal(expression, valueProvider.get(item.getFilterValue()));
 					}
+					break;
+				case NOT_EQUAL:
+					predicate = builder.notEqual(expression, valueProvider.get(item.getFilterValue()));
+					break;
+				case STARTS_WITH:
+					EntityType<OrderInfo> type = entityManager.getMetamodel().entity(OrderInfo.class);
+					predicate = builder.like(
+						builder.lower(
+							order.get(
+								type.getDeclaredSingularAttribute(item.getFilterDataField(), String.class)
+							)
+						), "%" + item.getFilterValue().toLowerCase() + "%"
+					);
+					break;
+				case LESS_THAN_OR_EQUAL:
+					if (valueProvider instanceof Comparable) {
+						Expression<Comparable> comparableExpression = order.get(item.getFilterDataField());
+						predicate = builder.lessThanOrEqualTo(comparableExpression, (Comparable) valueProvider.get(item.getFilterValue()));
+					}
+					break;
+				case LESS_THAN:
+					if (valueProvider instanceof Comparable) {
+						Expression<Comparable> comparableExpression = order.get(item.getFilterDataField());
+						predicate = builder.lessThan(comparableExpression, (Comparable) valueProvider.get(item.getFilterValue()));
+					}
+					break;
+				case GREATER_THAN_OR_EQUAL:
+					if (valueProvider instanceof Comparable) {
+						Expression<Comparable> comparableExpression = order.get(item.getFilterDataField());
+						predicate = builder.greaterThanOrEqualTo(comparableExpression, (Comparable) valueProvider.get(item.getFilterValue()));
+					}
+					break;
+				case GREATER_THAN:
+					if (valueProvider instanceof Comparable) {
+						Expression<Comparable> comparableExpression = order.get(item.getFilterDataField());
+						predicate = builder.greaterThan(comparableExpression, (Comparable) valueProvider.get(item.getFilterValue()));
+					}
+					break;
+			}
+			if (prevPredicate != null) {
+				switch (item.getFilterOperator()) {
+					case AND:
+						predicate = builder.and(prevPredicate, predicate);
+					case OR:
+						predicate = builder.or(prevPredicate, predicate);
 				}
+				prevPredicate = predicate;
 			}
-			if (languagesPredicate != null) {
-				if (mainOperatorPredicate == null) {
-					mainOperatorPredicate = languagesPredicate;
-				} else {
-					mainOperatorPredicate = builder.and(languagesPredicate, mainOperatorPredicate);
-				}
+			if (prevPredicate != null) {
+				criteria.where(prevPredicate);
 			}
-			if (categoriesPredicate != null) {
-				if (mainOperatorPredicate == null) {
-					mainOperatorPredicate = categoriesPredicate;
-				} else {
-					mainOperatorPredicate = builder.and(categoriesPredicate, mainOperatorPredicate);
-				}
-			}
-			if (statusesPredicate != null) {
-				if (mainOperatorPredicate == null) {
-					mainOperatorPredicate = statusesPredicate;
-				} else {
-					mainOperatorPredicate = builder.and(statusesPredicate, mainOperatorPredicate);
-				}
-			}
-			if (takingCurrencyPredicate != null) {
-				if (mainOperatorPredicate == null) {
-					mainOperatorPredicate = takingCurrencyPredicate;
-				} else {
-					mainOperatorPredicate = builder.and(takingCurrencyPredicate, mainOperatorPredicate);
-				}
-			}
-			if (givingCurrencyPredicate != null) {
-				if (mainOperatorPredicate == null) {
-					mainOperatorPredicate = givingCurrencyPredicate;
-				} else {
-					mainOperatorPredicate = builder.and(givingCurrencyPredicate, mainOperatorPredicate);
-				}
-			}
-
-			if (mainOperatorPredicate == null) {
-				mainOperatorPredicate = itemsOperatorPredicate;
-			} else if (itemsOperatorPredicate != null) {
-				mainOperatorPredicate = builder.and(itemsOperatorPredicate, mainOperatorPredicate);
-			}
-		}
-		UserPublicProfile profile = profileDAO.find(userId);
-		List<Language> userLanguages = (profile != null) ? profile.getLanguages() : null;
-		if (userLanguages != null && !userLanguages.isEmpty()) {
-			Predicate operatorPredicate = null;
-			Expression<Collection<String>> languages = order.get("languages").get("title");
-			for (Language language : userLanguages) {
-				Predicate containsLanguages = builder.isMember(language.getCode(), languages);
-				if (operatorPredicate == null) {
-					operatorPredicate = containsLanguages;
-				} else {
-					operatorPredicate = builder.or(containsLanguages, operatorPredicate);
-				}
-			}
-			if (mainOperatorPredicate == null) {
-				mainOperatorPredicate = operatorPredicate;
-			} else {
-				mainOperatorPredicate = builder.and(operatorPredicate, mainOperatorPredicate);
-			}
-		}
-
-		List<Currency> userCurrencies = (profile != null) ? profile.getCurrencies() : null;
-		if (userCurrencies != null && !userCurrencies.isEmpty()) {
-			Predicate operatorPredicate = null;
-			Expression<Currency> givingCurrencyExpression = order.get("givingCurrency");
-			for (Currency currency : userCurrencies) {
-				Predicate containsGivingCurrencies = builder.equal(givingCurrencyExpression, currency);//builder.isMember(currency, currencies);
-				if (operatorPredicate == null) {
-					operatorPredicate = containsGivingCurrencies;
-				} else {
-					operatorPredicate = builder.or(containsGivingCurrencies, operatorPredicate);
-				}
-			}
-			Predicate takingOperatorPredicate = null;
-			Expression<Currency> takingCurrencyExpression = order.get("takingCurrency");
-			for (Currency currency : userCurrencies) {
-				Predicate containsTakingCurrencies = builder.equal(takingCurrencyExpression, currency);
-				if (takingOperatorPredicate == null) {
-					takingOperatorPredicate = containsTakingCurrencies;
-				} else {
-					takingOperatorPredicate = builder.or(containsTakingCurrencies, takingOperatorPredicate);
-				}
-			}
-			operatorPredicate = builder.or(operatorPredicate, takingOperatorPredicate);
-			if (mainOperatorPredicate == null) {
-				mainOperatorPredicate = operatorPredicate;
-			} else {
-				mainOperatorPredicate = builder.and(operatorPredicate, mainOperatorPredicate);
-			}
-		}
-		if (mainOperatorPredicate != null) {
-			criteria.where(mainOperatorPredicate);
 		}
 		return criteria;
 	}

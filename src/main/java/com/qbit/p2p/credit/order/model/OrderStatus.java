@@ -8,22 +8,23 @@ import java.util.EnumSet;
  */
 public enum OrderStatus {
 	OPENED, IN_PROCESS, SUCCESS, NOT_SUCCESS, ARBITRATION;
-	public static EnumMap<OrderStatus, EnumSet<OrderStatus>> validStatusesMap;
+	
+	private static final EnumMap<OrderStatus, EnumSet<OrderStatus>> VALID_STATUSES_MAP;
 	static {	
-		validStatusesMap = new EnumMap<>(OrderStatus.class);
+		VALID_STATUSES_MAP = new EnumMap<>(OrderStatus.class);
 		EnumSet<OrderStatus> opened = EnumSet.of(IN_PROCESS, SUCCESS, NOT_SUCCESS, ARBITRATION);
-		validStatusesMap.put(OPENED, opened);
+		VALID_STATUSES_MAP.put(OPENED, opened);
 		EnumSet<OrderStatus> inProcess = EnumSet.of(SUCCESS, NOT_SUCCESS, ARBITRATION);
-		validStatusesMap.put(IN_PROCESS, inProcess);
+		VALID_STATUSES_MAP.put(IN_PROCESS, inProcess);
 		EnumSet<OrderStatus> success = EnumSet.of(NOT_SUCCESS, ARBITRATION);
-		validStatusesMap.put(SUCCESS, success);
+		VALID_STATUSES_MAP.put(SUCCESS, success);
 		EnumSet<OrderStatus> notSuccess = EnumSet.of(SUCCESS, ARBITRATION);
-		validStatusesMap.put(NOT_SUCCESS, notSuccess);
+		VALID_STATUSES_MAP.put(NOT_SUCCESS, notSuccess);
 		EnumSet<OrderStatus> arbitration = EnumSet.of(SUCCESS, NOT_SUCCESS);
-		validStatusesMap.put(ARBITRATION, arbitration);
+		VALID_STATUSES_MAP.put(ARBITRATION, arbitration);
 	}
 	
 	public boolean isValidNewStatus(OrderStatus newStatus) {
-		return validStatusesMap.get(this).contains(newStatus);
+		return VALID_STATUSES_MAP.get(this).contains(newStatus);
 	}
 }

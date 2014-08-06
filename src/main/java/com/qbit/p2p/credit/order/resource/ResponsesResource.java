@@ -2,6 +2,7 @@ package com.qbit.p2p.credit.order.resource;
 
 import com.qbit.commons.auth.AuthFilter;
 import com.qbit.p2p.credit.order.dao.OrderDAO;
+import com.qbit.p2p.credit.order.dao.OrderFlowDAO;
 import com.qbit.p2p.credit.order.model.OrderInfo;
 import com.qbit.p2p.credit.order.model.OrderStatus;
 import com.qbit.p2p.credit.order.model.Respond;
@@ -33,6 +34,9 @@ public class ResponsesResource {
 
 	@Inject
 	private OrderDAO orderDAO;
+	
+	@Inject
+	private OrderFlowDAO orderFlowDAO;
 
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -46,7 +50,7 @@ public class ResponsesResource {
 		respond.setUserId(userId);
 		respond.setCreationDate(new Date());
 		respond.setComment(respondRequest.getComment());
-		OrderInfo o = orderDAO.addRespond(respond, respondRequest.getOrderId());
+		OrderInfo o = orderFlowDAO.addRespond(respond, respondRequest.getOrderId());
 		return o;
 	}
 
@@ -55,8 +59,8 @@ public class ResponsesResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public OrderInfo approveRespond(RespondCreationRequest respondRequest) {
 		OrderInfo order = orderDAO.find(respondRequest.getOrderId());
-		String id = AuthFilter.getUserId(request);
-		if ((order == null) || !order.getUserId().equals(id)) {
+		String userId = AuthFilter.getUserId(request);
+		if ((order == null) || !order.getUserId().equals(userId)) {
 			return null;
 		}
 		if (order.getResponses() != null) {
@@ -64,7 +68,7 @@ public class ResponsesResource {
 				if (respond.getUserId().equals(respondRequest.getUserId()) && (order.getApprovedUserId() == null)) {
 					order.setApprovedUserId(respond.getUserId());
 					order.setStatus(OrderStatus.IN_PROCESS);
-					int numberOfEntities = orderDAO.changeStatus(order, order.getId(), order.getUserId());
+					int numberOfEntities = orderFlowDAO.changeStatus(order.getId(), userId, OrderStatus.IN_PROCESS,respondRequest.getUserId(), null);
 					return (numberOfEntities == 0) ? null : order;
 				}
 			}
@@ -75,6 +79,6 @@ public class ResponsesResource {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Respond getRespondByUser(@QueryParam("userId") String userId) {
-		return orderDAO.findRespond(userId);
+		return orderFlowDAO.findRespond(userId);
 	}
 }

@@ -3,8 +3,10 @@ package com.qbit.p2p.credit.order.resource;
 import com.qbit.p2p.credit.order.model.SearchRequest;
 import com.qbit.commons.auth.AuthFilter;
 import com.qbit.p2p.credit.order.dao.OrderDAO;
+import com.qbit.p2p.credit.order.dao.OrderFlowDAO;
 import com.qbit.p2p.credit.order.model.Comment;
 import com.qbit.p2p.credit.order.model.OrderInfo;
+import com.qbit.p2p.credit.order.model.OrderStatus;
 import com.qbit.p2p.credit.statistics.service.StatisticsService;
 import java.util.List;
 import javax.inject.Inject;
@@ -29,6 +31,8 @@ public class OrdersResource {
 	private HttpServletRequest request;
 	@Inject
 	private OrderDAO orderDAO;
+	@Inject
+	private OrderFlowDAO orderFlowDAO;
 	@Inject
 	private StatisticsService statisticsService;
 
@@ -72,6 +76,10 @@ public class OrdersResource {
 		
 		order.setStatus(statusRequest.getStatus());
 		order.setComment(new Comment(statusRequest.getComment()));
-		return orderDAO.changeStatus(order, statusRequest.getOrderId(), userId);
+		if(!userId.equals(order.getUserId())) {
+			return orderFlowDAO.changeStatus(order.getId(), order.getUserId(), null, userId, statusRequest.getStatus());
+		} else {
+			return orderFlowDAO.changeStatus(order.getId(), order.getUserId(), statusRequest.getStatus(), userId, null);
+		}
 	}	
 }

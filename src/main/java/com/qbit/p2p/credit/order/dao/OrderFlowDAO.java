@@ -73,9 +73,9 @@ public class OrderFlowDAO {
 		}
 	}
 
-	public int changeStatus(String orderId, String userId, OrderStatus status, String counteragentId, OrderStatus counteragentStatus) {
+	public int changeStatus(String orderId, String userId, OrderStatus status, String partnerId, OrderStatus counteragentStatus) {
 		OrderInfo order = orderDAO.find(orderId);
-		if (!newOrder.getUserId().equals(userId) || !order.getStatus().isValidNewStatus(status)) {
+		if (!order.getStatus().isValidNewStatus(status)) {
 			return 0;
 		}
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
@@ -84,14 +84,19 @@ public class OrderFlowDAO {
 			CriteriaUpdate<OrderInfo> update = builder.createCriteriaUpdate(OrderInfo.class);
 			Root<OrderInfo> root = update.from(OrderInfo.class);
 			if (OrderStatus.IN_PROCESS == status) {
-				update.set("approvedUserId", counteragentId);
+				update.set("approvedUserId", partnerId);
 			}
-			update.set("status", status);
+			if(counteragentStatus != null) {
+				update.set("status", counteragentStatus);
+			} else {
+				update.set("status", status);
+			}
 			update.where(builder.equal(root.get("id"), orderId));
+			update.where(builder.equal(root.get("userId"), userId));
 			int numberOfEntities = entityManager.createQuery(update).executeUpdate();
-			statisticsService.recalculatePartnersRating(newOrder.getUserId());
-			if (OrderStatus.SUCCESS == newOrder.getStatus()) {
-				statisticsService.recalculatePartnersRating(newOrder.getApprovedUserId());
+			statisticsService.recalculatePartnersRating(userId);
+			if (OrderStatus.SUCCESS == status) {
+				statisticsService.recalculatePartnersRating(partnerId);
 			}
 			return numberOfEntities;
 		} finally {
