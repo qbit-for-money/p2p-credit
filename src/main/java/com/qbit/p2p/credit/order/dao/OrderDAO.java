@@ -19,6 +19,7 @@ import com.qbit.p2p.credit.order.model.SortOrder;
 import com.qbit.p2p.credit.order.model.StringArrayValueProvider;
 import com.qbit.p2p.credit.order.model.StringValueProvider;
 import com.qbit.p2p.credit.order.model.ValueProvider;
+import com.qbit.p2p.credit.statistics.model.Statistics;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -35,6 +36,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
 import javax.persistence.metamodel.EntityType;
 
 /**
@@ -279,6 +281,16 @@ public class OrderDAO {
 					break;
 				case GREATER_THAN_OR_EQUAL:
 					if (valueProvider instanceof Comparable) {
+						if("summaryRating".equals(item.getFilterDataField())) {
+							Integer itemValue = (Integer) valueProvider.get(item.getFilterValue());
+							getSummaryRatingPredicate(itemValue.doubleValue(), criteria, builder);
+						} else if("opennessRating".equals(item.getFilterDataField())) {
+							getOpenessRatingPredicate((Integer) valueProvider.get(item.getFilterValue()), criteria, builder);
+						} else if("responsesCount".equals(item.getFilterDataField())) {
+							getResponsesCountPredicate((Integer) valueProvider.get(item.getFilterValue()), userId, criteria, entityManager);
+						} else if("partnersRating".equals(item.getFilterDataField())) {
+							getPartnersRatingPredicate((Integer) valueProvider.get(item.getFilterValue()), criteria, entityManager);
+						}
 						Expression<Comparable> comparableExpression = order.get(item.getFilterDataField());
 						predicate = builder.greaterThanOrEqualTo(comparableExpression, (Comparable) valueProvider.get(item.getFilterValue()));
 					}
@@ -304,5 +316,59 @@ public class OrderDAO {
 			}
 		}
 		return criteria;
+
+	}
+
+	private Predicate getSummaryRatingPredicate(double filterValue, CriteriaQuery criteria, CriteriaBuilder builder) {
+		Root<OrderInfo> order = criteria.from(OrderInfo.class);
+		Subquery<Statistics> subquery = criteria.subquery(Statistics.class);
+		Root fromStatistics = subquery.from(Statistics.class);
+		subquery.select(fromStatistics.get("id"));
+		Expression<Double> openessRatingProd = builder.prod(fromStatistics.<Double>get("opennessRating"), env.getUserRatingOpenessFactor());
+		Expression<Double> successOrdersCountProd = builder.prod(fromStatistics.<Double>get("successOrdersCount"), env.getUserRatingTransactionsFactor());
+		Expression<Double> sumExpression = builder.sum(openessRatingProd, successOrdersCountProd);
+		subquery.where(builder.greaterThanOrEqualTo(sumExpression, filterValue));
+		Predicate valuePredicate = builder.in(order.get("userId")).value(subquery);
+		return valuePredicate;
+	}
+	
+	private Predicate getOpenessRatingPredicate(int filterValue, CriteriaQuery criteria, CriteriaBuilder builder) {
+		Root<OrderInfo> order = criteria.from(OrderInfo.class);
+		Subquery<Statistics> subquery = criteria.subquery(Statistics.class);
+		Root fromStatistics = subquery.from(Statistics.class);
+		subquery.select(fromStatistics.get("id"));
+		Expression<Integer> openessRatingProd = fromStatistics.<Integer>get("opennessRating");
+		subquery.where(builder.greaterThanOrEqualTo(openessRatingProd, filterValue));
+		return builder.in(order.get("userId")).value(subquery);
+	}
+	
+	private Predicate getResponsesCountPredicate(int filterValue, String userId, CriteriaQuery criteria, EntityManager entityManager) {
+		Root<OrderInfo> order = criteria.from(OrderInfo.class);
+		
+		
+		TypedQuery<String> query = entityManager.createQuery("SELECT o.id FROM OrderInfo o JOIN o.responses r GROUP BY o.id HAVING count(r) >= :count AND o.userId = :userId", String.class);
+		query.setParameter("count", filterValue);
+		query.setParameter("userId", userId);
+		List<String> ordersId = query.getResultList();
+
+		if ((ordersId == null) || ordersId.isEmpty()) {
+			ordersId.add("");
+		}
+		return order.get("id").in(ordersId);
+	}
+	
+	private Predicate getPartnersRatingPredicate(int filterValue, CriteriaQuery criteria, EntityManager entityManager) {
+		Root<OrderInfo> order = criteria.from(OrderInfo.class);
+		
+		TypedQuery<String> query = entityManager.createNamedQuery("OrderInfo.findByPartnersRating", String.class);
+		query.setParameter("status", OrderStatus.SUCCESS);
+		query.setParameter("rating", filterValue);
+		query.setParameter("openessFactor", env.getUserRatingOpenessFactor());
+		query.setParameter("transactionsFactor", env.getUserRatingTransactionsFactor());
+		List<String> publicKeys = query.getResultList();
+		if ((publicKeys == null) || publicKeys.isEmpty()) {
+			publicKeys.add("");
+		}
+		return order.get("userPublicKey").in(publicKeys);
 	}
 }
