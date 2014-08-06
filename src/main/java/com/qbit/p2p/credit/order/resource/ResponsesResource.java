@@ -6,9 +6,7 @@ import com.qbit.p2p.credit.order.dao.OrderFlowDAO;
 import com.qbit.p2p.credit.order.model.OrderInfo;
 import com.qbit.p2p.credit.order.model.OrderStatus;
 import com.qbit.p2p.credit.order.model.Respond;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
@@ -65,8 +63,8 @@ public class ResponsesResource {
 		}
 		if (order.getResponses() != null) {
 			for (Respond respond : order.getResponses()) {
-				if (respond.getUserId().equals(respondRequest.getUserId()) && (order.getApprovedUserId() == null)) {
-					order.setApprovedUserId(respond.getUserId());
+				if (respond.getUserId().equals(respondRequest.getUserId()) && (order.getPartnerId() == null)) {
+					order.setPartnerId(respond.getUserId());
 					order.setStatus(OrderStatus.IN_PROCESS);
 					int numberOfEntities = orderFlowDAO.changeStatus(order.getId(), userId, OrderStatus.IN_PROCESS,respondRequest.getUserId(), null);
 					return (numberOfEntities == 0) ? null : order;

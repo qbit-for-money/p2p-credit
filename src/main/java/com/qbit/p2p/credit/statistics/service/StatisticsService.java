@@ -135,6 +135,7 @@ public class StatisticsService {
 		
 		return statistics;
 	}
+	
 	public long recalculatePartnersRating(String userId) {
 		UserPublicProfile user = userProfileDAO.find(userId);
 		if (user == null) {

@@ -27,6 +27,7 @@ public class Statistics implements Serializable {
 	private long ordersCount;
 	private long successOrdersCount;
 	private long partnersRating;
+	
 	public Statistics() {
 	}
 

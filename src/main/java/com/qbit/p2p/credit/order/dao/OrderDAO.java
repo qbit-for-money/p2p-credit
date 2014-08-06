@@ -9,16 +9,15 @@ import com.qbit.p2p.credit.order.model.FilterItem;
 import com.qbit.p2p.credit.order.model.OrderInfo;
 import com.qbit.p2p.credit.order.model.OrderStatus;
 import com.qbit.p2p.credit.order.model.SearchRequest;
-import com.qbit.p2p.credit.user.dao.UserProfileDAO;
 import com.qbit.p2p.credit.env.Env;
-import com.qbit.p2p.credit.order.model.DateValueProvider;
-import com.qbit.p2p.credit.order.model.IntegerValueProvider;
-import com.qbit.p2p.credit.order.model.OrderStatusArrayValueProvider;
-import com.qbit.p2p.credit.order.model.OrderStatusValueProvider;
+import com.qbit.p2p.credit.order.dao.meta.DateValueProvider;
+import com.qbit.p2p.credit.order.dao.meta.IntegerValueProvider;
+import com.qbit.p2p.credit.order.dao.meta.OrderStatusArrayValueProvider;
+import com.qbit.p2p.credit.order.dao.meta.OrderStatusValueProvider;
 import com.qbit.p2p.credit.order.model.SortOrder;
-import com.qbit.p2p.credit.order.model.StringArrayValueProvider;
-import com.qbit.p2p.credit.order.model.StringValueProvider;
-import com.qbit.p2p.credit.order.model.ValueProvider;
+import com.qbit.p2p.credit.order.dao.meta.StringArrayValueProvider;
+import com.qbit.p2p.credit.order.dao.meta.StringValueProvider;
+import com.qbit.p2p.credit.order.dao.meta.ValueProvider;
 import com.qbit.p2p.credit.statistics.model.Statistics;
 import java.util.Collection;
 import java.util.Date;
@@ -51,31 +50,22 @@ public class OrderDAO {
 
 	@Inject
 	private Env env;
-	@Inject
-	private UserProfileDAO profileDAO;
 
 	private static final Map<String, ValueProvider> VALUE_PROVIDERS_MAP;
 	private static final Map<String, String> EXPRESSION_PROVIDERS_MAP;
-
 	static {
-		ValueProvider stringValueProvider = new StringValueProvider();
-		ValueProvider integerValueProvider = new IntegerValueProvider();
-		ValueProvider dateValueProvider = new DateValueProvider();
-		ValueProvider stringArrayValueProvider = new StringArrayValueProvider();
-		ValueProvider orderStatusArrayValueProvider = new OrderStatusArrayValueProvider();
 		VALUE_PROVIDERS_MAP = new HashMap<>();
-		VALUE_PROVIDERS_MAP.put("status", new OrderStatusValueProvider());
-		VALUE_PROVIDERS_MAP.put("takingCurrency", stringValueProvider);
-		VALUE_PROVIDERS_MAP.put("givingCurrency", stringValueProvider);
-		VALUE_PROVIDERS_MAP.put("partnersRating", integerValueProvider);
-		VALUE_PROVIDERS_MAP.put("languages", stringArrayValueProvider);
-		VALUE_PROVIDERS_MAP.put("categories", stringArrayValueProvider);
-		VALUE_PROVIDERS_MAP.put("bookingDeadline", dateValueProvider);
-		VALUE_PROVIDERS_MAP.put("summaryRating", integerValueProvider);
-		VALUE_PROVIDERS_MAP.put("responsesCount", integerValueProvider);
-		VALUE_PROVIDERS_MAP.put("partnersRating", integerValueProvider);
-		VALUE_PROVIDERS_MAP.put("statuses", orderStatusArrayValueProvider);
-
+		VALUE_PROVIDERS_MAP.put("status", OrderStatusValueProvider.INST);
+		VALUE_PROVIDERS_MAP.put("takingCurrency", StringValueProvider.INST);
+		VALUE_PROVIDERS_MAP.put("givingCurrency", StringValueProvider.INST);
+		VALUE_PROVIDERS_MAP.put("partnersRating", IntegerValueProvider.INST);
+		VALUE_PROVIDERS_MAP.put("languages", StringArrayValueProvider.INST);
+		VALUE_PROVIDERS_MAP.put("categories", StringArrayValueProvider.INST);
+		VALUE_PROVIDERS_MAP.put("bookingDeadline", DateValueProvider.INST);
+		VALUE_PROVIDERS_MAP.put("summaryRating", IntegerValueProvider.INST);
+		VALUE_PROVIDERS_MAP.put("responsesCount", IntegerValueProvider.INST);
+		VALUE_PROVIDERS_MAP.put("partnersRating", IntegerValueProvider.INST);
+		VALUE_PROVIDERS_MAP.put("statuses", OrderStatusArrayValueProvider.INST);
 		EXPRESSION_PROVIDERS_MAP = new HashMap<>();
 		EXPRESSION_PROVIDERS_MAP.put("languages", "code");
 		EXPRESSION_PROVIDERS_MAP.put("categories", "code");
@@ -138,18 +128,14 @@ public class OrderDAO {
 				order.setIncomingAmount(newOrder.getIncomingAmount());
 				order.setUserId(newOrder.getUserId());
 				order.setComment(newOrder.getComment());
-				order.setApprovedUserId(newOrder.getApprovedUserId());
+				order.setPartnerId(newOrder.getPartnerId());
 				return order;
 			}
 		});
 	}
 
 	public List<OrderInfo> findWithFilter(String userId, SearchRequest searchRequest) {
-
-		boolean sortDesc = false;
-		if ((searchRequest != null) && searchRequest.getSortOrder() != null && searchRequest.getSortOrder() == SortOrder.DESC) {
-			sortDesc = true;
-		}
+		boolean sortDesc = ((searchRequest != null) && (searchRequest.getSortOrder() == SortOrder.DESC));
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {
 			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
@@ -161,7 +147,7 @@ public class OrderDAO {
 			criteria = formCriteria(userId, searchRequest, entityManager, criteria, builder);
 
 			String sortDataField = searchRequest.getSortDataField();
-			if (sortDataField != null && !sortDataField.isEmpty()) {
+			if ((sortDataField != null) && !sortDataField.isEmpty()) {
 				if (sortDesc) {
 					criteria.orderBy(builder.desc(order.get(sortDataField)), builder.asc(order.get("status")));
 				} else {
@@ -204,13 +190,12 @@ public class OrderDAO {
 	}
 
 	private CriteriaQuery formCriteria(String userId, SearchRequest searchRequest, EntityManager entityManager, CriteriaQuery criteria, CriteriaBuilder builder) {
-		if ((searchRequest != null) && (searchRequest.getFilterItems() == null)) {
+		if ((searchRequest == null) || (searchRequest.getFilterItems() == null)) {
 			return criteria;
 		}
 		Root<OrderInfo> order = criteria.from(OrderInfo.class);
-		List<FilterItem> filterItems = (searchRequest != null) ? searchRequest.getFilterItems() : null;
 		Predicate prevPredicate = null;
-		for (FilterItem item : filterItems) {
+		for (FilterItem item : searchRequest.getFilterItems()) {
 			if ((item.getFilterDataField() == null) || (item.getFilterValue() == null)) {
 				continue;
 			}
@@ -221,27 +206,21 @@ public class OrderDAO {
 			String pathExpression = EXPRESSION_PROVIDERS_MAP.get(item.getFilterDataField());
 			switch (item.getFilterCondition()) {
 				case IS_MEMBER:
-					Expression<Collection<String>> itemsExpression;
+					Expression<Collection> itemsExpression;
 					if ((pathExpression != null) && !pathExpression.isEmpty()) {
 						itemsExpression = order.get(item.getFilterDataField()).get(pathExpression);
 					} else {
 						itemsExpression = order.get(item.getFilterDataField());
 					}
-					if (valueProvider instanceof StringArrayValueProvider) {
-						StringArrayValueProvider stringArrayValueProvider = (StringArrayValueProvider) valueProvider;
-						String[] itemsValues = stringArrayValueProvider.get(item.getFilterValue());
-						for (String itemValue : itemsValues) {
+					Object value = valueProvider.get(item.getFilterValue());
+					if (value instanceof Object[]) {
+						for (Object itemValue : (Object[]) value) {
 							Predicate containsItems = builder.isMember(itemValue, itemsExpression);
 							if (predicate == null) {
 								predicate = containsItems;
 							} else {
 								predicate = builder.or(containsItems, predicate);
 							}
-						}
-					} else {
-						if (valueProvider instanceof Comparable) {
-							Expression<Collection<Comparable>> comparableExpression = order.get(item.getFilterDataField());
-							predicate = builder.isMember((Comparable) valueProvider.get(item.getFilterValue()), comparableExpression);
 						}
 					}
 				case EQUAL:
@@ -260,46 +239,39 @@ public class OrderDAO {
 				case STARTS_WITH:
 					EntityType<OrderInfo> type = entityManager.getMetamodel().entity(OrderInfo.class);
 					predicate = builder.like(
-						builder.lower(
-							order.get(
-								type.getDeclaredSingularAttribute(item.getFilterDataField(), String.class)
-							)
-						), "%" + item.getFilterValue().toLowerCase() + "%"
-					);
+							builder.lower(order.get(
+											type.getDeclaredSingularAttribute(item.getFilterDataField(), String.class))),
+							item.getFilterValue().toLowerCase() + "%");
 					break;
 				case LESS_THAN_OR_EQUAL:
-					if (valueProvider instanceof Comparable) {
-						Expression<Comparable> comparableExpression = order.get(item.getFilterDataField());
-						predicate = builder.lessThanOrEqualTo(comparableExpression, (Comparable) valueProvider.get(item.getFilterValue()));
-					}
+					predicate = builder.lessThanOrEqualTo((Expression<Comparable>) expression,
+							(Comparable) valueProvider.get(item.getFilterValue()));
 					break;
 				case LESS_THAN:
-					if (valueProvider instanceof Comparable) {
-						Expression<Comparable> comparableExpression = order.get(item.getFilterDataField());
-						predicate = builder.lessThan(comparableExpression, (Comparable) valueProvider.get(item.getFilterValue()));
-					}
+					predicate = builder.lessThan((Expression<Comparable>) expression,
+							(Comparable) valueProvider.get(item.getFilterValue()));
 					break;
 				case GREATER_THAN_OR_EQUAL:
-					if (valueProvider instanceof Comparable) {
-						if("summaryRating".equals(item.getFilterDataField())) {
-							Integer itemValue = (Integer) valueProvider.get(item.getFilterValue());
-							getSummaryRatingPredicate(itemValue.doubleValue(), criteria, builder);
-						} else if("opennessRating".equals(item.getFilterDataField())) {
-							getOpenessRatingPredicate((Integer) valueProvider.get(item.getFilterValue()), criteria, builder);
-						} else if("responsesCount".equals(item.getFilterDataField())) {
-							getResponsesCountPredicate((Integer) valueProvider.get(item.getFilterValue()), userId, criteria, entityManager);
-						} else if("partnersRating".equals(item.getFilterDataField())) {
-							getPartnersRatingPredicate((Integer) valueProvider.get(item.getFilterValue()), criteria, entityManager);
-						}
-						Expression<Comparable> comparableExpression = order.get(item.getFilterDataField());
-						predicate = builder.greaterThanOrEqualTo(comparableExpression, (Comparable) valueProvider.get(item.getFilterValue()));
+					if ("summaryRating".equals(item.getFilterDataField())) {
+						predicate = getSummaryRatingPredicate((Integer) valueProvider.get(item.getFilterValue()),
+								criteria, builder);
+					} else if("opennessRating".equals(item.getFilterDataField())) {
+						predicate = getOpenessRatingPredicate((Integer) valueProvider.get(item.getFilterValue()),
+								criteria, builder);
+					} else if("responsesCount".equals(item.getFilterDataField())) {
+						predicate = getResponsesCountPredicate((Integer) valueProvider.get(item.getFilterValue()),
+								userId, criteria, entityManager);
+					} else if("partnersRating".equals(item.getFilterDataField())) {
+						predicate = getPartnersRatingPredicate((Integer) valueProvider.get(item.getFilterValue()),
+								criteria, entityManager);
+					} else {
+						predicate = builder.greaterThanOrEqualTo((Expression<Comparable>) expression,
+								(Comparable) valueProvider.get(item.getFilterValue()));
 					}
 					break;
 				case GREATER_THAN:
-					if (valueProvider instanceof Comparable) {
-						Expression<Comparable> comparableExpression = order.get(item.getFilterDataField());
-						predicate = builder.greaterThan(comparableExpression, (Comparable) valueProvider.get(item.getFilterValue()));
-					}
+					predicate = builder.greaterThan((Expression<Comparable>) expression,
+							(Comparable) valueProvider.get(item.getFilterValue()));
 					break;
 			}
 			if (prevPredicate != null) {
@@ -328,8 +300,7 @@ public class OrderDAO {
 		Expression<Double> successOrdersCountProd = builder.prod(fromStatistics.<Double>get("successOrdersCount"), env.getUserRatingTransactionsFactor());
 		Expression<Double> sumExpression = builder.sum(openessRatingProd, successOrdersCountProd);
 		subquery.where(builder.greaterThanOrEqualTo(sumExpression, filterValue));
-		Predicate valuePredicate = builder.in(order.get("userId")).value(subquery);
-		return valuePredicate;
+		return builder.in(order.get("userId")).value(subquery);
 	}
 	
 	private Predicate getOpenessRatingPredicate(int filterValue, CriteriaQuery criteria, CriteriaBuilder builder) {

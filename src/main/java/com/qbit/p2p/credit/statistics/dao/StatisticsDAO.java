@@ -143,7 +143,7 @@ public class StatisticsDAO {
 			
 			Subquery<String> usersIdSubquery = criteria.subquery(String.class);
 			Root fromOrder = criteria.from(OrderInfo.class);
-			usersIdSubquery.select(fromOrder.get("approvedUserId")).distinct(true);
+			usersIdSubquery.select(fromOrder.get("partnerId")).distinct(true);
 			usersIdSubquery.where(
 				builder.and(builder.equal(fromOrder.get("status"), OrderStatus.SUCCESS), builder.equal(fromOrder.get("userId"), userId)));
 	

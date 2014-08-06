@@ -75,7 +75,7 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 
 	@OneToMany(cascade = CascadeType.ALL, targetEntity = Respond.class)
 	private List<Respond> responses = new ArrayList<>();
-	private String approvedUserId;
+	private String partnerId;
 
 	@OneToOne(cascade = CascadeType.ALL)
 	private Comment comment;
@@ -205,12 +205,12 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 		this.responses = responses;
 	}
 
-	public String getApprovedUserId() {
-		return approvedUserId;
+	public String getPartnerId() {
+		return partnerId;
 	}
 
-	public void setApprovedUserId(String approvedUserId) {
-		this.approvedUserId = approvedUserId;
+	public void setPartnerId(String partnerId) {
+		this.partnerId = partnerId;
 	}
 
 	public Comment getComment() {
@@ -235,6 +235,6 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 
 	@Override
 	public String toString() {
-		return "OrderInfo{" + "id=" + id + ", userId=" + userId + ", status=" + status + ", incomingAmount=" + incomingAmount + ", incomingCurrency=" + incomingCurrency + ", outcomingAmout=" + outcomingAmout + ", outcomingCurrency=" + outcomingCurrency + ", creationDate=" + creationDate + ", bookingDeadline=" + bookingDeadline + ", duration=" + duration + ", durationType=" + durationType + ", categories=" + categories + ", languages=" + languages + ", orderData=" + orderData + ", responses=" + responses + ", approvedUserId=" + approvedUserId + ", comment=" + comment + '}';
+		return "OrderInfo{" + "id=" + id + ", userId=" + userId + ", status=" + status + ", incomingAmount=" + incomingAmount + ", incomingCurrency=" + incomingCurrency + ", outcomingAmout=" + outcomingAmout + ", outcomingCurrency=" + outcomingCurrency + ", creationDate=" + creationDate + ", bookingDeadline=" + bookingDeadline + ", duration=" + duration + ", durationType=" + durationType + ", categories=" + categories + ", languages=" + languages + ", orderData=" + orderData + ", responses=" + responses + ", partnerId=" + partnerId + ", comment=" + comment + '}';
 	}
 }

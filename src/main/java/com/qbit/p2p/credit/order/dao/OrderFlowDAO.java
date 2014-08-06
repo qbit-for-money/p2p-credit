@@ -8,6 +8,7 @@ import com.qbit.p2p.credit.order.model.OrderStatus;
 import com.qbit.p2p.credit.order.model.Respond;
 import com.qbit.p2p.credit.statistics.service.StatisticsService;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -84,20 +85,18 @@ public class OrderFlowDAO {
 			CriteriaUpdate<OrderInfo> update = builder.createCriteriaUpdate(OrderInfo.class);
 			Root<OrderInfo> root = update.from(OrderInfo.class);
 			if (OrderStatus.IN_PROCESS == status) {
-				update.set("approvedUserId", partnerId);
+				update.set("partnerId", partnerId);
 			}
-			if(counteragentStatus != null) {
-				update.set("status", counteragentStatus);
-			} else {
-				update.set("status", status);
-			}
+			update.set("status", status);
 			update.where(builder.equal(root.get("id"), orderId));
 			update.where(builder.equal(root.get("userId"), userId));
 			int numberOfEntities = entityManager.createQuery(update).executeUpdate();
-			statisticsService.recalculatePartnersRating(userId);
-			if (OrderStatus.SUCCESS == status) {
+			
+			if (EnumSet.of(OrderStatus.SUCCESS, OrderStatus.NOT_SUCCESS, OrderStatus.ARBITRATION).contains(status)) {
+				statisticsService.recalculatePartnersRating(userId);
 				statisticsService.recalculatePartnersRating(partnerId);
 			}
+			
 			return numberOfEntities;
 		} finally {
 			entityManager.close();
