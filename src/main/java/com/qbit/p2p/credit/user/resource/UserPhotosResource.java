@@ -54,7 +54,7 @@ public class UserPhotosResource {
 			bufferedImage = ImageIO.read(imageFile);
 			ImageIO.write(bufferedImage, "jpeg", outputStream);
 		} catch (IOException ex) {
-			Logger.getLogger(UserPhotosResource.class.getName()).log(Level.SEVERE, null, ex);
+			throw new WebApplicationException(ex);
 		}
 		return outputStream.toByteArray();
 	}
