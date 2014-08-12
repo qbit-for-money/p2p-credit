@@ -225,11 +225,7 @@ public class OrderDAO {
 								containsArray = builder.or(containsItems, containsArray);
 							}
 						}
-						if (predicate == null) {
-							predicate = containsArray;
-						} else {
-							predicate = builder.and(containsArray, predicate);
-						}
+						predicate = containsArray;
 					}
 					break;
 				default:
@@ -293,9 +289,9 @@ public class OrderDAO {
 				}
 				prevPredicate = predicate;
 			}
-			if (prevPredicate != null) {
-				criteria.where(prevPredicate);
-			}
+		}
+		if (prevPredicate != null) {
+			criteria.where(prevPredicate);
 		}
 		return criteria;
 
@@ -310,7 +306,7 @@ public class OrderDAO {
 		Expression<Double> successOrdersCountProd = builder.prod(fromStatistics.<Double>get("successOrdersCount"), env.getUserRatingTransactionsFactor());
 		Expression<Double> sumExpression = builder.sum(openessRatingProd, successOrdersCountProd);
 		subquery.where(builder.greaterThanOrEqualTo(sumExpression, filterValue));
-		return builder.in(order.get("userId")).value(subquery);
+		return builder.in(order.get("userId")).value(subquery); 
 	}
 
 	private Predicate getOpenessRatingPredicate(int filterValue, CriteriaQuery criteria, CriteriaBuilder builder) {

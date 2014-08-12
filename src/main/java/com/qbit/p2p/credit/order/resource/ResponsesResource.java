@@ -49,7 +49,7 @@ public class ResponsesResource {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public OrderInfo approveRespond(RespondCreationRequest respondRequest) {
+	public int approveRespond(RespondCreationRequest respondRequest) {
 		String userId = AuthFilter.getUserId(request);
 		Comment comment = new Comment(userId, respondRequest.getComment());
 		return orderFlowDAO.approveRespond(respondRequest.getOrderId(), userId, respondRequest.getUserId(), comment);

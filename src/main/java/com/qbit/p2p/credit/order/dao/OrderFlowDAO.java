@@ -85,11 +85,16 @@ public class OrderFlowDAO {
 			CriteriaUpdate<OrderInfo> update = builder.createCriteriaUpdate(OrderInfo.class);
 			Root<OrderInfo> root = update.from(OrderInfo.class);
 			update.set("status", status);
-			update.where(builder.equal(root.get("id"), orderId));
-			update.where(builder.equal(root.get("partnerId"), partnerId));
+			Predicate updateStatusPredicate = builder.equal(root.get("id"), orderId);
+			updateStatusPredicate = builder.and(updateStatusPredicate, builder.equal(root.get("partnerId"), partnerId));
+			Predicate possibleStatusesPredicate = getPossibleStatusesPredicate(status, root, builder);
+			if (possibleStatusesPredicate != null) {
+				updateStatusPredicate = builder.and(updateStatusPredicate, possibleStatusesPredicate);
+			}
+			update.where(updateStatusPredicate);
 			int numberOfEntities = entityManager.createQuery(update).executeUpdate();
 			if (EnumSet.of(OrderStatus.SUCCESS, OrderStatus.NOT_SUCCESS, OrderStatus.ARBITRATION).contains(status)) {
-				//statisticsService.recalculatePartnersRating(order.getUserId());
+				statisticsService.recalculateUserOrdersStatistics(partnerId);
 				statisticsService.recalculatePartnersRating(partnerId);
 			}
 			return numberOfEntities;
@@ -108,50 +113,28 @@ public class OrderFlowDAO {
 			@Override
 			public Integer
 				call(EntityManager entityManager) {
-				return changeStatus(orderId, userId, status, comment, entityManager);
-			}
-		});
-	}
-
-	public OrderInfo approveRespond(final String orderId, final String userId, final String partnerId, final Comment comment) {
-		if (partnerId == null || partnerId.isEmpty()) {
-			return null;
-		}
-		return invokeInTransaction(entityManagerFactory, new TrCallable<OrderInfo>() {
-
-			@Override
-			public OrderInfo
-				call(EntityManager entityManager) {
-
-				OrderInfo order = entityManager.find(OrderInfo.class, orderId, LockModeType.PESSIMISTIC_WRITE);
-				if ((order == null) || !order.getUserId().equals(userId)) {
-					return null;
-				}
-				if (!order.isContainsRespond(userId) || (order.getPartnerId() != null)) {
-					return null;
-				}
 				CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 				CriteriaUpdate<OrderInfo> update = builder.createCriteriaUpdate(OrderInfo.class);
 				Root<OrderInfo> root = update.from(OrderInfo.class);
-				update.set("partnerId", partnerId);
-				update.where(builder.equal(root.get("id"), orderId));
-				update.where(builder.equal(root.get("userId"), userId));
-				entityManager.createQuery(update).executeUpdate();
-				order.setPartnerId(userId);
-				order.setStatus(OrderStatus.IN_PROCESS);
-				int numberOfEntities = changeStatus(orderId, userId, OrderStatus.IN_PROCESS, comment, entityManager);
-				return (numberOfEntities == 0) ? null : order;
+				update.set("status", status);
+				Predicate updateStatusPredicate = builder.equal(root.get("id"), orderId);
+				updateStatusPredicate = builder.and(updateStatusPredicate, builder.equal(root.get("userId"), userId));
+				Predicate possibleStatusesPredicate = getPossibleStatusesPredicate(status, root, builder);
+				if (possibleStatusesPredicate != null) {
+					updateStatusPredicate = builder.and(updateStatusPredicate, possibleStatusesPredicate);
+				}
+				update.where(updateStatusPredicate);
+				int numberOfEntities = entityManager.createQuery(update).executeUpdate();
+				if (EnumSet.of(OrderStatus.SUCCESS, OrderStatus.NOT_SUCCESS, OrderStatus.ARBITRATION).contains(status)) {
+					statisticsService.recalculateUserOrdersStatistics(userId);
+					statisticsService.recalculatePartnersRating(userId);
+				}
+				return numberOfEntities;
 			}
 		});
 	}
 
-	private int changeStatus(String orderId, String userId, OrderStatus status, Comment comment, EntityManager entityManager) {
-		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-		CriteriaUpdate<OrderInfo> update = builder.createCriteriaUpdate(OrderInfo.class);
-		Root<OrderInfo> root = update.from(OrderInfo.class);
-		update.set("status", status);
-		Predicate updateStatusPredicate = builder.equal(root.get("id"), orderId);
-		builder.and(updateStatusPredicate, builder.equal(root.get("userId"), userId));
+	private Predicate getPossibleStatusesPredicate(OrderStatus status, Root<OrderInfo> root, CriteriaBuilder builder) {
 		Predicate possibleStatusesPredicate = null;
 		for (OrderStatus possibleStatus : status.prev()) {
 			Predicate statusPredicate = builder.equal(root.<OrderStatus>get("status"), possibleStatus);
@@ -161,16 +144,32 @@ public class OrderFlowDAO {
 				possibleStatusesPredicate = builder.or(statusPredicate, possibleStatusesPredicate);
 			}
 		}
-		if (possibleStatusesPredicate != null) {
-			updateStatusPredicate = builder.and(updateStatusPredicate, possibleStatusesPredicate);
+		return builder.and(possibleStatusesPredicate, builder.notEqual(root.<OrderStatus>get("status"), OrderStatus.OPENED));
+
+	}
+
+	public Integer approveRespond(final String orderId, final String userId, final String partnerId, final Comment comment) {
+		if (partnerId == null || partnerId.isEmpty()) {
+			return null;
 		}
-		update.where(builder.equal(root.<OrderStatus>get("status"), updateStatusPredicate));
-		int numberOfEntities = entityManager.createQuery(update).executeUpdate();
-		if (EnumSet.of(OrderStatus.SUCCESS, OrderStatus.NOT_SUCCESS, OrderStatus.ARBITRATION).contains(status)) {
-			statisticsService.recalculateUserOrdersStatistics(userId);
-			//statisticsService.recalculatePartnersRating(order.getPartnerId());
-			statisticsService.recalculatePartnersRating(userId);
-		}
-		return numberOfEntities;
+		return invokeInTransaction(entityManagerFactory, new TrCallable<Integer>() {
+
+			@Override
+			public Integer
+				call(EntityManager entityManager) {
+				CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+				CriteriaUpdate<OrderInfo> update = builder.createCriteriaUpdate(OrderInfo.class);
+				Root<OrderInfo> root = update.from(OrderInfo.class);
+				update.set("partnerId", partnerId);
+				update.set("status", OrderStatus.IN_PROCESS);
+				Predicate predicate = builder.and(
+					builder.equal(root.get("id"), orderId),
+					builder.equal(root.get("userId"), userId),
+					builder.equal(root.get("status"), OrderStatus.OPENED),
+					builder.isNull(root.get("partnerId")));
+				update.where(predicate);
+				return entityManager.createQuery(update).executeUpdate();
+			}
+		});
 	}
 }

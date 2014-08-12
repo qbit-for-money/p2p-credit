@@ -3,6 +3,7 @@ package com.qbit.p2p.credit.statistics.service;
 import com.qbit.p2p.credit.order.dao.OrderDAO;
 import com.qbit.p2p.credit.order.model.FilterCondition;
 import com.qbit.p2p.credit.order.model.FilterItem;
+import com.qbit.p2p.credit.order.model.FilterOperator;
 import com.qbit.p2p.credit.order.model.SearchRequest;
 import com.qbit.p2p.credit.statistics.dao.StatisticsDAO;
 import com.qbit.p2p.credit.statistics.model.GlobalStatistics;
@@ -81,27 +82,33 @@ public class StatisticsService {
 		filterItem.setFilterDataField("status");
 		filterItem.setFilterCondition(FilterCondition.EQUAL);
 		filterItem.setFilterValue("SUCCESS");
-		filter.setFilterItems(Arrays.asList(filterItem));
-		long successLength = orderDAO.lengthWithFilter(userId, filter);
+		
+		FilterItem userIdFilterItem = new FilterItem();
+		userIdFilterItem.setFilterDataField("userId");
+		userIdFilterItem.setFilterCondition(FilterCondition.EQUAL);
+		userIdFilterItem.setFilterValue(userId);
+		userIdFilterItem.setFilterOperator(FilterOperator.AND);
+		filter.setFilterItems(Arrays.asList(filterItem, userIdFilterItem));
+		long successLength = orderDAO.lengthWithFilter(filter);
 		filterItem.setFilterValue("NOT_SUCCESS");
-		filter.setFilterItems(Arrays.asList(filterItem));
-		long notSuccessLength = orderDAO.lengthWithFilter(userId, filter);
+		filter.setFilterItems(Arrays.asList(filterItem, userIdFilterItem));
+		long notSuccessLength = orderDAO.lengthWithFilter(filter);
 		statistics.setOrdersRating(successLength - notSuccessLength);
 
 		filterItem = new FilterItem();
 		filterItem.setFilterDataField("status");
 		filterItem.setFilterCondition(FilterCondition.NOT_EQUAL);
 		filterItem.setFilterValue("OPENED");
-		filter.setFilterItems(Arrays.asList(filterItem));
-		long ordersCount = orderDAO.lengthWithFilter(userId, filter);
+		filter.setFilterItems(Arrays.asList(filterItem, userIdFilterItem));
+		long ordersCount = orderDAO.lengthWithFilter(filter);
 		statistics.setOrdersCount(ordersCount);
 
 		filterItem = new FilterItem();
 		filterItem.setFilterDataField("status");
 		filterItem.setFilterCondition(FilterCondition.EQUAL);
 		filterItem.setFilterValue("SUCCESS");
-		filter.setFilterItems(Arrays.asList(filterItem));
-		long allSuccessOrdersCount = orderDAO.lengthWithFilter(userId, filter);
+		filter.setFilterItems(Arrays.asList(filterItem, userIdFilterItem));
+		long allSuccessOrdersCount = orderDAO.lengthWithFilter(filter);
 		statistics.setSuccessOrdersCount(allSuccessOrdersCount);
 
 		statisticsDAO.updateUserOrdersStatistics(statistics);
