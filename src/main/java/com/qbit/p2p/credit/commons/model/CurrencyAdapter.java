@@ -1,4 +1,4 @@
-package com.qbit.p2p.credit.money.model.serialization;
+package com.qbit.p2p.credit.commons.model;
 
 import com.qbit.p2p.credit.commons.model.Currency;
 import java.io.Serializable;

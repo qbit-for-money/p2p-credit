@@ -30,10 +30,9 @@ public class MaterialsResource {
 	private MaterialDAO materialDAO;
 	
 	@GET
-	@Path("byUser")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Material> getByUser(@QueryParam("userId") String userId, @QueryParam("offset") int offset, @QueryParam("limit") int limit) {
-		return materialDAO.findByUser(userId, offset, limit);
+	public MaterialsWrapper getByUser(@QueryParam("userId") String userId, @QueryParam("offset") int offset, @QueryParam("limit") int limit) {
+		return new MaterialsWrapper(materialDAO.findByUser(userId, offset, limit));
 	}
 	
 	@PUT
@@ -41,9 +40,6 @@ public class MaterialsResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Material create(Material material) {
 		String userId = AuthFilter.getUserId(request);
-		if (userId == null) {
-			return null;
-		}
 		material.setUserId(userId);
 		return materialDAO.create(material);
 	}

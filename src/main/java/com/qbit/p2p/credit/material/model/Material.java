@@ -3,6 +3,7 @@ package com.qbit.p2p.credit.material.model;
 import java.io.Serializable;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -32,7 +33,7 @@ public class Material implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@XmlTransient
 	private String id;
-	
+	@Column(nullable = false)
 	private String userId;
 	private MaterialType type;
 	private String title;

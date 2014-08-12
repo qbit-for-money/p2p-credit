@@ -1,7 +1,7 @@
 package com.qbit.p2p.credit.user.model;
 
 import com.qbit.p2p.credit.commons.model.Currency;
-import com.qbit.p2p.credit.money.model.serialization.CurrencyAdapter;
+import com.qbit.p2p.credit.commons.model.CurrencyAdapter;
 import java.io.Serializable;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;

@@ -6,7 +6,6 @@ import com.qbit.p2p.credit.order.dao.OrderDAO;
 import com.qbit.p2p.credit.order.dao.OrderFlowDAO;
 import com.qbit.p2p.credit.order.model.Comment;
 import com.qbit.p2p.credit.order.model.OrderInfo;
-import com.qbit.p2p.credit.order.model.OrderStatus;
 import com.qbit.p2p.credit.statistics.service.StatisticsService;
 import java.util.List;
 import javax.inject.Inject;
@@ -52,10 +51,6 @@ public class OrdersResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public OrderInfo create(OrderInfo order) {
 		String userId = AuthFilter.getUserId(request);
-		if (userId == null) {
-			return null;
-		}
-		System.out.println("## " + order);
 		order.setUserId(userId);
 		if (!order.isValid()) {
 			return null;
@@ -65,21 +60,45 @@ public class OrdersResource {
 		return newOrder;
 	}
 
-	@POST
+	/*@POST
 	@Path("status")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public int changeOrderStatus(OrderChangeStatusRequest statusRequest) {
-		OrderInfo order = new OrderInfo();
+		if((statusRequest == null) || (statusRequest.getOrderId() == null) || statusRequest.getOrderId().isEmpty()) {
+			return 0;
+		}
+		OrderInfo order = orderDAO.find(statusRequest.getOrderId());
 		
 		String userId = AuthFilter.getUserId(request);
 		
 		order.setStatus(statusRequest.getStatus());
-		order.setComment(new Comment(statusRequest.getComment()));
+		order.setComment(new Comment(userId, statusRequest.getComment()));
 		if(!userId.equals(order.getUserId())) {
 			return orderFlowDAO.changeStatus(order.getId(), order.getUserId(), null, userId, statusRequest.getStatus());
 		} else {
 			return orderFlowDAO.changeStatus(order.getId(), order.getUserId(), statusRequest.getStatus(), userId, null);
 		}
-	}	
+	}*/
+	
+	@POST
+	@Path("status")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public int changeOrderStatus(OrderChangeStatusRequest statusRequest) {
+		if((statusRequest == null) || (statusRequest.getOrderId() == null) || statusRequest.getOrderId().isEmpty()) {
+			return 0;
+		}
+		OrderInfo order = orderDAO.find(statusRequest.getOrderId());
+		if(order == null) {
+			return 0;
+		}
+		String userId = AuthFilter.getUserId(request);
+		Comment comment = new Comment(userId, statusRequest.getComment());
+		if(userId.equals(order.getUserId())) {
+			return orderFlowDAO.changeStatus(statusRequest.getOrderId(), userId, statusRequest.getStatus(), comment);
+		} else {
+			return orderFlowDAO.changeStatusByPartner(statusRequest.getOrderId(), userId, statusRequest.getStatus(), comment);
+		}
+	}
 }

@@ -23,7 +23,6 @@ public class Statistics implements Serializable {
 	
 	private long opennessRating;
 	private long ordersRating;
-	private long ordersValue;
 	private long ordersCount;
 	private long successOrdersCount;
 	private long partnersRating;
@@ -59,14 +58,6 @@ public class Statistics implements Serializable {
 		this.ordersRating = ordersRating;
 	}
 
-	public long getOrdersValue() {
-		return ordersValue;
-	}
-
-	public void setOrdersValue(long ordersValue) {
-		this.ordersValue = ordersValue;
-	}
-
 	public long getOrdersCount() {
 		return ordersCount;
 	}
@@ -93,6 +84,6 @@ public class Statistics implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Statistics{" + "id=" + id + ", opennessRating=" + opennessRating + ", ordersRating=" + ordersRating + ", ordersValue=" + ordersValue + ", ordersCount=" + ordersCount + ", successOrdersCount=" + successOrdersCount + '}';
+		return "Statistics{" + "id=" + id + ", opennessRating=" + opennessRating + ", ordersRating=" + ordersRating + ", ordersCount=" + ordersCount + ", successOrdersCount=" + successOrdersCount + ", partnersRating=" + partnersRating + '}';
 	}
 }

@@ -11,6 +11,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 /**
  * @author Alexander_Sergeev
@@ -34,7 +35,7 @@ public class LanguageDAO {
 					return language;
 				}
 				language = new Language(code);
-				language.setCustom(true);
+				language.setCustom(false);
 				entityManager.merge(language);
 				return language;
 			}
@@ -46,7 +47,9 @@ public class LanguageDAO {
 		try {
 			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 			CriteriaQuery<Language> criteriaQuery = builder.createQuery(Language.class);
+			Root<Language> language = criteriaQuery.from(Language.class);
 			criteriaQuery.select(criteriaQuery.from(Language.class));
+			criteriaQuery.where(builder.equal(language.get("custom"), "f"));
 			TypedQuery<Language> query = entityManager.createQuery(criteriaQuery);
 			return query.getResultList();
 		} finally {

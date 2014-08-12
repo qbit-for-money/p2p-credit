@@ -37,6 +37,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 import javax.persistence.metamodel.EntityType;
+import javax.ws.rs.WebApplicationException;
 
 /**
  *
@@ -53,6 +54,7 @@ public class OrderDAO {
 
 	private static final Map<String, ValueProvider> VALUE_PROVIDERS_MAP;
 	private static final Map<String, String> EXPRESSION_PROVIDERS_MAP;
+
 	static {
 		VALUE_PROVIDERS_MAP = new HashMap<>();
 		VALUE_PROVIDERS_MAP.put("status", OrderStatusValueProvider.INST);
@@ -214,15 +216,23 @@ public class OrderDAO {
 					}
 					Object value = valueProvider.get(item.getFilterValue());
 					if (value instanceof Object[]) {
+						Predicate containsArray = null;
 						for (Object itemValue : (Object[]) value) {
 							Predicate containsItems = builder.isMember(itemValue, itemsExpression);
-							if (predicate == null) {
-								predicate = containsItems;
+							if (containsArray == null) {
+								containsArray = containsItems;
 							} else {
-								predicate = builder.or(containsItems, predicate);
+								containsArray = builder.or(containsItems, containsArray);
 							}
 						}
+						if (predicate == null) {
+							predicate = containsArray;
+						} else {
+							predicate = builder.and(containsArray, predicate);
+						}
 					}
+					break;
+				default:
 				case EQUAL:
 					if ("userId".equals(item.getFilterDataField()) && "CURRENT".equals(item.getFilterValue())) {
 						if ((userId != null) && !userId.isEmpty() && userId.contains("@")) {
@@ -239,47 +249,47 @@ public class OrderDAO {
 				case STARTS_WITH:
 					EntityType<OrderInfo> type = entityManager.getMetamodel().entity(OrderInfo.class);
 					predicate = builder.like(
-							builder.lower(order.get(
-											type.getDeclaredSingularAttribute(item.getFilterDataField(), String.class))),
-							item.getFilterValue().toLowerCase() + "%");
+						builder.lower(order.get(
+								type.getDeclaredSingularAttribute(item.getFilterDataField(), String.class))),
+						item.getFilterValue().toLowerCase() + "%");
 					break;
 				case LESS_THAN_OR_EQUAL:
 					predicate = builder.lessThanOrEqualTo((Expression<Comparable>) expression,
-							(Comparable) valueProvider.get(item.getFilterValue()));
+						(Comparable) valueProvider.get(item.getFilterValue()));
 					break;
 				case LESS_THAN:
 					predicate = builder.lessThan((Expression<Comparable>) expression,
-							(Comparable) valueProvider.get(item.getFilterValue()));
+						(Comparable) valueProvider.get(item.getFilterValue()));
 					break;
 				case GREATER_THAN_OR_EQUAL:
 					if ("summaryRating".equals(item.getFilterDataField())) {
 						predicate = getSummaryRatingPredicate((Integer) valueProvider.get(item.getFilterValue()),
-								criteria, builder);
-					} else if("opennessRating".equals(item.getFilterDataField())) {
+							criteria, builder);
+					} else if ("opennessRating".equals(item.getFilterDataField())) {
 						predicate = getOpenessRatingPredicate((Integer) valueProvider.get(item.getFilterValue()),
-								criteria, builder);
-					} else if("responsesCount".equals(item.getFilterDataField())) {
-						predicate = getResponsesCountPredicate((Integer) valueProvider.get(item.getFilterValue()),
-								userId, criteria, entityManager);
-					} else if("partnersRating".equals(item.getFilterDataField())) {
+							criteria, builder);
+					} else if ("partnersRating".equals(item.getFilterDataField())) {
 						predicate = getPartnersRatingPredicate((Integer) valueProvider.get(item.getFilterValue()),
-								criteria, entityManager);
+							criteria, entityManager);
 					} else {
 						predicate = builder.greaterThanOrEqualTo((Expression<Comparable>) expression,
-								(Comparable) valueProvider.get(item.getFilterValue()));
+							(Comparable) valueProvider.get(item.getFilterValue()));
 					}
 					break;
 				case GREATER_THAN:
 					predicate = builder.greaterThan((Expression<Comparable>) expression,
-							(Comparable) valueProvider.get(item.getFilterValue()));
+						(Comparable) valueProvider.get(item.getFilterValue()));
 					break;
 			}
 			if (prevPredicate != null) {
 				switch (item.getFilterOperator()) {
+					default:
 					case AND:
 						predicate = builder.and(prevPredicate, predicate);
+						break;
 					case OR:
 						predicate = builder.or(prevPredicate, predicate);
+						break;
 				}
 				prevPredicate = predicate;
 			}
@@ -302,7 +312,7 @@ public class OrderDAO {
 		subquery.where(builder.greaterThanOrEqualTo(sumExpression, filterValue));
 		return builder.in(order.get("userId")).value(subquery);
 	}
-	
+
 	private Predicate getOpenessRatingPredicate(int filterValue, CriteriaQuery criteria, CriteriaBuilder builder) {
 		Root<OrderInfo> order = criteria.from(OrderInfo.class);
 		Subquery<Statistics> subquery = criteria.subquery(Statistics.class);
@@ -312,25 +322,10 @@ public class OrderDAO {
 		subquery.where(builder.greaterThanOrEqualTo(openessRatingProd, filterValue));
 		return builder.in(order.get("userId")).value(subquery);
 	}
-	
-	private Predicate getResponsesCountPredicate(int filterValue, String userId, CriteriaQuery criteria, EntityManager entityManager) {
-		Root<OrderInfo> order = criteria.from(OrderInfo.class);
-		
-		
-		TypedQuery<String> query = entityManager.createQuery("SELECT o.id FROM OrderInfo o JOIN o.responses r GROUP BY o.id HAVING count(r) >= :count AND o.userId = :userId", String.class);
-		query.setParameter("count", filterValue);
-		query.setParameter("userId", userId);
-		List<String> ordersId = query.getResultList();
 
-		if ((ordersId == null) || ordersId.isEmpty()) {
-			ordersId.add("");
-		}
-		return order.get("id").in(ordersId);
-	}
-	
 	private Predicate getPartnersRatingPredicate(int filterValue, CriteriaQuery criteria, EntityManager entityManager) {
 		Root<OrderInfo> order = criteria.from(OrderInfo.class);
-		
+
 		TypedQuery<String> query = entityManager.createNamedQuery("OrderInfo.findByPartnersRating", String.class);
 		query.setParameter("status", OrderStatus.SUCCESS);
 		query.setParameter("rating", filterValue);

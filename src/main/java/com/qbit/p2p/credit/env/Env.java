@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * P2P properties
@@ -35,10 +36,13 @@ public class Env {
 	}
 	
 	@XmlElement
+	@XmlTransient
 	public String getUserPhotoPathFolder() {
 		return properties.getProperty("user.photo.path.folder");
 	}
 	
+	@XmlElement
+	@XmlTransient
 	public int getUpdateGlobalStatisticsWorkerPeriodHours() {
 		return Integer.parseInt(properties.getProperty("global.statistics.worker.period.hours"));
 	}

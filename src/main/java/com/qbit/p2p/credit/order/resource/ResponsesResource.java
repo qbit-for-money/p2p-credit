@@ -3,6 +3,7 @@ package com.qbit.p2p.credit.order.resource;
 import com.qbit.commons.auth.AuthFilter;
 import com.qbit.p2p.credit.order.dao.OrderDAO;
 import com.qbit.p2p.credit.order.dao.OrderFlowDAO;
+import com.qbit.p2p.credit.order.model.Comment;
 import com.qbit.p2p.credit.order.model.OrderInfo;
 import com.qbit.p2p.credit.order.model.OrderStatus;
 import com.qbit.p2p.credit.order.model.Respond;
@@ -52,7 +53,7 @@ public class ResponsesResource {
 		return o;
 	}
 
-	@POST
+	/*@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public OrderInfo approveRespond(RespondCreationRequest respondRequest) {
@@ -72,11 +73,14 @@ public class ResponsesResource {
 			}
 		}
 		return null;
-	}
-
-	@GET
+	}*/
+	
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Respond getRespondByUser(@QueryParam("userId") String userId) {
-		return orderFlowDAO.findRespond(userId);
+	public OrderInfo approveRespond(RespondCreationRequest respondRequest) {
+		String userId = AuthFilter.getUserId(request);
+		Comment comment = new Comment(userId, respondRequest.getComment());
+		return orderFlowDAO.approveRespond(respondRequest.getOrderId(), userId, respondRequest.getUserId(), comment);
 	}
 }

@@ -12,6 +12,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 /**
  * @author Alexander_Sergeev
@@ -22,7 +23,7 @@ public class CategoryDAO {
 	@Inject
 	private EntityManagerFactory entityManagerFactory;
 
-	public Category createCategory(final String code, final CategoryType type) {
+	public Category create(final String code, final CategoryType type) {
 		if ((code == null) || code.isEmpty() || type == null) {
 			throw new IllegalArgumentException("Category is not valid.");
 		}
@@ -42,13 +43,14 @@ public class CategoryDAO {
 		});
 	}
 
-	public List<Category> findAllCategories() {
+	public List<Category> findAll() {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {
 			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 			CriteriaQuery<Category> criteria = builder.createQuery(Category.class);
+			Root<Category> category = criteria.from(Category.class);
 			criteria.select(criteria.from(Category.class));
-			//criteria.where(builder.equal(category.get("custom"), "t"));
+			criteria.where(builder.equal(category.get("custom"), "f"));
 			TypedQuery<Category> query = entityManager.createQuery(criteria);
 			List<Category> c = query.getResultList();
 			return c;

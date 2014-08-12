@@ -6,7 +6,6 @@ import com.qbit.commons.dao.util.TrCallable;
 import com.qbit.p2p.credit.env.Env;
 import com.qbit.p2p.credit.order.model.OrderInfo;
 import com.qbit.p2p.credit.order.model.OrderStatus;
-import com.qbit.p2p.credit.order.model.Respond;
 import com.qbit.p2p.credit.statistics.model.GlobalStatistics;
 import com.qbit.p2p.credit.statistics.model.Statistics;
 import javax.inject.Inject;
@@ -16,8 +15,6 @@ import javax.persistence.LockModeType;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 import javax.ws.rs.WebApplicationException;
@@ -82,7 +79,6 @@ public class StatisticsDAO {
 					statistics = new Statistics(userStatistics.getId());
 				}
 				statistics.setOrdersRating(userStatistics.getOrdersRating());
-				statistics.setOrdersValue(userStatistics.getOrdersValue());
 				statistics.setOrdersCount(userStatistics.getOrdersCount());
 				statistics.setSuccessOrdersCount(userStatistics.getSuccessOrdersCount());
 				return entityManager.merge(statistics);

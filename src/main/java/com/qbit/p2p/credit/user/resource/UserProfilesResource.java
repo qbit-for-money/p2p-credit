@@ -95,7 +95,7 @@ public class UserProfilesResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public UserPublicProfile updateUserMainAttributes(UserPublicProfile userProfile) {
 		String userId = AuthFilter.getUserId(request);
-		if ((userId == null) || (userProfile == null) || !userId.equals(userProfile.getUserId())) {
+		if ((userProfile == null) || !userId.equals(userProfile.getUserId())) {
 			throw new IllegalArgumentException();
 		}
 		UserPublicProfile newProfile = userProfileDAO.updateUserMainAttributes(userProfile);
@@ -125,7 +125,7 @@ public class UserProfilesResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public UserPublicProfile updateUserVideos(UserPublicProfile userProfile) {
 		String userId = AuthFilter.getUserId(request);
-		if ((userId == null) || (userProfile == null) || !userId.equals(userProfile.getUserId())) {
+		if ((userProfile == null) || !userId.equals(userProfile.getUserId())) {
 			throw new IllegalArgumentException();
 		}
 		UserPublicProfile newProfile = userProfileDAO.updateUserVideos(userId, userProfile.getSocialLinks());
@@ -140,7 +140,7 @@ public class UserProfilesResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public UserPublicProfile updatePassportEnabled(UserPublicProfile userProfile) {
 		String userId = AuthFilter.getUserId(request);
-		if ((userId == null) || (userProfile == null) || !userId.equals(userProfile.getUserId())) {
+		if ((userProfile == null) || !userId.equals(userProfile.getUserId())) {
 			throw new IllegalArgumentException();
 		}
 		UserPublicProfile newProfile = userProfileDAO.updatePassportEnabled(userId, userProfile.isPassportEnabled());

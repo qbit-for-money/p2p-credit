@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.Objects;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -37,6 +38,7 @@ public class Respond implements Identifiable<String>, Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private String id;
+	@Column(nullable = false)
 	private String userId;
 	@XmlJavaTypeAdapter(DateAdapter.class)
 	@Temporal(TemporalType.TIMESTAMP)
