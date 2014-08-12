@@ -49,7 +49,7 @@ public class CategoryDAO {
 			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 			CriteriaQuery<Category> criteria = builder.createQuery(Category.class);
 			Root<Category> category = criteria.from(Category.class);
-			criteria.select(criteria.from(Category.class));
+			criteria.select(criteria.from(Category.class)).distinct(true);
 			criteria.where(builder.equal(category.get("custom"), "f"));
 			TypedQuery<Category> query = entityManager.createQuery(criteria);
 			List<Category> c = query.getResultList();

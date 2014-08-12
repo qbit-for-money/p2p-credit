@@ -48,7 +48,7 @@ public class LanguageDAO {
 			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 			CriteriaQuery<Language> criteriaQuery = builder.createQuery(Language.class);
 			Root<Language> language = criteriaQuery.from(Language.class);
-			criteriaQuery.select(criteriaQuery.from(Language.class));
+			criteriaQuery.select(criteriaQuery.from(Language.class)).distinct(true);
 			criteriaQuery.where(builder.equal(language.get("custom"), "f"));
 			TypedQuery<Language> query = entityManager.createQuery(criteriaQuery);
 			return query.getResultList();

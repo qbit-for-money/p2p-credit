@@ -59,27 +59,6 @@ public class OrdersResource {
 		statisticsService.recalculateUserOrdersStatistics(userId);
 		return newOrder;
 	}
-
-	/*@POST
-	@Path("status")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public int changeOrderStatus(OrderChangeStatusRequest statusRequest) {
-		if((statusRequest == null) || (statusRequest.getOrderId() == null) || statusRequest.getOrderId().isEmpty()) {
-			return 0;
-		}
-		OrderInfo order = orderDAO.find(statusRequest.getOrderId());
-		
-		String userId = AuthFilter.getUserId(request);
-		
-		order.setStatus(statusRequest.getStatus());
-		order.setComment(new Comment(userId, statusRequest.getComment()));
-		if(!userId.equals(order.getUserId())) {
-			return orderFlowDAO.changeStatus(order.getId(), order.getUserId(), null, userId, statusRequest.getStatus());
-		} else {
-			return orderFlowDAO.changeStatus(order.getId(), order.getUserId(), statusRequest.getStatus(), userId, null);
-		}
-	}*/
 	
 	@POST
 	@Path("status")
