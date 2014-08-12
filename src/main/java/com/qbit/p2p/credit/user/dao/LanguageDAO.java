@@ -35,7 +35,7 @@ public class LanguageDAO {
 					return language;
 				}
 				language = new Language(code);
-				language.setCustom(false);
+				language.setCustom(true);
 				entityManager.merge(language);
 				return language;
 			}
@@ -48,7 +48,7 @@ public class LanguageDAO {
 			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 			CriteriaQuery<Language> criteriaQuery = builder.createQuery(Language.class);
 			Root<Language> language = criteriaQuery.from(Language.class);
-			criteriaQuery.select(criteriaQuery.from(Language.class)).distinct(true);
+			criteriaQuery.select(language);
 			criteriaQuery.where(builder.equal(language.get("custom"), false));
 			TypedQuery<Language> query = entityManager.createQuery(criteriaQuery);
 			return query.getResultList();

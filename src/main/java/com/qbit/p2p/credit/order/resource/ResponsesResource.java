@@ -38,8 +38,7 @@ public class ResponsesResource {
 			return null;
 		}
 		Respond respond = respondRequest.toRespond();
-		//respond.setUserId(userId);
-		respond.setUserId("san1@mail.ru");
+		respond.setUserId(userId);
 		OrderInfo o = orderFlowDAO.addRespond(respond, respondRequest.getOrderId());
 		return o;
 	}

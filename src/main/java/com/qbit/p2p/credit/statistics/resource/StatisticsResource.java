@@ -3,6 +3,7 @@ package com.qbit.p2p.credit.statistics.resource;
 import com.qbit.p2p.credit.statistics.dao.StatisticsDAO;
 import com.qbit.p2p.credit.statistics.model.GlobalStatistics;
 import com.qbit.p2p.credit.statistics.model.Statistics;
+import com.qbit.p2p.credit.statistics.service.StatisticsService;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.GET;

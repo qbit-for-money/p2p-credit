@@ -110,7 +110,7 @@ public class UserProfilesResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public UserPublicProfile updateUserSocialLinks(UserPublicProfile userProfile) {
 		String userId = AuthFilter.getUserId(request);
-		if ((userId == null) || (userProfile == null) || !userId.equals(userProfile.getUserId())) {
+		if ((userProfile == null) || !userId.equals(userProfile.getUserId())) {
 			throw new IllegalArgumentException();
 		}
 		UserPublicProfile newProfile = userProfileDAO.updateUserSocialLinks(userId, userProfile.getSocialLinks());
@@ -128,7 +128,7 @@ public class UserProfilesResource {
 		if ((userProfile == null) || !userId.equals(userProfile.getUserId())) {
 			throw new IllegalArgumentException();
 		}
-		UserPublicProfile newProfile = userProfileDAO.updateUserVideos(userId, userProfile.getSocialLinks());
+		UserPublicProfile newProfile = userProfileDAO.updateUserVideos(userId, userProfile.getVideos());
 		statisticsService.recalculateOpenessRating(userId);
 		
 		return newProfile;

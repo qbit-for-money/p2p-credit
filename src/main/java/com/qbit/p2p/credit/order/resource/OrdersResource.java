@@ -43,7 +43,6 @@ public class OrdersResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public OrdersWrapper search(SearchRequest ordersRequest) {
-		System.out.println("!!! SEARCH");
 		String userId = AuthFilter.getUserId(request);
 		List<OrderInfo> orders = orderDAO.findWithFilter(userId, ordersRequest);
 		long length = orderDAO.lengthWithFilter(userId, ordersRequest);

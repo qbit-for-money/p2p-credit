@@ -6,6 +6,7 @@ import com.qbit.commons.dao.util.TrCallable;
 import com.qbit.commons.user.UserDAO;
 import com.qbit.commons.user.UserInfo;
 import com.qbit.p2p.credit.user.model.DataLink;
+import com.qbit.p2p.credit.user.model.Language;
 import com.qbit.p2p.credit.user.model.UserPublicProfile;
 import java.util.List;
 import javax.inject.Inject;
@@ -32,6 +33,8 @@ public class UserProfileDAO {
 
 	@Inject
 	private UserDAO userDAO;
+	@Inject
+	private LanguageDAO languageDAO;
 
 	public UserPublicProfile find(String id) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
@@ -166,13 +169,24 @@ public class UserProfileDAO {
 				userPublicProfile.setMailEnabled(userProfile.isMailEnabled());
 				userPublicProfile.setPhone(userProfile.getPhone());
 				userPublicProfile.setPhoneEnabled(userProfile.isPhoneEnabled());
-				userPublicProfile.setLanguages(userProfile.getLanguages());
+				List<Language> languages = userProfile.getLanguages();
+				if (languages != null) {
+					List<Language> notCustomLanguages = languageDAO.findAll();
+					if (notCustomLanguages != null) {
+						for (Language language : languages) {
+							if (!notCustomLanguages.contains(language)) {
+								language.setCustom(true);
+							}
+						}
+					}
+				}
+				userPublicProfile.setLanguages(languages);
 				userPublicProfile.setLanguagesEnabled(userProfile.isLanguagesEnabled());
 				userPublicProfile.setCurrencies(userProfile.getCurrencies());
 				userPublicProfile.setCurrenciesEnabled(userProfile.isCurrenciesEnabled());
 				userPublicProfile.setPersonalData(userProfile.getPersonalData());
 				userPublicProfile.setPersonalDataEnabled(userProfile.isPersonalDataEnabled());
-				return userPublicProfile;
+				return entityManager.merge(userPublicProfile);
 			}
 		});
 	}

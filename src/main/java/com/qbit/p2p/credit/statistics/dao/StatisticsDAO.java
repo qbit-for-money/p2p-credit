@@ -45,7 +45,7 @@ public class StatisticsDAO {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {
 			return DAOUtil.find(entityManagerFactory.createEntityManager(),
-				GlobalStatistics.class, 0L, null);
+				GlobalStatistics.class, 1L, null);
 		} finally {
 			entityManager.close();
 		}

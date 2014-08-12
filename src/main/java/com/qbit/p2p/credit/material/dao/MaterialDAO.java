@@ -97,8 +97,7 @@ public class MaterialDAO {
 				material.setDescription(description);
 				material.setPhysicalSize(size);
 				material.setExternalMaterials(externalMaterials);
-				entityManager.persist(material);
-				return material;
+				return entityManager.merge(material);
 			}
 		});
 	}

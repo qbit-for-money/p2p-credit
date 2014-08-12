@@ -18,6 +18,7 @@ import com.qbit.p2p.credit.order.model.SortOrder;
 import com.qbit.p2p.credit.order.dao.meta.StringArrayValueProvider;
 import com.qbit.p2p.credit.order.dao.meta.StringValueProvider;
 import com.qbit.p2p.credit.order.dao.meta.ValueProvider;
+import com.qbit.p2p.credit.order.model.Category;
 import com.qbit.p2p.credit.statistics.model.Statistics;
 import java.util.Collection;
 import java.util.Date;
@@ -50,6 +51,8 @@ public class OrderDAO {
 
 	@Inject
 	private Env env;
+	@Inject
+	private CategoryDAO categoryDAO;
 
 	private static final Map<String, ValueProvider> VALUE_PROVIDERS_MAP;
 	private static final Map<String, String> EXPRESSION_PROVIDERS_MAP;
@@ -98,6 +101,18 @@ public class OrderDAO {
 				}
 				orderInfo.setStatus(OrderStatus.OPENED);
 				orderInfo.setCreationDate(new Date());
+				List<Category> categories = orderInfo.getCategories();
+				if (categories != null) {
+					List<Category> notCustomCategories = categoryDAO.findAll();
+					if (notCustomCategories != null) {
+						for (Category category : categories) {
+							if (!notCustomCategories.contains(category)) {
+								category.setCustom(true);
+							}
+						}
+					}
+					orderInfo.setCategories(categories);
+				}
 				entityManager.merge(orderInfo);
 				return orderInfo;
 			}
@@ -145,7 +160,7 @@ public class OrderDAO {
 			CriteriaQuery criteria = builder.createQuery(OrderInfo.class);
 			Root<OrderInfo> order = criteria.from(OrderInfo.class);
 			criteria.select(order).distinct(true);
-			criteria = formCriteria(userId, searchRequest, entityManager, criteria, builder);
+			criteria = formCriteria(userId, searchRequest, order, entityManager, criteria, builder);
 
 			String sortDataField = searchRequest.getSortDataField();
 			if ((sortDataField != null) && !sortDataField.isEmpty()) {
@@ -182,19 +197,17 @@ public class OrderDAO {
 			Root<OrderInfo> order = criteria.from(OrderInfo.class);
 
 			criteria.select(builder.countDistinct(order));
-			criteria = formCriteria(userId, searchRequest, entityManager, criteria, builder);
-
+			criteria = formCriteria(userId, searchRequest, order, entityManager, criteria, builder);
 			return (Long) entityManager.createQuery(criteria).getSingleResult();
 		} finally {
 			entityManager.close();
 		}
 	}
 
-	private CriteriaQuery formCriteria(String userId, SearchRequest searchRequest, EntityManager entityManager, CriteriaQuery criteria, CriteriaBuilder builder) {
+	private CriteriaQuery formCriteria(String userId, SearchRequest searchRequest, Root<OrderInfo> order, EntityManager entityManager, CriteriaQuery criteria, CriteriaBuilder builder) {
 		if ((searchRequest == null) || (searchRequest.getFilterItems() == null)) {
 			return criteria;
 		}
-		Root<OrderInfo> order = criteria.from(OrderInfo.class);
 		Predicate prevPredicate = null;
 		for (FilterItem item : searchRequest.getFilterItems()) {
 			if ((item.getFilterDataField() == null) || (item.getFilterValue() == null)) {
