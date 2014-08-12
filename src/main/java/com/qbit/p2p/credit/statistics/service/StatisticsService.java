@@ -90,15 +90,13 @@ public class StatisticsService {
 		userIdFilterItem.setFilterOperator(FilterOperator.AND);
 		filter.setFilterItems(Arrays.asList(filterItem, userIdFilterItem));
 		long successLength = orderDAO.lengthWithFilter(filter);
-		
 		FilterItem partnerIdFilterItem = new FilterItem();
 		partnerIdFilterItem.setFilterDataField("partnerId");
 		partnerIdFilterItem.setFilterCondition(FilterCondition.EQUAL);
 		partnerIdFilterItem.setFilterValue(userId);
 		partnerIdFilterItem.setFilterOperator(FilterOperator.AND);
 		filter.setFilterItems(Arrays.asList(filterItem, partnerIdFilterItem));
-		successLength = successLength + orderDAO.lengthWithFilter(filter);
-		
+		successLength += orderDAO.lengthWithFilter(filter);
 		statistics.setSuccessOrdersCount(successLength);
 		
 		filterItem.setFilterValue("NOT_SUCCESS");
@@ -106,7 +104,7 @@ public class StatisticsService {
 		long notSuccessLength = orderDAO.lengthWithFilter(filter);
 		
 		filter.setFilterItems(Arrays.asList(filterItem, partnerIdFilterItem));
-		notSuccessLength = notSuccessLength + orderDAO.lengthWithFilter(filter);
+		notSuccessLength += orderDAO.lengthWithFilter(filter);
 		
 		statistics.setOrdersRating(successLength - notSuccessLength);
 
@@ -117,7 +115,7 @@ public class StatisticsService {
 		filter.setFilterItems(Arrays.asList(filterItem, userIdFilterItem));
 		long ordersCount = orderDAO.lengthWithFilter(filter);
 		filter.setFilterItems(Arrays.asList(filterItem, partnerIdFilterItem));
-		ordersCount = ordersCount + orderDAO.lengthWithFilter(filter);
+		ordersCount += orderDAO.lengthWithFilter(filter);
 		statistics.setOrdersCount(ordersCount);
 
 		statisticsDAO.updateUserOrdersStatistics(statistics);

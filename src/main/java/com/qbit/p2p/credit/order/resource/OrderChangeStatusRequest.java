@@ -15,6 +15,7 @@ public class OrderChangeStatusRequest {
 	private String orderId;
 	private String comment;
 	private OrderStatus status;
+	private boolean byPartner;
 
 	public String getOrderId() {
 		return orderId;
@@ -40,8 +41,16 @@ public class OrderChangeStatusRequest {
 		this.status = status;
 	}
 
+	public boolean isByPartner() {
+		return byPartner;
+	}
+
+	public void setByPartner(boolean byPartner) {
+		this.byPartner = byPartner;
+	}
+
 	@Override
 	public String toString() {
-		return "OrderChangeStatusRequest{" + "orderId=" + orderId + ", comment=" + comment + ", status=" + status + '}';
+		return "OrderChangeStatusRequest{" + "orderId=" + orderId + ", comment=" + comment + ", status=" + status + ", byPartner=" + byPartner + '}';
 	}
 }

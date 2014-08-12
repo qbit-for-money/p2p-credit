@@ -37,7 +37,6 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 import javax.persistence.metamodel.EntityType;
-import javax.ws.rs.WebApplicationException;
 
 /**
  *
@@ -58,6 +57,8 @@ public class OrderDAO {
 	static {
 		VALUE_PROVIDERS_MAP = new HashMap<>();
 		VALUE_PROVIDERS_MAP.put("status", OrderStatusValueProvider.INST);
+		VALUE_PROVIDERS_MAP.put("userId", StringValueProvider.INST);
+		VALUE_PROVIDERS_MAP.put("partnerId", StringValueProvider.INST);
 		VALUE_PROVIDERS_MAP.put("takingCurrency", StringValueProvider.INST);
 		VALUE_PROVIDERS_MAP.put("givingCurrency", StringValueProvider.INST);
 		VALUE_PROVIDERS_MAP.put("partnersRating", IntegerValueProvider.INST);
@@ -141,9 +142,7 @@ public class OrderDAO {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {
 			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-			CriteriaQuery criteria;
-
-			criteria = builder.createQuery(OrderInfo.class);
+			CriteriaQuery criteria = builder.createQuery(OrderInfo.class);
 			Root<OrderInfo> order = criteria.from(OrderInfo.class);
 			criteria.select(order).distinct(true);
 			criteria = formCriteria(userId, searchRequest, entityManager, criteria, builder);
@@ -277,7 +276,7 @@ public class OrderDAO {
 						(Comparable) valueProvider.get(item.getFilterValue()));
 					break;
 			}
-			if (prevPredicate != null) {
+			if ((prevPredicate != null) && (predicate != null)) {
 				switch (item.getFilterOperator()) {
 					default:
 					case AND:
@@ -287,8 +286,8 @@ public class OrderDAO {
 						predicate = builder.or(prevPredicate, predicate);
 						break;
 				}
-				prevPredicate = predicate;
 			}
+			prevPredicate = predicate;
 		}
 		if (prevPredicate != null) {
 			criteria.where(prevPredicate);
@@ -303,10 +302,10 @@ public class OrderDAO {
 		Root fromStatistics = subquery.from(Statistics.class);
 		subquery.select(fromStatistics.get("id"));
 		Expression<Double> openessRatingProd = builder.prod(fromStatistics.<Double>get("opennessRating"), env.getUserRatingOpenessFactor());
-		Expression<Double> successOrdersCountProd = builder.prod(fromStatistics.<Double>get("successOrdersCount"), env.getUserRatingTransactionsFactor());
+		Expression<Double> successOrdersCountProd = builder.prod(fromStatistics.<Double>get("successOrdersCount"), env.getUserSuccessOrdersCountFactor());
 		Expression<Double> sumExpression = builder.sum(openessRatingProd, successOrdersCountProd);
 		subquery.where(builder.greaterThanOrEqualTo(sumExpression, filterValue));
-		return builder.in(order.get("userId")).value(subquery); 
+		return builder.in(order.get("userId")).value(subquery);
 	}
 
 	private Predicate getOpenessRatingPredicate(int filterValue, CriteriaQuery criteria, CriteriaBuilder builder) {
@@ -326,7 +325,7 @@ public class OrderDAO {
 		query.setParameter("status", OrderStatus.SUCCESS);
 		query.setParameter("rating", filterValue);
 		query.setParameter("openessFactor", env.getUserRatingOpenessFactor());
-		query.setParameter("transactionsFactor", env.getUserRatingTransactionsFactor());
+		query.setParameter("successOrdersCountFactor", env.getUserSuccessOrdersCountFactor());
 		List<String> publicKeys = query.getResultList();
 		if ((publicKeys == null) || publicKeys.isEmpty()) {
 			publicKeys.add("");

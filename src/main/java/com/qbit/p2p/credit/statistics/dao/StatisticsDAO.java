@@ -9,6 +9,7 @@ import com.qbit.p2p.credit.order.model.OrderStatus;
 import com.qbit.p2p.credit.statistics.model.GlobalStatistics;
 import com.qbit.p2p.credit.statistics.model.Statistics;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.LockModeType;
@@ -22,6 +23,7 @@ import javax.ws.rs.WebApplicationException;
 /**
  * @author Alexander_Sergeev
  */
+@Singleton
 public class StatisticsDAO {
 
 	@Inject
@@ -133,7 +135,7 @@ public class StatisticsDAO {
 			CriteriaQuery<Double> criteria = builder.createQuery(Double.class);
 			Root<Statistics> statistics = criteria.from(Statistics.class);
 			Expression<Double> openessRatingProd = builder.prod(statistics.<Double>get("opennessRating"), env.getUserRatingOpenessFactor());
-			Expression<Double> successOrdersCountProd = builder.prod(statistics.<Double>get("successOrdersCount"), env.getUserRatingTransactionsFactor());
+			Expression<Double> successOrdersCountProd = builder.prod(statistics.<Double>get("successOrdersCount"), env.getUserSuccessOrdersCountFactor());
 			Expression<Double> sumExpression = builder.sum(openessRatingProd, successOrdersCountProd);
 			criteria.select(builder.sum(sumExpression));
 			

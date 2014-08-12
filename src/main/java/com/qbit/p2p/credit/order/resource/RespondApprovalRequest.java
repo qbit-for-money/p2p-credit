@@ -1,20 +1,17 @@
 package com.qbit.p2p.credit.order.resource;
 
-import com.qbit.p2p.credit.order.model.Respond;
-import java.util.Date;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- *
  * @author Alexander_Sergeev
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class RespondCreationRequest {
-
+public class RespondApprovalRequest {
 	private String orderId;
+	private String partnerId;
 	private String comment;
 
 	public String getOrderId() {
@@ -25,6 +22,14 @@ public class RespondCreationRequest {
 		this.orderId = orderId;
 	}
 
+	public String getPartnerId() {
+		return partnerId;
+	}
+
+	public void setPartnerId(String partnerId) {
+		this.partnerId = partnerId;
+	}
+
 	public String getComment() {
 		return comment;
 	}
@@ -32,16 +37,9 @@ public class RespondCreationRequest {
 	public void setComment(String comment) {
 		this.comment = comment;
 	}
-	
-	public Respond toRespond() {
-		Respond respond = new Respond();
-		respond.setCreationDate(new Date());
-		respond.setComment(comment);
-		return respond;
-	}
 
 	@Override
 	public String toString() {
-		return "RespondCreationRequest{" + "orderId=" + orderId + ", comment=" + comment + '}';
+		return "RespondApprovalRequest{" + "orderId=" + orderId + ", partnerId=" + partnerId + ", comment=" + comment + '}';
 	}
 }

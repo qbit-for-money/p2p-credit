@@ -53,8 +53,8 @@ public class Env {
 	}
 	
 	@XmlElement
-	public double getUserRatingTransactionsFactor() {
-		return Double.parseDouble(properties.getProperty("user.rating.transactions.factor"));
+	public double getUserSuccessOrdersCountFactor() {
+		return Double.parseDouble(properties.getProperty("user.rating.orders.success.factor"));
 	}
 	
 }

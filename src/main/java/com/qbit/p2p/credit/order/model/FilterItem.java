@@ -25,7 +25,7 @@ public class FilterItem {
 	}
 
 	public FilterCondition getFilterCondition() {
-		return filterCondition;
+		return (filterCondition == null) ? FilterCondition.EQUAL : filterCondition;
 	}
 
 	public void setFilterCondition(FilterCondition filterCondition) {
@@ -34,7 +34,7 @@ public class FilterItem {
 
 
 	public FilterOperator getFilterOperator() {
-		return filterOperator;
+		return (filterOperator == null) ? FilterOperator.AND : filterOperator;
 	}
 
 	public void setFilterOperator(FilterOperator filterOperator) {

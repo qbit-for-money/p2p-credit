@@ -6,6 +6,7 @@ import com.qbit.p2p.credit.order.dao.OrderDAO;
 import com.qbit.p2p.credit.order.dao.OrderFlowDAO;
 import com.qbit.p2p.credit.order.model.Comment;
 import com.qbit.p2p.credit.order.model.OrderInfo;
+import com.qbit.p2p.credit.statistics.dao.StatisticsDAO;
 import com.qbit.p2p.credit.statistics.service.StatisticsService;
 import java.util.List;
 import javax.inject.Inject;
@@ -34,16 +35,19 @@ public class OrdersResource {
 	private OrderFlowDAO orderFlowDAO;
 	@Inject
 	private StatisticsService statisticsService;
+	@Inject
+	private StatisticsDAO statisticsDAO;
 
 	@POST
 	@Path("search")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public OrdersWrapper search(SearchRequest ordersRequest) {
+		System.out.println("!!! SEARCH");
 		String userId = AuthFilter.getUserId(request);
 		List<OrderInfo> orders = orderDAO.findWithFilter(userId, ordersRequest);
 		long length = orderDAO.lengthWithFilter(userId, ordersRequest);
-		return new OrdersWrapper(orders, length);
+		return new OrdersWrapper(orders, length, statisticsDAO);
 	}
 
 	@PUT
@@ -61,20 +65,16 @@ public class OrdersResource {
 	}
 	
 	@POST
-	@Path("status")
+	@Path("{id}/status")
 	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
 	public int changeOrderStatus(OrderChangeStatusRequest statusRequest) {
 		if((statusRequest == null) || (statusRequest.getOrderId() == null) || statusRequest.getOrderId().isEmpty()) {
 			return 0;
 		}
-		OrderInfo order = orderDAO.find(statusRequest.getOrderId());
-		if(order == null) {
-			return 0;
-		}
 		String userId = AuthFilter.getUserId(request);
 		Comment comment = new Comment(userId, statusRequest.getComment());
-		if(userId.equals(order.getUserId())) {
+
+		if(!statusRequest.isByPartner()) {
 			return orderFlowDAO.changeStatus(statusRequest.getOrderId(), userId, statusRequest.getStatus(), comment);
 		} else {
 			return orderFlowDAO.changeStatusByPartner(statusRequest.getOrderId(), userId, statusRequest.getStatus(), comment);

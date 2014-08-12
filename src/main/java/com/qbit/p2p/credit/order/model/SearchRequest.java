@@ -21,8 +21,6 @@ public class SearchRequest {
 	private String sortDataField;
 	private int pageNumber;
 	private int pageSize;
-	private int recordstartindex;
-	private int recordendindex;
 
 	public List<FilterItem> getFilterItems() {
 		return filterItems;
@@ -56,22 +54,6 @@ public class SearchRequest {
 		this.pageSize = pageSize;
 	}
 
-	public int getRecordstartindex() {
-		return recordstartindex;
-	}
-
-	public void setRecordstartindex(int recordstartindex) {
-		this.recordstartindex = recordstartindex;
-	}
-
-	public int getRecordendindex() {
-		return recordendindex;
-	}
-
-	public void setRecordendindex(int recordendindex) {
-		this.recordendindex = recordendindex;
-	}
-
 	public int getPageNumber() {
 		return pageNumber;
 	}
@@ -82,6 +64,6 @@ public class SearchRequest {
 
 	@Override
 	public String toString() {
-		return "SearchRequest{" + "filterItems=" + filterItems + ", sortOrder=" + sortOrder + ", pageNumber=" + pageNumber + ", pageSize=" + pageSize + ", recordstartindex=" + recordstartindex + ", recordendindex=" + recordendindex + ", sortDataField=" + sortDataField + '}';
+		return "SearchRequest{" + "filterItems=" + filterItems + ", sortOrder=" + sortOrder + ", sortDataField=" + sortDataField + ", pageNumber=" + pageNumber + ", pageSize=" + pageSize + '}';
 	}
 }

@@ -7,6 +7,7 @@ import com.qbit.p2p.credit.like.model.LikeS;
 import com.qbit.p2p.credit.like.model.EntityPartId;
 import java.util.Set;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.LockModeType;
@@ -15,6 +16,7 @@ import javax.persistence.LockModeType;
  *
  * @author Alex
  */
+@Singleton
 public class LikeDAO {
 	
 	@Inject

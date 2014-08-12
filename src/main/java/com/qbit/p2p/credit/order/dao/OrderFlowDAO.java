@@ -11,6 +11,11 @@ import com.qbit.p2p.credit.statistics.service.StatisticsService;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
@@ -32,6 +37,16 @@ public class OrderFlowDAO {
 
 	@Inject
 	private StatisticsService statisticsService;
+
+	private final ExecutorService executorService = Executors.newFixedThreadPool(10, new ThreadFactory() {
+
+		@Override
+		public Thread newThread(Runnable runnable) {
+			Thread thread = new Thread(runnable, "OrderFlowDAO");
+			thread.setDaemon(true);
+			return thread;
+		}
+	});
 
 	public OrderInfo addRespond(final Respond respond, final String orderId) {
 		if (respond == null) {
@@ -58,8 +73,7 @@ public class OrderFlowDAO {
 				}
 				responses.add(respond);
 				order.setResponses(responses);
-				entityManager.merge(order);
-				return order;
+				return entityManager.merge(order);
 			}
 		});
 	}
@@ -74,33 +88,45 @@ public class OrderFlowDAO {
 		}
 	}
 
-	public int changeStatusByPartner(String orderId, String partnerId, OrderStatus status, Comment comment) {
+	public int changeStatusByPartner(final String orderId, final String partnerId, final OrderStatus status, final Comment comment) {
 		if ((orderId == null) || orderId.isEmpty() || (partnerId == null) || partnerId.isEmpty()
 			|| (status == null)) {
 			return 0;
 		}
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		try {
-			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-			CriteriaUpdate<OrderInfo> update = builder.createCriteriaUpdate(OrderInfo.class);
-			Root<OrderInfo> root = update.from(OrderInfo.class);
-			update.set("status", status);
-			Predicate updateStatusPredicate = builder.equal(root.get("id"), orderId);
-			updateStatusPredicate = builder.and(updateStatusPredicate, builder.equal(root.get("partnerId"), partnerId));
-			Predicate possibleStatusesPredicate = getPossibleStatusesPredicate(status, root, builder);
-			if (possibleStatusesPredicate != null) {
-				updateStatusPredicate = builder.and(updateStatusPredicate, possibleStatusesPredicate);
+		return invokeInTransaction(entityManagerFactory, new TrCallable<Integer>() {
+
+			@Override
+			public Integer
+				call(EntityManager entityManager) {
+				CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+				CriteriaUpdate<OrderInfo> update = builder.createCriteriaUpdate(OrderInfo.class);
+				Root<OrderInfo> root = update.from(OrderInfo.class);
+				update.set("status", status);
+				Predicate updateStatusPredicate = builder.equal(root.get("id"), orderId);
+				updateStatusPredicate = builder.and(updateStatusPredicate, builder.equal(root.get("partnerId"), partnerId));
+				Predicate possibleStatusesPredicate = getPossibleStatusesPredicate(status, root, builder);
+				if (possibleStatusesPredicate != null) {
+					updateStatusPredicate = builder.and(updateStatusPredicate, possibleStatusesPredicate);
+				}
+				update.where(updateStatusPredicate);
+				int numberOfEntities = entityManager.createQuery(update).executeUpdate();
+				if (EnumSet.of(OrderStatus.SUCCESS, OrderStatus.NOT_SUCCESS, OrderStatus.ARBITRATION).contains(status) && (numberOfEntities != 0)) {
+					executorService.submit(new Runnable() {
+						@Override
+						public void run() {
+							statisticsService.recalculateUserOrdersStatistics(partnerId);
+						}
+					});
+					executorService.submit(new Runnable() {
+						@Override
+						public void run() {
+							statisticsService.recalculatePartnersRating(partnerId);
+						}
+					});
+				}
+				return numberOfEntities;
 			}
-			update.where(updateStatusPredicate);
-			int numberOfEntities = entityManager.createQuery(update).executeUpdate();
-			if (EnumSet.of(OrderStatus.SUCCESS, OrderStatus.NOT_SUCCESS, OrderStatus.ARBITRATION).contains(status)) {
-				statisticsService.recalculateUserOrdersStatistics(partnerId);
-				statisticsService.recalculatePartnersRating(partnerId);
-			}
-			return numberOfEntities;
-		} finally {
-			entityManager.close();
-		}
+		});
 	}
 
 	public int changeStatus(final String orderId, final String userId, final OrderStatus status, final Comment comment) {
@@ -116,16 +142,21 @@ public class OrderFlowDAO {
 				CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 				CriteriaUpdate<OrderInfo> update = builder.createCriteriaUpdate(OrderInfo.class);
 				Root<OrderInfo> root = update.from(OrderInfo.class);
+
 				update.set("status", status);
 				Predicate updateStatusPredicate = builder.equal(root.get("id"), orderId);
 				updateStatusPredicate = builder.and(updateStatusPredicate, builder.equal(root.get("userId"), userId));
 				Predicate possibleStatusesPredicate = getPossibleStatusesPredicate(status, root, builder);
-				if (possibleStatusesPredicate != null) {
+				if (possibleStatusesPredicate
+					!= null) {
 					updateStatusPredicate = builder.and(updateStatusPredicate, possibleStatusesPredicate);
 				}
+
 				update.where(updateStatusPredicate);
 				int numberOfEntities = entityManager.createQuery(update).executeUpdate();
-				if (EnumSet.of(OrderStatus.SUCCESS, OrderStatus.NOT_SUCCESS, OrderStatus.ARBITRATION).contains(status)) {
+
+				if (EnumSet.of(OrderStatus.SUCCESS, OrderStatus.NOT_SUCCESS, OrderStatus.ARBITRATION)
+					.contains(status) && (numberOfEntities != 0)) {
 					statisticsService.recalculateUserOrdersStatistics(userId);
 					statisticsService.recalculatePartnersRating(userId);
 				}
@@ -148,9 +179,9 @@ public class OrderFlowDAO {
 
 	}
 
-	public Integer approveRespond(final String orderId, final String userId, final String partnerId, final Comment comment) {
+	public int approveRespond(final String orderId, final String userId, final String partnerId, final Comment comment) {
 		if (partnerId == null || partnerId.isEmpty()) {
-			return null;
+			return 0;
 		}
 		return invokeInTransaction(entityManagerFactory, new TrCallable<Integer>() {
 
@@ -171,5 +202,14 @@ public class OrderFlowDAO {
 				return entityManager.createQuery(update).executeUpdate();
 			}
 		});
+	}
+
+	@PreDestroy
+	public void shutdown() {
+		try {
+			executorService.shutdown();
+		} catch (Throwable ex) {
+			// Do nothing
+		}
 	}
 }

@@ -5,7 +5,6 @@ import com.qbit.p2p.credit.order.dao.OrderFlowDAO;
 import com.qbit.p2p.credit.order.model.Comment;
 import com.qbit.p2p.credit.order.model.OrderInfo;
 import com.qbit.p2p.credit.order.model.Respond;
-import java.util.Date;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
@@ -38,20 +37,18 @@ public class ResponsesResource {
 		if ((respondRequest == null) || (respondRequest.getOrderId() == null) || respondRequest.getOrderId().isEmpty()) {
 			return null;
 		}
-		Respond respond = new Respond();
-		respond.setUserId(userId);
-		respond.setCreationDate(new Date());
-		respond.setComment(respondRequest.getComment());
+		Respond respond = respondRequest.toRespond();
+		//respond.setUserId(userId);
+		respond.setUserId("san1@mail.ru");
 		OrderInfo o = orderFlowDAO.addRespond(respond, respondRequest.getOrderId());
 		return o;
 	}
 	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public int approveRespond(RespondCreationRequest respondRequest) {
+	public int approveRespond(RespondApprovalRequest respondRequest) {
 		String userId = AuthFilter.getUserId(request);
 		Comment comment = new Comment(userId, respondRequest.getComment());
-		return orderFlowDAO.approveRespond(respondRequest.getOrderId(), userId, respondRequest.getUserId(), comment);
+		return orderFlowDAO.approveRespond(respondRequest.getOrderId(), userId, respondRequest.getPartnerId(), comment);
 	}
 }

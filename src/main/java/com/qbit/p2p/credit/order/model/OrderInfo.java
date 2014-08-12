@@ -37,7 +37,7 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 @Entity
 @NamedQueries({
 	@NamedQuery(name = "OrderInfo.findByPartnersRating",
-		query = "SELECT t1.id FROM Statistics t0, Statistics t1 GROUP BY t0.id, t1.id HAVING t0.id IN (SELECT t3.partnerId FROM OrderInfo t3 WHERE (t3.status = :status) AND (t3.userId = t1.id) AND (t3.userId <> t0.id)) AND SUM(t0.opennessRating * :openessFactor + t0.ordersRating * :transactionsFactor) >= :rating")})
+		query = "SELECT t1.id FROM Statistics t0, Statistics t1 GROUP BY t0.id, t1.id HAVING t0.id IN (SELECT t3.partnerId FROM OrderInfo t3 WHERE (t3.status = :status) AND (t3.userId = t1.id) AND (t3.userId <> t0.id)) AND SUM(t0.opennessRating * :openessFactor + t0.ordersRating * :successOrdersCountFactor) >= :rating")})
 @Access(AccessType.FIELD)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -52,10 +52,10 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 	@Column(nullable = false)
 	private String userId;
 	private OrderStatus status;
-	@Column(precision = 10, scale = 8)
+	@Column(precision = 10, scale = 6)
 	private BigDecimal incomingAmount;
 	private String incomingCurrency;
-	@Column(precision = 10, scale = 8)
+	@Column(precision = 10, scale = 6)
 	private BigDecimal outcomingAmout;
 	private String outcomingCurrency;
 	@XmlJavaTypeAdapter(DateAdapter.class)

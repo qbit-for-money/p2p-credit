@@ -24,13 +24,11 @@ public class OrdersWrapper {
 	private List<OrderWrapper> orderWrappers;
 	@XmlElement
 	private long length;
-	@Inject
-	private StatisticsDAO statisticsDAO;
 
 	public OrdersWrapper() {
 	}
 
-	public OrdersWrapper(List<OrderInfo> orders, long length) {
+	public OrdersWrapper(List<OrderInfo> orders, long length, StatisticsDAO statisticsDAO) {
 		orderWrappers = new ArrayList<>();
 		for (OrderInfo order : orders) {
 			OrderWrapper wrapper = new OrderWrapper(order);
