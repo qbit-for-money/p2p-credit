@@ -5,24 +5,29 @@
 				<alert type="'warning'"><h4 style="margin-bottom: 0px;">User photo size should be greater than 400x300 and less than 2000x2000 and have type JPG.</h4></alert>
 			</div>
 		</div>
+		<div class="row ng-hide" ng-show="showUserPhotoError">
+			<div class="col-xs-12 hidden-md hidden-lg">
+				<alert type="'danger'" close="showUserPhotoError = false"><h4 style="margin-bottom: 0px;">{{photoErrorMessage}}</h4></alert>
+			</div>
+		</div>
 		<div class="row">
-			<div class="col-xs-4 col-md-3">
+			<div class="col-xs-4 col-md-3 col-lg-3">
 				<div class="container-fluid">
 					<div class="row">
 						<div class="col-xs-12 col-md-12">
-							<div class="img-thumbnail" style="min-width: 150px;" >
+							<div class="img-thumbnail" style="min-width: 80px;" >
 								<img id='user-photo' src="{{userPhotoSrc}}" width="100%" ng-if="!editUserPhoto"/>
 								<img id="user-photo-change" ng-hide="!imageSrc" width="100%" ng-src="{{imageSrc}}" />
 							</div>
 						</div>
-						<div class="col-xs-12 col-md-12" style="padding-top: 1px; min-width: 180px;">
+						<div class="col-xs-12 col-md-12" style="padding-top: 1px; min-width: 110px;">
 							<div class="progress">
 								<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{summaryRating}}" aria-valuemin="0" aria-valuemax="100" ng-style="{width : (summaryRating + '%') }">
 									<span style="color: #d58512; overflow: hidden; white-space: nowrap; padding-left: 3px;"> Rating: {{summaryRating}}</span>
 								</div>
 							</div>
 						</div>
-						<div class="col-xs-12 col-md-12" style="min-width: 180px; margin-top: -19px; padding-bottom: 10px;">
+						<div class="col-xs-12 col-md-12" style="min-width: 110px; margin-top: -19px; padding-bottom: 10px;">
 							<div class="browse-button btn btn-default col-xs-6 col-md-6" ng-if="isCurrentUser && !editUserPhoto && edit">
 								<span class="glyphicon glyphicon-refresh"></span>
 								<input type="file" name="file" ng-file-select="onFileSelect($files)" >
@@ -33,24 +38,29 @@
 						</div>
 					</div>
 					<div class="row ng-hide" ng-show="showUserPhotoError" style="">
-						<div class="col-xs-12 col-md-12">
+						<div class="hidden-xs hidden-sm col-md-12">
 							<alert type="'danger'" close="showUserPhotoError = false"><h4 style="margin-bottom: 0px;">{{photoErrorMessage}}</h4></alert>
 						</div>
 					</div>
 				</div>
 			</div>
+			<div>
+				<div class="col-xs-8 hidden-md hidden-lg ">
+					<h5 style="margin-top: -2px;">{{userPropertiesMap['name']}}<div style="float: right"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="userPublicKeyFromPath" entity-field="'name'" /></div></h5>
+				</div>
+			</div>
 			<div class="col-xs-12 col-md-9" style="padding-bottom: 1%;">
 				<div class="container-fluid">
 					<div class="row">
-						<div class="col-xs-12 col-md-12 " ng-if="!edit">
+						<div class="hidden-sm hidden-xs col-md-12 " ng-if="!edit">
 							<h4 style="margin-top: -2px;">{{userPropertiesMap['name']}}<div style="float: right"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="userPublicKeyFromPath" entity-field="'name'" /></div></h4>
 						</div>
 
-						<div class="col-xs-6 col-md-8" ng-if="edit">
+						<div class="col-xs-7 col-md-8" ng-if="edit">
 							<input type="text" id="name" class="form-control" ng-model="userPropertiesMap
 								['name']" placeholder="Name" maxlength="20"/>
 						</div>
-						<div class="col-xs-4 col-md-3 navbar-right" ng-hide="!isCurrentUser">
+						<div class="col-xs-5 col-md-3 navbar-right" ng-hide="!isCurrentUser">
 							<div class="input-group navbar-right" ng-hide="!edit">
 								<span class="btn-group">
 									<button class="btn btn-default" ng-disabled="disabledEditButton" ng-click="savePersonalPage()"><span class="glyphicon glyphicon-save"></span></button>
@@ -82,9 +92,6 @@
 								<div class="col-xs-8 col-md-10" ng-if="!edit && userPropertiesMap['mail']">
 									{{userPropertiesMap['mail']}}<div class="profile-like"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="userPublicKeyFromPath" entity-field="'mail'" /></div>
 								</div>
-								<!--div style="float: right; margin-right: 40px;" class="col-xs-2 col-md-2">
-									<like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="'123'" entity-field="'mail'" />
-								</div-->
 
 								<div class="col-xs-4 col-md-3 title-edit" ng-hide="!edit">
 									Mail:
@@ -113,7 +120,7 @@
 								</div>
 								<div class="input-group col-xs-7 col-md-8" ng-hide="!edit">
 									<input type="text" id="phone" ng-model="userPropertiesMap
-										['phone']" class="form-control masked-input-jqx" />
+										['phone']" class="form-control" />
 									<span class="input-group-btn">
 										<button class="btn btn-default" type="button" ng-click="changeVisible('phoneEnabled')">
 											<span class="glyphicon glyphicon-eye-{{userPropertiesMap['phoneEnabled']}}"></span>
@@ -165,19 +172,7 @@
 								</div>
 
 							</div>		
-
-							<!--div id="currency-range" class="row" ng-class="{'invisible': !currency || !edit}">
-								<div class="col-xs-4 col-md-3 title-edit" ng-if="edit">
-									Range:
-								</div>
-								<div class="col-xs-7 col-md-8">
-									<div id='priceSlider' style="position: relative; width: 100%"></div>
-									<div style="float: left">{{currency.startValue}} {{currency.code}}</div> 
-									<div style="float: right">{{currency.endValue}} {{currency.code}}</div> 							 
-								</div>
-
-							</div-->
-							<div class="row" ng-if="edit">
+							<!--div class="row" ng-if="edit">
 
 								<div class="col-xs-6 col-md-3 title-edit" ng-if="edit">
 									Personal Data:
@@ -188,19 +183,19 @@
 										<span class="glyphicon glyphicon-eye-{{userPropertiesMap['personalDataEnabled']}}"></span>
 									</button>
 								</div>
-							</div>
+							</div-->
 						</div>
 					</div>
 					<div class="row">
 						<div class="col-xs-12 col-md-12" style="margin-top: -10px; margin-bottom: -10px"><hr></div>
 					</div>
-					<div class="row col-xs-offset-0">Openness: {{ratingOpenness}}	</div>
-					<div class="row col-xs-offset-0">Transactions: {{ratingTransactions}}</div>
-					<div class="row col-xs-offset-0">Orders sum: {{ordersSumValue}}</div>
-					<div class="row col-xs-offset-0">Transactions sum: {{transactionsSum}}</div>
-					<div class="row col-xs-offset-0">Success transactions sum: {{successTransactionsSum}}</div>
-					<div class="row col-xs-offset-0">All transactions sum: {{allTransactionsSum}}</div>
-					<div class="row col-xs-offset-0">All success transactions sum: {{allSuccessTransactionsSum}}</div>
+					<div class="row col-xs-offset-0">Openness rating: {{ratingOpenness}}	</div>
+					<div class="row col-xs-offset-0">Orders rating: {{ordersRating}}</div>
+					<div class="row col-xs-offset-0">Partners rating: {{partnersRating}}</div>
+					<div class="row col-xs-offset-0">Orders count: {{ordersCount}}</div>
+					<div class="row col-xs-offset-0">Success orders count: {{successOrdersCount}}</div>
+					<div class="row col-xs-offset-0">All orders count: {{allOrdersCount}}</div>
+					<div class="row col-xs-offset-0">All success orders count: {{allSuccessOrdersCount}}</div>
 				</div>
 			</div>
 		</div>
@@ -209,7 +204,7 @@
 		<div class="row" id="addition-attributes" ng-hide="additionAttrsHidden">
 			<div class="col-xs-12 col-md-12">
 				<div class="container-fluid">
-					<div class="row">
+					<!--div class="row">
 						<div class="col-xs-12 col-md-12" style="margin-top: 1px; margin-right:-42px;">Personal info<div style="float: right"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="userPublicKeyFromPath" entity-field="'languages'" /></div></div>
 					</div>
 					<div class="row">
@@ -222,7 +217,7 @@
 							<div id="personalNotEditable" ng-hide="edit" ng-bind-html="userPropertiesMap['personalData']">
 							</div>
 						</div>
-					</div>
+					</div-->
 					<div class="row" style="padding-bottom: 15px;">
 						<div class="col-xs-3 col-md-3 navbar-right"  ng-hide="!isCurrentUser">			
 							<div class="navbar-right" >
@@ -273,7 +268,7 @@
 					<div style="float: right"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="userPublicKeyFromPath" entity-field="'names'" /></div>
 					<links-list links="userPropertiesMap['names']" type="'name'" save-data="updateProfile()" current="userPropertiesMap['isCurrentUser']" edited="editAdditional"></links-list>
 
-					<div class="row" ng-hide="!userPropertiesMap['bkiData'] && !editAdditional">
+					<!--div class="row" ng-hide="!userPropertiesMap['bkiData'] && !editAdditional">
 						<div class="col-xs-8 col-md-12" style="margin-top: 10px;">Сredit history<div style="float: right"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="userPublicKeyFromPath" entity-field="'bkiData'"/></div></div>
 					</div>
 					<div class="row" ng-hide="!userPropertiesMap['bkiData'] && !editAdditional">
@@ -287,7 +282,7 @@
 							<div id="bkiNotEditable" ng-hide="editAdditional" ng-bind-html="userPropertiesMap['bkiData']">
 							</div>
 						</div>
-					</div>
+					</div-->
 
 					<div class="row">
 						<div class="col-xs-3 col-md-3 navbar-right"  ng-hide="!isCurrentUser">			

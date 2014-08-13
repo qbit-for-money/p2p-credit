@@ -7,15 +7,11 @@ import com.qbit.p2p.credit.order.model.Comment;
 import com.qbit.p2p.credit.order.model.OrderInfo;
 import com.qbit.p2p.credit.order.model.OrderStatus;
 import com.qbit.p2p.credit.order.model.Respond;
+import com.qbit.p2p.credit.order.service.OrderStatisticsScheduler;
 import com.qbit.p2p.credit.statistics.service.StatisticsService;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
@@ -37,16 +33,8 @@ public class OrderFlowDAO {
 
 	@Inject
 	private StatisticsService statisticsService;
-
-	private final ExecutorService executorService = Executors.newFixedThreadPool(10, new ThreadFactory() {
-
-		@Override
-		public Thread newThread(Runnable runnable) {
-			Thread thread = new Thread(runnable, "OrderFlowDAO");
-			thread.setDaemon(true);
-			return thread;
-		}
-	});
+	@Inject
+	private OrderStatisticsScheduler scheduler;
 
 	public OrderInfo addRespond(final Respond respond, final String orderId) {
 		if (respond == null) {
@@ -111,18 +99,20 @@ public class OrderFlowDAO {
 				update.where(updateStatusPredicate);
 				int numberOfEntities = entityManager.createQuery(update).executeUpdate();
 				if (EnumSet.of(OrderStatus.SUCCESS, OrderStatus.NOT_SUCCESS, OrderStatus.ARBITRATION).contains(status) && (numberOfEntities != 0)) {
-					executorService.submit(new Runnable() {
+					scheduler.putTask(new Runnable() {
+
 						@Override
 						public void run() {
 							statisticsService.recalculateUserOrdersStatistics(partnerId);
 						}
-					});
-					executorService.submit(new Runnable() {
+					}, "recalculateUserOrdersStatistics", partnerId);
+					scheduler.putTask(new Runnable() {
+
 						@Override
 						public void run() {
 							statisticsService.recalculatePartnersRating(partnerId);
 						}
-					});
+					}, "recalculatePartnersRating", partnerId);
 				}
 				return numberOfEntities;
 			}
@@ -157,8 +147,20 @@ public class OrderFlowDAO {
 
 				if (EnumSet.of(OrderStatus.SUCCESS, OrderStatus.NOT_SUCCESS, OrderStatus.ARBITRATION)
 					.contains(status) && (numberOfEntities != 0)) {
-					statisticsService.recalculateUserOrdersStatistics(userId);
-					statisticsService.recalculatePartnersRating(userId);
+					scheduler.putTask(new Runnable() {
+
+						@Override
+						public void run() {
+							statisticsService.recalculateUserOrdersStatistics(userId);
+						}
+					}, "recalculateUserOrdersStatistics", userId);
+					scheduler.putTask(new Runnable() {
+
+						@Override
+						public void run() {
+							statisticsService.recalculatePartnersRating(userId);
+						}
+					}, "recalculatePartnersRating", userId);
 				}
 				return numberOfEntities;
 			}
@@ -202,14 +204,5 @@ public class OrderFlowDAO {
 				return entityManager.createQuery(update).executeUpdate();
 			}
 		});
-	}
-
-	@PreDestroy
-	public void shutdown() {
-		try {
-			executorService.shutdown();
-		} catch (Throwable ex) {
-			// Do nothing
-		}
 	}
 }

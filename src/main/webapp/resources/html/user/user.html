@@ -11,40 +11,6 @@
 					<div ng-include src="'resources/html/user/personal-info.html'"></div>
 				</div>
 			</div>
-			<div class="panel panel-default" ng-hide="!isCurrentUser">
-				<div class="panel-heading" ng-click="collapse('#collapseThree')" style="cursor: pointer">
-					<h4 class="panel-title">
-						<span class="glyphicon glyphicon-th-list"></span>
-					</h4>
-				</div>
-				<div id="collapseThree" class="panel-collapse collapse">
-					<div ng-include src="'resources/html/user/create-order.html'"></div>
-				</div>
-			</div>
-			<div class="panel panel-default" ng-if="isCurrentUser">
-				<div class="panel-heading" style="cursor: pointer">
-					<h4 class="panel-title"  ng-click="collapse('#collapseFour')">
-						<span class="glyphicon glyphicon-th-list"></span>
-					</h4>
-					<div class="col-md-10 col-xs-10"  ng-click="collapse('#collapseFour')" style="height: 100%"></div>
-					<div class="navbar-right"><button class="btn btn-success create-order-button" type="button" ng-click="openFormAndCreateOrder()" title="Create order">
-							<span class="glyphicon glyphicon-plus"></span>
-						</button></div>
-				</div>
-				<div id="collapseFour" class="panel-collapse collapse">
-					<div ng-include src="'resources/html/user/personal-orders-table.html'"></div>
-				</div>
-			</div>
-			<div class="panel panel-default" ng-if="isCurrentUser">
-				<div class="panel-heading" ng-click="collapse('#collapseFive')" style="cursor: pointer">
-					<h4 class="panel-title">
-						<span class="glyphicon glyphicon-shopping-cart"></span>
-					</h4>
-				</div>
-				<div id="collapseFive" class="panel-collapse in collapse">
-					<div ng-include src="'resources/html/user/orders-table.html'"></div>
-				</div>
-			</div>
 		</div>
 	</div>
 </div>

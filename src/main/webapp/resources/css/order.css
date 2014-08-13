@@ -187,22 +187,52 @@ span.center {
 }
 
 .credit-row {
-	background-color: #ffe5e9;
+	color: #000;
+	background-color: #ECB2BB;
 	border: 1px solid #f8f8f8;
+}
+.credit-row:hover {
+	background-color: #ECB2BB;
+	border: 1px solid #adadad;
+}
+.credit-row.active {
+	color: #fff;
+	background-color: #d9534f;
+	border: 1px solid #adadad;
 }
 #select2-drop .credit-row:hover {
 	background-color: #3875d7;
 }
 .borrow-row {
-	background-color: #e5fff4;
+	color: #000;
+	background-color: #A1DDA1;
 	border: 1px solid #f8f8f8;
+}
+.borrow-row:hover {
+	background-color: #A1DDA1;
+	border: 1px solid #adadad;
+}
+.borrow-row.active {
+	color: #fff;
+	background-color: #5cb85c;
+	border: 1px solid #adadad;
 }
 #select2-drop .borrow-row:hover {
 	background-color: #3875d7;
 }
 .exchange-row {
-	background-color: #f8f8f8;
+	color: #000;
+	background-color: #E4E4E4;
 	border: 1px solid #f8f8f8;
+}
+.exchange-row:hover {
+	background-color: #E4E4E4;
+	border: 1px solid #E4E4E4;
+}
+.exchange-row.active {
+	color: #fff;
+	background-color: #C9C5C5;
+	border: 1px solid #adadad;
 }
 #select2-drop .exchange-row:hover {
 	background-color: #3875d7;

@@ -6,9 +6,12 @@ import com.qbit.p2p.credit.order.dao.OrderDAO;
 import com.qbit.p2p.credit.order.dao.OrderFlowDAO;
 import com.qbit.p2p.credit.order.model.Comment;
 import com.qbit.p2p.credit.order.model.OrderInfo;
+import com.qbit.p2p.credit.order.service.OrderStatisticsScheduler;
 import com.qbit.p2p.credit.statistics.dao.StatisticsDAO;
 import com.qbit.p2p.credit.statistics.service.StatisticsService;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
@@ -37,13 +40,36 @@ public class OrdersResource {
 	private StatisticsService statisticsService;
 	@Inject
 	private StatisticsDAO statisticsDAO;
+	@Inject
+	private OrderStatisticsScheduler scheduler;
 
 	@POST
 	@Path("search")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public OrdersWrapper search(SearchRequest ordersRequest) {
-		String userId = AuthFilter.getUserId(request);
+		final String userId = AuthFilter.getUserId(request);
+//TEST
+		for (int i = 0; i < 10; i++) {
+			System.out.println("### INIT");
+			scheduler.putTask(new Runnable() {
+
+				@Override
+				public void run() {
+					System.out.println("### RUN");
+					statisticsService.recalculateUserOrdersStatistics(userId);
+					try {
+						Thread.sleep(3100);
+					} catch (InterruptedException ex) {
+					}
+				}
+			}, "run", userId);
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException ex) {
+			}
+		}
+//TEST
 		List<OrderInfo> orders = orderDAO.findWithFilter(userId, ordersRequest);
 		long length = orderDAO.lengthWithFilter(userId, ordersRequest);
 		return new OrdersWrapper(orders, length, statisticsDAO);
@@ -53,27 +79,34 @@ public class OrdersResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public OrderInfo create(OrderInfo order) {
-		String userId = AuthFilter.getUserId(request);
+		final String userId = AuthFilter.getUserId(request);
 		order.setUserId(userId);
+		System.out.println("@@ " + order);
 		if (!order.isValid()) {
 			return null;
 		}
 		OrderInfo newOrder = orderDAO.create(order);
-		statisticsService.recalculateUserOrdersStatistics(userId);
+		scheduler.putTask(new Runnable() {
+
+			@Override
+			public void run() {
+				statisticsService.recalculateUserOrdersStatistics(userId);
+			}
+		}, "recalculateUserOrdersStatistics", userId);
 		return newOrder;
 	}
-	
+
 	@POST
 	@Path("{id}/status")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public int changeOrderStatus(OrderChangeStatusRequest statusRequest) {
-		if((statusRequest == null) || (statusRequest.getOrderId() == null) || statusRequest.getOrderId().isEmpty()) {
+		if ((statusRequest == null) || (statusRequest.getOrderId() == null) || statusRequest.getOrderId().isEmpty()) {
 			return 0;
 		}
 		String userId = AuthFilter.getUserId(request);
 		Comment comment = new Comment(userId, statusRequest.getComment());
 
-		if(!statusRequest.isByPartner()) {
+		if (!statusRequest.isByPartner()) {
 			return orderFlowDAO.changeStatus(statusRequest.getOrderId(), userId, statusRequest.getStatus(), comment);
 		} else {
 			return orderFlowDAO.changeStatusByPartner(statusRequest.getOrderId(), userId, statusRequest.getStatus(), comment);

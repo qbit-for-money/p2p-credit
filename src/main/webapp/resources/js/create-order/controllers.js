@@ -226,7 +226,7 @@ initCategories();
 		$scope.takingValue = 2000;
 		$scope.givingValue = 0.1;
 		$scope.durationValue = 0;
-		CKEDITOR.instances.orderDataEditable.setData(exchangeInitData);
+		//CKEDITOR.instances.orderDataEditable.setData(exchangeInitData);
 		$scope.orderCreatingMap['orderCategories'].splice(0, $scope.orderCreatingMap['orderCategories'].length);
 		$scope.orderCreatingMap['orderCategories'].push($scope.allCategories[4]);
 		$scope.isCreditInit = true;
@@ -243,27 +243,19 @@ initCategories();
 		}
 		var orderInfo = {};
 		//var data = CKEDITOR.instances.orderDataEditable.getData();
-		var givingValue = angular.element("#giving-order-currency input").val();
-		var takingValue = angular.element("#taking-order-currency input").val();
+		var outcomingAmout = angular.element("#giving-order-currency input").val();
+		var incomingAmount = angular.element("#taking-order-currency input").val();
 		var durationValue = angular.element("#order-duration input").val();
-		var takingCurrency = $scope.currency.selectedTakingCurrency;
-		var givingCurrency = $scope.currency.selectedGivingCurrency;
+		var incomingCurrency = $scope.currency.selectedTakingCurrency;
+		var outcomingCurrency = $scope.currency.selectedGivingCurrency;
 
 		//orderInfo.orderData = data;
 		orderInfo.bookingDeadline = $scope.deadline;
-		if (currenciesMap[takingCurrency]) {
-			orderInfo.takingCurrency = currenciesMap[takingCurrency];
-		} else {
-			orderInfo.takingCurrency = takingCurrency;
-		}
-		orderInfo.takingValue = takingValue;
+		orderInfo.incomingCurrency = incomingCurrency;
+		orderInfo.incomingAmount = incomingAmount;
 		//addItems($scope.userPropertiesMap['currencies'], takingCurrency);
-		if (currenciesMap[givingCurrency]) {
-			orderInfo.givingCurrency = currenciesMap[givingCurrency];
-		} else {
-			orderInfo.givingCurrency = givingCurrency;
-		}
-		orderInfo.givingValue = givingValue;
+		orderInfo.outcomingCurrency = outcomingCurrency;
+		orderInfo.outcomingAmout = outcomingAmout;
 
 		orderInfo.duration = durationValue;
 		var durationType = $scope.selectedDurationType;

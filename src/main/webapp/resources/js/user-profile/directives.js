@@ -86,8 +86,8 @@ userProfileModule.directive("linksList", function() {
 
 			scope.editItems = function() {
 				if (scope.type === "phone") {
-					angular.element("#input-phone").jqxMaskedInput({mask: '+## (###)###-##-##'});
-					angular.element("#input-phone").jqxMaskedInput('inputValue', "07");
+					//angular.element("#input-phone").jqxMaskedInput({mask: '+## (###)###-##-##'});
+					//angular.element("#input-phone").jqxMaskedInput('inputValue', "07");
 				}
 			};
 
@@ -140,8 +140,8 @@ userProfileModule.directive("linksList", function() {
 				scope.newLink.edited = false;
 				if (scope.type === "phone") {
 					//getPhoneCode();
-					angular.element("#input-phone").jqxMaskedInput({mask: '+## (###)###-##-##'});
-					angular.element("#input-phone").jqxMaskedInput('inputValue', "07");
+					//angular.element("#input-phone").jqxMaskedInput({mask: '+## (###)###-##-##'});
+					//angular.element("#input-phone").jqxMaskedInput('inputValue', "07");
 				}
 			};
 
@@ -173,9 +173,9 @@ userProfileModule.directive("linksList", function() {
 						if (!scope.links[i].edited || (scope.links[i].edited === false)) {
 							scope.links[i].edited = true;
 							if (scope.type === "phone") {
-								angular.element("#" + scope.links[i].id).jqxMaskedInput({mask: '+## (###)###-##-##'});
-								angular.element("#" + scope.links[i].id).jqxMaskedInput('inputValue', "07");
-								angular.element("#" + scope.links[i].id).jqxMaskedInput('maskedValue', scope.links[i].link);
+								//angular.element("#" + scope.links[i].id).jqxMaskedInput({mask: '+## (###)###-##-##'});
+								//angular.element("#" + scope.links[i].id).jqxMaskedInput('inputValue', "07");
+								//angular.element("#" + scope.links[i].id).jqxMaskedInput('maskedValue', scope.links[i].link);
 							}
 							return;
 						} else {

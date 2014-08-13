@@ -41,7 +41,7 @@ public class StatisticsService {
 		if (user == null) {
 			throw new WebApplicationException();
 		}
-		
+
 		long openessRating = 0;
 		if ((user.getName() != null) && !user.getName().isEmpty()) {
 			openessRating += NAME_RATING;
@@ -64,9 +64,7 @@ public class StatisticsService {
 		if (user.getSocialLinks() != null) {
 			openessRating += user.getSocialLinks().size() * SOCIAL_LINKS_RATING;
 		}
-		
 		statisticsDAO.updateOpennessRating(user.getUserId(), openessRating);
-		
 		return openessRating;
 	}
 

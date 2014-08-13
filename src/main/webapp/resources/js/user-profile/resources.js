@@ -13,6 +13,13 @@ userModule.factory("usersProfileResource", function($resource) {
 	});
 });
 
+userModule.factory("photosResource", function($resource) {
+	return $resource(window.context + "webapi/photos", {}, {
+		getPhoto: {method: "GET",url: window.context + "webapi/photos/:id"},
+		setUserPhoto: {method: "PUT", url: window.context + "webapi/photos/current"}
+	});
+});
+
 userModule.factory("currencyResource", function($resource) {
 	return $resource(window.context + "webapi/currency/:id", {}, {
 		findAll: {method: "GET"}
@@ -20,7 +27,7 @@ userModule.factory("currencyResource", function($resource) {
 });
 
 userModule.factory("languagesResource", function($resource) {
-	return $resource(window.context + "webapi/profiles/languages", {}, {
+	return $resource(window.context + "webapi/languages", {}, {
 		findAll: {method: "GET"}
 	});
 });

@@ -13,7 +13,7 @@ import com.qbit.p2p.credit.order.dao.OrderDAO;
 import com.qbit.p2p.credit.order.dao.OrderFlowDAO;
 import com.qbit.p2p.credit.order.resource.CategoriesResource;
 import com.qbit.p2p.credit.order.resource.ResponsesResource;
-import com.qbit.p2p.credit.order.service.OrderFlowScheduler;
+import com.qbit.p2p.credit.order.service.OrderStatisticsScheduler;
 import com.qbit.p2p.credit.statistics.dao.StatisticsDAO;
 import com.qbit.p2p.credit.statistics.service.StatisticsService;
 import com.qbit.p2p.credit.user.dao.LanguageDAO;
@@ -69,9 +69,12 @@ public class P2PCreditApp extends Application {
 		addBinding(newBinder(StatisticsDAO.class).to(StatisticsDAO.class).in(Singleton.class), configuration);
 		addBinding(newBinder(StatisticsService.class).to(StatisticsService.class).in(Singleton.class), configuration);
 		addBinding(newBinder(LikeDAO.class).to(LikeDAO.class).in(Singleton.class), configuration);
+		
+		addBinding(newBinder(OrderStatisticsScheduler.class).to(OrderStatisticsScheduler.class).in(Singleton.class), configuration);
+		
 
 		configuration.commit();
-		serviceLocator.createAndInitialize(OrderFlowScheduler.class);
+		serviceLocator.createAndInitialize(OrderStatisticsScheduler.class);
 	}
 
 	/**
