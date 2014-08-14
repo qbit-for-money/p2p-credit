@@ -1,16 +1,14 @@
 <div class="row" style="margin-bottom: 20px;">
 	<div class="col-xs-offset-0 col-xs-12 col-md-offset-1 col-md-10">
-		<div class="panel-group" id="accordion">
 			<div class="panel panel-default" ng-hide="!currentUser.publicKey">
-				<div class="panel-heading" ng-click="collapse('#collapseOne')" style="cursor: pointer">
+				<div class="panel-heading">
 					<h4 class="panel-title">
-						<span class="glyphicon glyphicon-user"></span>
+						<span class="glyphicon glyphicon-user"></span> {{userPropertiesMap['name']}}
 					</h4>
 				</div>
 				<div id="collapseOne" class="panel-collapse in collapse">
 					<div ng-include src="'resources/html/user/personal-info.html'"></div>
 				</div>
 			</div>
-		</div>
 	</div>
 </div>

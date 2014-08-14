@@ -12,16 +12,29 @@ navbarModule.directive('ngFocus', ['$parse', function($parse) {
 		};
 	}]);
 
-navbarModule.directive('ngBlur', ['$parse', function($parse) {
+navbarModule.directive('ngEnterKey', ['$parse', function($parse) {
 		return function(scope, element, attr) {
-			var fn = $parse(attr['ngBlur']);
-			element.bind('blur', function(event) {
-				scope.$apply(function() {
-					fn(scope, {$event: event});
-				});
+			var fn = $parse(attr['ngEnterKey']);
+			element.bind("keypress", function(event) {
+				if (event.which === 13) {
+					scope.$apply(function() {
+						fn(scope, {$event: event});
+					});
+				}
 			});
 		};
 	}]);
+
+/*navbarModule.directive('ngBlur', ['$parse', function($parse) {
+ return function(scope, element, attr) {
+ //var fn = $parse(attr['ngBlur']);
+ //element.bind('blur', function(event) {
+ //scope.$apply(function() {
+ //fn(scope, {$event: event});
+ //});
+ //});
+ };
+ }]);*/
 
 navbarModule.directive('uiDropdown', function($compile, $timeout) {
 	return {
@@ -81,7 +94,7 @@ navbarModule.directive('uiDropdown', function($compile, $timeout) {
 							break;
 					}
 				}
-				
+
 				$timeout(function() {
 					scope.$apply(function() {
 						scope.selectedItem = item;

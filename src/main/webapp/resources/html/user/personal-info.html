@@ -20,8 +20,21 @@
 								<img id="user-photo-change" ng-hide="!imageSrc" width="100%" ng-src="{{imageSrc}}" />
 							</div>
 						</div>
+
 						<div class="col-xs-12 col-md-12" style="padding-top: 1px; min-width: 110px;">
-							<div class="progress">
+							<div class="popover top" id="in-address-popover" style="margin-bottom: 100%" ng-hide="!popoverShow">
+								<div class="arrow"></div>
+								<div class="popover-content">
+									<div class="row col-xs-offset-0">Openness rating: {{ratingOpenness}}	</div>
+									<div class="row col-xs-offset-0">Orders rating: {{ordersRating}}</div>
+									<div class="row col-xs-offset-0">Partners rating: {{partnersRating}}</div>
+									<div class="row col-xs-offset-0">Orders count: {{ordersCount}}</div>
+									<div class="row col-xs-offset-0">Success orders count: {{successOrdersCount}}</div>
+									<div class="row col-xs-offset-0">All orders count: {{allOrdersCount}}</div>
+									<div class="row col-xs-offset-0">All success orders count: {{allSuccessOrdersCount}}</div>
+								</div>
+							</div>
+							<div class="progress" ng-click="showStatisticsPopover()" style="cursor: pointer;">
 								<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{summaryRating}}" aria-valuemin="0" aria-valuemax="100" ng-style="{width : (summaryRating + '%') }">
 									<span style="color: #d58512; overflow: hidden; white-space: nowrap; padding-left: 3px;"> Rating: {{summaryRating}}</span>
 								</div>
@@ -45,20 +58,24 @@
 				</div>
 			</div>
 			<div>
-				<div class="col-xs-8 hidden-md hidden-lg " ng-click="edit = true">
+				<div class="col-xs-8 hidden-md hidden-lg " ng-click="editNameAttribute()" ng-if="!editName" style="cursor:pointer;">
 					<h5 style="margin-top: -2px;">{{userPropertiesMap['name']}}<div style="float: right"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="userPublicKeyFromPath" entity-field="'name'" /></div></h5>
+				</div>
+				<div class="col-xs-8 hidden-md hidden-lg" ng-if="editName">
+					<input type="text" id="xsUserName" class="form-control" ng-model="userPropertiesMap
+						['name']" placeholder="Name" maxlength="20" ng-blur="editNameAttribute()" ng-enter-key="editNameAttribute()"/>
 				</div>
 			</div>
 			<div class="col-xs-12 col-md-9" style="padding-bottom: 1%;">
 				<div class="container-fluid">
 					<div class="row">
-						<div class="hidden-sm hidden-xs col-md-12 " ng-if="!edit">
+						<div class="hidden-sm hidden-xs col-md-12 " ng-click="editNameAttribute()" ng-if="!editName" style="cursor:pointer;">
 							<h4 style="margin-top: -2px;">{{userPropertiesMap['name']}}<div style="float: right"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="userPublicKeyFromPath" entity-field="'name'" /></div></h4>
 						</div>
 
-						<div class="col-xs-7 col-md-8" ng-if="edit">
-							<input type="text" id="name" class="form-control" ng-model="userPropertiesMap
-								['name']" placeholder="Name" maxlength="20"/>
+						<div class="hidden-sm hidden-xs col-md-8" ng-if="editName">
+							<input type="text" id="userName" class="form-control" ng-model="userPropertiesMap
+								['name']" placeholder="Name" maxlength="20" ng-blur="editNameAttribute()" ng-enter-key="editNameAttribute()"/>
 						</div>
 						<div class="col-xs-5 col-md-3 navbar-right" ng-hide="!isCurrentUser">
 							<div class="input-group navbar-right" ng-hide="!edit">
@@ -84,21 +101,21 @@
 
 					<div id="user-attributes" class="row col-xs-offset-0">
 						<div class="container-fluid">
-							<div class="row" ng-if="(!edit && userPropertiesMap['mail']) || edit">
+							<div class="row">
 
-								<div class="col-xs-4 col-md-2 title" ng-if="!edit && userPropertiesMap['mail']">
+								<div class="col-xs-4 col-md-2 title" ng-if="!editMail">
 									Mail:
 								</div>
-								<div class="col-xs-8 col-md-10" ng-if="!edit && userPropertiesMap['mail']">
+								<div class="col-xs-8 col-md-10" ng-click="editMailAttribute()" ng-if="!editMail">
 									{{userPropertiesMap['mail']}}<div class="profile-like"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="userPublicKeyFromPath" entity-field="'mail'" /></div>
 								</div>
 
-								<div class="col-xs-4 col-md-3 title-edit" ng-hide="!edit">
+								<div class="hidden-xs col-md-3 title-edit title" ng-if="editMail">
 									Mail:
 								</div>
-								<div class="input-group col-xs-7 col-md-8" ng-hide="!edit">
+								<div class="input-group col-xs-11 col-md-8" ng-if="editMail">
 									<input type="email" id="mail" ng-model="userPropertiesMap
-										['mail']" class="form-control" />
+										['mail']" class="form-control" ng-enter-key="editMailAttribute()" ng-blur="editMailAttribute()"/>
 									<span class="input-group-btn">
 										<button class="btn btn-default" type="button" ng-click="changeVisible('mailEnabled')">
 											<span class="glyphicon glyphicon-eye-{{userPropertiesMap['mailEnabled']}}"></span>
@@ -186,7 +203,7 @@
 							</div-->
 						</div>
 					</div>
-					<div class="row">
+					<!--div class="row">
 						<div class="col-xs-12 col-md-12" style="margin-top: -10px; margin-bottom: -10px"><hr></div>
 					</div>
 					<div class="row col-xs-offset-0">Openness rating: {{ratingOpenness}}	</div>
@@ -195,7 +212,7 @@
 					<div class="row col-xs-offset-0">Orders count: {{ordersCount}}</div>
 					<div class="row col-xs-offset-0">Success orders count: {{successOrdersCount}}</div>
 					<div class="row col-xs-offset-0">All orders count: {{allOrdersCount}}</div>
-					<div class="row col-xs-offset-0">All success orders count: {{allSuccessOrdersCount}}</div>
+					<div class="row col-xs-offset-0">All success orders count: {{allSuccessOrdersCount}}</div-->
 				</div>
 			</div>
 		</div>
@@ -238,7 +255,7 @@
 							</div>
 						</div>
 					</div>
-					
+
 					<div class="row">
 						<div class="col-xs-12 col-md-12">
 							<div class="container-fluid">
@@ -262,8 +279,8 @@
 							</div>
 						</div>
 					</div>
-					
-					
+
+
 					<div style="float: right; margin-bottom: -5px;" ng-hide="editAdditional"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="userPublicKeyFromPath" entity-field="'videos'" /></div>
 					<links-list links="userPropertiesMap['videos']" type="'video'" save-data="updateProfile()" current="userPropertiesMap['isCurrentUser']" edited="editAdditional"></links-list>
 

@@ -171,3 +171,17 @@ select.custom {
 	color: black;
 	background-color: #e5e5e5;
 }
+
+.profile-panel {
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+	border-top-width: 0;
+}
+
+#in-address-popover {
+	//position: relative;
+	display: inherit;
+	min-width: 200px;
+	margin-bottom: 9px;
+	margin-top: -170px;
+}

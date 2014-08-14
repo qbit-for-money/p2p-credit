@@ -12,10 +12,13 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 	errorMessages["MIN_SIZE"] = "User photo size should be greater than 400x300";
 	errorMessages["MAX_SIZE"] = "User photo size should be less than 2000x2000";
 	errorMessages["IMAGE_TYPE"] = "Image type should be JPG";
+	$scope.popoverShow = false;
 	$scope.edit = false;
 	$scope.editAdditional = false;
 	$scope.editedPassport = false;
 	$scope.editUserPhoto = false;
+	$scope.editName = false;
+	$scope.editMail = false;
 	$scope.userProfile = {};
 	$scope.userPropertiesMap = {};
 	$scope.orderCreatingMap = {};
@@ -462,6 +465,53 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 	 }
 	 $scope.updateProfile();
 	 };*/
+	$scope.showStatisticsPopover = function() {
+		if($scope.popoverShow === true) {
+			$scope.popoverShow = false;
+		} else {
+			$scope.popoverShow = true;
+		}
+	};
+	
+	
+	$scope.editNameAttribute = function() {
+		if($scope.editName === true) {
+			$scope.editName = false;
+			if($scope.oldName !== $scope.userPropertiesMap['name']) {
+				console.log("EDIT " + $scope.editName)
+				$scope.endEditing();
+			}
+		} else {
+			$scope.editName = true;
+			$scope.oldName = $scope.userPropertiesMap['name'];
+			$timeout(function() {
+				angular.element("#xsUserName").focus();
+				if(!angular.element("#xsUserName").is(":focus")) {
+					angular.element("#userName").focus();
+				}
+			});
+		}
+	};
+	
+	$scope.editMailAttribute = function() {
+		if($scope.editMail === true) {
+			$scope.editMail = false;
+			console.log("EDIT " + $scope.userPropertiesMap['mail'])
+			if($scope.oldMail !== $scope.userPropertiesMap['mail']) {
+				
+				$scope.endEditing();
+			}
+		} else {
+			$scope.editMail = true;
+			$scope.oldMail = $scope.userPropertiesMap['mail'];
+			$timeout(function() {
+				angular.element("#mail").focus();
+			});
+		}
+	};
+	
+	
+	
 	$scope.editProfile = function() {
 		if ($scope.disabledEditButton) {
 			return;
@@ -701,7 +751,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		return re.test(email);
 	}
 
-	angular.element(document).on("focus", "#name", function() {
+	angular.element(document).on("focus", "#userName", function() {
 		angular.element(this).mask("SSSSSSSSSSSSSSSSSSSSSSSSSSS",
 				{'translation': {
 						S: {pattern: /[A-Za-zА-Яа-я0-9\s]/}
@@ -840,7 +890,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		} else {
 			$scope.additionAttrsHidden = false;
 			if ($scope.edit) {
-				initDataSCEditor();
+			//	initDataSCEditor();
 			}
 		}
 	};
