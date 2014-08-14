@@ -33,17 +33,13 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 	$scope.userPublicKeyFromPath = $location.$$path.replace("/users/", "");
 	var userProfileResponse;
 	$scope.currentUser = usersResource.current({});
-	$scope.categories = {};
-	$scope.categories.allCategories = [];
 	$scope.languages = {};
 	$scope.languages.allLanguages = [];
-	$scope.orderCreatingMap['orderLanguages'] = [];
-	$scope.orderCreatingMap['orderCategories'] = [];
-	$scope.orderCreatingMap['orderTakingValue'];
 	var allCurrencies = [];
 	var orderCurrencies = ["None"];
 	$scope.userPropertiesMap['currencies'] = [];
 	$scope.userPropertiesMap['languages'] = [];
+	$scope.languagesMap = {};
 	$scope.createOrderButtonEnabled = false;
 	$scope.additionAttrsHidden = true;
 	$scope.likesCount = {};
@@ -53,20 +49,12 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		multiple: true,
 		'simple_tags': true,
 		maximumSelectionSize: 20,
-		maximumInputLength: 20
-	};
-	$scope.categorySelect2Options = {
-		allowClear: true,
-		tags: $scope.categories.allCategories,
-		multiple: true,
-		'simple_tags': true,
-		maximumSelectionSize: 20,
 		maximumInputLength: 20,
 		createSearchChoice: function(term, data) {
 			if ($(data).filter(function() {
 				return this.text.localeCompare(term) === 0;
 			}).length === 0) {
-				return {id: term, text: term};
+				return null;
 			}
 		}
 	};
@@ -122,6 +110,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 				var languages = "";
 				for (var i = 0; i < userProfileResponse.languages.length; i++) {
 					$scope.userPropertiesMap['languages'].push(userProfileResponse.languages[i].code);
+					$scope.languagesMap[userProfileResponse.languages[i].code] = userProfileResponse.languages[i];
 					languages += (userProfileResponse.languages[i].code + ", ");
 				}
 				if (userProfileResponse.languages.length !== 0) {
@@ -152,10 +141,10 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 				$scope.ordersCount = userStatisticsResponse.ordersCount;
 				$scope.successOrdersCount = userStatisticsResponse.successOrdersCount;
 				$scope.partnersRating = userStatisticsResponse.partnersRating;
-				$scope.summaryRating = Math.floor($scope.ratingOpenness * $rootScope.env.userRatingOpenessFactor 
+				$scope.summaryRating = Math.floor($scope.ratingOpenness * $rootScope.env.userRatingOpenessFactor
 						+ $scope.successOrdersCount * $rootScope.env.userSuccessOrdersCountFactor);
 				var globalStatisticsResponse = usersProfileResource.getGlobalStatistics();
-				
+
 				globalStatisticsResponse.$promise.then(function() {
 					$scope.allOrdersCount = globalStatisticsResponse.allOrdersCount;
 					$scope.allSuccessOrdersCount = globalStatisticsResponse.allSuccessOrdersCount;
@@ -166,13 +155,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			$scope.userPropertiesMap['personalDataEnabled'] = (userProfileResponse.personalDataEnabled === true) ? visible : notVisible;
 			$scope.userPropertiesMap['bkiData'] = $sce.trustAsHtml(userProfileResponse.bkiData);
 			$scope.userPhotoSrc = window.context + "webapi/photos/" + userProfileResponse.publicKey;
-			var categoriesResponse = categoriesResource.findAll();
-			categoriesResponse.$promise.then(function() {
-				$scope.categories.allCategories.splice(0, $scope.categories.allCategories.length);
-				for (var i in categoriesResponse.categories) {
-					$scope.categories.allCategories.push(categoriesResponse.categories[i].title);
-				}
-			});
 			var languagesResponse = languagesResource.findAll();
 			languagesResponse.$promise.then(function() {
 				$scope.languages.allLanguages.splice(0, $scope.languages.allLanguages.length);
@@ -183,6 +165,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			if ($scope.edit) {
 				startEditing();
 			}
+			console.log("** " + JSON.stringify(userProfileResponse))
 			//reloadSCEditorInstance();
 			//reloadBKIscEditor();
 			//$scope.isValidOrder();
@@ -221,160 +204,160 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 	}
 
 	/*function initOrderckEditor() {
-		if (!$scope.scEditor.orderDataInitialized) {
-			if ($scope.isCurrentUser) {
-				CKEDITOR.disableAutoInline = true;
-				CKEDITOR.inline("orderDataEditable");
-			}
-			$scope.scEditor.orderDataInitialized = true;
-		}
-		$timeout(function() {
-			CKEDITOR.instances.orderDataEditable.setData("");
-		});
-	}*/
-	
-	/*$scope.initOrdersCreation = function() {
-		if (!$scope.isOrdersFormOpening) {
-			$scope.isOrdersFormOpening = true;
-			//initOrderckEditor();
-			$timeout(function() {
+	 if (!$scope.scEditor.orderDataInitialized) {
+	 if ($scope.isCurrentUser) {
+	 CKEDITOR.disableAutoInline = true;
+	 CKEDITOR.inline("orderDataEditable");
+	 }
+	 $scope.scEditor.orderDataInitialized = true;
+	 }
+	 $timeout(function() {
+	 CKEDITOR.instances.orderDataEditable.setData("");
+	 });
+	 }*/
 
-				currenciesMap[orderCurrencies[0]] = {};
-				currenciesMap[orderCurrencies[0]].max = 0;
-				angular.element('#take-currency-type').jqxDropDownList({source: orderCurrencies, autoDropDownHeight: true, selectedIndex: 1, width: '84%', height: '20px'});
-				angular.element('#take-currency-type').on('select', function(event) {
-					var index = event.args.index;
-					if (index === 0) {
-						if ($scope.giveCurrencyHiden === true) {
-							angular.element('#take-currency-type').jqxDropDownList({selectedIndex: 1});
-						} else {
-							$scope.$apply(function() {
-								$scope.takeCurrencyHiden = true;
-							});
-						}
-					}
-					else {
-						$scope.$apply(function() {
-							$scope.takeCurrencyHiden = false;
-						});
-						angular.element("#take-input").jqxNumberInput({symbol: orderCurrencies[index], min: 0.01, max: currenciesMap[orderCurrencies[index]].max, digits: getDigits(currenciesMap[orderCurrencies[index]].max)});
-					}
-					$scope.isValidOrder();
-				});
-				angular.element("#take-input").jqxNumberInput({width: '100%', height: '25px', symbol: orderCurrencies[1], min: 0.01, max: currenciesMap[orderCurrencies[1]].max, digits: getDigits(currenciesMap[orderCurrencies[1]].max), spinButtons: true, negativeSymbol: '-'});
-				angular.element("#take-input").on('change', $scope.isValidOrder);
-				angular.element('#give-currency-type').jqxDropDownList({source: orderCurrencies, autoDropDownHeight: true, selectedIndex: 1, width: '84%', height: '20px'});
-				angular.element('#give-currency-type').on('select', function(event) {
-					var index = event.args.index;
-					if (index === 0) {
-						if ($scope.takeCurrencyHiden === true) {
-							angular.element('#give-currency-type').jqxDropDownList({selectedIndex: 1});
-						} else {
-							$scope.$apply(function() {
-								$scope.giveCurrencyHiden = true;
-							});
-						}
-					}
-					else {
-						$scope.$apply(function() {
-							$scope.giveCurrencyHiden = false;
-						});
-						angular.element("#give-input").jqxNumberInput({symbol: orderCurrencies[index], min: 0.01, max: currenciesMap[orderCurrencies[index]].max, digits: getDigits(currenciesMap[orderCurrencies[index]].max)});
-					}
-					$scope.isValidOrder();
-				});
-				angular.element("#give-input").jqxNumberInput({width: '100%', height: '25px', symbol: orderCurrencies[1], min: 0.01, max: currenciesMap[orderCurrencies[1]].max, digits: getDigits(currenciesMap[orderCurrencies[1]].max), spinButtons: true, negativeSymbol: '-'});
-				angular.element("#give-input").on('change', $scope.isValidOrder);
-				var durationTypes = ["Hours", "Days"];
-				angular.element('#duration-type').jqxDropDownList({source: durationTypes, autoDropDownHeight: true, selectedIndex: 0, width: '84%', height: '20px'});
-				angular.element('#duration-type').on('select', function(event) {
-					var index = event.args.index;
-					angular.element("#duration-input").jqxNumberInput({symbol: durationTypes[index]});
-					$scope.isValidOrder();
-				});
-				angular.element("#duration-input").jqxNumberInput({width: '100%', height: '25px', symbol: durationTypes[0], min: 1, decimalDigits: 0, digits: 3, spinButtons: true, negativeSymbol: '-'});
-				angular.element("#duration-input").on('change', $scope.isValidOrder);
-				angular.element("#s2id_category input").focus();
-			});
-		} else {
-			clearOrder();
-			$scope.isOrdersFormOpening = false;
-		}
-	};*/
-	
-	
-	
+	/*$scope.initOrdersCreation = function() {
+	 if (!$scope.isOrdersFormOpening) {
+	 $scope.isOrdersFormOpening = true;
+	 //initOrderckEditor();
+	 $timeout(function() {
+	 
+	 currenciesMap[orderCurrencies[0]] = {};
+	 currenciesMap[orderCurrencies[0]].max = 0;
+	 angular.element('#take-currency-type').jqxDropDownList({source: orderCurrencies, autoDropDownHeight: true, selectedIndex: 1, width: '84%', height: '20px'});
+	 angular.element('#take-currency-type').on('select', function(event) {
+	 var index = event.args.index;
+	 if (index === 0) {
+	 if ($scope.giveCurrencyHiden === true) {
+	 angular.element('#take-currency-type').jqxDropDownList({selectedIndex: 1});
+	 } else {
+	 $scope.$apply(function() {
+	 $scope.takeCurrencyHiden = true;
+	 });
+	 }
+	 }
+	 else {
+	 $scope.$apply(function() {
+	 $scope.takeCurrencyHiden = false;
+	 });
+	 angular.element("#take-input").jqxNumberInput({symbol: orderCurrencies[index], min: 0.01, max: currenciesMap[orderCurrencies[index]].max, digits: getDigits(currenciesMap[orderCurrencies[index]].max)});
+	 }
+	 $scope.isValidOrder();
+	 });
+	 angular.element("#take-input").jqxNumberInput({width: '100%', height: '25px', symbol: orderCurrencies[1], min: 0.01, max: currenciesMap[orderCurrencies[1]].max, digits: getDigits(currenciesMap[orderCurrencies[1]].max), spinButtons: true, negativeSymbol: '-'});
+	 angular.element("#take-input").on('change', $scope.isValidOrder);
+	 angular.element('#give-currency-type').jqxDropDownList({source: orderCurrencies, autoDropDownHeight: true, selectedIndex: 1, width: '84%', height: '20px'});
+	 angular.element('#give-currency-type').on('select', function(event) {
+	 var index = event.args.index;
+	 if (index === 0) {
+	 if ($scope.takeCurrencyHiden === true) {
+	 angular.element('#give-currency-type').jqxDropDownList({selectedIndex: 1});
+	 } else {
+	 $scope.$apply(function() {
+	 $scope.giveCurrencyHiden = true;
+	 });
+	 }
+	 }
+	 else {
+	 $scope.$apply(function() {
+	 $scope.giveCurrencyHiden = false;
+	 });
+	 angular.element("#give-input").jqxNumberInput({symbol: orderCurrencies[index], min: 0.01, max: currenciesMap[orderCurrencies[index]].max, digits: getDigits(currenciesMap[orderCurrencies[index]].max)});
+	 }
+	 $scope.isValidOrder();
+	 });
+	 angular.element("#give-input").jqxNumberInput({width: '100%', height: '25px', symbol: orderCurrencies[1], min: 0.01, max: currenciesMap[orderCurrencies[1]].max, digits: getDigits(currenciesMap[orderCurrencies[1]].max), spinButtons: true, negativeSymbol: '-'});
+	 angular.element("#give-input").on('change', $scope.isValidOrder);
+	 var durationTypes = ["Hours", "Days"];
+	 angular.element('#duration-type').jqxDropDownList({source: durationTypes, autoDropDownHeight: true, selectedIndex: 0, width: '84%', height: '20px'});
+	 angular.element('#duration-type').on('select', function(event) {
+	 var index = event.args.index;
+	 angular.element("#duration-input").jqxNumberInput({symbol: durationTypes[index]});
+	 $scope.isValidOrder();
+	 });
+	 angular.element("#duration-input").jqxNumberInput({width: '100%', height: '25px', symbol: durationTypes[0], min: 1, decimalDigits: 0, digits: 3, spinButtons: true, negativeSymbol: '-'});
+	 angular.element("#duration-input").on('change', $scope.isValidOrder);
+	 angular.element("#s2id_category input").focus();
+	 });
+	 } else {
+	 clearOrder();
+	 $scope.isOrdersFormOpening = false;
+	 }
+	 };*/
+
+
+
 
 
 	/*$scope.createOrder = function() {
-		userService.get();
-		if (!$scope.isValidOrder()) {
-			return;
-		}
-		var data = CKEDITOR.instances.orderDataEditable.getData();
-		var orderInfo = {};
-		orderInfo.orderData = data;
-		var endDate = angular.element("#deadline").val();
-		orderInfo.endDate = endDate;
-		var takingValue = angular.element("#take-input").jqxNumberInput('val');
-		var takingCurrency = angular.element("#take-currency-type").jqxDropDownList('val');
-		if (takingCurrency !== "None") {
-			orderInfo.takingCurrency = currenciesMap[takingCurrency];
-			orderInfo.takingValue = Math.abs(takingValue);
-			addItems($scope.userPropertiesMap['currencies'], takingCurrency);
-		} else {
-			orderInfo.takingValue = null;
-			orderInfo.takingCurrency = null;
-		}
-		var givingValue = angular.element("#give-input").jqxNumberInput('val');
-		var givingCurrency = angular.element("#give-currency-type").jqxDropDownList('val');
-		if (givingCurrency !== "None") {
-			orderInfo.givingCurrency = currenciesMap[givingCurrency];
-			orderInfo.givingValue = Math.abs(givingValue);
-			addItems($scope.userPropertiesMap['currencies'], givingCurrency);
-		} else {
-			orderInfo.givingValue = null;
-			orderInfo.givingCurrency = null;
-		}
-		var duration = angular.element("#duration-input").jqxNumberInput('val');
-		orderInfo.duration = Math.abs(duration);
-		var durationType = angular.element("#duration-type").jqxDropDownList('val');
-		if (durationType === "Hours") {
-			orderInfo.durationType = "HOUR";
-		} else if (durationType === "Days") {
-			orderInfo.durationType = "DAY";
-		}
-		//orderInfo.categories = $scope.orderCreatingMap['orderCategories'];
-		orderInfo.categories = [];
-		for (var i in $scope.orderCreatingMap['orderCategories']) {
-			orderInfo.categories[i] = {};
-			orderInfo.categories[i].title = $scope.orderCreatingMap['orderCategories'][i];
-		}
-		orderInfo.languages = [];
-		for (var i in $scope.orderCreatingMap['orderLanguages']) {
-			orderInfo.languages[i] = {};
-			orderInfo.languages[i].title = $scope.orderCreatingMap['orderLanguages'][i];
-		}
-		//orderInfo.languages = $scope.orderCreatingMap['orderLanguages'];
-
-
-		//addItems($scope.userPropertiesMap['languages'], orderInfo.languages);
-		var orderResponse = ordersResource.create({}, orderInfo);
-		orderResponse.$promise.then(function() {
-			clearOrder();
-			$rootScope.userOrderDetails = true;
-			if (angular.element("#collapseThree").hasClass("in")) {
-				angular.element("#collapseThree").collapse("hide");
-			}
-			angular.element("#collapseFour").removeClass("in");
-			if (!angular.element("#collapseFour").hasClass("in")) {
-				angular.element("#collapseFour").collapse("show");
-			}
-
-			$scope.updateProfile();
-			$scope.isOrdersFormOpening = false;
-		});
-	};*/
+	 userService.get();
+	 if (!$scope.isValidOrder()) {
+	 return;
+	 }
+	 var data = CKEDITOR.instances.orderDataEditable.getData();
+	 var orderInfo = {};
+	 orderInfo.orderData = data;
+	 var endDate = angular.element("#deadline").val();
+	 orderInfo.endDate = endDate;
+	 var takingValue = angular.element("#take-input").jqxNumberInput('val');
+	 var takingCurrency = angular.element("#take-currency-type").jqxDropDownList('val');
+	 if (takingCurrency !== "None") {
+	 orderInfo.takingCurrency = currenciesMap[takingCurrency];
+	 orderInfo.takingValue = Math.abs(takingValue);
+	 addItems($scope.userPropertiesMap['currencies'], takingCurrency);
+	 } else {
+	 orderInfo.takingValue = null;
+	 orderInfo.takingCurrency = null;
+	 }
+	 var givingValue = angular.element("#give-input").jqxNumberInput('val');
+	 var givingCurrency = angular.element("#give-currency-type").jqxDropDownList('val');
+	 if (givingCurrency !== "None") {
+	 orderInfo.givingCurrency = currenciesMap[givingCurrency];
+	 orderInfo.givingValue = Math.abs(givingValue);
+	 addItems($scope.userPropertiesMap['currencies'], givingCurrency);
+	 } else {
+	 orderInfo.givingValue = null;
+	 orderInfo.givingCurrency = null;
+	 }
+	 var duration = angular.element("#duration-input").jqxNumberInput('val');
+	 orderInfo.duration = Math.abs(duration);
+	 var durationType = angular.element("#duration-type").jqxDropDownList('val');
+	 if (durationType === "Hours") {
+	 orderInfo.durationType = "HOUR";
+	 } else if (durationType === "Days") {
+	 orderInfo.durationType = "DAY";
+	 }
+	 //orderInfo.categories = $scope.orderCreatingMap['orderCategories'];
+	 orderInfo.categories = [];
+	 for (var i in $scope.orderCreatingMap['orderCategories']) {
+	 orderInfo.categories[i] = {};
+	 orderInfo.categories[i].title = $scope.orderCreatingMap['orderCategories'][i];
+	 }
+	 orderInfo.languages = [];
+	 for (var i in $scope.orderCreatingMap['orderLanguages']) {
+	 orderInfo.languages[i] = {};
+	 orderInfo.languages[i].title = $scope.orderCreatingMap['orderLanguages'][i];
+	 }
+	 //orderInfo.languages = $scope.orderCreatingMap['orderLanguages'];
+	 
+	 
+	 //addItems($scope.userPropertiesMap['languages'], orderInfo.languages);
+	 var orderResponse = ordersResource.create({}, orderInfo);
+	 orderResponse.$promise.then(function() {
+	 clearOrder();
+	 $rootScope.userOrderDetails = true;
+	 if (angular.element("#collapseThree").hasClass("in")) {
+	 angular.element("#collapseThree").collapse("hide");
+	 }
+	 angular.element("#collapseFour").removeClass("in");
+	 if (!angular.element("#collapseFour").hasClass("in")) {
+	 angular.element("#collapseFour").collapse("show");
+	 }
+	 
+	 $scope.updateProfile();
+	 $scope.isOrdersFormOpening = false;
+	 });
+	 };*/
 	function addItems(destArray, original) {
 		if (!destArray || !original) {
 			return;
@@ -409,76 +392,76 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 	}
 
 	/*function initDataSCEditor() {
-		console.log("%%% " + $scope.scEditor.dataInitialized)
-		if (!$scope.scEditor.dataInitialized) {
-			if ($scope.isCurrentUser) {
-				CKEDITOR.disableAutoInline = true;
-				CKEDITOR.inline("personalEditable");
-			}
-			$scope.scEditor.dataInitialized = true;
-			$timeout(function() {
-				reloadSCEditorInstance();
-			});
-		} else {
-			reloadSCEditorInstance();
-		}
-	}*/
+	 console.log("%%% " + $scope.scEditor.dataInitialized)
+	 if (!$scope.scEditor.dataInitialized) {
+	 if ($scope.isCurrentUser) {
+	 CKEDITOR.disableAutoInline = true;
+	 CKEDITOR.inline("personalEditable");
+	 }
+	 $scope.scEditor.dataInitialized = true;
+	 $timeout(function() {
+	 reloadSCEditorInstance();
+	 });
+	 } else {
+	 reloadSCEditorInstance();
+	 }
+	 }*/
 
 	/*function reloadSCEditorInstance() {
-		if ($scope.userPropertiesMap['personalData'] && (($scope.userPropertiesMap['personalData'].toString() === "DEFAULT")
-				|| ($scope.userPropertiesMap['personalData'].toString().indexOf("<p>DEFAULT</p>") === 0))) {
-			if ($scope.isCurrentUser && $scope.edit) {
-				CKEDITOR.instances.personalEditable.setData(defaultPersonalData);
-			} else if (!$scope.edit) {
-				$scope.userPropertiesMap['personalData'] = $sce.trustAsHtml(defaultPersonalData);
-			}
-		} else if ($scope.isCurrentUser && $scope.edit) {
-			if ($scope.userPropertiesMap['personalData']) {
-				CKEDITOR.instances.personalEditable.setData($scope.userPropertiesMap['personalData'].toString());
-			}
-		}
-	}*/
+	 if ($scope.userPropertiesMap['personalData'] && (($scope.userPropertiesMap['personalData'].toString() === "DEFAULT")
+	 || ($scope.userPropertiesMap['personalData'].toString().indexOf("<p>DEFAULT</p>") === 0))) {
+	 if ($scope.isCurrentUser && $scope.edit) {
+	 CKEDITOR.instances.personalEditable.setData(defaultPersonalData);
+	 } else if (!$scope.edit) {
+	 $scope.userPropertiesMap['personalData'] = $sce.trustAsHtml(defaultPersonalData);
+	 }
+	 } else if ($scope.isCurrentUser && $scope.edit) {
+	 if ($scope.userPropertiesMap['personalData']) {
+	 CKEDITOR.instances.personalEditable.setData($scope.userPropertiesMap['personalData'].toString());
+	 }
+	 }
+	 }*/
 
 	/*function initBKIscEditor() {
-
-		if ($scope.scEditor.BKIInitialized === false) {
-			if ($scope.isCurrentUser) {
-				CKEDITOR.disableAutoInline = true;
-				CKEDITOR.inline("bkiEditable");
-			}
-			$scope.scEditor.BKIInitialized = true;
-		} else {
-			reloadBKIscEditor();
-		}
-	}*/
+	 
+	 if ($scope.scEditor.BKIInitialized === false) {
+	 if ($scope.isCurrentUser) {
+	 CKEDITOR.disableAutoInline = true;
+	 CKEDITOR.inline("bkiEditable");
+	 }
+	 $scope.scEditor.BKIInitialized = true;
+	 } else {
+	 reloadBKIscEditor();
+	 }
+	 }*/
 
 	/*function reloadBKIscEditor() {
-		if ($scope.userPropertiesMap['bkiData'] && (($scope.userPropertiesMap['bkiData'].toString() === "DEFAULT")
-				|| ($scope.userPropertiesMap['bkiData'].toString().indexOf("<p>DEFAULT</p>") === 0))) {
-			if ($scope.isCurrentUser && $scope.editAdditional) {
-				CKEDITOR.instances.bkiEditable.setData(defaultPersonalData);
-			} else if (!$scope.editAdditional) {
-				$scope.userPropertiesMap['bkiData'] = $sce.trustAsHtml(defaultPersonalData);
-			}
-		} else if ($scope.isCurrentUser && $scope.editAdditional && $scope.userPropertiesMap['bkiData']) {
-			CKEDITOR.instances.bkiEditable.setData($scope.userPropertiesMap['bkiData'].toString());
-		}
-	}*/
+	 if ($scope.userPropertiesMap['bkiData'] && (($scope.userPropertiesMap['bkiData'].toString() === "DEFAULT")
+	 || ($scope.userPropertiesMap['bkiData'].toString().indexOf("<p>DEFAULT</p>") === 0))) {
+	 if ($scope.isCurrentUser && $scope.editAdditional) {
+	 CKEDITOR.instances.bkiEditable.setData(defaultPersonalData);
+	 } else if (!$scope.editAdditional) {
+	 $scope.userPropertiesMap['bkiData'] = $sce.trustAsHtml(defaultPersonalData);
+	 }
+	 } else if ($scope.isCurrentUser && $scope.editAdditional && $scope.userPropertiesMap['bkiData']) {
+	 CKEDITOR.instances.bkiEditable.setData($scope.userPropertiesMap['bkiData'].toString());
+	 }
+	 }*/
 
 	/*$scope.savePersonalPage = function() {
-		var data = CKEDITOR.instances.personalEditable.getData();
-		if (!$scope.userPropertiesMap['personalData'] || data !== $scope.userPropertiesMap['personalData'].toString()) {
-			$scope.userPropertiesMap['personalData'] = $sce.trustAsHtml(data);
-		}
-		$scope.endEditing();
-	};*/
+	 var data = CKEDITOR.instances.personalEditable.getData();
+	 if (!$scope.userPropertiesMap['personalData'] || data !== $scope.userPropertiesMap['personalData'].toString()) {
+	 $scope.userPropertiesMap['personalData'] = $sce.trustAsHtml(data);
+	 }
+	 $scope.endEditing();
+	 };*/
 	/*$scope.saveAdditionalData = function() {
-		var data = CKEDITOR.instances.bkiEditable.getData();
-		if (!$scope.userPropertiesMap['bkiData'] || data !== $scope.userPropertiesMap['bkiData'].toString()) {
-			$scope.userPropertiesMap['bkiData'] = $sce.trustAsHtml(data);
-		}
-		$scope.updateProfile();
-	};*/
+	 var data = CKEDITOR.instances.bkiEditable.getData();
+	 if (!$scope.userPropertiesMap['bkiData'] || data !== $scope.userPropertiesMap['bkiData'].toString()) {
+	 $scope.userPropertiesMap['bkiData'] = $sce.trustAsHtml(data);
+	 }
+	 $scope.updateProfile();
+	 };*/
 	$scope.editProfile = function() {
 		if ($scope.disabledEditButton) {
 			return;
@@ -506,9 +489,9 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		} else {
 			$scope.editAdditional = true;
 			/*initBKIscEditor();
-			$timeout(function() {
-				reloadBKIscEditor();
-			});*/
+			 $timeout(function() {
+			 reloadBKIscEditor();
+			 });*/
 		}
 		disableEditButton();
 	};
@@ -546,10 +529,10 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			$scope.currencies += ", ";
 		}
 		/*$timeout(function() {
-			angular.element("#phone").jqxMaskedInput({mask: '+## (###)###-##-##'});
-			angular.element("#phone").jqxMaskedInput('inputValue', "07");
-			angular.element("#phone").jqxMaskedInput('maskedValue', $scope.userPropertiesMap['phone']);
-		});*/
+		 angular.element("#phone").jqxMaskedInput({mask: '+## (###)###-##-##'});
+		 angular.element("#phone").jqxMaskedInput('inputValue', "07");
+		 angular.element("#phone").jqxMaskedInput('maskedValue', $scope.userPropertiesMap['phone']);
+		 });*/
 	}
 
 	$scope.changeVisible = function(propertyName) {
@@ -583,84 +566,132 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 	};
 	$scope.updateProfile = function() {
 		disableEditButton();
-		var userPublicProfile = {};
-		userPublicProfile.name = $scope.userPropertiesMap['name'];
-		userPublicProfile.phone = $scope.userPropertiesMap['phone'];
+		var userMainAttributes = {};
+		userMainAttributes.userId = $scope.currentUser.publicKey;
+		userMainAttributes.name = $scope.userPropertiesMap['name'];
+		userMainAttributes.phone = $scope.userPropertiesMap['phone'];
 		if ($scope.userPropertiesMap['phoneEnabled'] === visible) {
-			userPublicProfile.phoneEnabled = true;
+			userMainAttributes.phoneEnabled = true;
 		} else {
-			userPublicProfile.phoneEnabled = false;
+			userMainAttributes.phoneEnabled = false;
 		}
 		if ($scope.userPropertiesMap['mail'] && isValidEmail($scope.userPropertiesMap['mail'])) {
-			userPublicProfile.mail = $scope.userPropertiesMap['mail'];
+			userMainAttributes.mail = $scope.userPropertiesMap['mail'];
 		}
 
-		userPublicProfile.mailEnabled = ($scope.userPropertiesMap['mailEnabled'] === visible) ? true : false;
+		userMainAttributes.mailEnabled = ($scope.userPropertiesMap['mailEnabled'] === visible) ? true : false;
 		if ($scope.userPropertiesMap['personalDataEnabled'] === visible) {
-			userPublicProfile.personalDataEnabled = true;
+			userMainAttributes.personalDataEnabled = true;
 		} else {
-			userPublicProfile.personalDataEnabled = false;
+			userMainAttributes.personalDataEnabled = false;
 		}
 
-		userPublicProfile.personalData = ($scope.userPropertiesMap['personalData']) ? $scope.userPropertiesMap['personalData'].toString() : null;
-		userPublicProfile.bkiData = ($scope.userPropertiesMap['bkiData']) ? $scope.userPropertiesMap['bkiData'].toString() : null;
+		//userPublicProfile.personalData = ($scope.userPropertiesMap['personalData']) ? $scope.userPropertiesMap['personalData'].toString() : null;
+		//userPublicProfile.bkiData = ($scope.userPropertiesMap['bkiData']) ? $scope.userPropertiesMap['bkiData'].toString() : null;
+		//userPublicProfile.languages = [];
+		var languages = [];
 		if ($scope.userPropertiesMap['languages'] && ($scope.userPropertiesMap['languages'].length !== null)) {
-			userPublicProfile.languages = [];
+
 			for (var i in $scope.userPropertiesMap['languages']) {
-				userPublicProfile.languages[i] = {};
-				userPublicProfile.languages[i].title = $scope.userPropertiesMap['languages'][i];
+				//if($scope.languagesMap[$scope.userPropertiesMap['languages'][i]]) {
+				//userPublicProfile.languages[i] = $scope.languagesMap[$scope.userPropertiesMap['languages'][i]];
+				//} else {
+
+				languages[i] = {};
+				//userPublicProfile.languages[i].custom = false;
+				languages[i].code = $scope.userPropertiesMap['languages'][i];
+
+				//}
+
+
+				//userPublicProfile.languages[i].code = $scope.userPropertiesMap['languages'][i];
 			}
 		}
-
+		userMainAttributes.languages = languages;
+		console.log(JSON.stringify($scope.userPropertiesMap['languages']))
 		//userPublicProfile.languages = $scope.userPropertiesMap['languages'];
-		userPublicProfile.languagesEnabled = ($scope.userPropertiesMap['languagesEnabled'] === visible) ? true : false;
-		userPublicProfile.currencies = [];
+		userMainAttributes.languagesEnabled = ($scope.userPropertiesMap['languagesEnabled'] === visible) ? true : false;
+		userMainAttributes.currencies = [];
 		for (var i in $scope.userPropertiesMap['currencies']) {
 			if (currenciesMap[$scope.userPropertiesMap['currencies'][i]] !== undefined) {
-				userPublicProfile.currencies.push(currenciesMap[$scope.userPropertiesMap['currencies'][i]]);
+				userMainAttributes.currencies.push(currenciesMap[$scope.userPropertiesMap['currencies'][i]]);
 			}
 		}
-		userPublicProfile.currenciesEnabled = ($scope.userPropertiesMap['currenciesEnabled'] === visible) ? true : false;
-		userPublicProfile.socialLinks = [];
-		var socialLinks = $scope.userPropertiesMap['socialLinks'];
-		for (var i in socialLinks) {
-			var link = {};
-			link.title = socialLinks[i].title;
-			link.link = socialLinks[i].link;
-			link.id = socialLinks[i].id;
-			userPublicProfile.socialLinks.push(link);
-		}
-		userPublicProfile.phones = [];
-		var phones = $scope.userPropertiesMap['phones'];
-		for (var i in phones) {
-			var link = {};
-			link.title = phones[i].title;
-			link.link = phones[i].link;
-			link.id = phones[i].id;
-			userPublicProfile.phones.push(link);
-		}
-		userPublicProfile.videos = [];
-		var videos = $scope.userPropertiesMap['videos'];
-		for (var i in videos) {
-			var link = {};
-			link.title = videos[i].title;
-			link.link = videos[i].link;
-			link.id = videos[i].id;
-			userPublicProfile.videos.push(link);
-		}
-		userPublicProfile.namesLinks = [];
-		var names = $scope.userPropertiesMap['names'];
-		for (var i in names) {
-			var link = {};
-			link.title = names[i].title;
-			link.link = names[i].link;
-			link.id = names[i].id;
-			userPublicProfile.namesLinks.push(link);
-		}
-		userPublicProfile.passportEnabled = $scope.userPropertiesMap['passportEnabled'];
-		userProfileResponse = usersProfileResource.updatePublicProfile({}, userPublicProfile);
+		userMainAttributes.currenciesEnabled = ($scope.userPropertiesMap['currenciesEnabled'] === visible) ? true : false;
+		/*userPublicProfile.socialLinks = [];
+		 var socialLinks = $scope.userPropertiesMap['socialLinks'];
+		 for (var i in socialLinks) {
+		 var link = {};
+		 link.title = socialLinks[i].title;
+		 link.link = socialLinks[i].link;
+		 link.id = socialLinks[i].id;
+		 userPublicProfile.socialLinks.push(link);
+		 }
+		 userPublicProfile.phones = [];
+		 var phones = $scope.userPropertiesMap['phones'];
+		 for (var i in phones) {
+		 var link = {};
+		 link.title = phones[i].title;
+		 link.link = phones[i].link;
+		 link.id = phones[i].id;
+		 userPublicProfile.phones.push(link);
+		 }
+		 userPublicProfile.videos = [];
+		 var videos = $scope.userPropertiesMap['videos'];
+		 for (var i in videos) {
+		 var link = {};
+		 link.title = videos[i].title;
+		 link.link = videos[i].link;
+		 link.id = videos[i].id;
+		 userPublicProfile.videos.push(link);
+		 }
+		 userPublicProfile.namesLinks = [];
+		 var names = $scope.userPropertiesMap['names'];
+		 for (var i in names) {
+		 var link = {};
+		 link.title = names[i].title;
+		 link.link = names[i].link;
+		 link.id = names[i].id;
+		 userPublicProfile.namesLinks.push(link);
+		 }
+		 userPublicProfile.passportEnabled = $scope.userPropertiesMap['passportEnabled'];*/
+		userProfileResponse = usersProfileResource.updateUserMainAttributes({}, userMainAttributes);
 		userProfileResponse.$promise.then(function() {
-			reloadData();
+			var userSocialLinksRequest = {};
+			userSocialLinksRequest.userId = $scope.currentUser.publicKey;
+			userSocialLinksRequest.socialLinks = [];
+			var socialLinks = $scope.userPropertiesMap['socialLinks'];
+			for (var i in socialLinks) {
+				var link = {};
+				link.title = socialLinks[i].title;
+				link.link = socialLinks[i].link;
+				link.id = socialLinks[i].id;
+				userSocialLinksRequest.socialLinks.push(link);
+			}
+			userProfileResponse = usersProfileResource.updateUserSocialLinks({}, userSocialLinksRequest);
+			userProfileResponse.$promise.then(function() {
+				var userVideosRequest = {};
+				userVideosRequest.userId = $scope.currentUser.publicKey;
+				userVideosRequest.videos = [];
+				var videos = $scope.userPropertiesMap['videos'];
+				for (var i in videos) {
+					var link = {};
+					link.title = videos[i].title;
+					link.link = videos[i].link;
+					link.id = videos[i].id;
+					userVideosRequest.videos.push(link);
+				}
+				userProfileResponse = usersProfileResource.updateUserVideos({}, userVideosRequest);
+				userProfileResponse.$promise.then(function() {
+					var userPassportEnabledRequest = {};
+				userPassportEnabledRequest.userId = $scope.currentUser.publicKey;
+				userPassportEnabledRequest.passportEnabled = $scope.userPropertiesMap['passportEnabled'];
+					userProfileResponse = usersProfileResource.updatePassportEnabled({}, userPassportEnabledRequest);
+					userProfileResponse.$promise.then(function() {
+						reloadData();
+					});
+				});
+			});
 		});
 		//var userPrivateProfile = {};
 	};
@@ -785,23 +816,23 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		});
 	};
 	/*$scope.collapse = function(id) {
-		if (angular.element(id).hasClass("in")) {
-			angular.element(id).collapse("hide");
-			if ("#collapseThree" === id) {
-				clearOrder();
-				$scope.isOrdersFormOpening = false;
-			}
-		} else if ("#collapseThree" === id) {
-			if (!$scope.isOrdersFormOpening) {
-				angular.element(id).collapse('show');
-				$scope.initOrdersCreation();
-			} else if (!angular.element("#s2id_category input").is(":focus")) {
-				angular.element("#s2id_category input").focus();
-			}
-		} else {
-			angular.element(id).collapse('show');
-		}
-	};*/
+	 if (angular.element(id).hasClass("in")) {
+	 angular.element(id).collapse("hide");
+	 if ("#collapseThree" === id) {
+	 clearOrder();
+	 $scope.isOrdersFormOpening = false;
+	 }
+	 } else if ("#collapseThree" === id) {
+	 if (!$scope.isOrdersFormOpening) {
+	 angular.element(id).collapse('show');
+	 $scope.initOrdersCreation();
+	 } else if (!angular.element("#s2id_category input").is(":focus")) {
+	 angular.element("#s2id_category input").focus();
+	 }
+	 } else {
+	 angular.element(id).collapse('show');
+	 }
+	 };*/
 
 	$scope.changeAdditionAttrsVisible = function() {
 		if ($scope.additionAttrsHidden === false) {

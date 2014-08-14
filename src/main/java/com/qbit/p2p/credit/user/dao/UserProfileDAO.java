@@ -170,9 +170,10 @@ public class UserProfileDAO {
 				userPublicProfile.setPhone(userProfile.getPhone());
 				userPublicProfile.setPhoneEnabled(userProfile.isPhoneEnabled());
 				List<Language> languages = userProfile.getLanguages();
-				if (languages != null) {
+				if ((languages != null) && !languages.isEmpty()) {
 					List<Language> notCustomLanguages = languageDAO.findAll();
 					if (notCustomLanguages != null) {
+						//System.out.println("!! " + userProfile);
 						for (Language language : languages) {
 							if (!notCustomLanguages.contains(language)) {
 								language.setCustom(true);

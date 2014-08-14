@@ -98,6 +98,7 @@ public class UserProfilesResource {
 		if ((userProfile == null) || !userId.equals(userProfile.getUserId())) {
 			throw new IllegalArgumentException();
 		}
+		System.out.println("!! " + userProfile);
 		UserPublicProfile newProfile = userProfileDAO.updateUserMainAttributes(userProfile);		
 		statisticsService.recalculateOpenessRating(userId);
 		

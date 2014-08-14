@@ -54,25 +54,24 @@ navbarModule.directive('uiDropdown', function($compile, $timeout) {
 
 				angular.element(element).find('.dropdown-input').on("blur", function(e) {
 
-					
-					
+
+
 					$timeout(function() {
 						scope.$apply(function() {
 							scope.selectedItem = scope.inputText;
 							scope.inputText = "";
 							if (scope.selectedItem !== "") {
-						$('button.dropdown-toggle', element).html('<b class="caret"></b> <span class="li-item">' + scope.selectedItem + '</span>');
-					}
+								$('button.dropdown-toggle', element).html('<b class="caret"></b> <span class="li-item">' + scope.selectedItem + '</span>');
+							}
 						});
+						scope.onChangeInput();
 					});
 				});
 			}
 
 
 			scope.selectVal = function(item) {
-				if (angular.element(scope.elementId + " .input-text").is(":focus")) {
-
-				} else {
+				if (!angular.element(scope.elementId + " .input-text").is(":focus")) {
 					switch (attrs.menuType) {
 						case "button":
 							$('button.button-label', element).html(item);
@@ -82,13 +81,20 @@ navbarModule.directive('uiDropdown', function($compile, $timeout) {
 							break;
 					}
 				}
+				
+				$timeout(function() {
+					scope.$apply(function() {
+						scope.selectedItem = item;
+					});
+					scope.onChangeInput();
+				});
 
-				scope.selectedItem = item;
 				if (scope.doSelect) {
 					scope.doSelect({
 						selectedVal: item
 					});
 				}
+
 			};
 
 			scope.selectVal(scope.selectedItem);

@@ -45,7 +45,7 @@
 				</div>
 			</div>
 			<div>
-				<div class="col-xs-8 hidden-md hidden-lg ">
+				<div class="col-xs-8 hidden-md hidden-lg " ng-click="edit = true">
 					<h5 style="margin-top: -2px;">{{userPropertiesMap['name']}}<div style="float: right"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="userPublicKeyFromPath" entity-field="'name'" /></div></h5>
 				</div>
 			</div>
@@ -165,7 +165,7 @@
 									<!--input type="text" id="currencies" class="form-control input-jqx" ng-model="currencies" ng-change="editCurrencies"/-->
 									<span class="input-group-btn">
 										<button class="btn btn-default" type="button" ng-click="changeVisible('currenciesEnabled')">
-											<span class="span-jqx glyphicon glyphicon-eye-{{userPropertiesMap['currenciesEnabled']}}"></span>
+											<span class="glyphicon glyphicon-eye-{{userPropertiesMap['currenciesEnabled']}}"></span>
 										</button>
 									</span>
 
@@ -238,24 +238,15 @@
 							</div>
 						</div>
 					</div>
+					
 					<div class="row">
 						<div class="col-xs-12 col-md-12">
 							<div class="container-fluid">
-								<div style="float: right"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="userPublicKeyFromPath" entity-field="'socialLinks'" /></div>
-								<links-list links="userPropertiesMap['socialLinks']" type="'social-link'" save-data="updateProfile()" current="userPropertiesMap['isCurrentUser']" edited="editAdditional"></links-list>
-								<div style="float: right"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="userPublicKeyFromPath" entity-field="'phones'" /></div>
-								<links-list links="userPropertiesMap['phones']" type="'phone'" save-data="updateProfile()" current="userPropertiesMap['isCurrentUser']" edited="editAdditional"></links-list>
-							</div>
-						</div>
-					</div>
-
-					<div class="row">
-						<div class="col-xs-12 col-md-12">
-							<div class="container-fluid">
-								<div class="row" style="padding-bottom: 25px;">
-									<div class="col-xs-1 col-md-1" style="margin-bottom: -26px; margin-top: 17px;" ng-hide="!editAdditional"><input type="checkbox" ng-model="userPropertiesMap['passportEnabled']"></div>
-									<div class="col-xs-11 col-md-7" style="margin-bottom: -26px; margin-top: 17px;" ng-hide="userPropertiesMap['passportEnabled'] === false">Ready to show passport</div>
-									<div class="col-xs-11 col-md-7" style="margin-bottom: -26px; margin-top: 17px;" ng-hide="userPropertiesMap['passportEnabled'] !== false">Not ready to show passport</div>
+								<div style="float: right; padding-bottom: 3px;" ng-hide="editAdditional"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="userPublicKeyFromPath" entity-field="'passport'" /></div>
+								<div class="row">
+									<div class="col-xs-1 col-md-1" ng-hide="!editAdditional"><input type="checkbox" ng-model="userPropertiesMap['passportEnabled']"></div>
+									<div class="col-xs-9 col-md-7" ng-hide="userPropertiesMap['passportEnabled'] === false">Ready to show passport</div>
+									<div class="col-xs-9 col-md-7" ng-hide="userPropertiesMap['passportEnabled'] !== false">Not ready to show passport</div>
 								</div>
 								<div class="row">
 									<div class="col-xs-12 col-md-12"><hr></div>
@@ -263,10 +254,18 @@
 							</div>
 						</div>
 					</div>
-					<div style="float: right"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="userPublicKeyFromPath" entity-field="'videos'" /></div>
+					<div class="row">
+						<div class="col-xs-12 col-md-12">
+							<div class="container-fluid">
+								<div style="float: right" ng-hide="editAdditional"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="userPublicKeyFromPath" entity-field="'socialLinks'" /></div>
+								<links-list links="userPropertiesMap['socialLinks']" type="'social-link'" save-data="updateProfile()" current="userPropertiesMap['isCurrentUser']" edited="editAdditional"></links-list>
+							</div>
+						</div>
+					</div>
+					
+					
+					<div style="float: right; margin-bottom: -5px;" ng-hide="editAdditional"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="userPublicKeyFromPath" entity-field="'videos'" /></div>
 					<links-list links="userPropertiesMap['videos']" type="'video'" save-data="updateProfile()" current="userPropertiesMap['isCurrentUser']" edited="editAdditional"></links-list>
-					<div style="float: right"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="userPublicKeyFromPath" entity-field="'names'" /></div>
-					<links-list links="userPropertiesMap['names']" type="'name'" save-data="updateProfile()" current="userPropertiesMap['isCurrentUser']" edited="editAdditional"></links-list>
 
 					<!--div class="row" ng-hide="!userPropertiesMap['bkiData'] && !editAdditional">
 						<div class="col-xs-8 col-md-12" style="margin-top: 10px;">Сredit history<div style="float: right"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="userPublicKeyFromPath" entity-field="'bkiData'"/></div></div>

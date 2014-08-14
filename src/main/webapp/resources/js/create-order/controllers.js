@@ -110,21 +110,24 @@ initCategories();
 	$scope.isValidOrder = function() {
 
 		//var data = CKEDITOR.instances.orderDataEditable.getData();
-
 		var givingValue = angular.element("#giving-order-currency input").val();
 		var takingValue = angular.element("#taking-order-currency input").val();
 		var durationValue = angular.element("#order-duration input").val();
-		if (givingValue !== "") {
+		if(($scope.currency.selectedGivingCurrency === "%") && (givingValue !== "") && (givingValue >= 0)) {
+			setSuccess("#giving-order-currency input");
+		} else if ((givingValue !== "") && (givingValue > 0)) {
 			setSuccess("#giving-order-currency input");
 		} else {
 			setError("#giving-order-currency input");
 		}
-		if (takingValue !== "") {
+		if(($scope.currency.selectedTakingCurrency === "%") && (takingValue !== "") && (takingValue >= 0)) {
+			setSuccess("#giving-order-currency input");
+		} else if ((takingValue !== "") && (takingValue > 0)) {
 			setSuccess("#taking-order-currency input");
 		} else {
 			setError("#taking-order-currency input");
 		}
-		if (durationValue !== "") {
+		if ((durationValue !== "") && (durationValue >= 0)) {
 			setSuccess("#order-duration input");
 		} else {
 			setError("#order-duration input");
@@ -135,21 +138,35 @@ initCategories();
 				//&& data && (data !== "")
 				&& $scope.orderCreatingMap['orderCategories'] && ($scope.orderCreatingMap['orderCategories'].length !== 0)
 				&& $scope.deadline && ($scope.deadline !== "")) {
-			$timeout(function() {
+			if((($scope.currency.selectedGivingCurrency !== "%") && (givingValue <= 0)) 
+					|| (($scope.currency.selectedTakingCurrency !== "%") && (takingValue <= 0))) {
+				disableCreateOrderButton();
+			} else {
+				enableCreateOrderButton();
+			}
+			
+
+		} else {
+			disableCreateOrderButton();
+		}
+		return $scope.createOrderButtonEnabled;
+	};
+	
+	function enableCreateOrderButton() {
+		$timeout(function() {
 				$scope.$apply(function() {
 					$scope.createOrderButtonEnabled = true;
 				});
 			});
-
-		} else {
-			$timeout(function() {
+	}
+	
+	function disableCreateOrderButton() {
+		$timeout(function() {
 				$scope.$apply(function() {
 					$scope.createOrderButtonEnabled = false;
 				});
 			});
-		}
-		return $scope.createOrderButtonEnabled;
-	};
+	}
 
 	function setError(id) {
 		angular.element(id).removeClass("sc-has-success");

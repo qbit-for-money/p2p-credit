@@ -1,5 +1,5 @@
 <div class="row"> <!--ng-hide="(edited === false) && (!links || links.length === 0)"-->
-	<div class="col-xs-7 col-md-3" style="margin-top: 10px;">{{title}}</div>
+	<div class="col-xs-7 col-md-3" style="margin-top: 3px;">{{title}}</div>
 </div>
 <div class="row"><!-- ng-hide="(edited === false) && (!links || links.length === 0)"-->
 	<div class="col-xs-12 col-md-12"><hr></div>
@@ -52,7 +52,7 @@
 						</div>
 					</div>
 
-					<div class="col-xs-12 col-md-8" ng-hide="!(type === 'phone' && linkItem.title && !linkItem.edited)">
+					<!--div class="col-xs-12 col-md-8" ng-hide="!(type === 'phone' && linkItem.title && !linkItem.edited)">
 						<div class="container-fluid">
 							<div class="row">
 								<div class="col-xs-5 col-md-6 link-item title-item">{{linkItem.title}}</div><div class="col-xs-7 col-md-6">{{linkItem.link}}</div>
@@ -65,14 +65,11 @@
 								<div class="col-xs-6 col-md-6"></div><div class="col-xs-6 col-md-6 link-item">{{linkItem.link}}</div>
 							</div>
 						</div>
-					</div>
+					</div-->
 
 
 					<div class="col-xs-4 col-md-4"  ng-hide="!((linkItem.edited === true) && (edited === true) && (type !== 'name'))">
 						<input type="text"  class="form-control" placeholder="Title" ng-model="linkItem.title"/>
-					</div>
-					<div class="col-xs-6 col-md-4"  ng-hide="!((linkItem.edited === true) && (edited === true) && (type !== 'name'))" ng-class="{'has-success': isValidItem(linkItem, true), 'has-error': !isValidItem(linkItem, true)}">
-						<input type="text" id="{{linkItem.id}}"  class="form-control" ng-class="{'masked-input-jqx': ('phone' === type)}" placeholder="{{itemPlaceholder}}" ng-model="linkItem.link"/>
 					</div>
 					<div class="col-xs-8 col-md-8"  ng-hide="!((linkItem.edited === true) && (edited === true) && (type === 'name'))" ng-class="{'has-success': isValidItem(linkItem, true), 'has-error': !isValidItem(linkItem, true)}">
 						<input type="text" id="{{linkItem.id}}"  class="form-control" placeholder="{{itemPlaceholder}}" ng-model="linkItem.link"/>
@@ -95,9 +92,6 @@
 				<div class="row" ng-hide="edited === false || links.length > 5">
 					<div class="col-xs-4 col-md-4" ng-hide="(type === 'video') || (type === 'name')">
 						<input type="text"  class="form-control" placeholder="Title" ng-model="newLink.title" />
-					</div>
-					<div class="col-xs-4 col-md-4" ng-class="{'has-success': isValidItem(newLink), 'has-error': !isValidItem(newLink)}">
-						<input type="text" id="input-{{type}}"  class="form-control" ng-class="{'masked-input-jqx': ('phone' === type)}" ng-required="true" placeholder="{{itemPlaceholder}}" ng-model="newLink.link"/>
 					</div>
 					<div class="col-xs-4 col-md-4" ng-hide="(type !== 'video') && (type !== 'name')"></div>
 					<div class="col-xs-4 col-md-4">
