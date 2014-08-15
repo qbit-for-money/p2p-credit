@@ -13,6 +13,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 	errorMessages["MAX_SIZE"] = "User photo size should be less than 2000x2000";
 	errorMessages["IMAGE_TYPE"] = "Image type should be JPG";
 	$scope.popoverShow = false;
+	$scope.disabledEditButton = false;
 	$scope.edit = false;
 	$scope.editAdditional = false;
 	$scope.editedPassport = false;
@@ -46,7 +47,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 	$scope.userPropertiesMap['currencies'] = [];
 	$scope.userPropertiesMap['languages'] = [];
 	$scope.languagesMap = {};
-	$scope.createOrderButtonEnabled = false;
 	$scope.additionAttrsHidden = true;
 	$scope.likesCount = {};
 	$scope.currenciesSelect2Options = {
@@ -175,7 +175,11 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			//reloadSCEditorInstance();
 			//reloadBKIscEditor();
 			//$scope.isValidOrder();
-
+			$timeout(function() {
+			$scope.$apply(function() {
+				$scope.disabledEditButton = false;
+			});
+		});
 		});
 	}
 
@@ -483,7 +487,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		if ($scope.editMap[attribute] === true) {
 			$scope.editMap[attribute] = false;
 			if ($scope.editMap["old" + attribute] !== $scope.userPropertiesMap[attribute]) {
-				$scope.disabledEditButton();
+				disableEditButton();
 				$scope.endEditing();
 			}
 		} else {
@@ -511,7 +515,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 				$scope.editMap[attribute] = false;
 			});
 			if ($scope.editMap["old" + attribute] !== $scope.userPropertiesMap[attribute]) {
-				$scope.disabledEditButton();
+				disableEditButton();
 				$scope.endEditing();
 			}
 		});
@@ -527,7 +531,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			$scope.editName = false;
 			if ($scope.oldName !== $scope.userPropertiesMap['name']) {
 				console.log("EDIT " + $scope.editName)
-				$scope.disabledEditButton();
+				disableEditButton();
 				$scope.endEditing();
 			}
 		} else {
@@ -550,7 +554,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			$scope.editMail = false;
 			console.log("EDIT " + $scope.userPropertiesMap['mail'])
 			if ($scope.oldMail !== $scope.userPropertiesMap['mail']) {
-				$scope.disabledEditButton();
+				disableEditButton();
 				$scope.endEditing();
 			}
 		} else {
@@ -598,16 +602,21 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		disableEditButton();
 	};
 	function disableEditButton() {
-		$scope.disabledEditButton = true;
+		//$scope.disabledEditButton = true;
 		$timeout(function() {
+			$scope.$apply(function() {
+				$scope.disabledEditButton = true;
+			});
+		});
+		/*$timeout(function() {
 			$scope.$apply(function() {
 				$scope.disabledEditButton = false;
 			});
-		}, 500);
+		}, 500);*/
 	}
 
 	$scope.endEditing = function() {
-
+console.log("END");
 		var languages = "";
 		for (var i in $scope.userPropertiesMap['languages']) {
 			languages += $scope.userPropertiesMap['languages'][i] + ", "
@@ -667,6 +676,9 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		}
 	};
 	$scope.updateProfile = function() {
+		if ($scope.disabledEditButton) {
+			return;
+		}
 		disableEditButton();
 		var userMainAttributes = {};
 		userMainAttributes.userId = $scope.currentUser.publicKey;

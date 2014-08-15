@@ -100,7 +100,7 @@
 							<h4 style="margin-top: -2px;">{{userPropertiesMap['name']}}<div style="float: right"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="userPublicKeyFromPath" entity-field="'name'" /></div></h4>
 						</div>
 
-						<div class="hidden-sm hidden-xs col-md-8" ng-if="editName">
+						<div class="hidden-sm hidden-xs col-md-12" ng-if="editName">
 							<input type="text" id="userName" class="form-control" ng-model="userPropertiesMap
 								['name']" placeholder="Name" maxlength="20" ng-blur="editNameAttribute()" ng-enter-key="editNameAttribute()"/>
 						</div>
@@ -115,6 +115,7 @@
 					</div>
 					<div class="row">
 						<div class="hidden-xs hidden-sm col-md-12" ng-hide="!isCurrentUser" style="margin-top: -3px"><hr></div>
+						{{disabledEditButton}} fg
 						<!--div class="col-xs-1 col-md-1"  ng-hide="!isCurrentUser">
 							<div class="navbar-right col-xs-offset-9">
 								<button class="btn btn-default" ng-disabled="disabledEditButton" ng-click="editProfile()" ng-hide="edit"><span class="glyphicon glyphicon-edit"></span></button>
@@ -130,7 +131,7 @@
 							<div class="row">
 
 								<div class="col-xs-4 col-md-2 title" ng-click="editAttribute('mail')" ng-if="!editMap['mail']" style="cursor:pointer;">
-									Mail:
+									Mail: 
 								</div>
 								<div class="col-xs-8 col-md-10" ng-click="editAttribute('mail')" ng-if="!editMap['mail']" style="cursor:pointer;">
 									{{userPropertiesMap['mail']}}<div class="profile-like"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="userPublicKeyFromPath" entity-field="'mail'" /></div>
@@ -139,7 +140,7 @@
 								<div class="hidden-xs col-md-2 title-edit title" ng-if="editMap['mail']">
 									Mail:
 								</div>
-								<div class="input-group col-xs-11 col-md-8" ng-if="editMap['mail']">
+								<div class="input-group col-xs-12 col-md-9" ng-if="editMap['mail']">
 									<input type="email" id="mail" ng-model="userPropertiesMap
 										['mail']" class="form-control" ng-enter-key="editAttribute('mail')" ng-blur="editAttribute('mail')"/>
 									<span class="input-group-btn">
@@ -161,7 +162,7 @@
 								<div class="hidden-xs col-md-2 title-edit title" ng-if="editMap['phone']">
 									Phone:
 								</div>
-								<div class="input-group col-xs-11 col-md-8" ng-if="editMap['phone']">
+								<div class="input-group col-xs-12 col-md-9" ng-if="editMap['phone']">
 									<input type="text" id="phone" ng-model="userPropertiesMap
 										['phone']" class="form-control" ng-enter-key="editAttribute('phone')" ng-blur="editAttribute('phone')"/>
 									<span class="input-group-btn">
@@ -182,7 +183,7 @@
 								<div class="hidden-xs col-md-2 title-edit title" ng-if="editMap['languages']">
 									Languages:
 								</div>
-								<div class="input-group col-xs-11 col-md-8" ng-if="editMap['languages']" ng-click-out="disableEditAttribute('languages')">
+								<div class="input-group col-xs-12 col-md-9" ng-if="editMap['languages']" ng-click-out="disableEditAttribute('languages')">
 									<input type="hidden" class="form-control" ui-select2="languageSelect2Options" ng-model="userPropertiesMap
 										['languages']" id="languages" data-placeholder="Pick a language" style="width: 100%"/>
 									<span class="input-group-btn">
@@ -204,7 +205,7 @@
 								<div class="hidden-xs col-md-2 title-edit title" ng-if="editMap['currencies']">
 									Currencies:
 								</div>
-								<div class="input-group col-xs-11 col-md-8" ng-if="editMap['currencies']"  ng-click-out="disableEditAttribute('currencies')">
+								<div class="input-group col-xs-12 col-md-9" ng-if="editMap['currencies']"  ng-click-out="disableEditAttribute('currencies')">
 									<input type="hidden" class="form-control" ui-select2="currenciesSelect2Options" ng-model="userPropertiesMap
 										['currencies']" id="currencies" data-placeholder="Pick a currency" style="width: 100%" />
 									<!--input type="text" id="currencies" class="form-control input-jqx" ng-model="currencies" ng-change="editCurrencies"/-->
