@@ -25,6 +25,20 @@ navbarModule.directive('ngEnterKey', ['$parse', function($parse) {
 		};
 	}]);
 
+navbarModule.directive('ngClickOut', ['$parse', function($parse) {
+		return function(scope, element, attr) {
+			var fn = $parse(attr['ngClickOut']);
+			element.bind("mouseout", function(event) {
+				console.log("OUT");
+				$(document).bind("click", function(event) {
+					console.log("CLICK");
+					fn(scope, {$event: event});
+					$(document).unbind('click');
+				});
+			});
+		};
+	}]);
+
 /*navbarModule.directive('ngBlur', ['$parse', function($parse) {
  return function(scope, element, attr) {
  //var fn = $parse(attr['ngBlur']);

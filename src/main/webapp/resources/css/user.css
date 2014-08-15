@@ -1,3 +1,48 @@
+/* Smartphones (portrait) ----------- */
+@media only screen 
+and (max-width : 768px) {
+	#additional-visible-button {
+		margin-top: -20px;
+	}
+}
+@media only screen 
+and (min-width : 768px) and (max-width : 992px) {
+	#additional-visible-button {
+		margin-top: -25px;
+	}
+	
+	#user-photo {
+		cursor: pointer;
+	}
+	
+	#photo-buttons {
+		//padding-bottom: 10px;
+	}
+	#photo-cancel-button {
+		margin-bottom: 30px;
+	}
+}
+/* Larger screens ----------- */
+@media only screen 
+and (min-width : 992px) {
+	#additional-visible-button {
+		margin-top: -25px;
+	}
+	
+	#user-photo {
+		cursor: pointer;
+	}
+	#photo-buttons {
+		margin-bottom: -30px;
+		//padding-bottom: 19px;
+		//margin-bottom: 25px;
+	}
+	
+	/*#photo-cancel-button {
+		margin-bottom: 30px;
+	}*/
+}
+
 #user-google img {
 	position: relative; 
 	height: 32px; 
@@ -184,4 +229,15 @@ select.custom {
 	min-width: 200px;
 	margin-bottom: 9px;
 	margin-top: -170px;
+}
+
+#statistics-popover {
+	display: inherit;
+	min-width: 200px;
+	margin-top: 29px;
+}
+
+.additioanl-button {
+	height: 26px;
+	padding-top: 4px;
 }

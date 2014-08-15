@@ -17,6 +17,9 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 	$scope.editAdditional = false;
 	$scope.editedPassport = false;
 	$scope.editUserPhoto = false;
+	$scope.editMap = {};
+	$scope.editMap['links'] = false;
+	$scope.editMap['videos'] = false;
 	$scope.editName = false;
 	$scope.editMail = false;
 	$scope.userProfile = {};
@@ -466,19 +469,65 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 	 $scope.updateProfile();
 	 };*/
 	$scope.showStatisticsPopover = function() {
-		if($scope.popoverShow === true) {
+		if ($scope.popoverShow === true) {
 			$scope.popoverShow = false;
 		} else {
 			$scope.popoverShow = true;
 		}
 	};
-	
-	
+
+	$scope.editAttribute = function(attribute) {
+		if ($scope.disabledEditButton) {
+			return;
+		}
+		if ($scope.editMap[attribute] === true) {
+			$scope.editMap[attribute] = false;
+			if ($scope.editMap["old" + attribute] !== $scope.userPropertiesMap[attribute]) {
+				$scope.disabledEditButton();
+				$scope.endEditing();
+			}
+		} else {
+			$scope.editMap[attribute] = true;
+			$scope.editMap["old" + attribute] = $scope.userPropertiesMap[attribute]
+			$timeout(function() {
+				/*angular.element("#s2id_" + attribute).find(".select2-input").focus();
+				 if(!angular.element("#s2id_" + attribute).find(".select2-input").is(":focus")) {
+				 angular.element("#" + attribute).focus();
+				 }*/
+				angular.element("#" + attribute).focus();
+				//angular.element("#s2id_languages").find(".select2-input").focus();
+			});
+		}
+		console.log(attribute + " " + $scope.editMap[attribute])
+		$(document).unbind('click');
+	}
+
+	$scope.disableEditAttribute = function(attribute) {
+		if ($scope.disabledEditButton) {
+			return;
+		}
+		$timeout(function() {
+			$scope.$apply(function() {
+				$scope.editMap[attribute] = false;
+			});
+			if ($scope.editMap["old" + attribute] !== $scope.userPropertiesMap[attribute]) {
+				$scope.disabledEditButton();
+				$scope.endEditing();
+			}
+		});
+
+	}
+
+
 	$scope.editNameAttribute = function() {
-		if($scope.editName === true) {
+		if ($scope.disabledEditButton) {
+			return;
+		}
+		if ($scope.editName === true) {
 			$scope.editName = false;
-			if($scope.oldName !== $scope.userPropertiesMap['name']) {
+			if ($scope.oldName !== $scope.userPropertiesMap['name']) {
 				console.log("EDIT " + $scope.editName)
+				$scope.disabledEditButton();
 				$scope.endEditing();
 			}
 		} else {
@@ -486,19 +535,22 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			$scope.oldName = $scope.userPropertiesMap['name'];
 			$timeout(function() {
 				angular.element("#xsUserName").focus();
-				if(!angular.element("#xsUserName").is(":focus")) {
+				if (!angular.element("#xsUserName").is(":focus")) {
 					angular.element("#userName").focus();
 				}
 			});
 		}
 	};
-	
+
 	$scope.editMailAttribute = function() {
-		if($scope.editMail === true) {
+		if ($scope.disabledEditButton) {
+			return;
+		}
+		if ($scope.editMail === true) {
 			$scope.editMail = false;
 			console.log("EDIT " + $scope.userPropertiesMap['mail'])
-			if($scope.oldMail !== $scope.userPropertiesMap['mail']) {
-				
+			if ($scope.oldMail !== $scope.userPropertiesMap['mail']) {
+				$scope.disabledEditButton();
 				$scope.endEditing();
 			}
 		} else {
@@ -509,25 +561,25 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			});
 		}
 	};
-	
-	
-	
+
+
+
 	$scope.editProfile = function() {
 		if ($scope.disabledEditButton) {
 			return;
 		}
 		if ($scope.edit) {
-			$scope.cancel();
+			//$scope.cancel();
 			$scope.edit = false;
-			$scope.endEditing();
+			//$scope.endEditing();
 		} else {
 			$scope.edit = true;
-			startEditing();
+			//startEditing();
 			if (!$scope.additionAttrsHidden) {
 				//initDataSCEditor();
 			}
 		}
-		disableEditButton();
+		//disableEditButton();
 	};
 	$scope.editAdditionalProfile = function() {
 		if ($scope.disabledEditButton) {
@@ -734,8 +786,8 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 				userProfileResponse = usersProfileResource.updateUserVideos({}, userVideosRequest);
 				userProfileResponse.$promise.then(function() {
 					var userPassportEnabledRequest = {};
-				userPassportEnabledRequest.userId = $scope.currentUser.publicKey;
-				userPassportEnabledRequest.passportEnabled = $scope.userPropertiesMap['passportEnabled'];
+					userPassportEnabledRequest.userId = $scope.currentUser.publicKey;
+					userPassportEnabledRequest.passportEnabled = $scope.userPropertiesMap['passportEnabled'];
 					userProfileResponse = usersProfileResource.updatePassportEnabled({}, userPassportEnabledRequest);
 					userProfileResponse.$promise.then(function() {
 						reloadData();
@@ -840,7 +892,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		userPhotoRequest.endPoint.y = resultY2;
 		var data = $scope.imageSrc.replace(/^data:image\/(png|jpg|jpeg);base64,/, "");
 		userPhotoRequest.imageString = data;
-		var userPhotoResponse = usersProfileResource.setUserPhoto({}, userPhotoRequest);
+		var userPhotoResponse = photosResource.setUserPhoto({}, userPhotoRequest);
 		userPhotoResponse.$promise.then(function() {
 			$timeout(function() {
 				location.reload();
@@ -890,7 +942,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		} else {
 			$scope.additionAttrsHidden = false;
 			if ($scope.edit) {
-			//	initDataSCEditor();
+				//	initDataSCEditor();
 			}
 		}
 	};

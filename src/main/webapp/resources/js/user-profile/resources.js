@@ -10,7 +10,6 @@ userModule.factory("usersProfileResource", function($resource) {
 		updateUserSocialLinks: {method: "POST", url: window.context + "webapi/profiles/current/social"},
 		updateUserVideos: {method: "POST", url: window.context + "webapi/profiles/current/video"},
 		updatePassportEnabled: {method: "POST", url: window.context + "webapi/profiles/current/passport"},
-		setUserPhoto: {method: "PUT", url: window.context + "webapi/profiles/current/photo"},
 		getStatisticsById: {method: "GET", url: window.context + "webapi/statistics/:id", params: {id: "@id"}},
 		getGlobalStatistics: {method: "GET", url: window.context + "webapi/statistics/global"}
 	});

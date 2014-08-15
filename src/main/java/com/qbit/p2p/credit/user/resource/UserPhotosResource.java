@@ -64,10 +64,10 @@ public class UserPhotosResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public void setUserPhoto(UserPhotoRequest userPhoto) {
+		System.out.println("!!! " + userPhoto);
 		if (!userPhoto.isValid()) {
 			throw new WebApplicationException();
 		}
-		
 		String userId = AuthFilter.getUserId(request);
 		String imageName = EncryptionUtil.getMD5(userId);
 		File userPhotoFile = createPhotoPath(imageName);

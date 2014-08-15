@@ -17,7 +17,7 @@ angular.module("like", ["ngResource"]);
 angular.module("main", ["ngRoute", "ui.bootstrap", "chieffancypants.loadingBar", "common", "user",
 	"captcha-auth", "order", "user-profile", "user-edit", "navbar", "like", "ui.select2"]);
 
-angular.module("main").config(function($routeProvider, $locationProvider) {
+angular.module("main").config(function($routeProvider, $locationProvider, $sceDelegateProvider) {
 	$routeProvider.when("/", {
 		templateUrl: "resources/html/order/order-init.html",
 		controller: "OrderInitController"

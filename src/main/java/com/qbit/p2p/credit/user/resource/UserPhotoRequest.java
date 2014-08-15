@@ -17,7 +17,6 @@ public class UserPhotoRequest implements Serializable {
 	public static final int MAX_STRING_LENGTH = 1000000;
 	public static final Point2 MAX_SIZE = new Point2(1000, 1000);
 	public static final Point2 MIN_SIZE = new Point2(100, 100);
-	
 	private Point2 startPoint;
 	private Point2 endPoint;
 	private String imageString;

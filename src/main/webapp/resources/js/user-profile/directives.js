@@ -54,9 +54,11 @@ userProfileModule.directive('embedSrc', function() {
 userProfileModule.directive("linksList", function() {
 	return {
 		restrict: "E",
-		scope: {links: "=", type: "=", current: "=", edited: "=", saveData: "&"},
+		scope: {links: "=", type: "=", current: "=", edited: "=", saveData: "&", editAttribute: "&"},
 		templateUrl: "resources/html/user/links.html",
 		link: function(scope, element, attrs, ngModelCtrl) {
+			console.log(scope.edited + " " + scope.editAttribute)
+			scope.youtubeURL = '//www.youtube.com/embed/W13qDdJDHp8';
 			scope.newLink = {};
 			scope.newLink.title = "";
 			scope.newLink.link = "";
@@ -77,18 +79,22 @@ userProfileModule.directive("linksList", function() {
 				scope.itemPlaceholder = "Link";
 			}
 
-			scope.$watch("edited",
+			/*scope.$watch("edited",
 					function() {
 						if (scope.edited === true) {
 							scope.editItems();
 						}
-					}, true);
+					}, true);*/
 
 			scope.editItems = function() {
-				if (scope.type === "phone") {
+				if(scope.edited === true) {
+					scope.saveData();
+				}
+				scope.editAttribute();
+				//if (scope.type === "phone") {
 					//angular.element("#input-phone").jqxMaskedInput({mask: '+## (###)###-##-##'});
 					//angular.element("#input-phone").jqxMaskedInput('inputValue', "07");
-				}
+				//}
 			};
 
 			scope.isValidItem = function(link, isEditing) {
@@ -143,6 +149,7 @@ userProfileModule.directive("linksList", function() {
 					//angular.element("#input-phone").jqxMaskedInput({mask: '+## (###)###-##-##'});
 					//angular.element("#input-phone").jqxMaskedInput('inputValue', "07");
 				}
+				scope.saveData();
 			};
 
 			/*function getPhoneCode() {
