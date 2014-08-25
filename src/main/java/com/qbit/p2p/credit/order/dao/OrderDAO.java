@@ -121,8 +121,7 @@ public class OrderDAO {
 					}
 					orderInfo.setCategories(categories);
 				}
-				entityManager.merge(orderInfo);
-				return orderInfo;
+				return entityManager.merge(orderInfo);
 			}
 		});
 	}

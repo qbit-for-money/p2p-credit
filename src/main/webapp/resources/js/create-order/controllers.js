@@ -294,10 +294,11 @@ initCategories();
 			orderInfo.categories[i].code = $scope.orderCreatingMap['orderCategories'][i];
 			orderInfo.categories[i].type = categoriesMap[$scope.orderCreatingMap['orderCategories'][i]];
 		}
-console.log("# " + JSON.stringify(orderInfo))
+
 		var orderResponse = ordersResource.create({}, orderInfo);
 		orderResponse.$promise.then(function() {
-			console.log(JSON.stringify(orderResponse))
+			$rootScope.createdOrderId = orderResponse.id;
+			window.location.href = window.context + "#/orders";
 		});
 	};
 
