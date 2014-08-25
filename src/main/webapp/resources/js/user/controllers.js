@@ -8,7 +8,7 @@ userModule.controller("UserController", function($scope, $rootScope, usersResour
 	var currentUser = usersResource.current({});
 	currentUser.$promise.then(function() {
 		if (currentUser.publicKey) {
-			if ((currentUser.publicKey.indexOf("@") !== -1) || (currentUser.publicKey.indexOf("vk/") !== -1)) {
+			if ((currentUser.publicKey.indexOf("@") !== -1) || (currentUser.publicKey.indexOf("vk-") !== -1)) {
 				$scope.keyType = "envelope";
 			} else {
 				$scope.keyType = "user";
@@ -25,7 +25,7 @@ userModule.controller("UserController", function($scope, $rootScope, usersResour
 	};
 	
 	$rootScope.isVKAuth = function() {
-		return $rootScope.user && ($rootScope.user.publicKey.indexOf("vk/") !== -1);
+		return $rootScope.user && ($rootScope.user.publicKey.indexOf("vk-") !== -1);
 	};
 
 	$scope.goToOrderInit = function() {

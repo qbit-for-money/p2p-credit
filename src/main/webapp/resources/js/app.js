@@ -71,5 +71,5 @@ function isSessionURL(url) {
 }
 
 function goToFirstPage() {
-	window.location.href = window.context;
+	//window.location.href = window.context;
 }

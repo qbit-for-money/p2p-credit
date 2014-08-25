@@ -33,7 +33,7 @@ navbarModule.factory("navbarService", function($rootScope, authService) {
 	
 	function isNoCaptchaAuth() {
 		return $rootScope.user && (($rootScope.user.publicKey.indexOf("@") !== -1) 
-			|| ($rootScope.user.publicKey.indexOf("vk/") !== -1))
+			|| ($rootScope.user.publicKey.indexOf("vk-") !== -1))
 	}
 });
 

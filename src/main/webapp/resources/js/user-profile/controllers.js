@@ -84,7 +84,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			authService.openAuthDialog(true, false, "/users/" + $scope.userPublicKeyFromPath);
 		}
 		if ($scope.userPublicKeyFromPath === $scope.currentUser.publicKey) {
-			if (($scope.currentUser.publicKey.indexOf("@") === -1) && ($scope.currentUser.publicKey.indexOf("vk/") === -1)) {
+			if (($scope.currentUser.publicKey.indexOf("@") === -1) && ($scope.currentUser.publicKey.indexOf("vk-") === -1)) {
 				window.location.href = window.context;
 			} else {
 				$scope.isCurrentUser = true;
@@ -185,13 +185,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			});
 		});
 	}
-
-	/*$scope.reloadLikesCount = function() {
-	 
-	 
-	 
-	 $scope.likesCount
-	 }*/
 
 	function reloadAllCurrencies(callback) {
 		var currenciesResponse = currencyResource.findAll();
@@ -355,15 +348,16 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 	}
 
 	$scope.disableEditAttribute = function(attribute) {
-		if ($scope.disabledEditButton) {
+		/*if ($scope.disabledEditButton) {
 			return;
 		}
+		disableEditButton();*/
 		$timeout(function() {
 			$scope.$apply(function() {
 				$scope.editMap[attribute] = false;
 			});
 			if ($scope.editMap["old" + attribute] !== $scope.userPropertiesMap[attribute]) {
-				disableEditButton();
+
 				$scope.endEditing();
 			}
 		});
@@ -372,14 +366,14 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 
 
 	$scope.editNameAttribute = function() {
-		if ($scope.disabledEditButton) {
+		/*if ($scope.disabledEditButton) {
 			return;
-		}
+		}*/
 		if ($scope.editName === true) {
 			$scope.editName = false;
 			if ($scope.oldName !== $scope.userPropertiesMap['name']) {
 				console.log("EDIT " + $scope.editName)
-				disableEditButton();
+				//disableEditButton();
 				$scope.endEditing();
 			}
 		} else {
@@ -395,14 +389,14 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 	};
 
 	$scope.editMailAttribute = function() {
-		if ($scope.disabledEditButton) {
+		/*if ($scope.disabledEditButton) {
 			return;
-		}
+		}*/
 		if ($scope.editMail === true) {
 			$scope.editMail = false;
 			console.log("EDIT " + $scope.userPropertiesMap['mail'])
 			if ($scope.oldMail !== $scope.userPropertiesMap['mail']) {
-				disableEditButton();
+				//disableEditButton();
 				$scope.endEditing();
 			}
 		} else {
@@ -450,7 +444,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		disableEditButton();
 	};
 	function disableEditButton() {
-		//$scope.disabledEditButton = true;
+		$scope.disabledEditButton = true;
 		$timeout(function() {
 			$scope.$apply(function() {
 				$scope.disabledEditButton = true;
@@ -464,6 +458,10 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 	}
 
 	$scope.endEditing = function() {
+		if ($scope.disabledEditButton) {
+			return;
+		}
+		disableEditButton();
 		var languages = "";
 		for (var i in $scope.userPropertiesMap['languages']) {
 			languages += $scope.userPropertiesMap['languages'][i] + ", "
@@ -474,7 +472,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		$scope.userPropertiesMap['languagesStr'] = languages;
 		var currenciesStr = "";
 		for (var i in $scope.userPropertiesMap['currencies']) {
-			languages += $scope.userPropertiesMap['currencies'][i] + ", "
+			currenciesStr += $scope.userPropertiesMap['currencies'][i] + ", "
 		}
 		if (currenciesStr && currenciesStr.substring(currenciesStr.length - 2, currenciesStr.length) === ", ") {
 			currenciesStr = currenciesStr.substring(0, currenciesStr.length - 2);
@@ -518,10 +516,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		}
 	};
 	$scope.updateProfile = function() {
-		if ($scope.disabledEditButton) {
-			return;
-		}
-		disableEditButton();
 		var userMainAttributes = {};
 		userMainAttributes.userId = $scope.currentUser.publicKey;
 		userMainAttributes.name = $scope.userPropertiesMap['name'];
@@ -564,7 +558,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			}
 		}
 		userMainAttributes.languages = languages;
-		console.log(JSON.stringify($scope.userPropertiesMap['languages']))
+		console.log("666 " + JSON.stringify($scope.userPropertiesMap['languages']))
 		//userPublicProfile.languages = $scope.userPropertiesMap['languages'];
 		userMainAttributes.languagesEnabled = ($scope.userPropertiesMap['languagesEnabled'] === visible) ? true : false;
 		userMainAttributes.currencies = [];
@@ -644,7 +638,11 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 					userPassportEnabledRequest.passportEnabled = $scope.userPropertiesMap['passportEnabled'];
 					userProfileResponse = usersProfileResource.updatePassportEnabled({}, userPassportEnabledRequest);
 					userProfileResponse.$promise.then(function() {
-						reloadData();
+						$timeout(function() {
+							$scope.$apply(function() {
+								$scope.disabledEditButton = false;
+							});
+						});
 					});
 				});
 			});

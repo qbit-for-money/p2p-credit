@@ -39,7 +39,7 @@ public class UserProfilesResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public UserPublicProfile current() {
 		String userId = AuthFilter.getUserId(request);
-		if (!userId.contains("@")) {
+		if (!userId.contains("@") && !userId.contains("vk-")) {
 			return null;
 		}
 		UserPublicProfile profile = userProfileDAO.find(userId);

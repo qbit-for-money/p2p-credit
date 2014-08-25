@@ -164,6 +164,7 @@ public class UserProfileDAO {
 				if (userPublicProfile == null) {
 					return null;
 				}
+				System.out.println("&&&&&&&&&&&&&&77");
 				userPublicProfile.setName(userProfile.getName());
 				userPublicProfile.setMail(userProfile.getMail());
 				userPublicProfile.setMailEnabled(userProfile.isMailEnabled());
@@ -173,10 +174,11 @@ public class UserProfileDAO {
 				if ((languages != null) && !languages.isEmpty()) {
 					List<Language> notCustomLanguages = languageDAO.findAll();
 					if (notCustomLanguages != null) {
-						//System.out.println("!! " + userProfile);
 						for (Language language : languages) {
 							if (!notCustomLanguages.contains(language)) {
 								language.setCustom(true);
+							} else {
+								language.setCustom(false);
 							}
 						}
 					}
