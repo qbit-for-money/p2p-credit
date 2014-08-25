@@ -28,6 +28,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 	$scope.orderCreatingMap = {};
 	$scope.hasFocus = false;
 	$scope.isCurrentUser = false;
+	$scope.isCaptchaUser = false;
 	$scope.isOrdersFormOpening = false;
 	var currenciesMap = {};
 	$scope.scEditor = {};
@@ -94,6 +95,14 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		} else {
 			angular.element("#personalEditable").addClass("invisible");
 			$scope.isCurrentUser = false;
+			if (($scope.currentUser.publicKey.indexOf("@") === -1) && ($scope.currentUser.publicKey.indexOf("vk-") === -1)) {
+				/*$timeout(function() {
+					$scope.$apply(function() {
+						$scope.isCaptchaUser = true;
+					});
+				});*/
+				$scope.isCaptchaUser = true;
+			}
 			$scope.userPropertiesMap['isCurrentUser'] = false;
 			userProfileResponse = usersProfileResource.getById({'id': $scope.userPublicKeyFromPath});
 		}
@@ -322,7 +331,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 	};
 
 	$scope.editAttribute = function(attribute) {
-		if ($scope.disabledEditButton) {
+		if ($scope.disabledEditButton || !$scope.isCurrentUser) {
 			return;
 		}
 		if ($scope.editMap[attribute] === true) {
@@ -349,9 +358,9 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 
 	$scope.disableEditAttribute = function(attribute) {
 		/*if ($scope.disabledEditButton) {
-			return;
-		}
-		disableEditButton();*/
+		 return;
+		 }
+		 disableEditButton();*/
 		$timeout(function() {
 			$scope.$apply(function() {
 				$scope.editMap[attribute] = false;
@@ -366,9 +375,9 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 
 
 	$scope.editNameAttribute = function() {
-		/*if ($scope.disabledEditButton) {
+		if (!$scope.isCurrentUser) {
 			return;
-		}*/
+		}
 		if ($scope.editName === true) {
 			$scope.editName = false;
 			if ($scope.oldName !== $scope.userPropertiesMap['name']) {
@@ -389,12 +398,11 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 	};
 
 	$scope.editMailAttribute = function() {
-		/*if ($scope.disabledEditButton) {
+		if (!$scope.isCurrentUser) {
 			return;
-		}*/
+		}
 		if ($scope.editMail === true) {
 			$scope.editMail = false;
-			console.log("EDIT " + $scope.userPropertiesMap['mail'])
 			if ($scope.oldMail !== $scope.userPropertiesMap['mail']) {
 				//disableEditButton();
 				$scope.endEditing();
@@ -411,6 +419,9 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 
 
 	$scope.editProfile = function() {
+		if (!$scope.isCurrentUser) {
+			return;
+		}
 		if ($scope.disabledEditButton) {
 			return;
 		}
@@ -428,6 +439,9 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		//disableEditButton();
 	};
 	$scope.editAdditionalProfile = function() {
+		if (!$scope.isCurrentUser) {
+			return;
+		}
 		if ($scope.disabledEditButton) {
 			return;
 		}
@@ -558,7 +572,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			}
 		}
 		userMainAttributes.languages = languages;
-		console.log("666 " + JSON.stringify($scope.userPropertiesMap['languages']))
 		//userPublicProfile.languages = $scope.userPropertiesMap['languages'];
 		userMainAttributes.languagesEnabled = ($scope.userPropertiesMap['languagesEnabled'] === visible) ? true : false;
 		userMainAttributes.currencies = [];
@@ -669,6 +682,9 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 	 });*/
 
 	$scope.changeUserPhoto = function() {
+		if (!$scope.isCurrentUser) {
+			return;
+		}
 		$scope.editUserPhoto = true;
 		var modalInstance = $modal.open({
 			controller: "UserPhotoController",

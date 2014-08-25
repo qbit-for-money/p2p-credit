@@ -30,10 +30,10 @@ angular.module("main").config(function($httpProvider) {
 			responseError: function(response) {
 				if (isSessionURL(response.config.url)) {
 					$rootScope.$broadcast({
-						401: goToFirstPage(),
-						403: goToFirstPage(),
-						419: goToFirstPage(),
-						440: goToFirstPage()
+						401: goToFirstPage(401),
+						403: goToFirstPage(403),
+						419: goToFirstPage(419),
+						440: goToFirstPage(440)
 					}[response.status], response);
 				}
 				return $q.reject(response);
@@ -64,12 +64,13 @@ angular.module("main").config(function($httpProvider) {
 	});
 });
 function isSessionURL(url) {
-	if ("webapi/env" === url) {
+	if (("webapi/env" === url) || ("webapi/captcha-auth/auth" === url)) {
 		return false;
 	}
 	return true;
 }
 
-function goToFirstPage() {
+function goToFirstPage(state) {
+	console.log("## " + state);
 	//window.location.href = window.context;
 }

@@ -45,6 +45,9 @@ public class LikesResource {
 	public LikeS like(@PathParam("type") String entityType, @PathParam("id") String entityId,  @PathParam("field") String entityField)
 			throws ClassNotFoundException {
 		String userPublicKey = AuthFilter.getUserId(request);
+		if(!isNotCaptcha(userPublicKey)) {
+			return null;
+		}
 		if("user.model.UserPublicProfile".equals(entityType) && userPublicKey.equals(entityId)) {
 			return null;
 		}
@@ -57,9 +60,16 @@ public class LikesResource {
 	public LikeS dislike(@PathParam("type") String entityType, @PathParam("id") String entityId,  @PathParam("field") String entityField)
 			throws ClassNotFoundException {
 		String userPublicKey = AuthFilter.getUserId(request);
+		if(!isNotCaptcha(userPublicKey)) {
+			return null;
+		}
 		if("user.model.UserPublicProfile".equals(entityType) && userPublicKey.equals(entityId)) {
 			return null;
 		}
 		return likeDAO.dislike(userPublicKey, new EntityPartId(entityType, entityId, entityField));
+	}
+	
+	private boolean isNotCaptcha(String userId) {
+		return (userId != null) && !userId.isEmpty() && (userId.contains("vk-") || userId.contains("@"));
 	}
 }

@@ -8,6 +8,7 @@ likeModule.directive("likeButtons", function($compile, likesResource, $timeout, 
 		},
 		link: function(scope, element, attrs) {
 			scope.userPublicKeyFromPath = $location.$$path.replace("/users/", "");
+			scope.isCurrentUser = true;
 
 			if ($rootScope.user && (scope.userPublicKeyFromPath === $rootScope.user.publicKey)) {
 				$timeout(function() {
@@ -19,6 +20,11 @@ likeModule.directive("likeButtons", function($compile, likesResource, $timeout, 
 				$timeout(function() {
 					scope.$apply(function() {
 						scope.isCurrentUser = false;
+						if (($rootScope.user.publicKey.indexOf("@") === -1) && ($rootScope.user.publicKey.indexOf("vk-") === -1)) {
+							scope.isCaptchaUser = true;
+						} else {
+							scope.isCaptchaUser = false;
+						}
 					});
 				});
 			}
@@ -36,12 +42,12 @@ likeModule.directive("likeButtons", function($compile, likesResource, $timeout, 
 			function init() {
 				element.children().remove();
 				var html = '<span class="badge like-count">{{likeCount}}</span><span class="badge like-count">{{dislikeCount}}</span>'
-						+ '<button class="btn btn-default btn-xs ng-scope" type="button" ng-click="like()" title="Like" ng-disabled="alreadyVotedUser()" ng-hide="isCurrentUser">'
-						+ '<span class="glyphicon glyphicon glyphicon-thumbs-up"></span>'
-						+ '</button>'
-						+ '<button class="btn btn-default btn-xs ng-scope" type="button" ng-click="dislike()" title="Dislike" ng-disabled="alreadyVotedUser()" ng-hide="isCurrentUser">'
-						+ '<span class="glyphicon glyphicon glyphicon-thumbs-down"></span>'
-						+ '</button>';
+					+ '<button class="btn btn-default btn-xs ng-scope" type="button" ng-click="like()" title="Like" ng-disabled="alreadyVotedUser()" ng-hide="isCurrentUser || isCaptchaUser">'
+					+ '<span class="glyphicon glyphicon glyphicon-thumbs-up"></span>'
+					+ '</button>'
+					+ '<button class="btn btn-default btn-xs ng-scope" type="button" ng-click="dislike()" title="Dislike" ng-disabled="alreadyVotedUser()" ng-hide="isCurrentUser || isCaptchaUser">'
+					+ '<span class="glyphicon glyphicon glyphicon-thumbs-down"></span>'
+					+ '</button>';
 				element.append($compile(html)(scope));
 			}
 

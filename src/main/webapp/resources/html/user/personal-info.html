@@ -84,14 +84,7 @@
 					<input type="text" id="xsUserName" class="form-control" ng-model="userPropertiesMap
 						['name']" placeholder="Name" maxlength="20" ng-blur="editNameAttribute()" ng-enter-key="editNameAttribute()"/>
 				</div>
-				<!--div class="row"-->
-						<div class="col-xs-8 hidden-md hidden-lg" ng-hide="!isCurrentUser" style="margin-top: -3px"><hr></div>
-						<!--div class="col-xs-1 col-md-1"  ng-hide="!isCurrentUser">
-							<div class="navbar-right col-xs-offset-9">
-								<button class="btn btn-default" ng-disabled="disabledEditButton" ng-click="editProfile()" ng-hide="edit"><span class="glyphicon glyphicon-edit"></span></button>
-							</div>
-						</div-->
-					<!--/div-->
+				<div class="col-xs-8 hidden-md hidden-lg" ng-hide="!isCurrentUser" style="margin-top: -3px"><hr></div>
 			</div>
 			<div class="col-xs-12 col-sm-8 col-md-9" style="padding-bottom: 1%;">
 				<div class="container-fluid">
@@ -104,22 +97,9 @@
 							<input type="text" id="userName" class="form-control" ng-model="userPropertiesMap
 								['name']" placeholder="Name" maxlength="20" ng-blur="editNameAttribute()" ng-enter-key="editNameAttribute()"/>
 						</div>
-						<!--div class="col-xs-5 col-md-3 navbar-right" ng-hide="!isCurrentUser">
-							<div class="input-group navbar-right" ng-hide="!edit">
-								<span class="btn-group">
-									<button class="btn btn-default" ng-disabled="disabledEditButton" ng-click="savePersonalPage()"><span class="glyphicon glyphicon-save"></span></button>
-									<button class="btn btn-default" ng-disabled="disabledEditButton" ng-click="editProfile()"><span class="glyphicon glyphicon-edit"></span></button>
-								</span>
-							</div>
-						</div-->
 					</div>
 					<div class="row">
 						<div class="hidden-xs hidden-sm col-md-12" ng-hide="!isCurrentUser" style="margin-top: -3px"><hr></div>
-						<!--div class="col-xs-1 col-md-1"  ng-hide="!isCurrentUser">
-							<div class="navbar-right col-xs-offset-9">
-								<button class="btn btn-default" ng-disabled="disabledEditButton" ng-click="editProfile()" ng-hide="edit"><span class="glyphicon glyphicon-edit"></span></button>
-							</div>
-						</div-->
 					</div>
 					<div class="row" ng-hide="isCurrentUser">
 						<div class="col-xs-12 col-md-12" style="margin-top: -10px"><hr></div>
@@ -233,24 +213,10 @@
 							</div-->
 						</div>
 					</div>
-					<!--div class="row">
-						<div class="col-xs-12 col-md-12" style="margin-top: -10px; margin-bottom: -10px"><hr></div>
-					</div>
-					<div class="row col-xs-offset-0">Openness rating: {{ratingOpenness}}	</div>
-					<div class="row col-xs-offset-0">Orders rating: {{ordersRating}}</div>
-					<div class="row col-xs-offset-0">Partners rating: {{partnersRating}}</div>
-					<div class="row col-xs-offset-0">Orders count: {{ordersCount}}</div>
-					<div class="row col-xs-offset-0">Success orders count: {{successOrdersCount}}</div>
-					<div class="row col-xs-offset-0">All orders count: {{allOrdersCount}}</div>
-					<div class="row col-xs-offset-0">All success orders count: {{allSuccessOrdersCount}}</div-->
 				</div>
 			</div>
 		</div>
-		
-		
-		
-		
-		
+
 		<div class="row hidden-sm hidden-xs" style="margin-bottom: -15px;">
 			<div class="hidden-sm hidden-xs col-md-8" style="float: right;">
 				<div class="navbar-right">
@@ -261,52 +227,14 @@
 		</div>
 		<div class="row" id="additional-visible-button">
 			<div class="col-xs-12 col-sm-8 hidden-md hidden-lg" style="float: right;">
-				<!--div class="navbar-right"-->
-					<button class="btn btn-default max-width additioanl-button" ng-click="changeAdditionAttrsVisible()" ng-hide="!additionAttrsHidden"><span class="glyphicon glyphicon-arrow-down"></span></button>
-					<button class="btn btn-default max-width additioanl-button" style="margin-bottom: 5px;" ng-click="changeAdditionAttrsVisible()" ng-hide="additionAttrsHidden"><span class="glyphicon glyphicon-arrow-up"></span></button>
-				<!--/div-->
-					
+				<button class="btn btn-default max-width additioanl-button" ng-click="changeAdditionAttrsVisible()" ng-hide="!additionAttrsHidden"><span class="glyphicon glyphicon-arrow-down"></span></button>
+				<button class="btn btn-default max-width additioanl-button" style="margin-bottom: 5px;" ng-click="changeAdditionAttrsVisible()" ng-hide="additionAttrsHidden"><span class="glyphicon glyphicon-arrow-up"></span></button>
 			</div>
 
 		</div>
 		<div class="row" id="addition-attributes" ng-hide="additionAttrsHidden">
 			<div class="col-xs-12 col-md-12">
 				<div class="container-fluid">
-					<!--div class="row">
-						<div class="col-xs-12 col-md-12" style="margin-top: 1px; margin-right:-42px;">Personal info<div style="float: right"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="userPublicKeyFromPath" entity-field="'languages'" /></div></div>
-					</div>
-					<div class="row">
-						<div class="col-xs-12 col-md-12"><hr></div>
-					</div>
-					<div class="row" style="padding-bottom: 5px;">
-						<div class="col-xs-12 col-md-12">
-							<div id="personalEditable" ng-hide="!edit"  contenteditable="true" class="ckeditor-area">
-							</div>
-							<div id="personalNotEditable" ng-hide="edit" ng-bind-html="userPropertiesMap['personalData']">
-							</div>
-						</div>
-					</div-->
-					<!--div class="row" style="padding-bottom: 15px;">
-						<div class="col-xs-3 col-md-3 navbar-right"  ng-hide="!isCurrentUser">			
-							<div class="navbar-right" >
-								<button class="btn btn-default" ng-hide="!edit" ng-disabled="disabledEditButton" ng-click="savePersonalPage()"><span class="glyphicon glyphicon-save"></span></button>
-							</div>
-						</div>
-					</div-->
-
-					<!--div class="row">
-						<div class="col-xs-3 col-md-3 navbar-right"  ng-hide="!isCurrentUser">
-							<button class="btn btn-default navbar-right" ng-disabled="disabledEditButton" ng-click="editAdditionalProfile()" ng-hide="editAdditional"><span class="glyphicon glyphicon-edit"></span></button>
-
-							<div class="input-group navbar-right" ng-hide="!editAdditional">
-								<span class="btn-group">
-									<button class="btn btn-default" ng-disabled="disabledEditButton" ng-click="saveAdditionalData()"><span class="glyphicon glyphicon-save"></span></button>
-									<button class="btn btn-default" ng-disabled="disabledEditButton" ng-click="editAdditionalProfile()"><span class="glyphicon glyphicon-edit"></span></button>
-								</span>
-							</div>
-						</div>
-					</div-->
-
 					<div class="row">
 						<div class="col-xs-12 col-md-12">
 							<div class="container-fluid" ng-click-out="disableEditAttribute('passport1')">
@@ -335,22 +263,6 @@
 
 					<div style="float: right; margin-bottom: -5px;" ng-hide="editAdditional"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="userPublicKeyFromPath" entity-field="'videos'" /></div>
 					<links-list links="userPropertiesMap['videos']" type="'video'" edit-attribute="editAttribute('videos')" save-data="updateProfile()" current="userPropertiesMap['isCurrentUser']" edited="editMap['videos']"></links-list>
-
-					<!--div class="row" ng-hide="!userPropertiesMap['bkiData'] && !editAdditional">
-						<div class="col-xs-8 col-md-12" style="margin-top: 10px;">Сredit history<div style="float: right"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="userPublicKeyFromPath" entity-field="'bkiData'"/></div></div>
-					</div>
-					<div class="row" ng-hide="!userPropertiesMap['bkiData'] && !editAdditional">
-						<div class="col-xs-12 col-md-12"><hr></div>
-					</div>
-
-					<div class="row" style="padding-bottom: 5px;">
-						<div class="col-xs-12 col-md-12">
-							<div id="bkiEditable" ng-hide="!editAdditional" contenteditable="true" class="ckeditor-area">
-							</div>
-							<div id="bkiNotEditable" ng-hide="editAdditional" ng-bind-html="userPropertiesMap['bkiData']">
-							</div>
-						</div>
-					</div-->
 
 					<div class="row">
 						<div class="col-xs-3 col-md-3 navbar-right"  ng-hide="!isCurrentUser">			
