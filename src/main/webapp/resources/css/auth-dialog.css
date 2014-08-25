@@ -25,14 +25,14 @@ and (min-width : 798px) {
 	cursor: pointer;
 	width: 100%;
 	height: auto;
-	border: 1px solid #e5e5e5;
-	-moz-border-radius:    4px;
-	-webkit-border-radius: 4px;
-	border-radius:         4px;
+	//border: 1px solid #e5e5e5;
+	//-moz-border-radius:    4px;
+	//-webkit-border-radius: 4px;
+	//border-radius:         4px;
 }
 
 .auth-dialog img.google {
-	max-width: 254px;
+	max-width: 122px;
 }
 
 #pin {

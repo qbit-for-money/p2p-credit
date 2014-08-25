@@ -39,3 +39,15 @@ commonModule.factory("delayedProxy", function($timeout) {
 commonModule.factory("getRandBinary", function() {
 	return Math.floor(Math.random() * 2);
 });
+
+commonModule.factory("isPhone", function() {
+	return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+});
+
+commonModule.factory("phone", function() {
+	return {
+		isPhone: function() {
+			return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+		}
+	};
+});

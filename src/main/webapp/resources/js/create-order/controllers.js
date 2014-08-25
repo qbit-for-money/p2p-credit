@@ -1,6 +1,6 @@
 var orderModule = angular.module("order");
 
-orderModule.controller("CreateOrderController", function($scope, $rootScope, $timeout, userProfileService, $window, ordersResource) {
+orderModule.controller("CreateOrderController", function($scope, $rootScope, $timeout, userProfileService, usersProfileResource, $window, ordersResource) {
 	var creditInitData = "&nbsp; I want to take credit..";
 	var borrowInitData = " &nbsp; I want to invest..";
 	var exchangeInitData = "&nbsp; I want to exchange..";
@@ -68,7 +68,13 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 		}
 		$scope.allCurrencies.splice(0, 1);
 	});
-
+	loadCurrentUserLanguages();
+	function loadCurrentUserLanguages() {
+		var userProfileResponse = usersProfileResource.current({});
+		userProfileResponse.$promise.then(function() {
+			$scope.userLanguages = userProfileResponse.languages;
+		});
+	}
 	function initDeadline() {
 		var date = new Date();
 		var newDate = new Date(new Date(date).setMonth(date.getMonth() + 3));
@@ -137,7 +143,7 @@ initCategories();
 				&& durationValue && (durationValue !== "")
 				//&& data && (data !== "")
 				&& $scope.orderCreatingMap['orderCategories'] && ($scope.orderCreatingMap['orderCategories'].length !== 0)
-				&& $scope.deadline && ($scope.deadline !== "")) {
+				&& $scope.deadline && ($scope.deadline !== "") && $scope.userLanguages && ($scope.userLanguages.length > 0)) {
 			if((($scope.currency.selectedGivingCurrency !== "%") && (givingValue <= 0)) 
 					|| (($scope.currency.selectedTakingCurrency !== "%") && (takingValue <= 0))) {
 				disableCreateOrderButton();
@@ -260,7 +266,7 @@ initCategories();
 		}
 		var orderInfo = {};
 		//var data = CKEDITOR.instances.orderDataEditable.getData();
-		var outcomingAmout = angular.element("#giving-order-currency input").val();
+		var outcomingAmount = angular.element("#giving-order-currency input").val();
 		var incomingAmount = angular.element("#taking-order-currency input").val();
 		var durationValue = angular.element("#order-duration input").val();
 		var incomingCurrency = $scope.currency.selectedTakingCurrency;
@@ -272,7 +278,8 @@ initCategories();
 		orderInfo.incomingAmount = incomingAmount;
 		//addItems($scope.userPropertiesMap['currencies'], takingCurrency);
 		orderInfo.outcomingCurrency = outcomingCurrency;
-		orderInfo.outcomingAmout = outcomingAmout;
+		orderInfo.outcomingAmount = outcomingAmount;
+		orderInfo.languages = $scope.userLanguages;
 
 		orderInfo.duration = durationValue;
 		var durationType = $scope.selectedDurationType;
@@ -285,8 +292,9 @@ initCategories();
 		for (var i in $scope.orderCreatingMap['orderCategories']) {
 			orderInfo.categories[i] = {};
 			orderInfo.categories[i].code = $scope.orderCreatingMap['orderCategories'][i];
+			orderInfo.categories[i].type = categoriesMap[$scope.orderCreatingMap['orderCategories'][i]];
 		}
-
+console.log("# " + JSON.stringify(orderInfo))
 		var orderResponse = ordersResource.create({}, orderInfo);
 		orderResponse.$promise.then(function() {
 			console.log(JSON.stringify(orderResponse))

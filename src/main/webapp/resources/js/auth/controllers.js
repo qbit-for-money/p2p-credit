@@ -13,6 +13,7 @@ authModule.controller("AuthDialogController", function($scope, captchaAuthResour
 	$scope.model.encodedKey = "";
 	$scope.captchaSrc = "";
 	$scope.url = "webapi/oauth2/authenticate";
+	$scope.vkurl = "webapi/vk-oauth2/authenticate";
 	if((redirectUrl !== undefined) && (redirectUrl !== "")) {
 		$scope.url +=  "?redirect=" + redirectUrl;
 	}

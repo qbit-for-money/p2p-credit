@@ -10,8 +10,6 @@ import com.qbit.p2p.credit.order.service.OrderStatisticsScheduler;
 import com.qbit.p2p.credit.statistics.dao.StatisticsDAO;
 import com.qbit.p2p.credit.statistics.service.StatisticsService;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
@@ -49,7 +47,8 @@ public class OrdersResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public OrdersWrapper search(SearchRequest ordersRequest) {
 		final String userId = AuthFilter.getUserId(request);
-//TEST
+		
+/*//TEST
 		for (int i = 0; i < 10; i++) {
 			System.out.println("### INIT");
 			scheduler.putTask(new Runnable() {
@@ -69,8 +68,10 @@ public class OrdersResource {
 			} catch (InterruptedException ex) {
 			}
 		}
-//TEST
+//TEST*/
+		System.out.println("!! " + ordersRequest);
 		List<OrderInfo> orders = orderDAO.findWithFilter(userId, ordersRequest);
+		System.out.println("!! " + orders);
 		long length = orderDAO.lengthWithFilter(userId, ordersRequest);
 		return new OrdersWrapper(orders, length, statisticsDAO);
 	}
@@ -100,6 +101,7 @@ public class OrdersResource {
 	@Path("{id}/status")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public int changeOrderStatus(OrderChangeStatusRequest statusRequest) {
+		System.out.println("!! " + statusRequest);
 		if ((statusRequest == null) || (statusRequest.getOrderId() == null) || statusRequest.getOrderId().isEmpty()) {
 			return 0;
 		}

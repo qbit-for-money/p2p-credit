@@ -54,8 +54,6 @@ orderModule.directive('bsDropdown', function($compile, $modal, ordersResource) {
 			};
 
 			scope.openCommentDialog = function() {
-				angular.element("#contentorders-table > div.jqx-grid-content.jqx-grid-content-bootstrap.jqx-widget-content.jqx-widget-content-bootstrap > div.jqx-enableselect.jqx-widget-content.jqx-widget-content-bootstrap").addClass("static-position");
-				angular.element("#contentuser-orders-table > div.jqx-grid-content.jqx-grid-content-bootstrap.jqx-widget-content.jqx-widget-content-bootstrap > div.jqx-enableselect.jqx-widget-content.jqx-widget-content-bootstrap").addClass("static-position");
 				var status = scope.items[scope.selectedItem].name.toUpperCase();
 				if (status === "NOT SUCCESS") {
 					status = "NOT_SUCCESS";
@@ -91,10 +89,10 @@ orderModule.directive('bsDropdown', function($compile, $modal, ordersResource) {
 				response.orderId = orderId;
 				response.status = status;
 				response.comment = comment;
-				var orderResponse = ordersResource.changeStatus({}, response);
+				console.log(JSON.stringify(response))
+				var orderResponse = ordersResource.changeStatus({id : orderId}, response);
 				orderResponse.$promise.then(function() {
-					angular.element('#user-orders-table').jqxGrid('updatebounddata');
-					angular.element('#orders-table').jqxGrid('updatebounddata');
+					scope.doFunction();
 				});
 			};
 

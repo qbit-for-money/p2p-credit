@@ -1,7 +1,7 @@
 <%@ page pageEncoding="UTF-8" %>
 <form name="userForm" id="user-form" class="navbar-form navbar-right invisible" ng-controller="UserController">
 	<div class="form-group">
-		<div class="input-group" style="width: 20em;" ng-if="isGoogleAuth()">
+		<div class="input-group" style="width: 20em;" ng-if="isGoogleAuth() || isVKAuth()">
 			<input type="text" class="form-control" ng-model="user.publicKey" ng-readonly="true"/>
 			<span class="input-group-btn">
 				<button class="btn btn-default" type="button" ng-click="logout()" title="Logout">
@@ -10,7 +10,7 @@
 			</span>
 		</div>
 		<div class="input-group">
-			<span class="btn-group" ng-if="user && !isGoogleAuth()">
+			<span class="btn-group" ng-if="user && !isGoogleAuth() && !isVKAuth()">
 				<button class="btn btn-default" id="user-google" type="button" ng-click="authWithGoogle()"  title="Login with Google+">
 					<img src="resources/img/google-logo.png" alt="Google+" ng-if="!isGoogleAuth()"/>
 				</button>

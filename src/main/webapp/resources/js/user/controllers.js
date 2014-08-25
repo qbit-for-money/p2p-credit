@@ -1,12 +1,14 @@
 var userModule = angular.module("user");
 
-userModule.controller("UserController", function($scope, $rootScope, usersResource, authService, $location) {
+userModule.controller("UserController", function($scope, $rootScope, usersResource, authService, $location, phone) {
+
 	$scope.keyType = "user";
 	$scope.logoutButton = "";
+	$rootScope.isPhone = phone.isPhone();
 	var currentUser = usersResource.current({});
 	currentUser.$promise.then(function() {
 		if (currentUser.publicKey) {
-			if (currentUser.publicKey.indexOf("@") !== -1) {
+			if ((currentUser.publicKey.indexOf("@") !== -1) || (currentUser.publicKey.indexOf("vk/") !== -1)) {
 				$scope.keyType = "envelope";
 			} else {
 				$scope.keyType = "user";
@@ -21,6 +23,10 @@ userModule.controller("UserController", function($scope, $rootScope, usersResour
 	$rootScope.isGoogleAuth = function() {
 		return $rootScope.user && ($rootScope.user.publicKey.indexOf("@") !== -1);
 	};
+	
+	$rootScope.isVKAuth = function() {
+		return $rootScope.user && ($rootScope.user.publicKey.indexOf("vk/") !== -1);
+	};
 
 	$scope.goToOrderInit = function() {
 		window.location.href = window.context;
@@ -32,7 +38,6 @@ userModule.controller("UserController", function($scope, $rootScope, usersResour
 	};
 
 	$scope.authWithGoogle = function() {
-		console.log("GOOGLE: " + window.context + $location.$$path)
 		window.location.href = window.context + "webapi/oauth2/authenticate?redirect=" + window.context + $location.$$path;
 	};
 
@@ -43,7 +48,6 @@ userModule.controller("UserController", function($scope, $rootScope, usersResour
 	$scope.logout = function() {
 		var logoutResponse = usersResource.logout({});
 		logoutResponse.$promise.then(function() {
-			//location.reload();
 			window.location.href = window.context;
 		});
 	};

@@ -17,7 +17,29 @@ angular.module("like", ["ngResource"]);
 angular.module("main", ["ngRoute", "ui.bootstrap", "chieffancypants.loadingBar", "common", "user",
 	"captcha-auth", "order", "user-profile", "user-edit", "navbar", "like", "ui.select2"]);
 
-angular.module("main").config(function($routeProvider, $locationProvider, $sceDelegateProvider) {
+angular.module("main").config(function($httpProvider) {
+	$httpProvider.interceptors.push([
+		'$injector',
+		function($injector) {
+			return $injector.get('SessionInterceptor');
+		}
+	]);
+})
+	.factory('SessionInterceptor', function($q, $window, $rootScope) {
+		return {
+			responseError: function(response) {
+				if (isSessionURL(response.config.url)) {
+					$rootScope.$broadcast({
+						401: goToFirstPage(),
+						403: goToFirstPage(),
+						419: goToFirstPage(),
+						440: goToFirstPage()
+					}[response.status], response);
+				}
+				return $q.reject(response);
+			}
+		};
+	}).config(function($routeProvider, $locationProvider, $sceDelegateProvider, $httpProvider) {
 	$routeProvider.when("/", {
 		templateUrl: "resources/html/order/order-init.html",
 		controller: "OrderInitController"
@@ -29,7 +51,7 @@ angular.module("main").config(function($routeProvider, $locationProvider, $sceDe
 		controller: "CreateOrderController"
 	}).when("/orders", {
 		templateUrl: "resources/html/order/orders-table.html",
-		controller: "BorrowController"
+		controller: "OrdersController"
 	}).otherwise({redirectTo: "/"});
 }).run(function($rootScope, $location) {
 	$rootScope.location = $location;
@@ -41,3 +63,13 @@ angular.module("main").config(function($routeProvider, $locationProvider, $sceDe
 		$rootScope.requestCount--;
 	});
 });
+function isSessionURL(url) {
+	if ("webapi/env" === url) {
+		return false;
+	}
+	return true;
+}
+
+function goToFirstPage() {
+	window.location.href = window.context;
+}

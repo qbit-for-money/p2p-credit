@@ -44,6 +44,8 @@
 		<script type="text/javascript" src="resources/lib/tinymce/js/tinymce/tinymce.min.js"></script>
 		<script type="text/javascript" src="resources/lib/jquery/jquery-2.1.0.min.js"></script>
 		<script type="text/javascript" src="resources/lib/jquery/jquery.mask.min.js"></script>
+		<script type="text/javascript" src="resources/lib/jquery/jquery.autopager-1.0.0.js"></script>
+		<script type="text/javascript" src="resources/lib/jquery/jquery.tabslideout.v1.2.js"></script>
 		<script type="text/javascript" src="resources/lib/select2-3.5.0/select2.min.js"></script>
 		<script type="text/javascript" src="resources/lib/angular/angular.min.js"></script>
 		<script type="text/javascript" src="resources/lib/angular/angular-route.min.js"></script>
@@ -56,6 +58,7 @@
 		<script type="text/javascript" src="resources/lib/bootstrap/core/js/ui-bootstrap-tpls-0.10.0.min.js"></script>
 		<script type="text/javascript" src="resources/lib/bootstrap/accordion/bootstrap-collapse.js"></script>
 		<script type="text/javascript" src="resources/lib/bootstrap/datepicker/js/bootstrap-datepicker.js"></script> 
+		<script type="text/javascript" src="resources/lib/bootstrap/tab/bootstrap-tab.js"></script> 
 		<script type="text/javascript" src="resources/lib/imgareaselect/scripts/jquery.imgareaselect.pack.js"></script> 
 
 		<script type="text/javascript" src="resources/js/app.js"></script>

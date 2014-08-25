@@ -5,6 +5,8 @@ import com.qbit.p2p.credit.order.dao.OrderFlowDAO;
 import com.qbit.p2p.credit.order.model.Comment;
 import com.qbit.p2p.credit.order.model.OrderInfo;
 import com.qbit.p2p.credit.order.model.Respond;
+import com.qbit.p2p.credit.user.dao.UserProfileDAO;
+import com.qbit.p2p.credit.user.model.UserPublicProfile;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
@@ -28,6 +30,9 @@ public class ResponsesResource {
 	
 	@Inject
 	private OrderFlowDAO orderFlowDAO;
+	
+	@Inject
+	private UserProfileDAO userProfileDAO;
 
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -36,6 +41,9 @@ public class ResponsesResource {
 		String userId = AuthFilter.getUserId(request);
 		if ((respondRequest == null) || (respondRequest.getOrderId() == null) || respondRequest.getOrderId().isEmpty()) {
 			return null;
+		}
+		if (userProfileDAO.find(userId) == null) {
+			userProfileDAO.create(userId);
 		}
 		Respond respond = respondRequest.toRespond();
 		respond.setUserId(userId);

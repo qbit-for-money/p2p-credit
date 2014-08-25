@@ -9,9 +9,15 @@ orderModule.factory("categoriesResource", function($resource) {
 orderModule.factory("ordersResource", function($resource) {
 	return $resource(window.context + "webapi/orders", {}, {
 		create: {method: "PUT"},
-		getResponse: {method: "GET", url: window.context + "webapi/orders/respond"},
-		addResponse: {method: "PUT", url: window.context + "webapi/orders/respond"},
-		approveResponse: {method: "POST", url: window.context + "webapi/orders/respond"},
-		changeStatus: {method: "POST", url: window.context + "webapi/orders/status"}
+		changeStatus: {method: "POST", url: window.context + "webapi/orders/:id/status", params: {id: "@id"}},
+		search:{method: "POST", url: window.context + "webapi/orders/search"}
+	});
+});
+
+orderModule.factory("responsesResource", function($resource) {
+	return $resource(window.context + "webapi/responses", {}, {
+		create: {method: "PUT"},
+		addResponse: {method: "PUT"},
+		approveResponse: {method: "POST"}
 	});
 });

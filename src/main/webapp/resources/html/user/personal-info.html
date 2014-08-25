@@ -115,7 +115,6 @@
 					</div>
 					<div class="row">
 						<div class="hidden-xs hidden-sm col-md-12" ng-hide="!isCurrentUser" style="margin-top: -3px"><hr></div>
-						{{disabledEditButton}} fg
 						<!--div class="col-xs-1 col-md-1"  ng-hide="!isCurrentUser">
 							<div class="navbar-right col-xs-offset-9">
 								<button class="btn btn-default" ng-disabled="disabledEditButton" ng-click="editProfile()" ng-hide="edit"><span class="glyphicon glyphicon-edit"></span></button>
@@ -140,11 +139,11 @@
 								<div class="hidden-xs col-md-2 title-edit title" ng-if="editMap['mail']">
 									Mail:
 								</div>
-								<div class="input-group col-xs-12 col-md-9" ng-if="editMap['mail']">
+								<div class="input-group col-xs-12 col-md-9" ng-if="editMap['mail']" ng-click-out="disableEditAttribute('mail')">
 									<input type="email" id="mail" ng-model="userPropertiesMap
-										['mail']" class="form-control" ng-enter-key="editAttribute('mail')" ng-blur="editAttribute('mail')"/>
+										['mail']" class="form-control" ng-enter-key="editAttribute('mail')"/>
 									<span class="input-group-btn">
-										<button class="btn btn-default" type="button" ng-click="changeVisible('mailEnabled')">
+										<button class="btn btn-default" type="button" ng-click="changeVisible('mailEnabled')" id="mail-button">
 											<span class="glyphicon glyphicon-eye-{{userPropertiesMap['mailEnabled']}}"></span>
 										</button>
 									</span>
@@ -162,11 +161,11 @@
 								<div class="hidden-xs col-md-2 title-edit title" ng-if="editMap['phone']">
 									Phone:
 								</div>
-								<div class="input-group col-xs-12 col-md-9" ng-if="editMap['phone']">
+								<div class="input-group col-xs-12 col-md-9" ng-if="editMap['phone']" ng-click-out="disableEditAttribute('phone')">
 									<input type="text" id="phone" ng-model="userPropertiesMap
-										['phone']" class="form-control" ng-enter-key="editAttribute('phone')" ng-blur="editAttribute('phone')"/>
+										['phone']" class="form-control" ng-enter-key="editAttribute('phone')"/>
 									<span class="input-group-btn">
-										<button class="btn btn-default" type="button" ng-click="changeVisible('phoneEnabled')">
+										<button class="btn btn-default" type="button" ng-click="changeVisible('phoneEnabled')" id="phone-button">
 											<span class="glyphicon glyphicon-eye-{{userPropertiesMap['phoneEnabled']}}"></span>
 										</button>
 									</span>
@@ -187,7 +186,7 @@
 									<input type="hidden" class="form-control" ui-select2="languageSelect2Options" ng-model="userPropertiesMap
 										['languages']" id="languages" data-placeholder="Pick a language" style="width: 100%"/>
 									<span class="input-group-btn">
-										<button class="btn btn-default" type="button" ng-click="changeVisible('languagesEnabled')">
+										<button class="btn btn-default" type="button" ng-click="changeVisible('languagesEnabled')" id="languages-button">
 											<span class="span-jqx glyphicon glyphicon-eye-{{userPropertiesMap['languagesEnabled']}}"></span>
 										</button>
 									</span>
@@ -210,7 +209,7 @@
 										['currencies']" id="currencies" data-placeholder="Pick a currency" style="width: 100%" />
 									<!--input type="text" id="currencies" class="form-control input-jqx" ng-model="currencies" ng-change="editCurrencies"/-->
 									<span class="input-group-btn">
-										<button class="btn btn-default" type="button" ng-click="changeVisible('currenciesEnabled')">
+										<button class="btn btn-default" type="button" ng-click="changeVisible('currenciesEnabled')" id="currencies-button">
 											<span class="glyphicon glyphicon-eye-{{userPropertiesMap['currenciesEnabled']}}"></span>
 										</button>
 									</span>
@@ -256,7 +255,7 @@
 			<div class="hidden-sm hidden-xs col-md-8" style="float: right;">
 				<div class="navbar-right">
 					<button class="btn btn-default navbar-right" ng-click="changeAdditionAttrsVisible()" ng-hide="!additionAttrsHidden"><span class="glyphicon glyphicon-arrow-down"></span></button>
-					<button class="btn btn-default navbar-right" ng-click="changeAdditionAttrsVisible()" ng-hide="additionAttrsHidden"><span class="glyphicon glyphicon-arrow-up"></span></button>
+					<button class="btn btn-default navbar-right" style="margin-bottom: 5px;" ng-click="changeAdditionAttrsVisible()" ng-hide="additionAttrsHidden"><span class="glyphicon glyphicon-arrow-up"></span></button>
 				</div>
 			</div>
 		</div>
@@ -264,7 +263,7 @@
 			<div class="col-xs-12 col-sm-8 hidden-md hidden-lg" style="float: right;">
 				<!--div class="navbar-right"-->
 					<button class="btn btn-default max-width additioanl-button" ng-click="changeAdditionAttrsVisible()" ng-hide="!additionAttrsHidden"><span class="glyphicon glyphicon-arrow-down"></span></button>
-					<button class="btn btn-default max-width additioanl-button" ng-click="changeAdditionAttrsVisible()" ng-hide="additionAttrsHidden"><span class="glyphicon glyphicon-arrow-up"></span></button>
+					<button class="btn btn-default max-width additioanl-button" style="margin-bottom: 5px;" ng-click="changeAdditionAttrsVisible()" ng-hide="additionAttrsHidden"><span class="glyphicon glyphicon-arrow-up"></span></button>
 				<!--/div-->
 					
 			</div>

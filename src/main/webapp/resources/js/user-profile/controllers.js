@@ -84,7 +84,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			authService.openAuthDialog(true, false, "/users/" + $scope.userPublicKeyFromPath);
 		}
 		if ($scope.userPublicKeyFromPath === $scope.currentUser.publicKey) {
-			if ($scope.currentUser.publicKey.indexOf("@") === -1) {
+			if (($scope.currentUser.publicKey.indexOf("@") === -1) && ($scope.currentUser.publicKey.indexOf("vk/") === -1)) {
 				window.location.href = window.context;
 			} else {
 				$scope.isCurrentUser = true;
@@ -142,13 +142,16 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			$scope.userPropertiesMap['socialLinks'] = (userProfileResponse.socialLinks) ? userProfileResponse.socialLinks : [];
 			var userStatisticsResponse = usersProfileResource.getStatisticsById({'id': $scope.userPublicKeyFromPath});
 			userStatisticsResponse.$promise.then(function() {
-				$scope.ratingOpenness = userStatisticsResponse.opennessRating;
-				$scope.ordersRating = userStatisticsResponse.ordersRating;
-				$scope.ordersCount = userStatisticsResponse.ordersCount;
-				$scope.successOrdersCount = userStatisticsResponse.successOrdersCount;
-				$scope.partnersRating = userStatisticsResponse.partnersRating;
+				$scope.ratingOpenness = (userStatisticsResponse.opennessRating) ? userStatisticsResponse.opennessRating : 0;
+				$scope.ordersRating = (userStatisticsResponse.ordersRating) ? userStatisticsResponse.ordersRating : 0;
+				$scope.ordersCount = (userStatisticsResponse.ordersCount) ? userStatisticsResponse.ordersCount : 0;
+				$scope.successOrdersCount = (userStatisticsResponse.successOrdersCount) ? userStatisticsResponse.successOrdersCount : 0;
+				$scope.partnersRating = (userStatisticsResponse.partnersRating) ? userStatisticsResponse.partnersRating : 0;
 				$scope.summaryRating = Math.floor($scope.ratingOpenness * $rootScope.env.userRatingOpenessFactor
-						+ $scope.successOrdersCount * $rootScope.env.userSuccessOrdersCountFactor);
+					+ $scope.successOrdersCount * $rootScope.env.userSuccessOrdersCountFactor);
+				if (!$scope.summaryRating || ($scope.summaryRating === null) || ($scope.summaryRating === "NaN")) {
+					$scope.summaryRating = 0;
+				}
 				var globalStatisticsResponse = usersProfileResource.getGlobalStatistics();
 
 				globalStatisticsResponse.$promise.then(function() {
@@ -160,7 +163,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			$scope.userPropertiesMap['personalData'] = $sce.trustAsHtml(userProfileResponse.personalData);
 			$scope.userPropertiesMap['personalDataEnabled'] = (userProfileResponse.personalDataEnabled === true) ? visible : notVisible;
 			$scope.userPropertiesMap['bkiData'] = $sce.trustAsHtml(userProfileResponse.bkiData);
-			$scope.userPhotoSrc = window.context + "webapi/photos/" + userProfileResponse.publicKey;
+			$scope.userPhotoSrc = window.context + "webapi/photos/" + userProfileResponse.userId;
 			var languagesResponse = languagesResource.findAll();
 			languagesResponse.$promise.then(function() {
 				$scope.languages.allLanguages.splice(0, $scope.languages.allLanguages.length);
@@ -176,10 +179,10 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			//reloadBKIscEditor();
 			//$scope.isValidOrder();
 			$timeout(function() {
-			$scope.$apply(function() {
-				$scope.disabledEditButton = false;
+				$scope.$apply(function() {
+					$scope.disabledEditButton = false;
+				});
 			});
-		});
 		});
 	}
 
@@ -213,161 +216,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		});
 	}
 
-	/*function initOrderckEditor() {
-	 if (!$scope.scEditor.orderDataInitialized) {
-	 if ($scope.isCurrentUser) {
-	 CKEDITOR.disableAutoInline = true;
-	 CKEDITOR.inline("orderDataEditable");
-	 }
-	 $scope.scEditor.orderDataInitialized = true;
-	 }
-	 $timeout(function() {
-	 CKEDITOR.instances.orderDataEditable.setData("");
-	 });
-	 }*/
-
-	/*$scope.initOrdersCreation = function() {
-	 if (!$scope.isOrdersFormOpening) {
-	 $scope.isOrdersFormOpening = true;
-	 //initOrderckEditor();
-	 $timeout(function() {
-	 
-	 currenciesMap[orderCurrencies[0]] = {};
-	 currenciesMap[orderCurrencies[0]].max = 0;
-	 angular.element('#take-currency-type').jqxDropDownList({source: orderCurrencies, autoDropDownHeight: true, selectedIndex: 1, width: '84%', height: '20px'});
-	 angular.element('#take-currency-type').on('select', function(event) {
-	 var index = event.args.index;
-	 if (index === 0) {
-	 if ($scope.giveCurrencyHiden === true) {
-	 angular.element('#take-currency-type').jqxDropDownList({selectedIndex: 1});
-	 } else {
-	 $scope.$apply(function() {
-	 $scope.takeCurrencyHiden = true;
-	 });
-	 }
-	 }
-	 else {
-	 $scope.$apply(function() {
-	 $scope.takeCurrencyHiden = false;
-	 });
-	 angular.element("#take-input").jqxNumberInput({symbol: orderCurrencies[index], min: 0.01, max: currenciesMap[orderCurrencies[index]].max, digits: getDigits(currenciesMap[orderCurrencies[index]].max)});
-	 }
-	 $scope.isValidOrder();
-	 });
-	 angular.element("#take-input").jqxNumberInput({width: '100%', height: '25px', symbol: orderCurrencies[1], min: 0.01, max: currenciesMap[orderCurrencies[1]].max, digits: getDigits(currenciesMap[orderCurrencies[1]].max), spinButtons: true, negativeSymbol: '-'});
-	 angular.element("#take-input").on('change', $scope.isValidOrder);
-	 angular.element('#give-currency-type').jqxDropDownList({source: orderCurrencies, autoDropDownHeight: true, selectedIndex: 1, width: '84%', height: '20px'});
-	 angular.element('#give-currency-type').on('select', function(event) {
-	 var index = event.args.index;
-	 if (index === 0) {
-	 if ($scope.takeCurrencyHiden === true) {
-	 angular.element('#give-currency-type').jqxDropDownList({selectedIndex: 1});
-	 } else {
-	 $scope.$apply(function() {
-	 $scope.giveCurrencyHiden = true;
-	 });
-	 }
-	 }
-	 else {
-	 $scope.$apply(function() {
-	 $scope.giveCurrencyHiden = false;
-	 });
-	 angular.element("#give-input").jqxNumberInput({symbol: orderCurrencies[index], min: 0.01, max: currenciesMap[orderCurrencies[index]].max, digits: getDigits(currenciesMap[orderCurrencies[index]].max)});
-	 }
-	 $scope.isValidOrder();
-	 });
-	 angular.element("#give-input").jqxNumberInput({width: '100%', height: '25px', symbol: orderCurrencies[1], min: 0.01, max: currenciesMap[orderCurrencies[1]].max, digits: getDigits(currenciesMap[orderCurrencies[1]].max), spinButtons: true, negativeSymbol: '-'});
-	 angular.element("#give-input").on('change', $scope.isValidOrder);
-	 var durationTypes = ["Hours", "Days"];
-	 angular.element('#duration-type').jqxDropDownList({source: durationTypes, autoDropDownHeight: true, selectedIndex: 0, width: '84%', height: '20px'});
-	 angular.element('#duration-type').on('select', function(event) {
-	 var index = event.args.index;
-	 angular.element("#duration-input").jqxNumberInput({symbol: durationTypes[index]});
-	 $scope.isValidOrder();
-	 });
-	 angular.element("#duration-input").jqxNumberInput({width: '100%', height: '25px', symbol: durationTypes[0], min: 1, decimalDigits: 0, digits: 3, spinButtons: true, negativeSymbol: '-'});
-	 angular.element("#duration-input").on('change', $scope.isValidOrder);
-	 angular.element("#s2id_category input").focus();
-	 });
-	 } else {
-	 clearOrder();
-	 $scope.isOrdersFormOpening = false;
-	 }
-	 };*/
-
-
-
-
-
-	/*$scope.createOrder = function() {
-	 userService.get();
-	 if (!$scope.isValidOrder()) {
-	 return;
-	 }
-	 var data = CKEDITOR.instances.orderDataEditable.getData();
-	 var orderInfo = {};
-	 orderInfo.orderData = data;
-	 var endDate = angular.element("#deadline").val();
-	 orderInfo.endDate = endDate;
-	 var takingValue = angular.element("#take-input").jqxNumberInput('val');
-	 var takingCurrency = angular.element("#take-currency-type").jqxDropDownList('val');
-	 if (takingCurrency !== "None") {
-	 orderInfo.takingCurrency = currenciesMap[takingCurrency];
-	 orderInfo.takingValue = Math.abs(takingValue);
-	 addItems($scope.userPropertiesMap['currencies'], takingCurrency);
-	 } else {
-	 orderInfo.takingValue = null;
-	 orderInfo.takingCurrency = null;
-	 }
-	 var givingValue = angular.element("#give-input").jqxNumberInput('val');
-	 var givingCurrency = angular.element("#give-currency-type").jqxDropDownList('val');
-	 if (givingCurrency !== "None") {
-	 orderInfo.givingCurrency = currenciesMap[givingCurrency];
-	 orderInfo.givingValue = Math.abs(givingValue);
-	 addItems($scope.userPropertiesMap['currencies'], givingCurrency);
-	 } else {
-	 orderInfo.givingValue = null;
-	 orderInfo.givingCurrency = null;
-	 }
-	 var duration = angular.element("#duration-input").jqxNumberInput('val');
-	 orderInfo.duration = Math.abs(duration);
-	 var durationType = angular.element("#duration-type").jqxDropDownList('val');
-	 if (durationType === "Hours") {
-	 orderInfo.durationType = "HOUR";
-	 } else if (durationType === "Days") {
-	 orderInfo.durationType = "DAY";
-	 }
-	 //orderInfo.categories = $scope.orderCreatingMap['orderCategories'];
-	 orderInfo.categories = [];
-	 for (var i in $scope.orderCreatingMap['orderCategories']) {
-	 orderInfo.categories[i] = {};
-	 orderInfo.categories[i].title = $scope.orderCreatingMap['orderCategories'][i];
-	 }
-	 orderInfo.languages = [];
-	 for (var i in $scope.orderCreatingMap['orderLanguages']) {
-	 orderInfo.languages[i] = {};
-	 orderInfo.languages[i].title = $scope.orderCreatingMap['orderLanguages'][i];
-	 }
-	 //orderInfo.languages = $scope.orderCreatingMap['orderLanguages'];
-	 
-	 
-	 //addItems($scope.userPropertiesMap['languages'], orderInfo.languages);
-	 var orderResponse = ordersResource.create({}, orderInfo);
-	 orderResponse.$promise.then(function() {
-	 clearOrder();
-	 $rootScope.userOrderDetails = true;
-	 if (angular.element("#collapseThree").hasClass("in")) {
-	 angular.element("#collapseThree").collapse("hide");
-	 }
-	 angular.element("#collapseFour").removeClass("in");
-	 if (!angular.element("#collapseFour").hasClass("in")) {
-	 angular.element("#collapseFour").collapse("show");
-	 }
-	 
-	 $scope.updateProfile();
-	 $scope.isOrdersFormOpening = false;
-	 });
-	 };*/
 	function addItems(destArray, original) {
 		if (!destArray || !original) {
 			return;
@@ -609,14 +457,13 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			});
 		});
 		/*$timeout(function() {
-			$scope.$apply(function() {
-				$scope.disabledEditButton = false;
-			});
-		}, 500);*/
+		 $scope.$apply(function() {
+		 $scope.disabledEditButton = false;
+		 });
+		 }, 500);*/
 	}
 
 	$scope.endEditing = function() {
-console.log("END");
 		var languages = "";
 		for (var i in $scope.userPropertiesMap['languages']) {
 			languages += $scope.userPropertiesMap['languages'][i] + ", "
@@ -639,11 +486,6 @@ console.log("END");
 		if ($scope.currencies) {
 			$scope.currencies += ", ";
 		}
-		/*$timeout(function() {
-		 angular.element("#phone").jqxMaskedInput({mask: '+## (###)###-##-##'});
-		 angular.element("#phone").jqxMaskedInput('inputValue', "07");
-		 angular.element("#phone").jqxMaskedInput('maskedValue', $scope.userPropertiesMap['phone']);
-		 });*/
 	}
 
 	$scope.changeVisible = function(propertyName) {
@@ -817,9 +659,9 @@ console.log("END");
 
 	angular.element(document).on("focus", "#userName", function() {
 		angular.element(this).mask("SSSSSSSSSSSSSSSSSSSSSSSSSSS",
-				{'translation': {
-						S: {pattern: /[A-Za-zА-Яа-я0-9\s]/}
-					}});
+			{'translation': {
+					S: {pattern: /[A-Za-zА-Яа-я0-9\s]/}
+				}});
 	});
 	/*angular.element(document).on("focus", "#mail", function() {
 	 angular.element(this).mask("SSSSSSSSSSSSSS",
@@ -837,11 +679,11 @@ console.log("END");
 		});
 		modalInstance.result.then(function() {
 		},
-				function() {
-					var ias = angular.element('#user-photo-change').imgAreaSelect({instance: true});
-					ias.setOptions({hide: true});
-					ias.update();
-				});
+			function() {
+				var ias = angular.element('#user-photo-change').imgAreaSelect({instance: true});
+				ias.setOptions({hide: true});
+				ias.update();
+			});
 	};
 	function loadImageError() {
 		$scope.showUserPhotoError = true;
@@ -859,7 +701,7 @@ console.log("END");
 			imag.onload = function() {
 
 				if ((result.indexOf("jpg") === -1)
-						&& (result.indexOf("jpeg") === -1)) {
+					&& (result.indexOf("jpeg") === -1)) {
 					$scope.photoErrorMessage = errorMessages["IMAGE_TYPE"];
 					loadImageError();
 				}
@@ -929,24 +771,6 @@ console.log("END");
 			}, 100);
 		});
 	};
-	/*$scope.collapse = function(id) {
-	 if (angular.element(id).hasClass("in")) {
-	 angular.element(id).collapse("hide");
-	 if ("#collapseThree" === id) {
-	 clearOrder();
-	 $scope.isOrdersFormOpening = false;
-	 }
-	 } else if ("#collapseThree" === id) {
-	 if (!$scope.isOrdersFormOpening) {
-	 angular.element(id).collapse('show');
-	 $scope.initOrdersCreation();
-	 } else if (!angular.element("#s2id_category input").is(":focus")) {
-	 angular.element("#s2id_category input").focus();
-	 }
-	 } else {
-	 angular.element(id).collapse('show');
-	 }
-	 };*/
 
 	$scope.changeAdditionAttrsVisible = function() {
 		if ($scope.additionAttrsHidden === false) {

@@ -29,11 +29,18 @@ navbarModule.directive('ngClickOut', ['$parse', function($parse) {
 		return function(scope, element, attr) {
 			var fn = $parse(attr['ngClickOut']);
 			element.bind("mouseout", function(event) {
-				console.log("OUT");
+				//console.log("OUT " + $(element).find("button").attr("id"));
+				//var buttonId = $(element).find("button").attr("id");
+				console.log("& " + $(element).find("button").attr("id"))
 				$(document).bind("click", function(event) {
-					console.log("CLICK");
-					fn(scope, {$event: event});
-					$(document).unbind('click');
+					//console.log("CLICK " + this);
+					event = event || window.event;
+					var el = event.target || event.srcElement;
+					console.log(el.id + " " + $(element).find("button").attr("id"));
+					if ($(element).find("button").attr("id") !== el.id) {
+						fn(scope, {$event: event});
+						$(document).unbind('click');
+					}
 				});
 			});
 		};
@@ -68,7 +75,7 @@ navbarModule.directive('uiDropdown', function($compile, $timeout) {
 			//scope.bSelectedItem = scope.selectedItem;
 			scope.inputText = "";
 			var html = '';
-			html += '<div class="input-group" id="{{elementId}}"><input type="number" class="form-control" ng-model="inputValue" ng-change="onChangeInput()" placeholder="{{placeholder}}">';
+			html += '<div class="input-group" id="{{elementId}}"><input type="number" min="0" class="form-control" ng-model="inputValue" ng-change="onChangeInput()" placeholder="{{placeholder}}">';
 			html += '<div class="input-group-btn ui-dropdown-button"><button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="li-item">Action</span> <b class="caret"></b></button>';
 
 			html += '<ul class="dropdown-menu dropdown-menu-left" style="right: 0; left: auto;"><li ng-repeat="item in items"><a tabindex="-1" data-ng-click="selectVal(item)" style="cursor:pointer">{{item}}</a></li><li ng-hide="!isDropdownInput"><input type="text" class="dropdown-input" placeholder=" Other.." ng-model="inputText"/></li></ul></div>';

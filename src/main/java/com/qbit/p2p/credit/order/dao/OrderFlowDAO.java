@@ -49,6 +49,7 @@ public class OrderFlowDAO {
 				if ((order == null) || order.getUserId().equals(respond.getUserId())) {
 					return null;
 				}
+				
 				List<Respond> responses = order.getResponses();
 				if (responses != null) {
 					for (Respond orderRespond : order.getResponses()) {
@@ -61,6 +62,7 @@ public class OrderFlowDAO {
 				}
 				responses.add(respond);
 				order.setResponses(responses);
+				System.out.println("!! RESPOND: " + order);
 				return entityManager.merge(order);
 			}
 		});

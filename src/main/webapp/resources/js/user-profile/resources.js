@@ -5,7 +5,7 @@ userModule.factory("usersProfileResource", function($resource) {
 		current: {method: "GET", url: window.context + "webapi/profiles/current"},
 		getAll: {method: "GET"},
 		getById: {method: "GET", url: window.context + "webapi/profiles/:id", params: {id: "@id"}},
-		getShortById: {method: "GET", url: window.context + "webapi/profiles/short/:id", params: {id: "@id"}},
+		getShortById: {method: "GET", url: window.context + "webapi/profiles/:id/short", params: {id: "@id"}},
 		updateUserMainAttributes: {method: "POST", url: window.context + "webapi/profiles/current"},
 		updateUserSocialLinks: {method: "POST", url: window.context + "webapi/profiles/current/social"},
 		updateUserVideos: {method: "POST", url: window.context + "webapi/profiles/current/video"},

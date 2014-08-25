@@ -56,7 +56,7 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 	private BigDecimal incomingAmount;
 	private String incomingCurrency;
 	@Column(precision = 10, scale = 6)
-	private BigDecimal outcomingAmout;
+	private BigDecimal outcomingAmount;
 	private String outcomingCurrency;
 	@XmlJavaTypeAdapter(DateAdapter.class)
 	@Temporal(TemporalType.TIMESTAMP)
@@ -122,16 +122,12 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 		this.incomingCurrency = incomingCurrency;
 	}
 
-	public BigDecimal getOutcomingAmout() {
-		return outcomingAmout;
+	public BigDecimal getOutcomingAmount() {
+		return outcomingAmount;
 	}
 
-	public void setOutcomingAmout(BigDecimal outcomingAmout) {
-		if (outcomingAmout != null) {
-			this.outcomingAmout = outcomingAmout.setScale(3, RoundingMode.HALF_UP);
-		} else {
-			this.outcomingAmout = null;
-		}
+	public void setOutcomingAmount(BigDecimal outcomingAmount) {
+		this.outcomingAmount = outcomingAmount;
 	}
 
 	public String getOutcomingCurrency() {
@@ -231,7 +227,7 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 			&& (categories != null)
 			&& (languages != null)
 			&& (incomingCurrency != null || outcomingCurrency != null)
-			&& (!BigDecimal.ZERO.equals(incomingAmount) || !BigDecimal.ZERO.equals(outcomingAmout));
+			&& (!BigDecimal.ZERO.equals(incomingAmount) || !BigDecimal.ZERO.equals(outcomingAmount));
 	}
 	
 	public boolean isContainsRespond(String userId) {
@@ -249,6 +245,6 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 
 	@Override
 	public String toString() {
-		return "OrderInfo{" + "id=" + id + ", userId=" + userId + ", status=" + status + ", incomingAmount=" + incomingAmount + ", incomingCurrency=" + incomingCurrency + ", outcomingAmout=" + outcomingAmout + ", outcomingCurrency=" + outcomingCurrency + ", creationDate=" + creationDate + ", bookingDeadline=" + bookingDeadline + ", duration=" + duration + ", durationType=" + durationType + ", categories=" + categories + ", languages=" + languages + ", orderData=" + orderData + ", responses=" + responses + ", partnerId=" + partnerId + ", comment=" + comment + '}';
+		return "OrderInfo{" + "id=" + id + ", userId=" + userId + ", status=" + status + ", incomingAmount=" + incomingAmount + ", incomingCurrency=" + incomingCurrency + ", outcomingAmount=" + outcomingAmount + ", outcomingCurrency=" + outcomingCurrency + ", creationDate=" + creationDate + ", bookingDeadline=" + bookingDeadline + ", duration=" + duration + ", durationType=" + durationType + ", categories=" + categories + ", languages=" + languages + ", orderData=" + orderData + ", responses=" + responses + ", partnerId=" + partnerId + ", comment=" + comment + '}';
 	}
 }

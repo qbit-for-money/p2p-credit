@@ -1,110 +1,343 @@
-<script id="responsesTmpl" type="text/x-angular-tmpl">
-<li class="list-group-item" id="{{responseId}}">
-
+<script id="userOrdersTableTmpl" type="text/x-angular-tmpl">
+	<div class="table-row panel panel-default">
+	<div>
+	<div class="panel-body" style="padding-top: 0;padding-bottom: 0;">
+	<div class="container-fluid">
+	<div class="row" id="tabs">
+	<ul class="nav nav-tabs" role="tablist" id="user-order-tab">
+	<li class="active"><a href="#order-attrs{{orderId}}" data-toggle="tab">Order</a></li>
+	<!--li><a href="#order-description{{orderId}}" data-toggle="tab">Description</a></li-->
+	<li><a href="#responses-list{{orderId}}" data-toggle="tab">Responses list</a></li>
+	</ul>
+	<div id="tab-content" class="tab-content">
+	<div class="order-attrs tab-pane active" id="order-attrs{{orderId}}">
+	<div class="table-status-button">
 	<div class="row">
-		<div class="col-xs-3 col-md-2">
-			<div class='jqx-rc-all'>
-				<div style='margin-top: 3px;'>
-					<a href="{{userurl}}"><img height="83" src="{{imgurl}}"/></a>
-				</div>
-			</div>
-		</div>
-		<div class="col-xs-6 col-md-7" ng-if="{{isComment}}">
+	<div class="container-fluid">
+	<div class="col-xs-12 col-md-12">	
+	<bs-dropdown data-menu-type="button" order-id={{orderId}} do-function="updateTables()" ng-hide="{{(status !== true)|| (orderStatus === 'SUCCESS')}}"></bs-dropdown>
+	</div>
+	</div>
+	</div>
+	</div>
+	{{orderAttributes}}
+	</div>
 
-			<div class="container-fluid">
-				<div class="col-xs-12 col-md-12" style="margin: 3px;">
-					Comment: {{comment}}
-				</div>
-			</div>
-		</div>
-		<div class="col-xs-6 col-md-7" ng-if="{{isAttributes}}">
-			<div class="container-fluid">
-				<div class="col-xs-12 col-md-12" style="margin: 6px;" id="name">
-					Name: <span></span>
-				</div>
-			</div>
-			<div class="container-fluid">
-				<div class="col-xs-12 col-md-12" style="margin: 6px;" id="mail">
-					Mail: <span></span>
-				</div>
-			</div>
-			<div class="container-fluid">
-				<div class="col-xs-12 col-md-12" style="margin: 6px;" id="phone">
-					Phone: <span></span>
-				</div>
-			</div>
-		</div>
-		<div class="col-xs-3 col-md-3">
-			<div class="container-fluid">
-				<div class="col-xs-12 col-md-12" style="margin: 6px;">
+	<div class="order-description tab-pane" id="order-description{{orderId}}">
+	<div class="table-status-button">
+	<div class="row">
+	<div class="container-fluid">
+	<div class="col-xs-12 col-md-12">	
+	<bs-dropdown data-menu-type="button" order-id={{orderId}} do-function="updateTables()" ng-hide="{{(status !== true)|| (orderStatus === 'SUCCESS')}}"></bs-dropdown>
+	</div>
+	</div>
+	</div>
+	</div>
+	<div class="row" style="margin: 5px;">
+	<div class="col-xs-12 col-md-12">
+	{{freeDescription}}
+	</div>
+	</div>
+	</div>	
+	<div class="responses-list tab-pane" id="responses-list{{orderId}}">
+	<div class="table-status-button" style="margin-top: -39px;">
+	<div class="row">
+	<div class="container-fluid">
+	<div class="col-xs-12 col-md-12">	
+	<bs-dropdown data-menu-type="button" order-id={{orderId}} do-function="updateTables()" ng-hide="{{(status !== true)|| (orderStatus === 'SUCCESS')}}"></bs-dropdown>
+	</div>
+	</div>
+	</div>
+	</div>
+	<div class="row" style="margin: 1px;">
+	<div class="col-xs-12 col-md-12">
 
-				</div>
-			</div>
-			<div class="container-fluid">
-				<div class="col-xs-12 col-md-12" style="margin-top: 12px;">
-					<div class="navbar-right">
-						<button class="btn btn-success" type="button" ng-hide="{{status === true}}" ng-disabled="{{orderStatus !== 'OPENED'}}" ng-click="approve({{orderId}}, '{{userId}}')">
-							Yes!
-						</button>
+	<div class="dropdown open" style="weight: 100%">
+	<ul class="list-group" id="responses-list">
+	{{responsesList}}
+	</ul>
 
-						<bs-dropdown data-menu-type="button" order-id="{{orderId}}" ng-hide="{{(status !== true)|| ((orderStatus === 'SUCCESS') || (orderStatus === 'NOT SUCCESS') || (orderStatus === 'ARBITRATION')) || (orderStatus === 'IN PROCESS') && (isApprovedResponse == false)}}"></bs-dropdown>
-					</div>
-				</div>
-			</div>
-			<div class="container-fluid">
-				<div class="col-xs-12 col-md-12" style="margin: 6px;">
+	</div>
+	</div>
+	</div>
+	</div>
+	</div>	
 
-				</div>
+	</div>
+
+
+	</div>
+	</div>
+	</div>
+	</div>
+	</div>
+</script>
+<script id="userOrderAttrsTmpl" type="text/x-angular-tmpl">
+<div class="row" style="margin: 5px; font-size: 12px;">
+	<div class="col-xs-4 col-md-4">
+		<div class="container-fluid">
+			<div class="row" ng-hide="'{{take}}' === ''">
+				<div class="col-xs-12 col-md-12">Take: {{take}}</div>
+			</div>
+			<div class="row" ng-hide="'{{give}}' === ''">
+				<div class="col-xs-12 col-md-12">Give: {{give}}</div>
 			</div>
 
 		</div>
 	</div>
-</li>
+
+	<div class="col-xs-4 col-md-4">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-xs-12 col-md-12">Categories: {{categories}}</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-12 col-md-12">Booking deadline: {{endDate}}</div>
+			</div>
+
+		</div>
+	</div>
+
+
+
+	<div class="col-xs-4 col-md-4">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-xs-12 col-md-12">Duration: {{duration}}</div>
+			</div>
+			
+			<div class="row">
+				<div class="col-xs-12 col-md-12">Status: {{orderStatus}}</div>
+			</div>
+
+
+		</div>
+	</div>
+</div>
+</script>
+
+<script id="responsesTmpl" type="text/x-angular-tmpl">
+	<li class="list-group-item" id="{{responseId}}">
+
+	<div class="row">
+	<div class="col-xs-3 col-md-2">
+	<div class='jqx-rc-all'>
+	<div style='margin-top: 3px;'>
+	<a href="{{userurl}}"><img height="83" src="{{imgurl}}"/></a>
+	</div>
+	</div>
+	</div>
+	<div class="col-xs-6 col-md-7" ng-if="{{isComment}}">
+
+	<div class="container-fluid">
+	<div class="col-xs-12 col-md-12" style="margin: 3px;">
+	Comment: {{comment}}
+	</div>
+	</div>
+	</div>
+	<div class="col-xs-6 col-md-7" ng-if="{{isAttributes}}">
+	<div class="container-fluid">
+	<div class="col-xs-12 col-md-12" style="margin: 6px;" id="name">
+	Name: <span></span>
+	</div>
+	</div>
+	<div class="container-fluid">
+	<div class="col-xs-12 col-md-12" style="margin: 6px;" id="mail">
+	Mail: <span></span>
+	</div>
+	</div>
+	<div class="container-fluid">
+	<div class="col-xs-12 col-md-12" style="margin: 6px;" id="phone">
+	Phone: <span></span>
+	</div>
+	</div>
+	</div>
+	<div class="col-xs-3 col-md-3">
+	<div class="container-fluid">
+	<div class="col-xs-12 col-md-12" style="margin: 6px;">
+
+	</div>
+	</div>
+	<div class="container-fluid">
+	<div class="col-xs-12 col-md-12" style="margin-top: 12px;">
+	<div class="navbar-right">
+	<button class="btn btn-success" type="button" ng-hide="{{status === true}}" ng-disabled="{{orderStatus !== 'OPENED'}}" ng-click="approve({{orderId}}, '{{userId}}')">
+	Yes!
+	</button>
+
+	<bs-dropdown data-menu-type="button" order-id="{{orderId}}" do-function="updateTables()" ng-hide="{{(status !== true)|| (orderStatus === 'SUCCESS') || ((orderStatus === 'IN PROCESS') && (isApprovedResponse == false))}}"></bs-dropdown>
+	</div>
+	</div>
+	</div>
+	<div class="container-fluid">
+	<div class="col-xs-12 col-md-12" style="margin: 6px;">
+
+	</div>
+	</div>
+
+	</div>
+	</div>
+	</li>
+</script>
+
+
+<script id="ordersTableTmpl" type="text/x-angular-tmpl">
+	<div class="table-row panel panel-default">
+	<div>
+	<div class="panel-body" style="padding-top: 0;padding-bottom: 0;">
+	<div class="container-fluid">
+	<div class="row" id="tabs">
+	<ul class="nav nav-tabs" role="tablist" id="order-tab">
+	<li class="active"><a href="#order-attrs{{orderId}}" data-toggle="tab">Order</a></li>
+	<!--li><a href="#order-description{{orderId}}" data-toggle="tab">Description</a></li-->
+	</ul>
+	<div id="tab-content" class="tab-content">
+	<div class="order-attrs tab-pane active" id="order-attrs{{orderId}}">
+	<div class="table-status-button" ng-hide="{{isUserOrder === true}}" style="margin-right: -37px;">
+	<div class="row">
+	<div class='container-fluid' >
+	<div class='col-xs-12 col-md-12'>
+	<div class="col-xs-3 col-md-3">
+	<button class="btn btn-default" type="button" ng-click="">
+	Chat <span class="glyphicon glyphicon-pencil"></span>
+	</button>
+	</div>
+
+	<div class="btn-group col-xs-8 col-md-8" style="padding-left: 35px;" ng-hide="false">
+	<button class="btn btn-success" type="button" ng-click="addResponse({{orderId}})" style="width: 60%" ng-disabled="{{disabled === true}}">
+	Yes!
+	</button>
+
+	<button class="btn btn-success" type="button" ng-click="openCommentDialog({{orderId}})"  ng-disabled="{{disabled === true}}">
+	<span class="glyphicon glyphicon-cloud"></span>
+	</button>
+	</div>
+
+	</div>
+	</div>
+	</div>
+	</div>
+	<div class="table-status-button">
+	<div class="row">
+	<div class="container-fluid">
+	<div class="col-xs-12 col-md-12">	
+	<bs-dropdown data-menu-type="button" order-id={{orderId}} do-function="updateTables()" ng-hide="{{(status !== true) || (orderStatus === 'SUCCESS')}}"></bs-dropdown>
+	</div>
+	</div>
+	</div>
+	</div>
+	{{orderAttributes}}
+	</div>
+	</div>	
+
+	</div>
+
+
+	</div>
+	</div>
+	</div>
+	</div>
+	</div>
+</script>
+
+<script id="orderAttrsTmpl" type="text/x-angular-tmpl">
+	<div class="row" style="margin: 5px; font-size: 12px;">
+	<div class="col-xs-3 col-md-3">
+	<div class="container-fluid">
+	<div class="row" ng-hide="'{{take}}' === ''">
+	<div class="col-xs-12 col-md-12">Take: {{take}}</div>
+	</div>
+	<div class="row" ng-hide="'{{give}}' === ''">
+	<div class="col-xs-12 col-md-12">Give: {{give}}</div>
+	</div>
+
+	</div>
+	</div>
+
+	<div class="col-xs-3 col-md-3">
+	<div class="container-fluid">
+	<div class="row">
+	<div class="col-xs-12 col-md-12">Categories: {{categories}}</div>
+	</div>
+	<div class="row">
+	<div class="col-xs-12 col-md-12">Languages: {{languages}}</div>
+	</div>
+
+	</div>
+	</div>
+
+
+
+	<div class="col-xs-3 col-md-3">
+	<div class="container-fluid">
+	<div class="row">
+	<div class="col-xs-12 col-md-12">Booking deadline: {{endDate}}</div>
+	</div>
+	<div class="row">
+	<div class="col-xs-12 col-md-12">Duration: {{duration}}</div>
+	</div>
+
+
+	</div>
+	</div>
+
+	<div class="col-xs-3 col-md-3">
+	<div class="container-fluid">
+	<div class="row">
+	<div class="col-xs-12 col-md-12">Summary rating: {{summaryRating}}</div>
+	</div>
+	<div class="row">
+	<div class="col-xs-12 col-md-12">Openness rating: {{opennessRating}}</div>
+	</div>
+
+	</div>
+	</div>
+	</div>
 </script>
 
 <script id="userOrdersTableDetailTmpl" type="text/x-angular-tmpl">
-<ul style="margin-left: 30px;">
+	<ul style="margin-left: 30px;">
 	<li>Free description</li>
 	<li>Responses list</li>
-</ul>
-<div class="order-description container-fluid">
-<div style="position: absolute; top: 10px; right: 49px; height: 18px;">
-		<div class="row">
-			<div class="container-fluid">
-				<div class="col-xs-12 col-md-12">	
-					<bs-dropdown data-menu-type="button" order-id={{orderId}} ng-hide="{{(status !== true)|| ((orderStatus === 'SUCCESS') || (orderStatus === 'NOT SUCCESS') || (orderStatus === 'ARBITRATION'))}}"></bs-dropdown>
-				</div>
-			</div>
-		</div>
+	</ul>
+	<div class="order-description container-fluid">
+	<div style="position: absolute; top: 10px; right: 49px; height: 18px;">
+	<div class="row">
+	<div class="container-fluid">
+	<div class="col-xs-12 col-md-12">	
+	<bs-dropdown data-menu-type="button" order-id={{orderId}} do-function="updateTables()" ng-hide="{{(status !== true)|| (orderStatus === 'SUCCESS')}}"></bs-dropdown>
+	</div>
+	</div>
+	</div>
 	</div>
 	<div class="row" style="margin: 5px;">
-		<div class="col-xs-12 col-md-12">
-			{{freeDescription}}
-		</div>
+	<div class="col-xs-12 col-md-12">
+	{{freeDescription}}
 	</div>
-</div>
-<div class="responses-list container-fluid">
+	</div>
+	</div>
+	<div class="responses-list container-fluid">
 	<div style="position: absolute; top: 10px; right: 49px; height: 18px;">
-		<div class="row">
-			<div class="container-fluid">
-				<div class="col-xs-12 col-md-12">	
-					<bs-dropdown data-menu-type="button" order-id={{orderId}} ng-hide="{{(status !== true)|| ((orderStatus === 'SUCCESS') || (orderStatus === 'NOT SUCCESS') || (orderStatus === 'ARBITRATION'))}}"></bs-dropdown>
-				</div>
-			</div>
-		</div>
+	<div class="row">
+	<div class="container-fluid">
+	<div class="col-xs-12 col-md-12">	
+	<bs-dropdown data-menu-type="button" order-id={{orderId}} do-function="updateTables()" ng-hide="{{(status !== true)||(orderStatus === 'SUCCESS')}}"></bs-dropdown>
+	</div>
+	</div>
+	</div>
 	</div>
 	<div class="row" style="margin: 1px;">
-		<div class="col-xs-12 col-md-12">
+	<div class="col-xs-12 col-md-12">
 
-			<div class="dropdown open" style="weight: 100%">
-				<ul class="list-group" id="responses-list">
-					#responses-list
-				</ul>
+	<div class="dropdown open" style="weight: 100%">
+	<ul class="list-group" id="responses-list">
+	#responses-list
+	</ul>
 
-			</div>
-		</div>
 	</div>
-</div>
+	</div>
+	</div>
+	</div>
 </script>
 <script id="ordersTableDetailTmpl" type="text/x-angular-tmpl">
 	<ul style='margin-left: 30px;'>

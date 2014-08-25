@@ -10,9 +10,17 @@ likeModule.directive("likeButtons", function($compile, likesResource, $timeout, 
 			scope.userPublicKeyFromPath = $location.$$path.replace("/users/", "");
 
 			if ($rootScope.user && (scope.userPublicKeyFromPath === $rootScope.user.publicKey)) {
-				scope.isCurrentUser = true;
+				$timeout(function() {
+					scope.$apply(function() {
+						scope.isCurrentUser = true;
+					});
+				});
 			} else {
-				scope.isCurrentUser = false;
+				$timeout(function() {
+					scope.$apply(function() {
+						scope.isCurrentUser = false;
+					});
+				});
 			}
 			scope.alreadyVotedUser = function() {
 

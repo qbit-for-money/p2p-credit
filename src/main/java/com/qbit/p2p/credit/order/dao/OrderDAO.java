@@ -20,6 +20,7 @@ import com.qbit.p2p.credit.order.dao.meta.StringValueProvider;
 import com.qbit.p2p.credit.order.dao.meta.ValueProvider;
 import com.qbit.p2p.credit.order.model.Category;
 import com.qbit.p2p.credit.statistics.model.Statistics;
+import com.qbit.p2p.credit.user.dao.UserProfileDAO;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -53,6 +54,8 @@ public class OrderDAO {
 	private Env env;
 	@Inject
 	private CategoryDAO categoryDAO;
+	@Inject
+	private UserProfileDAO userProfileDAO;
 
 	private static final Map<String, ValueProvider> VALUE_PROVIDERS_MAP;
 	private static final Map<String, String> EXPRESSION_PROVIDERS_MAP;
@@ -81,7 +84,7 @@ public class OrderDAO {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {
 			return DAOUtil.find(entityManagerFactory.createEntityManager(),
-				OrderInfo.class, id, null);
+					OrderInfo.class, id, null);
 		} finally {
 			entityManager.close();
 		}
@@ -99,6 +102,9 @@ public class OrderDAO {
 				if (userInfo == null) {
 					return null;
 				}
+				if (userProfileDAO.find(userInfo.getPublicKey()) == null) {
+					userProfileDAO.create(userInfo.getPublicKey());
+				}
 				orderInfo.setStatus(OrderStatus.OPENED);
 				orderInfo.setCreationDate(new Date());
 				List<Category> categories = orderInfo.getCategories();
@@ -108,6 +114,8 @@ public class OrderDAO {
 						for (Category category : categories) {
 							if (!notCustomCategories.contains(category)) {
 								category.setCustom(true);
+							} else {
+								category.setCustom(false);
 							}
 						}
 					}
@@ -127,7 +135,7 @@ public class OrderDAO {
 
 			@Override
 			public OrderInfo
-				call(EntityManager entityManager) {
+					call(EntityManager entityManager) {
 				OrderInfo order = entityManager.find(OrderInfo.class, newOrder.getId(), LockModeType.PESSIMISTIC_WRITE);
 				if (order == null) {
 					return null;
@@ -137,7 +145,7 @@ public class OrderDAO {
 				order.setDurationType(newOrder.getDurationType());
 				order.setBookingDeadline(newOrder.getBookingDeadline());
 				order.setOutcomingCurrency(newOrder.getOutcomingCurrency());
-				order.setOutcomingAmout(newOrder.getOutcomingAmout());
+				order.setOutcomingAmount(newOrder.getOutcomingAmount());
 				order.setLanguages(newOrder.getLanguages());
 				order.setOrderData(newOrder.getOrderData());
 				order.setResponses(newOrder.getResponses());
@@ -257,36 +265,36 @@ public class OrderDAO {
 				case STARTS_WITH:
 					EntityType<OrderInfo> type = entityManager.getMetamodel().entity(OrderInfo.class);
 					predicate = builder.like(
-						builder.lower(order.get(
-								type.getDeclaredSingularAttribute(item.getFilterDataField(), String.class))),
-						item.getFilterValue().toLowerCase() + "%");
+							builder.lower(order.get(
+											type.getDeclaredSingularAttribute(item.getFilterDataField(), String.class))),
+							item.getFilterValue().toLowerCase() + "%");
 					break;
 				case LESS_THAN_OR_EQUAL:
 					predicate = builder.lessThanOrEqualTo((Expression<Comparable>) expression,
-						(Comparable) valueProvider.get(item.getFilterValue()));
+							(Comparable) valueProvider.get(item.getFilterValue()));
 					break;
 				case LESS_THAN:
 					predicate = builder.lessThan((Expression<Comparable>) expression,
-						(Comparable) valueProvider.get(item.getFilterValue()));
+							(Comparable) valueProvider.get(item.getFilterValue()));
 					break;
 				case GREATER_THAN_OR_EQUAL:
 					if ("summaryRating".equals(item.getFilterDataField())) {
 						predicate = getSummaryRatingPredicate((Integer) valueProvider.get(item.getFilterValue()),
-							criteria, builder);
+								criteria, builder);
 					} else if ("opennessRating".equals(item.getFilterDataField())) {
 						predicate = getOpenessRatingPredicate((Integer) valueProvider.get(item.getFilterValue()),
-							criteria, builder);
+								criteria, builder);
 					} else if ("partnersRating".equals(item.getFilterDataField())) {
 						predicate = getPartnersRatingPredicate((Integer) valueProvider.get(item.getFilterValue()),
-							criteria, entityManager);
+								criteria, entityManager);
 					} else {
 						predicate = builder.greaterThanOrEqualTo((Expression<Comparable>) expression,
-							(Comparable) valueProvider.get(item.getFilterValue()));
+								(Comparable) valueProvider.get(item.getFilterValue()));
 					}
 					break;
 				case GREATER_THAN:
 					predicate = builder.greaterThan((Expression<Comparable>) expression,
-						(Comparable) valueProvider.get(item.getFilterValue()));
+							(Comparable) valueProvider.get(item.getFilterValue()));
 					break;
 			}
 			if ((prevPredicate != null) && (predicate != null)) {

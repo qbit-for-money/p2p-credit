@@ -2,7 +2,7 @@ var navbarModule = angular.module("navbar");
 
 navbarModule.factory("navbarService", function($rootScope, authService) {
 	function goToProfile() {
-		if (!$rootScope.user || ($rootScope.user.publicKey.indexOf("@") === -1)) {
+		if (!isNoCaptchaAuth()) {
 			authService.openAuthDialog(false, true, "profile");
 		} else {
 			window.location.href = window.context + "#/users/" + $rootScope.user.publicKey;
@@ -10,7 +10,7 @@ navbarModule.factory("navbarService", function($rootScope, authService) {
 	};
 	
 	function goToOrderCreating() {
-		if (!$rootScope.user || ($rootScope.user.publicKey.indexOf("@") === -1)) {
+		if (!isNoCaptchaAuth()) {
 			authService.openAuthDialog(false, true, window.context + "#/create-order");
 		} else {
 			window.location.href = window.context + "#/create-order";
@@ -18,7 +18,7 @@ navbarModule.factory("navbarService", function($rootScope, authService) {
 	};
 	
 	function goToOrders() {
-		if (!$rootScope.user || ($rootScope.user.publicKey.indexOf("@") === -1)) {
+		if (!isNoCaptchaAuth()) {
 			authService.openAuthDialog(false, true, window.context + "#/orders");
 		} else {
 			window.location.href = window.context + "#/orders";
@@ -30,6 +30,11 @@ navbarModule.factory("navbarService", function($rootScope, authService) {
 		goToOrderCreating: goToOrderCreating,
 		goToOrders: goToOrders
 	};
+	
+	function isNoCaptchaAuth() {
+		return $rootScope.user && (($rootScope.user.publicKey.indexOf("@") !== -1) 
+			|| ($rootScope.user.publicKey.indexOf("vk/") !== -1))
+	}
 });
 
 
