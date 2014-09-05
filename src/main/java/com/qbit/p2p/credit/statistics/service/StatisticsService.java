@@ -141,7 +141,6 @@ public class StatisticsService {
 		statistics.setAllSuccessOrdersCount(allSuccessOrdersCount);
 
 		statisticsDAO.updateGlobalStatistics(statistics);
-		System.out.println("!! RECALCULATE GLOBA STATISTICS " + statistics);
 		return statistics;
 	}
 	

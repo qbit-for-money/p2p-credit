@@ -1,5 +1,7 @@
 package com.qbit.p2p.credit.env;
 
+import com.qbit.commons.user.UserDAO;
+import com.qbit.p2p.credit.like.dao.LikeDAO;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
@@ -13,10 +15,17 @@ public class EnvResource {
 
 	@Inject
 	private Env env;
+	@Inject
+	private UserDAO userDAO;
+	
+	@Inject
+	private LikeDAO likeDAO;
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Env get() {
+		//System.out.println("## COUNT: " + likeDAO.getAdditionalIdCount("aleksashka6666@gmail.com"));
+		//System.out.println("() " + userDAO.getAdditionalIdCount("aleksashka6666@gmail.com") + "() " + userDAO.findFromAllIds("aleksashka6666@gmail.com"));
 		return env;
 	}
 }

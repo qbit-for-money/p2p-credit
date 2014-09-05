@@ -71,6 +71,5 @@ function isSessionURL(url) {
 }
 
 function goToFirstPage(state) {
-	console.log("## " + state);
-	//window.location.href = window.context;
+	window.location.href = window.context;
 }

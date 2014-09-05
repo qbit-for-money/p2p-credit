@@ -10,6 +10,8 @@ import com.qbit.p2p.credit.order.model.OrderInfo;
 import com.qbit.p2p.credit.order.model.OrderStatus;
 import com.qbit.p2p.credit.order.model.SearchRequest;
 import com.qbit.p2p.credit.env.Env;
+import com.qbit.commons.log.model.OperationType;
+import com.qbit.commons.log.service.LogScheduler;
 import com.qbit.p2p.credit.order.dao.meta.DateValueProvider;
 import com.qbit.p2p.credit.order.dao.meta.IntegerValueProvider;
 import com.qbit.p2p.credit.order.dao.meta.OrderStatusArrayValueProvider;
@@ -56,6 +58,8 @@ public class OrderDAO {
 	private CategoryDAO categoryDAO;
 	@Inject
 	private UserProfileDAO userProfileDAO;
+	@Inject
+	private LogScheduler logScheduler;
 
 	private static final Map<String, ValueProvider> VALUE_PROVIDERS_MAP;
 	private static final Map<String, String> EXPRESSION_PROVIDERS_MAP;
@@ -121,7 +125,10 @@ public class OrderDAO {
 					}
 					orderInfo.setCategories(categories);
 				}
-				return entityManager.merge(orderInfo);
+				OrderInfo mergedOrderInfo = entityManager.merge(orderInfo);
+				logScheduler.createLog(OperationType.ORDER_CREATION, 
+						mergedOrderInfo.getUserId(), mergedOrderInfo.getId());
+				return mergedOrderInfo;
 			}
 		});
 	}

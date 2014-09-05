@@ -34,7 +34,6 @@ public class UserProfileFilter implements Filter {
 
 		boolean isRequestToCurrentProfile = "/users-profile/current".equals(httpRequest.getPathInfo());
 		boolean userIdIsMail = ((userId != null) && userId.contains("@"));
-
 		if (isRequestToCurrentProfile && !userIdIsMail) {
 			if (contextPath.startsWith(filterConfig.getInitParameter("context-path"))) {
 				((HttpServletResponse) servletResponse).sendRedirect(contextPath);

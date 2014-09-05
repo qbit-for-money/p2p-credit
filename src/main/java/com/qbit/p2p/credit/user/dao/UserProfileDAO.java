@@ -5,9 +5,14 @@ import static com.qbit.commons.dao.util.DAOUtil.invokeInTransaction;
 import com.qbit.commons.dao.util.TrCallable;
 import com.qbit.commons.user.UserDAO;
 import com.qbit.commons.user.UserInfo;
+import com.qbit.commons.log.model.OperationType;
+import com.qbit.commons.log.service.LogScheduler;
 import com.qbit.p2p.credit.user.model.DataLink;
 import com.qbit.p2p.credit.user.model.Language;
+import com.qbit.p2p.credit.user.model.ShortProfile;
 import com.qbit.p2p.credit.user.model.UserPublicProfile;
+import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -21,6 +26,10 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.EntityType;
 import javax.ws.rs.WebApplicationException;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import org.eclipse.persistence.jaxb.MarshallerProperties;
 
 /**
  * @author Alexander_Sergeev
@@ -35,10 +44,14 @@ public class UserProfileDAO {
 	private UserDAO userDAO;
 	@Inject
 	private LanguageDAO languageDAO;
+	@Inject
+	private LogScheduler logScheduler;
 
 	public UserPublicProfile find(String id) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {
+			//TypedQuery<UserInfo> q = entityManager.createQuery("SELECT u FROM UserInfo u JOIN u WHERE :userId MEMBER OF u.additionalIds", UserInfo.class);
+			//System.out.println(q.getResultList());
 			return DAOUtil.find(entityManagerFactory.createEntityManager(),
 					UserPublicProfile.class, id, null);
 		} finally {
@@ -161,10 +174,11 @@ public class UserProfileDAO {
 			@Override
 			public UserPublicProfile call(EntityManager entityManager) {
 				UserPublicProfile userPublicProfile = entityManager.find(UserPublicProfile.class, userProfile.getUserId());
+				//TypedQuery<UserInfo> q = entityManager.createQuery("SELECT u FROM UserInfo u JOIN u WHERE :userId MEMBER OF u.additionalIds", UserInfo.class);
+			//System.out.println("** " + q.getResultList());
 				if (userPublicProfile == null) {
 					return null;
 				}
-				System.out.println("&&&&&&&&&&&&&&77");
 				userPublicProfile.setName(userProfile.getName());
 				userPublicProfile.setMail(userProfile.getMail());
 				userPublicProfile.setMailEnabled(userProfile.isMailEnabled());
@@ -189,7 +203,24 @@ public class UserProfileDAO {
 				userPublicProfile.setCurrenciesEnabled(userProfile.isCurrenciesEnabled());
 				userPublicProfile.setPersonalData(userProfile.getPersonalData());
 				userPublicProfile.setPersonalDataEnabled(userProfile.isPersonalDataEnabled());
-				return entityManager.merge(userPublicProfile);
+				UserPublicProfile mergedProfile = entityManager.merge(userPublicProfile);
+
+				ShortProfile serializedProfile = new ShortProfile(mergedProfile);
+
+				try {
+					JAXBContext jc = JAXBContext.newInstance(ShortProfile.class);
+					Marshaller marshaller = jc.createMarshaller();
+					marshaller.setProperty(MarshallerProperties.MEDIA_TYPE, "application/json");
+					marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+					StringWriter writer = new StringWriter();
+					marshaller.marshal(serializedProfile, writer);
+					logScheduler.createLog(OperationType.PROFILE_CHANGING,
+							mergedProfile.getUserId(), mergedProfile.getUserId(),
+							"COMMON", writer.toString());
+				} catch (JAXBException ex) {
+					//
+				}
+				return mergedProfile;
 			}
 		});
 	}

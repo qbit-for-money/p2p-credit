@@ -1,14 +1,45 @@
 var userModule = angular.module("user");
 
-userModule.controller("UserController", function($scope, $rootScope, usersResource, authService, $location, phone) {
+userModule.controller("UserController", function($scope, $rootScope, usersResource, authService, $location, phone, location) {
 
 	$scope.keyType = "user";
 	$scope.logoutButton = "";
 	$rootScope.isPhone = phone.isPhone();
-	var currentUser = usersResource.current({});
-	currentUser.$promise.then(function() {
-		if (currentUser.publicKey) {
-			if ((currentUser.publicKey.indexOf("@") !== -1) || (currentUser.publicKey.indexOf("vk-") !== -1)) {
+
+	function supportsHtml5Storage() {
+		try {
+			return 'localStorage' in window && window['localStorage'] !== null;
+		} catch (e) {
+			return false;
+		}
+	}
+	
+	location.getLocation(function(location) {
+		usersResource.setUserLocation({}, location);
+	});
+
+
+
+
+	if (supportsHtml5Storage()) {
+		var localStorage = window.localStorage;
+		var machineId = localStorage.getItem("MACHINE_ID");
+		if (!machineId) {
+			var generatedId = Math.floor(Math.random() * 100000000000);
+			localStorage.setItem("MACHINE_ID", generatedId);
+			machineId = localStorage.getItem("MACHINE_ID");
+		}
+		var machineIdRequest = {};
+		machineIdRequest.machineId = machineId;
+		usersResource.setMachineId({}, machineIdRequest);
+	}
+
+	var currentUserAltId = usersResource.currentAltId({});
+	currentUserAltId.$promise.then(function() {
+		if (currentUserAltId && currentUserAltId.userId) {
+			if ((currentUserAltId.userId.indexOf("@") !== -1)
+				|| (currentUserAltId.userId.indexOf("vk-") !== -1)
+				|| (currentUserAltId.userId.indexOf("fb-") !== -1)) {
 				$scope.keyType = "envelope";
 			} else {
 				$scope.keyType = "user";
@@ -21,11 +52,15 @@ userModule.controller("UserController", function($scope, $rootScope, usersResour
 	angular.element("#user-form").removeClass("invisible");
 
 	$rootScope.isGoogleAuth = function() {
-		return $rootScope.user && ($rootScope.user.publicKey.indexOf("@") !== -1);
+		return $rootScope.currentUserAltId && ($rootScope.currentUserAltId.indexOf("@") !== -1);
 	};
-	
+
 	$rootScope.isVKAuth = function() {
-		return $rootScope.user && ($rootScope.user.publicKey.indexOf("vk-") !== -1);
+		return $rootScope.currentUserAltId && ($rootScope.currentUserAltId.indexOf("vk-") !== -1);
+	};
+
+	$rootScope.isFBAuth = function() {
+		return $rootScope.currentUserAltId && ($rootScope.currentUserAltId.indexOf("fb-") !== -1);
 	};
 
 	$scope.goToOrderInit = function() {
@@ -34,7 +69,7 @@ userModule.controller("UserController", function($scope, $rootScope, usersResour
 
 	$scope.goToProfile = function() {
 		$rootScope.userType = undefined;
-		window.location.href = window.context + "#/users/" + currentUser.publicKey;
+		window.location.href = window.context + "#/users/" + $rootScope.currentUserAltId;
 	};
 
 	$scope.authWithGoogle = function() {

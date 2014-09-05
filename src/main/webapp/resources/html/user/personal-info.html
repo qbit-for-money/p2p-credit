@@ -78,7 +78,7 @@
 					</div>
 				</div>
 				<div class="col-xs-8 hidden-md hidden-lg " ng-click="editNameAttribute()" ng-if="!editName" style="cursor:pointer;">
-					<h5 style="margin-top: -2px;">{{userPropertiesMap['name']}}<div style="float: right"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="userPublicKeyFromPath" entity-field="'name'" /></div></h5>
+					<h5 style="margin-top: -2px;">{{userPropertiesMap['name']}}<div style="float: right" ng-if='authMap["userIdByAltId"]'><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="authMap['userIdByAltId']" entity-field="'name'" user-alt-id="currentUserAltId"/></div></h5>
 				</div>
 				<div class="col-xs-8 hidden-md hidden-lg" ng-if="editName">
 					<input type="text" id="xsUserName" class="form-control" ng-model="userPropertiesMap
@@ -90,7 +90,7 @@
 				<div class="container-fluid">
 					<div class="row">
 						<div class="hidden-sm hidden-xs col-md-12 " ng-click="editNameAttribute()" ng-if="!editName" style="cursor:pointer;">
-							<h4 style="margin-top: -2px;">{{userPropertiesMap['name']}}<div style="float: right"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="userPublicKeyFromPath" entity-field="'name'" /></div></h4>
+							<h4 style="margin-top: -2px;">{{userPropertiesMap['name']}}<div style="float: right" ng-if='authMap["userIdByAltId"]'><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="authMap['userIdByAltId']" entity-field="'name'" user-alt-id="currentUserAltId"/></div></h4>
 						</div>
 
 						<div class="hidden-sm hidden-xs col-md-12" ng-if="editName">
@@ -101,19 +101,24 @@
 					<div class="row">
 						<div class="hidden-xs hidden-sm col-md-12" ng-hide="!isCurrentUser" style="margin-top: -3px"><hr></div>
 					</div>
-					<div class="row" ng-hide="isCurrentUser">
-						<div class="col-xs-12 col-md-12" style="margin-top: -10px"><hr></div>
-					</div>
 
 					<div id="user-attributes" class="row col-xs-offset-0">
 						<div class="container-fluid">
+							<div class="row" ng-hide="!isCurrentUser">
+								<div class="col-xs-4 col-md-3">Зайти с:</div>
+								<div class="col-xs-8 col-md-8">
+									<a href="webapi/oauth2/authenticate" ng-hide="authMap['GOOGLE']"><img height="25" src="resources/img/g2-plus.png"/></a>
+									<a href="webapi/vk-oauth2/authenticate" ng-hide="authMap['VK']"><img height="25" src="resources/img/vk.png"/></a>
+									<a href="webapi/facebook-oauth2/authenticate" ng-hide="authMap['FB']"><img height="28" src="resources/img/facebook.png"/></a>
+								</div>
+							</div>
 							<div class="row">
 
 								<div class="col-xs-4 col-md-2 title" ng-click="editAttribute('mail')" ng-if="!editMap['mail']" style="cursor:pointer;">
 									Mail: 
 								</div>
 								<div class="col-xs-8 col-md-10" ng-click="editAttribute('mail')" ng-if="!editMap['mail']" style="cursor:pointer;">
-									{{userPropertiesMap['mail']}}<div class="profile-like"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="userPublicKeyFromPath" entity-field="'mail'" /></div>
+									{{userPropertiesMap['mail']}}<div class="profile-like" ng-if='authMap["userIdByAltId"]'><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="authMap['userIdByAltId']" entity-field="'mail'" user-alt-id="currentUserAltId"/></div>
 								</div>
 
 								<div class="hidden-xs col-md-2 title-edit title" ng-if="editMap['mail']">
@@ -135,7 +140,7 @@
 									Phone:
 								</div>
 								<div class="col-xs-8 col-md-10" ng-click="editAttribute('phone')" ng-if="!editMap['phone']" style="cursor:pointer;">
-									{{userPropertiesMap['phone']}}<div class="profile-like"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="userPublicKeyFromPath" entity-field="'phone'" /></div>
+									{{userPropertiesMap['phone']}}<div class="profile-like" ng-if='authMap["userIdByAltId"]'><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="authMap['userIdByAltId']" entity-field="'phone'" user-alt-id="currentUserAltId"/></div>
 								</div>
 
 								<div class="hidden-xs col-md-2 title-edit title" ng-if="editMap['phone']">
@@ -157,7 +162,7 @@
 									Languages:
 								</div>
 								<div class="col-xs-8 col-md-10" ng-click="editAttribute('languages')" ng-if="!editMap['languages']" style="cursor:pointer;">
-									{{userPropertiesMap['languagesStr']}}<div class="profile-like"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="userPublicKeyFromPath" entity-field="'languages'" /></div>
+									{{userPropertiesMap['languagesStr']}}<div class="profile-like" ng-if='authMap["userIdByAltId"]'><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="authMap['userIdByAltId']" entity-field="'languages'" user-alt-id="currentUserAltId"/></div>
 								</div>
 								<div class="hidden-xs col-md-2 title-edit title" ng-if="editMap['languages']">
 									Languages:
@@ -178,7 +183,7 @@
 									Currencies:
 								</div>
 								<div class="col-xs-8 col-md-10" ng-click="editAttribute('currencies')" ng-if="!editMap['currencies']" style="cursor:pointer;">
-									{{userPropertiesMap['currenciesStr']}}<div class="profile-like"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="userPublicKeyFromPath" entity-field="'currensies'" /></div>
+									{{userPropertiesMap['currenciesStr']}}<div class="profile-like" ng-if='authMap["userIdByAltId"]'><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="authMap['userIdByAltId']" entity-field="'currensies'" user-alt-id="currentUserAltId"/></div>
 								</div>
 
 								<div class="hidden-xs col-md-2 title-edit title" ng-if="editMap['currencies']">
@@ -195,22 +200,7 @@
 									</span>
 
 								</div>
-
 							</div>	
-
-
-							<!--div class="row" ng-if="edit">
-
-								<div class="col-xs-6 col-md-3 title-edit" ng-if="edit">
-									Personal Data:
-								</div>
-								<div class="col-xs-5 col-md-8" ng-if="edit">
-
-									<button class="btn btn-default" style="float: right; margin-right: -15px;" type="button" ng-click="changeVisible('personalDataEnabled')">
-										<span class="glyphicon glyphicon-eye-{{userPropertiesMap['personalDataEnabled']}}"></span>
-									</button>
-								</div>
-							</div-->
 						</div>
 					</div>
 				</div>
@@ -237,13 +227,13 @@
 				<div class="container-fluid">
 					<div class="row">
 						<div class="col-xs-12 col-md-12">
-							<div class="container-fluid" ng-click-out="disableEditAttribute('passport1')">
-								<div style="float: right; padding-bottom: 3px;"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="userPublicKeyFromPath" entity-field="'passport'" /></div>
+							<div class="container-fluid" ng-click-out="disableEditAttribute('passportEnabled')">
+								<div style="float: right; padding-bottom: 3px;" ng-if='authMap["userIdByAltId"]'><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="authMap['userIdByAltId']" entity-field="'passport'" user-alt-id="currentUserAltId"/></div>
 								<div class="row">
-									<div class="col-xs-1 col-md-1" ng-if="editMap['passport']" style="cursor:pointer;"><input type="checkbox" ng-model="userPropertiesMap
+									<div class="col-xs-1 col-md-1" ng-if="editMap['passportEnabled']" style="cursor:pointer;"><input type="checkbox" ng-model="userPropertiesMap
 										['passportEnabled']"></div>
-									<div class="col-xs-9 col-md-10" ng-click="editAttribute('passport')" ng-if="userPropertiesMap['passportEnabled']" style="cursor:pointer;">Ready to show passport</div>
-									<div class="col-xs-9 col-md-10" ng-click="editAttribute('passport')" ng-if="!userPropertiesMap['passportEnabled']" style="cursor:pointer;">Not ready to show passport</div>
+									<div class="col-xs-9 col-md-10" ng-click="editAttribute('passportEnabled')" ng-if="userPropertiesMap['passportEnabled']" style="cursor:pointer;">Ready to show passport</div>
+									<div class="col-xs-9 col-md-10" ng-click="editAttribute('passportEnabled')" ng-if="!userPropertiesMap['passportEnabled']" style="cursor:pointer;">Not ready to show passport</div>
 								</div>
 								<div class="row">
 									<div class="col-xs-12 col-md-12"><hr></div>
@@ -254,14 +244,14 @@
 					<div class="row">
 						<div class="col-xs-12 col-md-12">
 							<div class="container-fluid">
-								<div style="float: right" ng-hide="editAdditional"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="userPublicKeyFromPath" entity-field="'socialLinks'" /></div>
+								<div style="float: right" ng-hide="editAdditional" ng-if='authMap["userIdByAltId"]'><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="authMap['userIdByAltId']" entity-field="'socialLinks'" user-alt-id="currentUserAltId"/></div>
 								<links-list links="userPropertiesMap['socialLinks']" type="'social-link'" edit-attribute="editAttribute('links')" save-data="updateProfile()" current="userPropertiesMap['isCurrentUser']" edited="editMap['links']"></links-list>
 							</div>
 						</div>
 					</div>
 
 
-					<div style="float: right; margin-bottom: -5px;" ng-hide="editAdditional"><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="userPublicKeyFromPath" entity-field="'videos'" /></div>
+					<div style="float: right; margin-bottom: -5px;" ng-hide="editAdditional" ng-if='authMap["userIdByAltId"]'><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="authMap['userIdByAltId']" entity-field="'videos'" user-alt-id="currentUserAltId"/></div>
 					<links-list links="userPropertiesMap['videos']" type="'video'" edit-attribute="editAttribute('videos')" save-data="updateProfile()" current="userPropertiesMap['isCurrentUser']" edited="editMap['videos']"></links-list>
 
 					<div class="row">

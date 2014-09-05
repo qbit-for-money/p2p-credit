@@ -14,8 +14,12 @@ authModule.controller("AuthDialogController", function($scope, captchaAuthResour
 	$scope.captchaSrc = "";
 	$scope.url = "webapi/oauth2/authenticate";
 	$scope.vkurl = "webapi/vk-oauth2/authenticate";
+	$scope.fburl = "webapi/facebook-oauth2/authenticate";
+	
 	if((redirectUrl !== undefined) && (redirectUrl !== "")) {
 		$scope.url +=  "?redirect=" + redirectUrl;
+		//$scope.vkurl += "?redirect=" + redirectUrl;
+		$scope.fburl += "?redirect=" + redirectUrl;
 	}
 
 	function changePin() {

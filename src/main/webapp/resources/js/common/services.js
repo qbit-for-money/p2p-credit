@@ -51,3 +51,41 @@ commonModule.factory("phone", function() {
 		}
 	};
 });
+
+commonModule.factory("location", function() {
+	return {
+		getIp: function() {
+			var xmlhttp;
+			if (window.XMLHttpRequest)
+				xmlhttp = new XMLHttpRequest();
+			else
+				xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+			xmlhttp.open("GET", " http://api.hostip.info/get_html.php ", false);
+			xmlhttp.send();
+			var hostipInfo = xmlhttp.responseText.split("\n");
+			for (var i = 0; hostipInfo.length >= i; i++) {
+				var ipAddress = hostipInfo[i].split(":");
+				if (ipAddress[0] == "IP")
+					return ipAddress[1].replace(" ", "");
+			}
+			return false;
+		},
+		getLocation: function(callback) {
+			var userLocation = {};
+			jQuery.ajax({
+				url: '//freegeoip.net/json/',
+				type: 'POST',
+				dataType: 'jsonp',
+				success: function(location) {
+					userLocation.latitude = location.latitude;
+					userLocation.longitude = location.longitude;
+					userLocation.country = location.country_name;
+					userLocation.city = location.city;
+					if (callback) {
+						callback(userLocation);
+					}
+				}
+			});
+		}
+	};
+});

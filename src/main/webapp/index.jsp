@@ -39,7 +39,7 @@
 			window.context = "${context}";
 
 		</script>
-                        
+
 		<script type="text/javascript" src="resources/lib/pluso/pluso.js"></script>
 		<script type="text/javascript" src="resources/lib/tinymce/js/tinymce/tinymce.min.js"></script>
 		<script type="text/javascript" src="resources/lib/jquery/jquery-2.1.0.min.js"></script>
@@ -78,30 +78,30 @@
 		<script type="text/javascript" src="resources/js/order/controllers.js"></script>
 		<script type="text/javascript" src="resources/js/order/resources.js"></script>
 		<script type="text/javascript" src="resources/js/orders-table/controllers.js"></script>
-		
+
 		<script type="text/javascript" src="resources/js/create-order/controllers.js"></script>
 
 		<script type="text/javascript" src="resources/lib/imgareaselect/scripts/upload.js"></script>
-		
+
 		<script type="text/javascript" src="resources/js/user-profile/resources.js"></script>
 		<script type="text/javascript" src="resources/js/user-profile/controllers.js"></script>
 		<script type="text/javascript" src="resources/js/user-profile/directives.js"></script>
 		<script type="text/javascript" src="resources/js/user-profile/services.js"></script>
-		
+
 		<script type="text/javascript" src="resources/js/user-orders-table/controllers.js"></script>
 		<script type="text/javascript" src="resources/js/user-orders-table/directives.js"></script>
 
 		<script type="text/javascript" src="resources/js/navbar/controllers.js"></script>
 		<script type="text/javascript" src="resources/js/navbar/directives.js"></script>
 		<script type="text/javascript" src="resources/js/navbar/services.js"></script>
-		
+
 		<script type="text/javascript" src="resources/js/like/resources.js"></script>
 		<script type="text/javascript" src="resources/js/like/directives.js"></script>
-		
+
 		<script type="text/javascript" src="resources/js/short-search/controllers.js"></script>
 
 		<div ng-include src="'resources/html/templates/templates.html'"></div>
-		
+
 		<script type="text/javascript" src="resources/js/common/tables-common.js"></script>
 	</body>
 </html>

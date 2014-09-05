@@ -1,23 +1,22 @@
 var likeModule = angular.module("like");
 
-likeModule.directive("likeButtons", function($compile, likesResource, $timeout, $rootScope, $location) {
+likeModule.directive("likeButtons", function($compile, likesResource, usersResource, $timeout, $rootScope, $location) {
 	return {
 		restrict: "E",
 		scope: {
-			entityType: "=", entityId: "=", entityField: "="
+			entityType: "=", entityId: "=", entityField: "=", userAltId: "="
 		},
 		link: function(scope, element, attrs) {
 			scope.userPublicKeyFromPath = $location.$$path.replace("/users/", "");
 			scope.isCurrentUser = true;
+			$timeout(function() {
+				if (!scope.userAltId || (scope.userPublicKeyFromPath === scope.userAltId)) {
 
-			if ($rootScope.user && (scope.userPublicKeyFromPath === $rootScope.user.publicKey)) {
-				$timeout(function() {
 					scope.$apply(function() {
 						scope.isCurrentUser = true;
 					});
-				});
-			} else {
-				$timeout(function() {
+
+				} else {
 					scope.$apply(function() {
 						scope.isCurrentUser = false;
 						if (($rootScope.user.publicKey.indexOf("@") === -1) && ($rootScope.user.publicKey.indexOf("vk-") === -1)) {
@@ -26,8 +25,11 @@ likeModule.directive("likeButtons", function($compile, likesResource, $timeout, 
 							scope.isCaptchaUser = false;
 						}
 					});
-				});
-			}
+				}
+			});
+
+
+
 			scope.alreadyVotedUser = function() {
 
 				if (scope.alreadyVotedUserPublicKeys && $rootScope.user && (scope.alreadyVotedUserPublicKeys.indexOf($rootScope.user.publicKey) !== -1)) {

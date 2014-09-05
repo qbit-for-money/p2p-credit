@@ -27,7 +27,7 @@ public class UserPublicProfile implements Serializable {
 
 	@Id
 	private String userId;
-	
+
 	private String name;
 	private String mail;
 	private boolean mailEnabled;

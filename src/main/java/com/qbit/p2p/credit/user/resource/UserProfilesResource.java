@@ -1,6 +1,7 @@
 package com.qbit.p2p.credit.user.resource;
 
 import com.qbit.commons.auth.AuthFilter;
+import com.qbit.commons.user.UserDAO;
 import com.qbit.p2p.credit.user.dao.UserProfileDAO;
 import com.qbit.p2p.credit.statistics.service.StatisticsService;
 import com.qbit.p2p.credit.user.model.ShortProfile;
@@ -27,7 +28,9 @@ public class UserProfilesResource {
 
 	@Context
 	private HttpServletRequest request;
-
+	
+	@Inject
+	UserDAO userDAO;
 	@Inject
 	private UserProfileDAO userProfileDAO;
 
@@ -39,7 +42,7 @@ public class UserProfilesResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public UserPublicProfile current() {
 		String userId = AuthFilter.getUserId(request);
-		if (!userId.contains("@") && !userId.contains("vk-")) {
+		if (!userId.contains("@") && !userId.contains("vk-") && !userId.contains("fb-")) {
 			return null;
 		}
 		UserPublicProfile profile = userProfileDAO.find(userId);
@@ -98,7 +101,6 @@ public class UserProfilesResource {
 		if ((userProfile == null) || !userId.equals(userProfile.getUserId())) {
 			throw new IllegalArgumentException();
 		}
-		System.out.println("!! " + userProfile);
 		UserPublicProfile newProfile = userProfileDAO.updateUserMainAttributes(userProfile);		
 		statisticsService.recalculateOpenessRating(userId);
 		

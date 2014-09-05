@@ -11,11 +11,16 @@
 						<img src="resources/img/g2-plus.png" class="img-btn google" alt="Google+"/>
 					</a>
 					<a href="{{vkurl}}" ng-if="auth === 'google'">
-						<img src="resources/img/vk.png" class="img-btn google" alt="VK"/>
+						<img src="resources/img/vk.png" class="img-btn google" alt="VK" style="max-width: 77px;"/>
+					</a>
+					<a href="{{fburl}}" ng-if="auth === 'google'">
+						<img src="resources/img/facebook.png" class="img-btn google" alt="Facebook"/>
 					</a>
 					<img src="resources/img/g2-plus.png" class="img-btn google" alt="Google+"
 						 ng-if="auth === 'noReg'"/>
 					<img src="resources/img/vk.png" class="img-btn google" alt="VK"
+						 ng-if="auth === 'noReg'"/>
+					<img src="resources/img/facebook.png" class="img-btn google" alt="Facebook" style="max-width: 84px;"
 						 ng-if="auth === 'noReg'"/>
 				</label>
 			</div>
@@ -25,7 +30,10 @@
 						<img src="resources/img/g2-plus.png" class="img-btn google" alt="Google+"/>
 					</a>
 				<a href="{{vkurl}}" ng-if="auth === 'google'">
-						<img src="resources/img/vk.png" class="img-btn google" alt="VK"/>
+						<img src="resources/img/vk.png" class="img-btn google" alt="VK" style="max-width: 77px;"/>
+					</a>
+				<a href="{{fburl}}" ng-if="auth === 'google'">
+						<img src="resources/img/facebook.png" class="img-btn google" style="max-width: 84px;" alt="Facebook"/>
 					</a>
 			</div>
 		</div>

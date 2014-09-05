@@ -29,12 +29,11 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 	$scope.hasFocus = false;
 	$scope.isCurrentUser = false;
 	$scope.isCaptchaUser = false;
-	$scope.isOrdersFormOpening = false;
+	$scope.authMap = {};
 	var currenciesMap = {};
 	$scope.scEditor = {};
 	$scope.scEditor.dataInitialized = false;
 	$scope.scEditor.BKIInitialized = false;
-	$scope.scEditor.orderDataInitialized = false;
 	var visible = "open";
 	var notVisible = "close";
 	var defaultPersonalData = '<p style="text-align: center;"><img src="resources/img/elephant-logo.png"/></p>';
@@ -80,35 +79,62 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			}
 		}
 	};
+	var userByAltId = usersResource.byAltId({id: $scope.userPublicKeyFromPath});
+
+	userByAltId.$promise.then(function() {
+		$timeout(function() {
+			$scope.$apply(function() {
+				$scope.authMap["userIdByAltId"] = userByAltId.publicKey;
+			});
+		});
+	});
 	$scope.currentUser.$promise.then(function() {
 		if (!$scope.currentUser.publicKey) {
 			authService.openAuthDialog(true, false, "/users/" + $scope.userPublicKeyFromPath);
 		}
-		if ($scope.userPublicKeyFromPath === $scope.currentUser.publicKey) {
-			if (($scope.currentUser.publicKey.indexOf("@") === -1) && ($scope.currentUser.publicKey.indexOf("vk-") === -1)) {
-				window.location.href = window.context;
+		var currentUserAltId = usersResource.currentAltId({});
+		currentUserAltId.$promise.then(function() {
+			if ($scope.userPublicKeyFromPath === currentUserAltId.userId) {
+				if (($scope.currentUser.publicKey.indexOf("@") === -1) && ($scope.currentUser.publicKey.indexOf("vk-") === -1) && ($scope.currentUser.publicKey.indexOf("fb-") === -1)) {
+					window.location.href = window.context;
+				} else {
+					$scope.isCurrentUser = true;
+					$scope.userPropertiesMap['isCurrentUser'] = true;
+					userProfileResponse = usersProfileResource.current({});
+					$scope.currentUserAltId = currentUserAltId.userId;
+					$scope.authMap["userIdByAltId"] = currentUserAltId.userId;
+					hideAuthServices();
+					reloadAllCurrencies();
+					reloadData();
+				}
 			} else {
-				$scope.isCurrentUser = true;
-				$scope.userPropertiesMap['isCurrentUser'] = true;
-				userProfileResponse = usersProfileResource.current({});
+				angular.element("#personalEditable").addClass("invisible");
+				$scope.isCurrentUser = false;
+				if (($scope.currentUser.publicKey.indexOf("@") === -1) && ($scope.currentUser.publicKey.indexOf("vk-") === -1) && ($scope.currentUser.publicKey.indexOf("fb-") === -1)) {
+					$scope.isCaptchaUser = true;
+				}
+				$scope.userPropertiesMap['isCurrentUser'] = false;
+				$scope.authMap["userIdByAltId"] = userByAltId.publicKey;
+				console.log("ALT1: " + $scope.userPublicKeyFromPath + " " + $scope.authMap["userIdByAltId"])
+				userProfileResponse = usersProfileResource.getById({'id': $scope.authMap["userIdByAltId"]});
+				hideAuthServices();
+				reloadAllCurrencies();
+				reloadData();
 			}
-		} else {
-			angular.element("#personalEditable").addClass("invisible");
-			$scope.isCurrentUser = false;
-			if (($scope.currentUser.publicKey.indexOf("@") === -1) && ($scope.currentUser.publicKey.indexOf("vk-") === -1)) {
-				/*$timeout(function() {
-					$scope.$apply(function() {
-						$scope.isCaptchaUser = true;
-					});
-				});*/
-				$scope.isCaptchaUser = true;
-			}
-			$scope.userPropertiesMap['isCurrentUser'] = false;
-			userProfileResponse = usersProfileResource.getById({'id': $scope.userPublicKeyFromPath});
-		}
-		reloadAllCurrencies();
-		reloadData();
+
+		});
 	});
+	function hideAuthServices() {
+		if ($scope.currentUserAltId.indexOf("@") !== -1) {
+			$scope.authMap["GOOGLE"] = true;
+		}
+		if ($scope.currentUserAltId.indexOf("vk-") !== -1) {
+			$scope.authMap["VK"] = true;
+		}
+		if ($scope.currentUserAltId.indexOf("fb-") !== -1) {
+			$scope.authMap["FB"] = true;
+		}
+	}
 	function reloadData() {
 		userProfileResponse.$promise.then(function() {
 			$scope.userPropertiesMap['name'] = userProfileResponse.name;
@@ -119,9 +145,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			$scope.userPropertiesMap['languagesEnabled'] = (userProfileResponse.languagesEnabled === true) ? visible : notVisible;
 			$scope.userPropertiesMap['languages'] = [];
 			if (userProfileResponse.languages) {
-				/*if ($scope.userPropertiesMap['languages']) {
-				 $scope.userPropertiesMap['languages'].splice(0, $scope.userPropertiesMap['languages'].length);
-				 }*/
 				var languages = "";
 				for (var i = 0; i < userProfileResponse.languages.length; i++) {
 					$scope.userPropertiesMap['languages'].push(userProfileResponse.languages[i].code);
@@ -149,7 +172,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			$scope.userPropertiesMap['videos'] = (userProfileResponse.videos) ? userProfileResponse.videos : [];
 			$scope.userPropertiesMap['names'] = (userProfileResponse.namesLinks) ? userProfileResponse.namesLinks : [];
 			$scope.userPropertiesMap['socialLinks'] = (userProfileResponse.socialLinks) ? userProfileResponse.socialLinks : [];
-			var userStatisticsResponse = usersProfileResource.getStatisticsById({'id': $scope.userPublicKeyFromPath});
+			var userStatisticsResponse = usersProfileResource.getStatisticsById({'id': userProfileResponse.userId});
 			userStatisticsResponse.$promise.then(function() {
 				$scope.ratingOpenness = (userStatisticsResponse.opennessRating) ? userStatisticsResponse.opennessRating : 0;
 				$scope.ordersRating = (userStatisticsResponse.ordersRating) ? userStatisticsResponse.ordersRating : 0;
@@ -183,10 +206,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			if ($scope.edit) {
 				startEditing();
 			}
-			console.log("** " + JSON.stringify(userProfileResponse))
-			//reloadSCEditorInstance();
-			//reloadBKIscEditor();
-			//$scope.isValidOrder();
 			$timeout(function() {
 				$scope.$apply(function() {
 					$scope.disabledEditButton = false;
@@ -247,81 +266,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		}
 	}
 
-	function getDigits(x) {
-		return Math.log(x) / Math.LN10 + 1;
-	}
-
-	/*function initDataSCEditor() {
-	 console.log("%%% " + $scope.scEditor.dataInitialized)
-	 if (!$scope.scEditor.dataInitialized) {
-	 if ($scope.isCurrentUser) {
-	 CKEDITOR.disableAutoInline = true;
-	 CKEDITOR.inline("personalEditable");
-	 }
-	 $scope.scEditor.dataInitialized = true;
-	 $timeout(function() {
-	 reloadSCEditorInstance();
-	 });
-	 } else {
-	 reloadSCEditorInstance();
-	 }
-	 }*/
-
-	/*function reloadSCEditorInstance() {
-	 if ($scope.userPropertiesMap['personalData'] && (($scope.userPropertiesMap['personalData'].toString() === "DEFAULT")
-	 || ($scope.userPropertiesMap['personalData'].toString().indexOf("<p>DEFAULT</p>") === 0))) {
-	 if ($scope.isCurrentUser && $scope.edit) {
-	 CKEDITOR.instances.personalEditable.setData(defaultPersonalData);
-	 } else if (!$scope.edit) {
-	 $scope.userPropertiesMap['personalData'] = $sce.trustAsHtml(defaultPersonalData);
-	 }
-	 } else if ($scope.isCurrentUser && $scope.edit) {
-	 if ($scope.userPropertiesMap['personalData']) {
-	 CKEDITOR.instances.personalEditable.setData($scope.userPropertiesMap['personalData'].toString());
-	 }
-	 }
-	 }*/
-
-	/*function initBKIscEditor() {
-	 
-	 if ($scope.scEditor.BKIInitialized === false) {
-	 if ($scope.isCurrentUser) {
-	 CKEDITOR.disableAutoInline = true;
-	 CKEDITOR.inline("bkiEditable");
-	 }
-	 $scope.scEditor.BKIInitialized = true;
-	 } else {
-	 reloadBKIscEditor();
-	 }
-	 }*/
-
-	/*function reloadBKIscEditor() {
-	 if ($scope.userPropertiesMap['bkiData'] && (($scope.userPropertiesMap['bkiData'].toString() === "DEFAULT")
-	 || ($scope.userPropertiesMap['bkiData'].toString().indexOf("<p>DEFAULT</p>") === 0))) {
-	 if ($scope.isCurrentUser && $scope.editAdditional) {
-	 CKEDITOR.instances.bkiEditable.setData(defaultPersonalData);
-	 } else if (!$scope.editAdditional) {
-	 $scope.userPropertiesMap['bkiData'] = $sce.trustAsHtml(defaultPersonalData);
-	 }
-	 } else if ($scope.isCurrentUser && $scope.editAdditional && $scope.userPropertiesMap['bkiData']) {
-	 CKEDITOR.instances.bkiEditable.setData($scope.userPropertiesMap['bkiData'].toString());
-	 }
-	 }*/
-
-	/*$scope.savePersonalPage = function() {
-	 var data = CKEDITOR.instances.personalEditable.getData();
-	 if (!$scope.userPropertiesMap['personalData'] || data !== $scope.userPropertiesMap['personalData'].toString()) {
-	 $scope.userPropertiesMap['personalData'] = $sce.trustAsHtml(data);
-	 }
-	 $scope.endEditing();
-	 };*/
-	/*$scope.saveAdditionalData = function() {
-	 var data = CKEDITOR.instances.bkiEditable.getData();
-	 if (!$scope.userPropertiesMap['bkiData'] || data !== $scope.userPropertiesMap['bkiData'].toString()) {
-	 $scope.userPropertiesMap['bkiData'] = $sce.trustAsHtml(data);
-	 }
-	 $scope.updateProfile();
-	 };*/
 	$scope.showStatisticsPopover = function() {
 		if ($scope.popoverShow === true) {
 			$scope.popoverShow = false;
@@ -344,34 +288,22 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			$scope.editMap[attribute] = true;
 			$scope.editMap["old" + attribute] = $scope.userPropertiesMap[attribute]
 			$timeout(function() {
-				/*angular.element("#s2id_" + attribute).find(".select2-input").focus();
-				 if(!angular.element("#s2id_" + attribute).find(".select2-input").is(":focus")) {
-				 angular.element("#" + attribute).focus();
-				 }*/
 				angular.element("#" + attribute).focus();
-				//angular.element("#s2id_languages").find(".select2-input").focus();
 			});
 		}
-		console.log(attribute + " " + $scope.editMap[attribute])
 		$(document).unbind('click');
-	}
+	};
 
 	$scope.disableEditAttribute = function(attribute) {
-		/*if ($scope.disabledEditButton) {
-		 return;
-		 }
-		 disableEditButton();*/
 		$timeout(function() {
 			$scope.$apply(function() {
 				$scope.editMap[attribute] = false;
 			});
 			if ($scope.editMap["old" + attribute] !== $scope.userPropertiesMap[attribute]) {
-
 				$scope.endEditing();
 			}
 		});
-
-	}
+	};
 
 
 	$scope.editNameAttribute = function() {
@@ -381,8 +313,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		if ($scope.editName === true) {
 			$scope.editName = false;
 			if ($scope.oldName !== $scope.userPropertiesMap['name']) {
-				console.log("EDIT " + $scope.editName)
-				//disableEditButton();
 				$scope.endEditing();
 			}
 		} else {
@@ -404,7 +334,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		if ($scope.editMail === true) {
 			$scope.editMail = false;
 			if ($scope.oldMail !== $scope.userPropertiesMap['mail']) {
-				//disableEditButton();
 				$scope.endEditing();
 			}
 		} else {
@@ -426,17 +355,10 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			return;
 		}
 		if ($scope.edit) {
-			//$scope.cancel();
 			$scope.edit = false;
-			//$scope.endEditing();
 		} else {
 			$scope.edit = true;
-			//startEditing();
-			if (!$scope.additionAttrsHidden) {
-				//initDataSCEditor();
-			}
 		}
-		//disableEditButton();
 	};
 	$scope.editAdditionalProfile = function() {
 		if (!$scope.isCurrentUser) {
@@ -450,10 +372,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			$scope.updateProfile();
 		} else {
 			$scope.editAdditional = true;
-			/*initBKIscEditor();
-			 $timeout(function() {
-			 reloadBKIscEditor();
-			 });*/
 		}
 		disableEditButton();
 	};
@@ -464,11 +382,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 				$scope.disabledEditButton = true;
 			});
 		});
-		/*$timeout(function() {
-		 $scope.$apply(function() {
-		 $scope.disabledEditButton = false;
-		 });
-		 }, 500);*/
 	}
 
 	$scope.endEditing = function() {
@@ -549,30 +462,15 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		} else {
 			userMainAttributes.personalDataEnabled = false;
 		}
-
-		//userPublicProfile.personalData = ($scope.userPropertiesMap['personalData']) ? $scope.userPropertiesMap['personalData'].toString() : null;
-		//userPublicProfile.bkiData = ($scope.userPropertiesMap['bkiData']) ? $scope.userPropertiesMap['bkiData'].toString() : null;
-		//userPublicProfile.languages = [];
 		var languages = [];
 		if ($scope.userPropertiesMap['languages'] && ($scope.userPropertiesMap['languages'].length !== null)) {
 
 			for (var i in $scope.userPropertiesMap['languages']) {
-				//if($scope.languagesMap[$scope.userPropertiesMap['languages'][i]]) {
-				//userPublicProfile.languages[i] = $scope.languagesMap[$scope.userPropertiesMap['languages'][i]];
-				//} else {
-
 				languages[i] = {};
-				//userPublicProfile.languages[i].custom = false;
 				languages[i].code = $scope.userPropertiesMap['languages'][i];
-
-				//}
-
-
-				//userPublicProfile.languages[i].code = $scope.userPropertiesMap['languages'][i];
 			}
 		}
 		userMainAttributes.languages = languages;
-		//userPublicProfile.languages = $scope.userPropertiesMap['languages'];
 		userMainAttributes.languagesEnabled = ($scope.userPropertiesMap['languagesEnabled'] === visible) ? true : false;
 		userMainAttributes.currencies = [];
 		for (var i in $scope.userPropertiesMap['currencies']) {
@@ -581,43 +479,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			}
 		}
 		userMainAttributes.currenciesEnabled = ($scope.userPropertiesMap['currenciesEnabled'] === visible) ? true : false;
-		/*userPublicProfile.socialLinks = [];
-		 var socialLinks = $scope.userPropertiesMap['socialLinks'];
-		 for (var i in socialLinks) {
-		 var link = {};
-		 link.title = socialLinks[i].title;
-		 link.link = socialLinks[i].link;
-		 link.id = socialLinks[i].id;
-		 userPublicProfile.socialLinks.push(link);
-		 }
-		 userPublicProfile.phones = [];
-		 var phones = $scope.userPropertiesMap['phones'];
-		 for (var i in phones) {
-		 var link = {};
-		 link.title = phones[i].title;
-		 link.link = phones[i].link;
-		 link.id = phones[i].id;
-		 userPublicProfile.phones.push(link);
-		 }
-		 userPublicProfile.videos = [];
-		 var videos = $scope.userPropertiesMap['videos'];
-		 for (var i in videos) {
-		 var link = {};
-		 link.title = videos[i].title;
-		 link.link = videos[i].link;
-		 link.id = videos[i].id;
-		 userPublicProfile.videos.push(link);
-		 }
-		 userPublicProfile.namesLinks = [];
-		 var names = $scope.userPropertiesMap['names'];
-		 for (var i in names) {
-		 var link = {};
-		 link.title = names[i].title;
-		 link.link = names[i].link;
-		 link.id = names[i].id;
-		 userPublicProfile.namesLinks.push(link);
-		 }
-		 userPublicProfile.passportEnabled = $scope.userPropertiesMap['passportEnabled'];*/
 		userProfileResponse = usersProfileResource.updateUserMainAttributes({}, userMainAttributes);
 		userProfileResponse.$promise.then(function() {
 			var userSocialLinksRequest = {};
@@ -660,7 +521,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 				});
 			});
 		});
-		//var userPrivateProfile = {};
 	};
 
 	function isValidEmail(email) {
@@ -674,12 +534,6 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 					S: {pattern: /[A-Za-zА-Яа-я0-9\s]/}
 				}});
 	});
-	/*angular.element(document).on("focus", "#mail", function() {
-	 angular.element(this).mask("SSSSSSSSSSSSSS",
-	 {'translation': {
-	 S: {pattern: /[a-zA-Z0-9._%-]+@[a-zA-Z0-9-]+\\.[a-zA-Z]{2,4}/}
-	 }});
-	 });*/
 
 	$scope.changeUserPhoto = function() {
 		if (!$scope.isCurrentUser) {
@@ -785,15 +639,12 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			}, 100);
 		});
 	};
-
+	
 	$scope.changeAdditionAttrsVisible = function() {
 		if ($scope.additionAttrsHidden === false) {
 			$scope.additionAttrsHidden = true;
 		} else {
 			$scope.additionAttrsHidden = false;
-			if ($scope.edit) {
-				//	initDataSCEditor();
-			}
 		}
 	};
 });

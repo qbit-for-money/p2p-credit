@@ -2,15 +2,15 @@ var navbarModule = angular.module("navbar");
 
 navbarModule.factory("navbarService", function($rootScope, authService) {
 	function goToProfile() {
-		if (!isNoCaptchaAuth()) {
+		if (isCaptchaAuth()) {
 			authService.openAuthDialog(false, true, "profile");
 		} else {
-			window.location.href = window.context + "#/users/" + $rootScope.user.publicKey;
+			window.location.href = window.context + "#/users/" + $rootScope.currentUserAltId;
 		}
 	};
 	
 	function goToOrderCreating() {
-		if (!isNoCaptchaAuth()) {
+		if (isCaptchaAuth()) {
 			authService.openAuthDialog(false, true, window.context + "#/create-order");
 		} else {
 			window.location.href = window.context + "#/create-order";
@@ -18,7 +18,7 @@ navbarModule.factory("navbarService", function($rootScope, authService) {
 	};
 	
 	function goToOrders() {
-		if (!isNoCaptchaAuth()) {
+		if (isCaptchaAuth()) {
 			authService.openAuthDialog(false, true, window.context + "#/orders");
 		} else {
 			window.location.href = window.context + "#/orders";
@@ -31,9 +31,10 @@ navbarModule.factory("navbarService", function($rootScope, authService) {
 		goToOrders: goToOrders
 	};
 	
-	function isNoCaptchaAuth() {
-		return $rootScope.user && (($rootScope.user.publicKey.indexOf("@") !== -1) 
-			|| ($rootScope.user.publicKey.indexOf("vk-") !== -1))
+	function isCaptchaAuth() {
+		return !($rootScope.user && (($rootScope.user.publicKey.indexOf("@") !== -1) 
+			|| ($rootScope.user.publicKey.indexOf("vk-") !== -1)
+			|| ($rootScope.user.publicKey.indexOf("fb-") !== -1)))
 	}
 });
 
