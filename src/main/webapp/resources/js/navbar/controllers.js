@@ -2,6 +2,7 @@ var navbarModule = angular.module("navbar");
 
 navbarModule.controller("NavbarController", function($scope, $location, navbarService) {
 	$scope.isNavbarCollapsed = true;
+	$scope.unreadMessagesCount = 0;
 	if (typeof String.prototype.startsWith !== 'function') {
 		String.prototype.startsWith = function(str) {
 			return this.indexOf(str) === 0;
@@ -22,4 +23,8 @@ navbarModule.controller("NavbarController", function($scope, $location, navbarSe
 	$scope.goToOrders = function() {
 		navbarService.goToOrders();
 	};
+	
+	$scope.goToChat = function() {
+		navbarService.goToChat();
+	}
 });

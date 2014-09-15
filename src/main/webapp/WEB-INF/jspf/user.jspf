@@ -11,9 +11,9 @@
 		</div>
 		<div class="input-group">
 			<span class="btn-group" ng-if="user && !isGoogleAuth() && !isVKAuth() && !isFBAuth()">
-				<button class="btn btn-default" id="user-google" type="button" ng-click="authWithGoogle()"  title="Login with Google+">
+				<!--button class="btn btn-default" id="user-google" type="button" ng-click="authWithGoogle()"  title="Login with Google+">
 					<img src="resources/img/google-logo.png" alt="Google+" ng-if="!isGoogleAuth()"/>
-				</button>
+				</button-->
 
 				<button class="btn btn-default" type="button" ng-click="logout()" title="Logout">
 					<span class="glyphicon {{logoutButton}}"></span>

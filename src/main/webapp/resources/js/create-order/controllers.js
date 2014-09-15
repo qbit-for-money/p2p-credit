@@ -90,28 +90,7 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 			$scope.creditInit();
 		});
 	}
-initCategories();
-	function initOrderckEditor() {
-		if (!$scope.scEditor.orderDataInitialized) {
-			CKEDITOR.disableAutoInline = true;
-			CKEDITOR.inline('orderDataEditable', {
-				on: {
-					instanceReady: function(evt) {
-						$scope.scEditor.orderDataInitialized = true;
-						CKEDITOR.instances.orderDataEditable.setData("");
-						$scope.validateDescription();
-						initCategories();
-					},
-					change: function(evt) {
-						$scope.isValidOrder();
-						$scope.validateDescription();
-					}
-				}
-			});
-		}
-	}
-
-	//initOrderckEditor();
+	initCategories();
 
 	$scope.isValidOrder = function() {
 
@@ -119,14 +98,14 @@ initCategories();
 		var givingValue = angular.element("#giving-order-currency input").val();
 		var takingValue = angular.element("#taking-order-currency input").val();
 		var durationValue = angular.element("#order-duration input").val();
-		if(($scope.currency.selectedGivingCurrency === "%") && (givingValue !== "") && (givingValue >= 0)) {
+		if (($scope.currency.selectedGivingCurrency === "%") && (givingValue !== "") && (givingValue >= 0)) {
 			setSuccess("#giving-order-currency input");
 		} else if ((givingValue !== "") && (givingValue > 0)) {
 			setSuccess("#giving-order-currency input");
 		} else {
 			setError("#giving-order-currency input");
 		}
-		if(($scope.currency.selectedTakingCurrency === "%") && (takingValue !== "") && (takingValue >= 0)) {
+		if (($scope.currency.selectedTakingCurrency === "%") && (takingValue !== "") && (takingValue >= 0)) {
 			setSuccess("#giving-order-currency input");
 		} else if ((takingValue !== "") && (takingValue > 0)) {
 			setSuccess("#taking-order-currency input");
@@ -138,40 +117,40 @@ initCategories();
 		} else {
 			setError("#order-duration input");
 		}
-		if (takingValue && (takingValue !== "") && isNumber(takingValue) 
-				&& givingValue && (givingValue !== "") && isNumber(givingValue) 
-				&& durationValue && (durationValue !== "")
-				//&& data && (data !== "")
-				&& $scope.orderCreatingMap['orderCategories'] && ($scope.orderCreatingMap['orderCategories'].length !== 0)
-				&& $scope.deadline && ($scope.deadline !== "") && $scope.userLanguages && ($scope.userLanguages.length > 0)) {
-			if((($scope.currency.selectedGivingCurrency !== "%") && (givingValue <= 0)) 
-					|| (($scope.currency.selectedTakingCurrency !== "%") && (takingValue <= 0))) {
+		if (takingValue && (takingValue !== "") && isNumber(takingValue)
+			&& givingValue && (givingValue !== "") && isNumber(givingValue)
+			&& durationValue && (durationValue !== "")
+			//&& data && (data !== "")
+			&& $scope.orderCreatingMap['orderCategories'] && ($scope.orderCreatingMap['orderCategories'].length !== 0)
+			&& $scope.deadline && ($scope.deadline !== "") && $scope.userLanguages && ($scope.userLanguages.length > 0)) {
+			if ((($scope.currency.selectedGivingCurrency !== "%") && (givingValue <= 0))
+				|| (($scope.currency.selectedTakingCurrency !== "%") && (takingValue <= 0))) {
 				disableCreateOrderButton();
 			} else {
 				enableCreateOrderButton();
 			}
-			
+
 
 		} else {
 			disableCreateOrderButton();
 		}
 		return $scope.createOrderButtonEnabled;
 	};
-	
+
 	function enableCreateOrderButton() {
 		$timeout(function() {
-				$scope.$apply(function() {
-					$scope.createOrderButtonEnabled = true;
-				});
+			$scope.$apply(function() {
+				$scope.createOrderButtonEnabled = true;
 			});
+		});
 	}
-	
+
 	function disableCreateOrderButton() {
 		$timeout(function() {
-				$scope.$apply(function() {
-					$scope.createOrderButtonEnabled = false;
-				});
+			$scope.$apply(function() {
+				$scope.createOrderButtonEnabled = false;
 			});
+		});
 	}
 
 	function setError(id) {

@@ -48,27 +48,6 @@ public class OrdersResource {
 	public OrdersWrapper search(SearchRequest ordersRequest) {
 		final String userId = AuthFilter.getUserId(request);
 		
-/*//TEST
-		for (int i = 0; i < 10; i++) {
-			System.out.println("### INIT");
-			scheduler.putTask(new Runnable() {
-
-				@Override
-				public void run() {
-					System.out.println("### RUN");
-					statisticsService.recalculateUserOrdersStatistics(userId);
-					try {
-						Thread.sleep(3100);
-					} catch (InterruptedException ex) {
-					}
-				}
-			}, "run", userId);
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException ex) {
-			}
-		}
-//TEST*/
 		System.out.println("!! " + ordersRequest);
 		List<OrderInfo> orders = orderDAO.findWithFilter(userId, ordersRequest);
 		System.out.println("!! " + orders);

@@ -1,0 +1,67 @@
+
+<div class="modal-body" id="modal-chat-dialog">
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-xs-3 col-md-3">
+				<a href="{{partnerUrl}}">{{partnerName}}</a>
+			</div>
+		</div>
+		<div class="row">
+			<div class="panel panel-default" id="chat-history" style="">
+				<div class="panel-body">
+					<div class="container-fluid">
+						<div class="row" ng-repeat="messageValue in messageHistory" style="margin-bottom: 5px;">
+							<div class="col-xs-2 col-md-2">
+								<a href="" ng-click="goToPartnerPage()"><img height="33" src="{{partnerImgUrl}}" ng-hide="messageValue.userId === currentUserId"/></a>
+								<a href="" ng-click="goToCurrentUserPage()"><img height="33" src="{{userImgUrl}}" ng-hide="messageValue.userId !== currentUserId"/></a>
+							</div>
+							<div class="col-xs-7 col-md-7">
+								<div class="container-fluid">
+									<div class="row" ng-hide="messageValue.userId === currentUserId">
+										<a href="{{partnerUrl}}">{{partnerName}}</a>
+									</div>
+									<div class="row" ng-hide="messageValue.userId !== currentUserId">
+										<a href="{{currentUserUrl}}">{{currentUserName}}h</a>
+									</div>
+									<div class="row" style="overflow-wrap: break-word; padding-top: 5px;">
+										{{messageValue.message}}
+									</div>
+								</div>
+
+								<!--div class="col-xs-3 col-md-3">
+									<img height="53" src="{{partnerImgUrl}}"/>
+								</div>
+								<ul class="dropdown" style="right: 0; left: auto;">
+									<li ng-repeat="messageValue in messageHistory">
+										<div>{{messageValue.message}}</div>
+									</li>
+								</ul-->
+							</div>
+							<div class="col-xs-3 col-md-3" style="color: silver;">
+								{{messageValue.creationDate}}
+							</div>
+						</div>
+					</div>						
+				</div>				
+			</div>
+		</div>
+		<div class="row" style="margin-right: -15px;">
+			<div class="col-xs-12 col-md-12" style="padding-left: 0; padding-right: 0;">
+				<textarea id="chat-text-area" rows="3" cols="50" style="width: 100%; max-height: 100px; max-width: 100%;" ng-model="message"> 
+				</textarea>
+			</div>
+		</div>
+		<div class="row" style="padding-top: 15px;">
+			<div class="col-xs-6 col-md-6">
+				<button class="btn btn-danger navbar-left" type="button" ng-click="close()" style="width: 100%">
+					<span class="glyphicon glyphicon-remove"></span>
+				</button>
+			</div>
+			<div class="col-xs-6 col-md-6">
+				<button class="btn btn-success navbar-right" ng-disabled="message === ''" type="button" ng-click="send(message)" style="width: 100%">
+					<span class="glyphicon glyphicon-send"></span>
+				</button>
+			</div>
+		</div>
+	</div>
+</div>

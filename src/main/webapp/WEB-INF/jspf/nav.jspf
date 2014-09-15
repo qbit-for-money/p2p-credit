@@ -18,12 +18,22 @@
 
 			<ul class="nav navbar-nav" style="cursor: pointer">
 				<!--li ng-class="{ active: isActive('/')}" title="Create order"><a href="#"><span class="glyphicon glyphicon-th"></span></a></li-->
-				<li title="Make a request" ng-class="{ active: isActive('/create-order')}"><a ng-click="goToOrderCreating()"><span class="glyphicon glyphicon-shopping-cart"></span></a></li>
-				<li title="Search orders" ng-class="{ active: isActive('/orders')}"><a ng-click="goToOrders()"><span class="glyphicon glyphicon-search"></span></a></li>
-				<li title="Profile" ng-class="{ active: isActive('/users')}"><a ng-click="goToProfile()"><span class="glyphicon glyphicon-user"></span></a></li>
+				<li title="Создать заявку" ng-class="{ active: isActive('/create-order')}"><a ng-click="goToOrderCreating()"><span class="glyphicon glyphicon-shopping-cart"></span></a></li>
+				<li title="Поиск заявок" ng-class="{ active: isActive('/orders')}"><a ng-click="goToOrders()"><span class="glyphicon glyphicon-search"></span></a></li>
+				<li title="Профиль" ng-class="{ active: isActive('/users')}"><a ng-click="goToProfile()"><span class="glyphicon glyphicon-user"></span></a></li>
 			</ul>
 
 			<%@ include file="user.jspf" %>
+			<form name="userChatForm" id="user-chat-form" class="navbar-form navbar-right " ng-if="isGoogleAuth() || isVKAuth() || isFBAuth()">
+				<div class="form-group">
+					<span class="badge" ng-hide="unreadMessagesCount === 0">{{unreadMessagesCount}}</span>
+					<button class="btn btn-default" type="button" ng-click="goToChat()" title="Сообщения">
+						<span class="glyphicon glyphicon-envelope"></span>
+					</button>
+				</div>
+			</form>
+
+
 		</div><!-- /.navbar-collapse -->
 	</div><!-- /.container-fluid -->
 </nav>

@@ -1,28 +1,61 @@
-<div class="panel-body" ng-controller="OrdersController">
-	<div class="sliding-panel" style="z-index: 600; background-color: #eeeeee;width: 350px;">
-		<a class="handle" href="http://jemand.ru">Content</a>
+<div class="panel-body" style="margin-top: -10px;">
+	<div class="container-fluid" style="z-index: 1">
 		<div class="row">
-							<div class="col-xs-1 col-md-1" style="cursor:pointer;margin-left: 30px;"><input type="checkbox" ng-model="isUserTable"></div>
-							<div class="col-xs-9 col-md-10" ng-click="editIsUserTable()" ng-if="isUserTable" style="cursor:pointer;">My orders</div>
-							<div class="col-xs-9 col-md-10" ng-click="editIsUserTable()" ng-if="!isUserTable" style="cursor:pointer;">All orders</div>
+			<div class="hidden-xs col-sm-1 col-md-1"></div>
+			<div class="col-xs-12 col-sm-10 col-md-10">
+				<div class="panel panel-default" style="border-bottom-left-radius: 0; border-bottom-right-radius: 0; background-color: whitesmoke;">
+					<div class="panel-body">
+						<div class="container-fluid">
+							<div class="row">
+								<div class="hidden-xs col-sm-4 col-md-4" style="">
+									<dropdown dropdown-title="'Фильтровать:'" items="filterBy" do-select="selectOrdersFilter"></dropdown>
+								</div>
+								<div class="col-xs-12 hidden-sm hidden-md hidden-lg" style="padding-bottom: 10px;z-index: 4;">
+									<dropdown dropdown-title="'Фильтровать:'" d-style="'width: 100%;'" items="filterBy" do-select="selectOrdersFilter"></dropdown>
+								</div>
+								<div class="col-sm-5 col-md-5" style="padding-top: 5px; z-index: 3;" ng-if="filterItem === 'categories'">
+									<input type="hidden" class="form-control" ui-select2="categorySelect2Options" ng-model="ordersSearchMap
+										['orderCategories']" id="category" data-placeholder="Category" style="width: 100%; margin-top: -5px;" ng-change="isValidOrder()"/>
+								</div>
+								
+								<div class="col-sm-5 col-md-5" style="padding-top: 5px;" ng-if="(filterItem === 'incomingCurrency') || (filterItem === 'outcomingCurrency')">
+									<dropdown d-class="'max-width'" d-style="'margin-top: -5px;'" items="allCurrenciesDropdown" do-select="selectCurrency"></dropdown>
+								</div>
+								<div class="col-sm-5 col-md-5" style="padding-top: 5px;" ng-if="(filterItem === 'incomingAmount') || (filterItem === 'outcomingAmount')">
+									<input	type="number" id="amount" class="form-control" style="margin-top: -5px;"/>
+								</div>
+								<div class="col-sm-2 col-md-2" style="z-index: 0;">
+									<button class="btn btn-primary max-width" type="button" ng-click="filterOrdersTable()"><span class="glyphicon glyphicon-search"></span></button>
+								</div>
+							</div>
+							<div class="row" style="padding-top: 5px;">
+								<div class="hidden-xs col-sm-12 col-md-5">								
+									<dropdown dropdown-title="'Заявки:'" d-style="'width: 60%;'" items="ordersOwn" do-select="selectOrdersOwn"></dropdown>
+								</div>
+								<div class="col-xs-12 hidden-sm hidden-md hidden-lg">								
+									<dropdown dropdown-title="'Заявки:'" d-style="'width: 100%;'" items="ordersOwn" do-select="selectOrdersOwn"></dropdown>
+								</div>
+								<div class="hidden-xs col-sm-12 col-md-5">
+									<dropdown dropdown-title="'Сортировать:'" d-style="'width: 60%;'" items="sortedBy" do-select="sortTable"></dropdown>
+								</div>
+								<div class="col-xs-12 hidden-sm hidden-md hidden-lg">
+									<dropdown dropdown-title="'Сортировать:'" d-style="'width: 100%;'" items="sortedBy" do-select="sortTable"></dropdown>
+								</div>
+
+								
+							</div>
 						</div>
-		<h5><span lang="ru">Filter:</span></h5><br>
-		<span lang="ru">
-			<div class="row">
-				<div class="">
-					<div class="container-fluid">
-						
 					</div>
 				</div>
 			</div>
-		</span>
-		<h5><span lang="ru">Sorting:</span></h5><br>
-	</div>
-	<div class="container-fluid" style="z-index: 1">
-
+			<div class="hidden-xs col-sm-1 col-md-1"></div>
+		</div>
 		<div class="row" ng-hide="!isUserTable">
 			<div class="hidden-xs col-sm-1 col-md-1"></div>
 			<div class="col-xs-12 col-sm-10 col-md-10">
+				<div style="background-color: rgb(250, 250, 250); min-height: 100px; margin-top: -19px; border: 1px solid #ddd; border-top-width: 0;" ng-hide="!emptyList">
+					<div style="width: 100%;text-align: center; padding-top: 40px;" >Список пуст</div>
+				</div>
 				<div id="user-orders-table">
 				</div>
 			</div>
@@ -31,6 +64,9 @@
 		<div class="row" ng-hide="isUserTable">
 			<div class="hidden-xs col-sm-1 col-md-1"></div>
 			<div class="col-xs-12 col-sm-10 col-md-10">
+				<div style="background-color: rgb(250, 250, 250); min-height: 100px; margin-top: -19px; border: 1px solid #ddd; border-top-width: 0;" ng-hide="!emptyList">
+					<div style="width: 100%;text-align: center; padding-top: 40px;">Список пуст</div>
+				</div>
 				<div id="orders-table">
 				</div>
 			</div>

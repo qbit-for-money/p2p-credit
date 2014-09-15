@@ -25,10 +25,19 @@ navbarModule.factory("navbarService", function($rootScope, authService) {
 		}
 	};
 	
+	function goToChat() {
+		if (isCaptchaAuth()) {
+			authService.openAuthDialog(false, true, window.context + "#/orders");
+		} else {
+			window.location.href = window.context + "#/messages";
+		}
+	}
+	
 	return {
 		goToProfile: goToProfile,
 		goToOrderCreating: goToOrderCreating,
-		goToOrders: goToOrders
+		goToOrders: goToOrders,
+		goToChat: goToChat
 	};
 	
 	function isCaptchaAuth() {

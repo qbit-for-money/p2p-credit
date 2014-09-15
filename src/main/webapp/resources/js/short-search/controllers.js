@@ -63,7 +63,8 @@ navbarModule.controller("ShortSearchController", function($scope, $rootScope, us
 		$rootScope.searchRequest.selectedTakingCurrency = $scope.selectedTakingCurrency;
 		$rootScope.searchRequest.takingValue = $scope.takingValue;
 		
-		if (!$rootScope.user || ($rootScope.user.publicKey.indexOf("@") === -1)) {
+		if (!$rootScope.user || (($rootScope.user.publicKey.indexOf("@") === -1) 
+			&& ($rootScope.user.publicKey.indexOf("vk-") === -1) && ($rootScope.user.publicKey.indexOf("fb-") === -1))) {
 		 authService.openAuthDialog(false, true, window.context + "#/orders");
 		 } else {
 		 window.location.href = window.context + "#/orders";

@@ -1,0 +1,124 @@
+<div class="row">
+	<div class="hidden-xs col-sm-1 col-md-1"></div>
+	<div class="col-xs-12 col-sm-10 col-md-10" style="margin-bottom: -20px;">
+		<div class="panel panel-default" style="border-bottom-left-radius: 0; border-bottom-right-radius: 0; background-color: whitesmoke;">
+			<div class="panel-body" style="padding: 10px;">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-sm-12 col-md-12">								
+							<span class="glyphicon glyphicon-envelope" ng-hide="partnerId &&  (partnerId !== '')"></span> <a href="{{partnerUrl}}" ng-hide="!partnerId || (partnerId === '')"><img height="20" src="{{partnerImgUrl}}"/> {{partnerName}}</a> 
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="hidden-xs col-sm-1 col-md-1"></div>
+</div>
+<div class="row">
+	<div class="hidden-xs col-sm-1 col-md-1"></div>
+	<div class="col-xs-12 col-sm-10 col-md-10" ng-hide="isDialog">
+		<div style="height: 45px; margin-top: -20px; border: 1px solid #ddd; border-top-width: 0;" ng-hide="lastMessages && lastMessages.length !== 0">
+			<div style="width: 100%;text-align: center; padding-top: 20px;">Список пуст</div>
+		</div>
+		<div class="container-fluid">
+			<div class="row last-message" ng-repeat="userValue in lastMessages" ng-click="openDialog(userValue.linkId)">
+				<div class="col-xs-1 col-md-1">
+					<a href="{{userValue.url}}"><img height="33" src="{{userValue.imgUrl}}"/></a>
+				</div>
+				<div class="col-xs-3 col-md-3">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-xs-12 col-md-12">
+								<a href="{{userValue.url}}">{{userValue.name}}</a>
+							</div>
+						</div>
+						<div class="row" style="">
+							<div class="col-xs-12 col-md-12" style="color: silver;">
+								{{userValue.creationDate}}
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-7 col-md-7">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-xs-2 col-md-2">
+								<img height="33" src="{{userValue.userImgUrl}}"/>
+							</div>
+							<div class="col-xs-10 col-md-10">
+								{{userValue.message}}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>		
+
+	</div>
+	<div class="col-xs-12 col-sm-10 col-md-10" ng-hide="!isDialog">
+		<div id="messages-go-back" ng-click="goToLastMessages()">
+			<div style="width: 100%;"><span style="padding-left: 5px;">Назад</span></div>
+		</div>
+		<!--div style="height: 25px; border: 1px solid #ddd; border-top-width: 0;" ng-hide="messageHistory && messageHistory.length !== 0">
+			
+		</div-->
+		<div class="row" style="margin-right: 0; margin-left: 0; ">
+			<div class="panel panel-default" id="chat-history" style="border-top-left-radius: 0; border-top-right-radius: 0; border-top-width: 0;">
+				<div class="panel-body">
+					<div class="container-fluid">
+						<div style="width: 100%;text-align: center;color: silver;" ng-hide="messageHistory && messageHistory.length !== 0">Список пуст</div>
+						<div class="row" ng-repeat="messageValue in messageHistory" style="margin-bottom: 5px;">
+							<div class="col-xs-2 col-md-2">
+								<div class="navbar-right">
+									<a href="" ng-click="goToPartnerPage()"><img height="33" src="{{partnerImgUrl}}" ng-hide="messageValue.userId === currentUserId"/></a>
+								<a href="" ng-click="goToCurrentUserPage()"><img height="33" src="{{userImgUrl}}" ng-hide="messageValue.userId !== currentUserId"/></a>
+								</div>	
+							</div>
+							<div class="col-xs-7 col-md-7">
+								<div class="container-fluid">
+									<div class="row" ng-hide="messageValue.userId === currentUserId">
+										<a href="{{partnerUrl}}">{{partnerName}}</a>
+									</div>
+									<div class="row" ng-hide="messageValue.userId !== currentUserId">
+										<a href="{{currentUserUrl}}">{{currentUserName}}h</a>
+									</div>
+									<div class="row" style="overflow-wrap: break-word; padding-top: 5px;">
+										{{messageValue.message}}
+									</div>
+								</div>
+
+								<!--div class="col-xs-3 col-md-3">
+									<img height="53" src="{{partnerImgUrl}}"/>
+								</div>
+								<ul class="dropdown" style="right: 0; left: auto;">
+									<li ng-repeat="messageValue in messageHistory">
+										<div>{{messageValue.message}}</div>
+									</li>
+								</ul-->
+							</div>
+							<div class="col-xs-3 col-md-3" style="color: silver;">
+								{{messageValue.creationDate}}
+							</div>
+						</div>
+					</div>						
+				</div>				
+			</div>
+		</div>
+		<div class="row" style="padding: 5px; border: 1px solid #ddd; border-top-width: 0;margin-right: 0; margin-left: 0;background-color: #F7F7F7;">
+			<div class="hidden-xs col-sm-2 col-md-2">
+				<img height="63" src="{{userImgUrl}}"/>
+			</div>
+			<div class="col-xs-12 col-sm-8 col-md-8" style="padding-left: 0; padding-right: 0;">
+				<textarea id="chat-text-area" rows="3" cols="50" style="width: 100%; max-height: 100px; max-width: 100%;" ng-model="message"> 
+				</textarea>
+			</div>
+			<div class="col-xs-12 col-sm-2 col-md-2" id="send-message-button">
+				<button class="btn btn-success navbar-right" ng-disabled="message === ''" type="button" ng-click="send(message)" style="width: 100%; float: right;">
+					<span class="glyphicon glyphicon-send"></span>
+				</button>
+			</div>
+		</div>
+	</div>
+	<div class="hidden-xs col-sm-1 col-md-1"></div>
+</div>

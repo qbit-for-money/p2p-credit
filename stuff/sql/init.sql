@@ -1,8 +1,6 @@
 /* Category  */
-insert into category VALUES ('Кредит под процент', 'f', 0);
-insert into category VALUES ('Кредит под залог', 'f', 0);
-insert into category VALUES ('Кредит на образование', 'f', 0);
-insert into category VALUES ('Кредит', 'f', 0);
+insert into category VALUES ('Выручить под процент', 'f', 0);
+insert into category VALUES ('Выручить под залог', 'f', 0);
 insert into category VALUES ('Обмен', 'f', 2);
 insert into category VALUES ('Безвозвратно', 'f', 0);
 insert into category VALUES ('Без %', 'f', 0);

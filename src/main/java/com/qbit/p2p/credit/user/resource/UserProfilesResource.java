@@ -69,6 +69,12 @@ public class UserProfilesResource {
 		if (!profile.isPersonalDataEnabled()) {
 			profile.setPersonalData(null);
 		}
+		if(!profile.isLanguagesEnabled()) {
+			profile.setLanguages(null);
+		}
+		if(profile.isCurrenciesEnabled()) {
+			profile.setCurrencies(null);
+		}
 		return profile;
 	}
 

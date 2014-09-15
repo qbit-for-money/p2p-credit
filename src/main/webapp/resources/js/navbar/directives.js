@@ -141,3 +141,43 @@ navbarModule.directive('uiDropdown', function($compile, $timeout) {
 		}
 	};
 });
+
+navbarModule.directive('dropdown', function($compile, $timeout) {
+	return {
+		restrict: 'E',
+		scope: {
+			items: "=items",
+			title: "=dropdownTitle",
+			dClass: "=dClass",
+			dStyle: "=dStyle",
+			doSelect: '&doSelect'
+		},
+		link: function(scope, element, attrs) {
+			scope.selectedItem = 0;
+			var html = '<div class="dropdown">{{title}} <button class="btn btn-default dropdown-toggle {{dClass}}" style="{{dStyle}}" role="button" data-toggle="dropdown"  href="javascript:;">Dropdown<b class="caret"></b></button>';
+			html += '<ul class="dropdown-menu"><li ng-repeat="item in items"><a tabindex="-1" data-ng-click="selectVal(item)" style="cursor:pointer">{{item.name}}</a></li></ul></div>';
+			element.append($compile(html)(scope));
+			for (var i = 0; i < scope.items.length; i++) {
+				if (scope.items[i].id === scope.selectedItem) {
+					scope.bSelectedItem = scope.items[i];
+					break;
+				}
+			}
+			
+			scope.selectVal = function(item) {
+				$('button.dropdown-toggle', element).html('<b class="caret"></b> ' + item.name);
+				$timeout(function() {
+					scope.$apply(function() {
+						var expressionHandler = scope.doSelect();
+						scope.selectedItem = item.id;
+						expressionHandler({
+							item: item
+						});
+					});
+				});
+
+			};
+			scope.selectVal(scope.bSelectedItem);
+		}
+	};
+});

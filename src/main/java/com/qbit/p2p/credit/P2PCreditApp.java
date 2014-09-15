@@ -10,6 +10,7 @@ import com.qbit.p2p.credit.like.dao.LikeDAO;
 import com.qbit.commons.log.dao.LogDAO;
 import com.qbit.commons.log.service.LogScheduler;
 import com.qbit.p2p.credit.material.dao.MaterialDAO;
+import com.qbit.p2p.credit.message.dao.MessageDAO;
 import com.qbit.p2p.credit.order.dao.CategoryDAO;
 import com.qbit.p2p.credit.order.dao.OrderDAO;
 import com.qbit.p2p.credit.order.dao.OrderFlowDAO;
@@ -72,6 +73,7 @@ public class P2PCreditApp extends Application {
 		addBinding(newBinder(StatisticsService.class).to(StatisticsService.class).in(Singleton.class), configuration);
 		addBinding(newBinder(LikeDAO.class).to(LikeDAO.class).in(Singleton.class), configuration);
 		addBinding(newBinder(LogDAO.class).to(LogDAO.class).in(Singleton.class), configuration);
+		addBinding(newBinder(MessageDAO.class).to(MessageDAO.class).in(Singleton.class), configuration);
 		
 		addBinding(newBinder(OrderStatisticsScheduler.class).to(OrderStatisticsScheduler.class).in(Singleton.class), configuration);
 		addBinding(newBinder(LogScheduler.class).to(LogScheduler.class).in(Singleton.class), configuration);

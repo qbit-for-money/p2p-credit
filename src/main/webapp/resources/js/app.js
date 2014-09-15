@@ -6,6 +6,8 @@ angular.module("captcha-auth", ["ngResource"]);
 
 angular.module("order", ["ngResource"]);
 
+angular.module("chat", ["ngResource"]);
+
 angular.module("user-profile", ["ngResource", "ngSanitize"]);
 
 angular.module("user-edit", ["ngResource"]);
@@ -15,7 +17,7 @@ angular.module("navbar", ["ngResource", "common"]);
 angular.module("like", ["ngResource"]);
 
 angular.module("main", ["ngRoute", "ui.bootstrap", "chieffancypants.loadingBar", "common", "user",
-	"captcha-auth", "order", "user-profile", "user-edit", "navbar", "like", "ui.select2"]);
+	"captcha-auth", "order", "user-profile", "user-edit", "navbar", "like", "chat", "ui.select2"]);
 
 angular.module("main").config(function($httpProvider) {
 	$httpProvider.interceptors.push([
@@ -39,7 +41,7 @@ angular.module("main").config(function($httpProvider) {
 				return $q.reject(response);
 			}
 		};
-	}).config(function($routeProvider, $locationProvider, $sceDelegateProvider, $httpProvider) {
+	}).config(function($routeProvider, $locationProvider) {
 	$routeProvider.when("/", {
 		templateUrl: "resources/html/order/order-init.html",
 		controller: "OrderInitController"
@@ -52,6 +54,9 @@ angular.module("main").config(function($httpProvider) {
 	}).when("/orders", {
 		templateUrl: "resources/html/order/orders-table.html",
 		controller: "OrdersController"
+	}).when("/messages", {
+		templateUrl: "resources/html/chat/chat.html",
+		controller: "ChatController"
 	}).otherwise({redirectTo: "/"});
 }).run(function($rootScope, $location) {
 	$rootScope.location = $location;
@@ -71,5 +76,6 @@ function isSessionURL(url) {
 }
 
 function goToFirstPage(state) {
-	window.location.href = window.context;
+	console.log(state)
+	//window.location.href = window.context;
 }

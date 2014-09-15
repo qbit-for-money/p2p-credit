@@ -17,6 +17,7 @@
 		<link rel="stylesheet" type="text/css" href="resources/css/auth-dialog.css">
 		<link rel="stylesheet" type="text/css" href="resources/css/order.css">
 		<link rel="stylesheet" type="text/css" href="resources/css/user.css">
+		<link rel="stylesheet" type="text/css" href="resources/css/chat.css">
 	</head>
 	<body class="default">
 		<!--div class="container" ng-if="user === null" ng-controller="AuthDialogOpeningController">
@@ -60,6 +61,7 @@
 		<script type="text/javascript" src="resources/lib/bootstrap/datepicker/js/bootstrap-datepicker.js"></script> 
 		<script type="text/javascript" src="resources/lib/bootstrap/tab/bootstrap-tab.js"></script> 
 		<script type="text/javascript" src="resources/lib/imgareaselect/scripts/jquery.imgareaselect.pack.js"></script> 
+		<script type="text/javascript" src="resources/lib/jquery/jquery-dateFormat.min.js"></script> 
 
 		<script type="text/javascript" src="resources/js/app.js"></script>
 
@@ -103,5 +105,9 @@
 		<div ng-include src="'resources/html/templates/templates.html'"></div>
 
 		<script type="text/javascript" src="resources/js/common/tables-common.js"></script>
+		
+		<script type="text/javascript" src="resources/js/chat/controllers.js"></script>
+		<script type="text/javascript" src="resources/js/chat/services.js"></script>
+		<script type="text/javascript" src="resources/js/chat/resources.js"></script>
 	</body>
 </html>

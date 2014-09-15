@@ -13,7 +13,7 @@ userModule.controller("UserController", function($scope, $rootScope, usersResour
 			return false;
 		}
 	}
-	
+
 	location.getLocation(function(location) {
 		usersResource.setUserLocation({}, location);
 	});
@@ -50,6 +50,7 @@ userModule.controller("UserController", function($scope, $rootScope, usersResour
 		}
 	});
 	angular.element("#user-form").removeClass("invisible");
+	angular.element("#user-chat-form").removeClass("invisible");
 
 	$rootScope.isGoogleAuth = function() {
 		return $rootScope.currentUserAltId && ($rootScope.currentUserAltId.indexOf("@") !== -1);
