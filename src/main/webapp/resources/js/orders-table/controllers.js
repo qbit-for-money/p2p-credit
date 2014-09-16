@@ -16,6 +16,7 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 	var currenciesMap = {};
 	$scope.allCurrencies = [];
 	$scope.selectedCurrency;
+	$scope.isBlocked = false;
 	$scope.sortedBy = [{
 			id: 0,
 			name: "Продолжительность",
@@ -70,16 +71,29 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 			name: "Дать в сумме",
 			fieldTitle: "outcomingAmount"
 		}];
+	
+	function blockRequest() {
+		$scope.isBlocked = true;
+	}
+	
+	function unblockRequest() {
+		$scope.isBlocked = false;
+	}
 
 	$scope.selectOrdersOwn = function(ordersOwn) {
-		console.log(ordersOwn.item.id);
+		if(!loadOnScroll) {
+			return;
+		}
+		loadOnScroll = false;
+		//$scope.isBlocked = true;
+		console.log(ordersOwn.item.id + " **");
 		if (ordersOwn.item.id === 1) {
 			$scope.isUserTable = true;
-			loadOnScroll = true;
+			//loadOnScroll = true;
 			userOrdersTableFilterInit();
 		} else {
 			$scope.isUserTable = false;
-			loadOnScroll = true;
+			//loadOnScroll = true;
 			ordersTableFilterInit();
 		}
 	}
@@ -103,6 +117,10 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 	};
 
 	$scope.filterOrdersTable = function() {
+		if(!loadOnScroll) {
+			return;
+		}
+		loadOnScroll = false;
 		pageNumber = 0;
 		userPageNumber = 0;
 		if ($scope.filterItem === "categories" && $scope.ordersSearchMap.orderCategories && $scope.ordersSearchMap.orderCategories.length !== 0) {
@@ -143,6 +161,10 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 	};
 
 	$scope.sortTable = function(selectedItem) {
+		if(!loadOnScroll) {
+			return;
+		}
+		loadOnScroll = false;
 		pageNumber = 0;
 		userPageNumber = 0;
 		searchRequest.sortDataField = selectedItem.item.fieldTitle;
@@ -317,7 +339,9 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 		} else {
 			$scope.emptyList = false;
 		}
+		
 		for (var i in orders) {
+			console.log(JSON.stringify(orders[i]))
 			var orderId = orders[i].id;
 			var orderAttrsContext = {
 				orderId: orderId,
@@ -340,7 +364,8 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 				status: (orders[i].partnerId) ? true : false,
 				orderStatus: orders[i].status,
 				responsesList: getResponsesContent(orders[i]),
-				orderAttributes: orderAttrsContent
+				orderAttributes: orderAttrsContent,
+				partnerId: orders[i].partnerId
 			};
 			exp = $interpolate(liTemplate);
 			var content = exp(tabsContext);
@@ -385,7 +410,6 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 				orderStatus: order.status,
 				status: (order.partnerId) ? true : false,
 				isApprovedResponse: (order.partnerId === order.responses[i].id) ? true : false
-					//openCommentDialog: openCommentDialog
 			};
 			var responseContent = responsesExp(responsesContext);
 			responsesContent += responseContent;
@@ -398,7 +422,6 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 
 	function initOrdersTable(reload) {
 		searchRequest.pageNumber = pageNumber;
-		pageNumber += 1;
 		var orderResponse = ordersResource.search({}, searchRequest);
 		orderResponse.$promise.then(function() {
 			ordersCount = orderResponse.length;
@@ -551,10 +574,8 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 		loadOnScroll = false;
 
 		$timeout(function() {
-
+			pageNumber += 1;
 			initOrdersTable(true);
-
-
 		}, 700);
 	}
 

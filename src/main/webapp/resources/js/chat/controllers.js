@@ -48,13 +48,15 @@ chatModule.controller("ChatDialogController", function($scope, $rootScope, partn
 	var currentUserProfileResponse = usersProfileResource.getShortById({'id': currentUserId});
 	currentUserProfileResponse.$promise.then(function() {
 		$scope.currentUserName = (currentUserProfileResponse.name) ? currentUserProfileResponse.name : currentUserId;
-		console.log("USER: " + $scope.currentUserName + " PARTNER: " + $scope.partnerName)
+		var partnerProfileResponse = usersProfileResource.getShortById({'id': partnerId});
+		partnerProfileResponse.$promise.then(function() {
+			$scope.partnerName = (partnerProfileResponse.name) ? partnerProfileResponse.name : partnerId;
+			console.log("USER: " + $scope.currentUserName + " PARTNER: " + $scope.partnerName)
+			loadMessages();
+		});
 	});
-	var partnerProfileResponse = usersProfileResource.getShortById({'id': partnerId});
-	partnerProfileResponse.$promise.then(function() {
-		$scope.partnerName = (partnerProfileResponse.name) ? partnerProfileResponse.name : partnerId;
-	});
-	loadMessages();
+
+
 	console.log(currentUserId + " " + partnerId)
 	//var response = messagesResource.getLaterThan({date: });
 	$scope.send = function(message) {
@@ -352,23 +354,23 @@ chatModule.controller("ChatController", function($scope, $rootScope, chatService
 			$scope.partnerName = (partnerProfileResponse.name) ? partnerProfileResponse.name : partnerId;
 		});
 		loadMessages(partnerId);
-	
-			angular.element("#chat-history").scroll(function() {
-				//console.log("SCROLL: " + angular.element("#chat-history").scrollTop() + " " + angular.element("#chat-history").height() + " " + angular.element("#chat-history").parent().height())
-				if (angular.element("#chat-history").scrollTop() === 0) {
-					$timeout(function() {
-						if ((pageNumber > 30) || (messagesCount <= pageNumber * 15)) {
-							return;
-						}
-						if (loadOnScroll === false) {
-							return;
-						}
-						loadOnScroll = false;
-						loadMessages(partnerId, true);
-					}, 500);
-				}
-			});
-		
+
+		angular.element("#chat-history").scroll(function() {
+			//console.log("SCROLL: " + angular.element("#chat-history").scrollTop() + " " + angular.element("#chat-history").height() + " " + angular.element("#chat-history").parent().height())
+			if (angular.element("#chat-history").scrollTop() === 0) {
+				$timeout(function() {
+					if ((pageNumber > 30) || (messagesCount <= pageNumber * 15)) {
+						return;
+					}
+					if (loadOnScroll === false) {
+						return;
+					}
+					loadOnScroll = false;
+					loadMessages(partnerId, true);
+				}, 500);
+			}
+		});
+
 
 		secondsInWaitingTimerId = $interval(loadLastMessages, 4000);
 		if (usersSecondsInWaitingTimerId) {
