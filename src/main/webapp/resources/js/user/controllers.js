@@ -83,7 +83,7 @@ userModule.controller("UserController", function($scope, $rootScope, usersResour
 	};
 
 	$scope.openAuthDialog = function() {
-		authService.openAuthDialog(false);
+		authService.openAuthDialog(false, true);
 	};
 
 	$scope.logout = function() {

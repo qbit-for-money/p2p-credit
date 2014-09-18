@@ -32,7 +32,7 @@
 
 		<div class="footer navbar-default">
 			<div class="pluso" data-background="#ebebeb" data-options="medium,square,line,horizontal,nocounter,theme=07" data-services="google,twitter,facebook,vkontakte,odnoklassniki,moimir" data-url="https://www.bitgates.com" data-title="p2p-credit"></div>
-			<p>&copy; Bitgates 2014</p>
+			<p>&copy; Yes!Money 2014</p>
 		</div>
 
 		<script type="text/javascript">
