@@ -2,8 +2,8 @@ var orderModule = angular.module("order");
 
 orderModule.controller("OrdersController", function($scope, $rootScope, ordersResource, responsesResource, usersResource, userProfileService, usersProfileResource, userService, $interpolate, $compile, $modal, $timeout, chatService) {
 	$scope.isUserTable = false;
-	var ordersCount;
-	var userOrdersCount;
+	$scope.ordersCount;
+	$scope.userOrdersCount;
 	var pageNumber = 0;
 	var userPageNumber = 0;
 	var loadOnScroll = true;
@@ -15,87 +15,75 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 	$scope.allCategories = [];
 	var currenciesMap = {};
 	$scope.allCurrencies = [];
+	$scope.allCurrenciesWithoutPersent = [];
 	$scope.selectedCurrency;
 	$scope.isBlocked = false;
-	$scope.sortedBy = [{
+	//$scope.givingValue = "";
+	$scope.sortedBy = [/*{
+	 id: 0,
+	 name: "Проценты",
+	 fieldTitle: "percent"
+	 }, */{
 			id: 0,
-			name: "Продолжительность",
-			fieldTitle: "duration"
+			name: "Сумма",
+			fieldTitle: "amount"
 		}, {
 			id: 1,
-			name: "Взять в валюте",
-			fieldTitle: "incomingCurrency"
-		}, {
-			id: 2,
-			name: "Дать в валюте",
-			fieldTitle: "outcomingCurrency"
-		}, {
-			id: 3,
-			name: "Взять в сумме",
-			fieldTitle: "incomingAmount"
-		}, {
-			id: 4,
-			name: "Дать в сумме",
-			fieldTitle: "outcomingAmount"
+			name: "Срок",
+			fieldTitle: "duration"
 		}];
+	//incomingAmount outcomingAmount
 	$scope.ordersOwn = [{
 			id: 0,
 			name: "Все"
 		}, {
 			id: 1,
-			name: "Свои"
+			name: "Мои"
 		}];
 
-	$scope.filterBy = [/*{
-			id: 0,
-			name: "Нет",
-			fieldTitle: "no"
-		},*/ {
-			id: 0,
-			name: "Категории",
-			fieldTitle: "categories"
-		}, {
-			id: 1,
-			name: "Взять в валюте",
-			fieldTitle: "incomingCurrency"
-		}, {
-			id: 2,
-			name: "Дать в валюте",
-			fieldTitle: "outcomingCurrency"
-		}, {
-			id: 3,
-			name: "Взять в сумме",
-			fieldTitle: "incomingAmount"
-		}, {
-			id: 4,
-			name: "Дать в сумме",
-			fieldTitle: "outcomingAmount"
-		}];
-	
-	function blockRequest() {
-		$scope.isBlocked = true;
-	}
-	
-	function unblockRequest() {
-		$scope.isBlocked = false;
-	}
+	$scope.isBond = false;
 
+	/*function blockRequest() {
+	 $scope.isBlocked = true;
+	 }
+	 
+	 function unblockRequest() {
+	 $scope.isBlocked = false;
+	 }*/
+	console.log($rootScope.searchRequest)
 	$scope.selectOrdersOwn = function(ordersOwn) {
-		if(!loadOnScroll) {
+		if (!loadOnScroll || ($scope.allCurrencies.length === 0)) {
 			return;
 		}
-		loadOnScroll = false;
+		console.log("OWN")
+		//loadOnScroll = false;
 		//$scope.isBlocked = true;
-		console.log(ordersOwn.item.id + " **");
 		if (ordersOwn.item.id === 1) {
 			$scope.isUserTable = true;
 			//loadOnScroll = true;
+			searchRequest.filterItems.splice(1, searchRequest.filterItems.length);
 			userOrdersTableFilterInit();
 		} else {
 			$scope.isUserTable = false;
 			//loadOnScroll = true;
 			ordersTableFilterInit();
 		}
+	}
+
+	$scope.selectType = function(selectedItem) {
+		$scope.type = selectedItem;
+		if ($scope.type === "borrow") {
+			$scope.selectedGivingCurrency = "RUR";
+			$scope.selectedTakingCurrency = "%";
+		} else if ($scope.type === "credit") {
+			$scope.selectedGivingCurrency = "%";
+			$scope.selectedTakingCurrency = "RUR";
+		} else {
+			$scope.selectedGivingCurrency = "RUR";
+			$scope.selectedTakingCurrency = "BTC";
+		}
+		loadOnScroll = true;
+		console.log($scope.type)
 	}
 	/*$scope.editIsUserTable = function() {
 	 //$(document).scrollTop();
@@ -112,91 +100,117 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 	 }
 	 };*/
 
-	$scope.selectOrdersFilter = function(selectedItem) {
-		$scope.filterItem = selectedItem.item.fieldTitle;
-	};
+
+
+	/*$scope.selectOrdersFilter = function(selectedItem) {
+	 $scope.filterItem = selectedItem.item.fieldTitle;
+	 };*/
 
 	$scope.filterOrdersTable = function() {
-		if(!loadOnScroll) {
+		if (!loadOnScroll) {
 			return;
 		}
+
+		ordersTableFilterInit();
 		loadOnScroll = false;
 		pageNumber = 0;
 		userPageNumber = 0;
-		if ($scope.filterItem === "categories" && $scope.ordersSearchMap.orderCategories && $scope.ordersSearchMap.orderCategories.length !== 0) {
-			var filterItem = {};
-			filterItem.filterOperator = "1";
-			filterItem.filterDataField = "categories";
-			filterItem.filterCondition = "IS_MEMBER";
-			var cateroiesStr = "";
-			for (var i in $scope.ordersSearchMap.orderCategories) {
-				cateroiesStr += $scope.ordersSearchMap.orderCategories[i] + ", ";
-			}
-			filterItem.filterValue = cateroiesStr;
-			searchRequest.filterItems[1] = filterItem;
-		} else if (($scope.filterItem === "incomingCurrency") || ($scope.filterItem === "outcomingCurrency")) {
-			var filterItem = {};
-			filterItem.filterOperator = "1";
-			filterItem.filterDataField = $scope.filterItem;
-			filterItem.filterCondition = "EQUAL";
-			filterItem.filterValue = $scope.selectedCurrency;
-			searchRequest.filterItems[1] = filterItem;
-		} else if (($scope.filterItem === "incomingAmount") || ($scope.filterItem === "outcomingAmount")) {
-			var filterItem = {};
-			filterItem.filterOperator = "1";
-			filterItem.filterDataField = $scope.filterItem;
-			filterItem.filterCondition = "GREATER_THAN";
-			var val = angular.element("#amount").val();
-			filterItem.filterValue = (val) ? val : 0;
-			searchRequest.filterItems[1] = filterItem;
-		} else {
-			searchRequest.filterItems.splice(1, searchRequest.filterItems.length);
-		}
-		
-		if(!$scope.isUserTable) {
+		/*if ($scope.filterItem === "categories" && $scope.ordersSearchMap.orderCategories && $scope.ordersSearchMap.orderCategories.length !== 0) {
+		 var filterItem = {};
+		 filterItem.filterOperator = "1";
+		 filterItem.filterDataField = "categories";
+		 filterItem.filterCondition = "IS_MEMBER";
+		 var cateroiesStr = "";
+		 for (var i in $scope.ordersSearchMap.orderCategories) {
+		 cateroiesStr += $scope.ordersSearchMap.orderCategories[i] + ", ";
+		 }
+		 filterItem.filterValue = cateroiesStr;
+		 searchRequest.filterItems[1] = filterItem;
+		 } else if (($scope.filterItem === "incomingCurrency") || ($scope.filterItem === "outcomingCurrency")) {
+		 var filterItem = {};
+		 filterItem.filterOperator = "1";
+		 filterItem.filterDataField = $scope.filterItem;
+		 filterItem.filterCondition = "EQUAL";
+		 filterItem.filterValue = $scope.selectedCurrency;
+		 searchRequest.filterItems[1] = filterItem;
+		 } else if (($scope.filterItem === "incomingAmount") || ($scope.filterItem === "outcomingAmount")) {
+		 var filterItem = {};
+		 filterItem.filterOperator = "1";
+		 filterItem.filterDataField = $scope.filterItem;
+		 filterItem.filterCondition = "GREATER_THAN";
+		 var val = angular.element("#amount").val();
+		 filterItem.filterValue = (val) ? val : 0;
+		 searchRequest.filterItems[1] = filterItem;
+		 } else {
+		 searchRequest.filterItems.splice(1, searchRequest.filterItems.length);
+		 }*/
+
+		console.log(JSON.stringify(searchRequest))
+
+		if (!$scope.isUserTable) {
 			initOrdersTable();
 		} else {
 			initUserOrdersTable();
 		}
 	};
 
-	$scope.sortTable = function(selectedItem) {
-		if(!loadOnScroll) {
-			return;
+	function initFilter() {
+		$scope.sortTable({item: {fieldTitle: "amount"}});
+		if ($rootScope.searchRequest) {
+			console.log("> " + JSON.stringify($rootScope.searchRequest))
+			$scope.selectType($rootScope.searchRequest.type);
+			$scope.givingValue = parseInt($rootScope.searchRequest.givingValue);
+			$scope.takingValue = parseInt($rootScope.searchRequest.takingValue);
+			$scope.selectedGivingCurrency = $rootScope.searchRequest.selectedGivingCurrency;
+			$scope.selectedTakingCurrency = $rootScope.searchRequest.selectedTakingCurrency;
+		} else {
+			$scope.givingValue = "1234";
+			$scope.takingValue = "24";
+			$scope.selectType("borrow");
+
 		}
-		loadOnScroll = false;
-		pageNumber = 0;
-		userPageNumber = 0;
+		$scope.filterOrdersTable();
+	}
+
+	$scope.sortTable = function(selectedItem) {
+		console.log("SORT")
+		loadOnScroll = true;
+		/*if (!loadOnScroll) {
+		 return;
+		 }*/
+		//loadOnScroll = false;
+		// pageNumber = 0;
+		//userPageNumber = 0;
 		searchRequest.sortDataField = selectedItem.item.fieldTitle;
 		searchRequest.sortOrder = "DESC";
-		if(!$scope.isUserTable) {
-			ordersTableFilterInit();
-		} else {
-			userOrdersTableFilterInit();
-		}
+		// if (!$scope.isUserTable) {
+		//ordersTableFilterInit();
+		// } else {
+		//userOrdersTableFilterInit();
+		// }
 	};
 
 	/*$scope.sortUserOrdersTable = function(selectedItem) {
-		searchRequest.sortDataField = selectedItem.item.fieldTitle;
-		searchRequest.sortOrder = "ASC";
-		userOrdersTableFilterInit();
-	};*/
+	 searchRequest.sortDataField = selectedItem.item.fieldTitle;
+	 searchRequest.sortOrder = "ASC";
+	 userOrdersTableFilterInit();
+	 };*/
 
-	$scope.categorySelect2Options = {
-		allowClear: true,
-		tags: $scope.allCategories,
-		multiple: true,
-		'simple_tags': true,
-		maximumSelectionSize: 20,
-		maximumInputLength: 20,
-		createSearchChoice: function(term, data) {
-			if ($(data).filter(function() {
-				return this.text.localeCompare(term) === 0;
-			}).length === 0) {
-				return {id: term, text: term};
-			}
-		}
-	};
+	/*$scope.categorySelect2Options = {
+	 allowClear: true,
+	 tags: $scope.allCategories,
+	 multiple: true,
+	 'simple_tags': true,
+	 maximumSelectionSize: 20,
+	 maximumInputLength: 20,
+	 createSearchChoice: function(term, data) {
+	 if ($(data).filter(function() {
+	 return this.text.localeCompare(term) === 0;
+	 }).length === 0) {
+	 return {id: term, text: term};
+	 }
+	 }
+	 };*/
 
 	userProfileService.getAllCurrencies(function(currencies) {
 		$scope.allCurrenciesDropdown = [];
@@ -207,27 +221,45 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 			currenciesMap[currency.code].id = currency.id;
 			currenciesMap[currency.code].step = currency.maxValue / 10;
 			$scope.allCurrencies.push(currency.code);
-			if (i !== 0) {
-				$scope.allCurrenciesDropdown[i - 1] = {};
-				$scope.allCurrenciesDropdown[i - 1].id = parseInt(i - 1);
-				$scope.allCurrenciesDropdown[i - 1].name = currencies[i].code;
+			if (currency.id !== "PERCENT") {
+				$scope.allCurrenciesWithoutPersent.push(currency.code);
 			}
+			/*if (i !== 0) {
+			 $scope.allCurrenciesDropdown[i - 1] = {};
+			 $scope.allCurrenciesDropdown[i - 1].id = parseInt(i - 1);
+			 $scope.allCurrenciesDropdown[i - 1].name = currencies[i].code;
+			 }*/
 		}
+		$timeout(function() {
+			initFilter();
+		});
 	});
 
-	userProfileService.getAllCategories(function(categories) {
-		$scope.allCategories.splice(0, $scope.allCategories.length);
+	/*userProfileService.getAllCategories(function(categories) {
+	 $scope.allCategories.splice(0, $scope.allCategories.length);
+	 
+	 for (var i in categories) {
+	 $scope.allCategories.push(categories[i].code);
+	 }
+	 });*/
 
-		for (var i in categories) {
-			$scope.allCategories.push(categories[i].code);
-		}
-	});
+	/*$scope.selectCurrency = function(selectedItem) {
+	 $scope.selectedCurrency = currenciesMap[selectedItem.item.name].id;
+	 };*/
 
-	$scope.selectCurrency = function(selectedItem) {
-		$scope.selectedCurrency = currenciesMap[selectedItem.item.name].id;
+	$scope.selectOutcomingCurrency = function(item) {
+		console.log("OUT: " + JSON.stringify(item))
+	};
+
+	$scope.selectIncomingCurrency = function(item) {
+		console.log("IN: " + JSON.stringify(item))
 	};
 
 	function ordersTableFilterInit() {
+		searchRequest.filterItems.splice(0, searchRequest.filterItems.length);
+		//console.log(">> " + $scope.givingValue + " " + $scope.takingValue)
+		console.log(">>" + angular.element("#giving-currency").find(".li-item").text())
+		console.log(">>>" + angular.element("#taking-currency").find(".li-item").text())
 		pageNumber = 0;
 		//searchRequest.filterItems = [];
 		var filterItem = {};
@@ -236,11 +268,132 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 		filterItem.filterCondition = "EQUAL";
 		filterItem.filterValue = "OPENED";
 		searchRequest.filterItems[0] = filterItem;
-		initOrdersTable();
+
+
+
+		var bondFilterItem = {};
+		bondFilterItem.filterOperator = "1";
+		bondFilterItem.filterDataField = "bond";
+		bondFilterItem.filterCondition = "EQUAL";
+		bondFilterItem.filterValue = $scope.isBond;
+		searchRequest.filterItems[1] = bondFilterItem;
+
+		/*var borowFilterItem = {};
+		 borowFilterItem.filterOperator = "1";
+		 borowFilterItem.filterDataField = "incomingCurrency";
+		 borowFilterItem.filterCondition = "EQUAL";
+		 borowFilterItem.filterValue = "PERCENT";
+		 
+		 var creditFilterItem = {};
+		 creditFilterItem.filterOperator = "1";
+		 creditFilterItem.filterDataField = "outcomingCurrency";
+		 creditFilterItem.filterCondition = "EQUAL";
+		 creditFilterItem.filterValue = "PERCENT";*/
+
+		var durationFilterItem = {};
+		durationFilterItem.filterOperator = "1";
+		durationFilterItem.filterDataField = "duration";
+		var duration = angular.element("#order-duration").find("input").val();
+		durationFilterItem.filterCondition = "GREATER_THAN_OR_EQUAL";
+		durationFilterItem.filterValue = (duration !== "") ? duration : 0;
+
+		searchRequest.filterItems[2] = durationFilterItem;
+
+		var incomingCurrency = angular.element("#taking-currency").find(".li-item").text();
+		if (incomingCurrency === "") {
+			incomingCurrency = $scope.selectedTakingCurrency;
+		}
+		var outcomingCurrency = angular.element("#giving-currency").find(".li-item").text();
+		if (outcomingCurrency === "") {
+			outcomingCurrency = $scope.selectedGivingCurrency;
+		}
+
+		var incomingCurrencyFilterItem = {};
+		incomingCurrencyFilterItem.filterOperator = "1";
+		incomingCurrencyFilterItem.filterDataField = "incomingCurrency";
+		incomingCurrencyFilterItem.filterCondition = "EQUAL";
+		incomingCurrencyFilterItem.filterValue = incomingCurrency;
+
+		var outcomingCurrencyFilterItem = {};
+		outcomingCurrencyFilterItem.filterOperator = "1";
+		outcomingCurrencyFilterItem.filterDataField = "outcomingCurrency";
+		outcomingCurrencyFilterItem.filterCondition = "EQUAL";
+		outcomingCurrencyFilterItem.filterValue = outcomingCurrency;
+
+		searchRequest.filterItems[3] = incomingCurrencyFilterItem;
+		searchRequest.filterItems[4] = outcomingCurrencyFilterItem;
+
+		var incomingAmountFilterItem = {};
+		incomingAmountFilterItem.filterOperator = "1";
+		incomingAmountFilterItem.filterDataField = "incomingAmount";
+		var incomingAmount = angular.element("#taking-currency").find("input").val();
+		incomingAmountFilterItem.filterValue = (incomingAmount !== "") ? incomingAmount : 0;
+
+		var outcomingAmountFilterItem = {};
+		outcomingAmountFilterItem.filterOperator = "1";
+		outcomingAmountFilterItem.filterDataField = "outcomingAmount";
+		var outcomingAmount = angular.element("#giving-currency").find("input").val();
+		outcomingAmountFilterItem.filterValue = (outcomingAmount !== "") ? outcomingAmount : 0;
+
+		if (($scope.type === "borrow") || ($scope.type === "exchange")) {
+			//incomingAmount = (incomingAmount && incomingAmount !== "") ? incomingAmount : 100;
+			//outcomingAmount = (outcomingAmount && outcomingAmount !== "") ? outcomingAmount : 0;
+			incomingAmountFilterItem.filterCondition = "LESS_THAN_OR_EQUAL";
+			outcomingAmountFilterItem.filterCondition = "GREATER_THAN_OR_EQUAL";
+			incomingAmountFilterItem.filterValue = incomingAmount;
+			outcomingAmountFilterItem.filterValue = outcomingAmount;
+		} else if ($scope.type === "credit") {
+			incomingAmountFilterItem.filterCondition = "GREATER_THAN_OR_EQUAL";
+			outcomingAmountFilterItem.filterCondition = "LESS_THAN_OR_EQUAL";
+			incomingAmountFilterItem.filterValue = (incomingAmount !== "") ? incomingAmount : 0;
+			outcomingAmountFilterItem.filterValue = (outcomingAmount !== "") ? outcomingAmount : 100;
+		}
+
+		console.log("TYPE: " + $scope.type)
+		console.log("INCOMING: " + incomingAmount + " " + incomingCurrencyFilterItem.filterValue + " " + incomingAmountFilterItem.filterCondition)
+		console.log("OUTCOMING: " + outcomingAmount + " " + outcomingCurrencyFilterItem.filterValue + " " + outcomingAmountFilterItem.filterCondition)
+		if (incomingAmount && (incomingAmount !== "")) {
+			searchRequest.filterItems.push(incomingAmountFilterItem);
+		}
+		if (outcomingAmount && (outcomingAmount !== "")) {
+			searchRequest.filterItems.push(outcomingAmountFilterItem);
+		}
+
+		/*if ($scope.type === "borrow") {
+		 searchRequest.filterItems[1] = outcomingCurrencyFilterItem;
+		 
+		 var outcomingCurrencyFilterItem = {};
+		 outcomingCurrencyFilterItem.filterOperator = "1";
+		 outcomingCurrencyFilterItem.filterDataField = "outcomingCurrency";
+		 outcomingCurrencyFilterItem.filterCondition = "EQUAL";
+		 outcomingCurrencyFilterItem.filterValue = $scope.selectedGivingCurrency;
+		 } else if ($scope.type === "credit") {
+		 searchRequest.filterItems[1] = creditFilterItem;
+		 
+		 var incomingCurrencyFilterItem = {};
+		 incomingCurrencyFilterItem.filterOperator = "1";
+		 incomingCurrencyFilterItem.filterDataField = "outcomingCurrency";
+		 incomingCurrencyFilterItem.filterCondition = "EQUAL";
+		 incomingCurrencyFilterItem.filterValue = $scope.selectedTakingCurrency;
+		 
+		 
+		 //$scope.selectedGivingCurrency = "%";
+		 //$scope.selectedTakingCurrency = "RUR";
+		 //giving-currency
+		 } else {
+		 var notCreditFilterItem = creditFilterItem;
+		 notCreditFilterItem.filterCondition = "NOT_EQUAL";
+		 var notBorrowFilterItem = creditFilterItem;
+		 notBorrowFilterItem.filterCondition = "NOT_EQUAL";
+		 searchRequest.filterItems[1] = notCreditFilterItem;
+		 searchRequest.filterItems[2] = notBorrowFilterItem;
+		 }*/
+
+		//initOrdersTable();
 	}
 
 	function userOrdersTableFilterInit() {
-		userPageNumber = 0;
+		//userPageNumber = 0;
 		var userResponse = usersResource.current({});
 		userResponse.$promise.then(function() {
 			userPageNumber = 0;
@@ -280,6 +433,7 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 		var orderResponse = responsesResource.addResponse({}, response);
 
 		orderResponse.$promise.then(function() {
+			pageNumber = 0;
 			$scope.updateTables();
 		});
 	};
@@ -288,29 +442,27 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 		var id = angular.element(this).attr('id');
 		var userProfileResponse = usersProfileResource.getShortById({'id': publicKey});
 		userProfileResponse.$promise.then(function() {
-			var name = (userProfileResponse.name) ? userProfileResponse.name : "Hidden";
+			var name = (userProfileResponse.name) ? userProfileResponse.name : "Не указано";
 			angular.element("#" + id + " #name span").text(name);
-			var phone = (userProfileResponse.phone) ? userProfileResponse.phone : "Hidden";
+			var phone = (userProfileResponse.phone) ? userProfileResponse.phone : "Скрыт";
 			angular.element("#" + id + " #phone span").text(phone);
-			var mail = (userProfileResponse.mail) ? userProfileResponse.mail : "Hidden";
+			var mail = (userProfileResponse.mail) ? userProfileResponse.mail : "Скрыта";
 			angular.element("#" + id + " #mail span").text(mail);
 		});
 	}
-	/*userProfileService.getAllCategoriesTitle(function(categories) {
-	 userProfileService.getAllLanguages(function(languages) {
-	 userProfileService.getAllCurrencies(function(currencies) {
-	 initUserOrdersTable(categories, languages, currencies);
-	 });
-	 });
-	 });*/
 
 	function initUserOrdersTable(reload) {
+		console.log("********************* " + userPageNumber)
+		
 		searchRequest.pageNumber = userPageNumber;
-		userPageNumber += 1;
+		if(reload) {
+			userPageNumber += 1;
+		}
+		
 		var orderResponse = ordersResource.search({}, searchRequest);
 
 		orderResponse.$promise.then(function() {
-			userOrdersCount = orderResponse.length;
+			$scope.userOrdersCount = orderResponse.length;
 			console.log("USER PAGE NUMBER: " + userPageNumber)
 			var orders = formatDownloadedOrders(orderResponse.orderWrappers);
 			var tabsdiv = angular.element("#user-orders-table");
@@ -334,12 +486,13 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 	function processUserOrdersTableData(orders, tabsdiv) {
 		var tableTemplate = angular.element("#userOrdersTableTmpl").text();
 		var orderAttrsTemplate = angular.element("#userOrderAttrsTmpl").text();
-		if (!orders || (orders.length === 0)) {
+		if ((!orders || (orders.length === 0)) && (userPageNumber === 0)) {
 			$scope.emptyList = true;
+			userPageNumber--;
 		} else {
 			$scope.emptyList = false;
 		}
-		
+
 		for (var i in orders) {
 			console.log(JSON.stringify(orders[i]))
 			var orderId = orders[i].id;
@@ -351,13 +504,19 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 				give: orders[i].give,
 				endDate: orders[i].endDate,
 				duration: orders[i].duration,
-				orderStatus: orders[i].status
+				orderStatus: orders[i].status,
+				description: orders[i].description
 			};
 			var exp = $interpolate(orderAttrsTemplate);
 			var orderAttrsContent = exp(orderAttrsContext);
 
 			var liTemplate = "<div style='margin-top: -22px;' id='" + orderId + "'>" + tableTemplate + "</div>";
-
+			var responsesCount;
+			if (orders[i].responses && (orders[i].responses.length !== 0)) {
+				responsesCount = orders[i].responses.length;
+			} else {
+				responsesCount = 0;
+			}
 			var tabsContext = {
 				orderId: orderId,
 				freeDescription: "DESCRIPTION",
@@ -365,7 +524,9 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 				orderStatus: orders[i].status,
 				responsesList: getResponsesContent(orders[i]),
 				orderAttributes: orderAttrsContent,
-				partnerId: orders[i].partnerId
+				partnerId: orders[i].partnerId,
+				type: orders[i].type,
+				responsesCount: responsesCount
 			};
 			exp = $interpolate(liTemplate);
 			var content = exp(tabsContext);
@@ -424,7 +585,7 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 		searchRequest.pageNumber = pageNumber;
 		var orderResponse = ordersResource.search({}, searchRequest);
 		orderResponse.$promise.then(function() {
-			ordersCount = orderResponse.length;
+			$scope.ordersCount = orderResponse.length;
 
 			console.log("PAGE NUMBER: " + pageNumber)
 			var orders = formatDownloadedOrders(orderResponse.orderWrappers);
@@ -450,8 +611,9 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 	function processOrdersTableData(orders, tabsdiv) {
 		var tableTemplate = angular.element("#ordersTableTmpl").text();
 		var orderAttrsTemplate = angular.element("#orderAttrsTmpl").text();
-		if (!orders || (orders.length === 0)) {
+		if ((!orders || (orders.length === 0)) && (pageNumber === 0)) {
 			$scope.emptyList = true;
+			pageNumber--;
 		} else {
 			$scope.emptyList = false;
 		}
@@ -466,7 +628,7 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 				orderId: orderId,
 				imgurl: imgurl,
 				userurl: userurl,
-				userName: orders[i].userId,
+				userId: orders[i].userId,
 				categories: orders[i].categories,
 				languages: orders[i].languages,
 				take: orders[i].take,
@@ -479,7 +641,8 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 				ordersCount: orders[i].statistics.ordersCount,
 				successOrdersCount: orders[i].statistics.successOrdersCount,
 				partnersRating: orders[i].statistics.partnersRating,
-				creationDate: orders[i].creationDate
+				creationDate: orders[i].creationDate,
+				description: orders[i].description
 
 			};
 			var exp = $interpolate(orderAttrsTemplate);
@@ -508,13 +671,30 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 			var result = $compile(content)($scope);
 			tabsdiv.append(result);
 		}
+
 		$('#order-tab').tab();
+
+		for (var i in orders) {
+			angular.element("#user-name-" + orders[i].id).text();
+			angular.element('#user-name-' + orders[i].id).bind('isVisible', setUserAttrs);
+			angular.element('#user-name-' + orders[i].id).show('slow', function() {
+				angular.element(this).trigger('isVisible', [orders[i].userId]);
+			});
+		}
+
 		$timeout(function() {
 			loadOnScroll = true;
 		}, 200);
 	}
 
-
+	function setUserAttrs(e, publicKey) {
+		var id = angular.element(this).attr('id');
+		var userProfileResponse = usersProfileResource.getShortById({'id': publicKey});
+		userProfileResponse.$promise.then(function() {
+			var name = (userProfileResponse.name) ? userProfileResponse.name : publicKey;
+			angular.element("#" + id).text(name);
+		});
+	}
 
 	function getSummaryRating(ratingOpenness, successOrdersCount) {
 		var summaryRating = Math.floor(ratingOpenness * $rootScope.env.userRatingOpenessFactor
@@ -565,7 +745,7 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 	function loadData() {
 		console.log("LOAD DATA")
 
-		if ((pageNumber > 30) || ((ordersCount) && (ordersCount <= pageNumber * 10))) {
+		if ((pageNumber > 30) || (($scope.ordersCount) && ($scope.ordersCount <= pageNumber * 10))) {
 			return;
 		}
 		if (loadOnScroll === false) {
@@ -582,7 +762,7 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 	function loadUserData() {
 		console.log("LOAD USER DATA")
 
-		if ((userPageNumber > 30) || ((userOrdersCount) && (userOrdersCount <= userPageNumber * 10))) {
+		if ((userPageNumber > 30) || (($scope.userOrdersCount) && ($scope.userOrdersCount <= userPageNumber * 10))) {
 			return;
 		}
 		if (loadOnScroll === false) {

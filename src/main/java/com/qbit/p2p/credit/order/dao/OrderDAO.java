@@ -70,8 +70,8 @@ public class OrderDAO {
 		VALUE_PROVIDERS_MAP.put("status", OrderStatusValueProvider.INST);
 		VALUE_PROVIDERS_MAP.put("userId", StringValueProvider.INST);
 		VALUE_PROVIDERS_MAP.put("partnerId", StringValueProvider.INST);
-		VALUE_PROVIDERS_MAP.put("incomingCurrency", CurrencyValueProvider.INST);
-		VALUE_PROVIDERS_MAP.put("outcomingCurrency", CurrencyValueProvider.INST);
+		VALUE_PROVIDERS_MAP.put("incomingCurrency", StringValueProvider.INST);
+		VALUE_PROVIDERS_MAP.put("outcomingCurrency", StringValueProvider.INST);
 		VALUE_PROVIDERS_MAP.put("incomingAmount", StringValueProvider.INST);
 		VALUE_PROVIDERS_MAP.put("outcomingAmount", StringValueProvider.INST);
 		VALUE_PROVIDERS_MAP.put("partnersRating", IntegerValueProvider.INST);
@@ -82,6 +82,8 @@ public class OrderDAO {
 		VALUE_PROVIDERS_MAP.put("responsesCount", IntegerValueProvider.INST);
 		VALUE_PROVIDERS_MAP.put("partnersRating", IntegerValueProvider.INST);
 		VALUE_PROVIDERS_MAP.put("statuses", OrderStatusArrayValueProvider.INST);
+		VALUE_PROVIDERS_MAP.put("duration", StringValueProvider.INST);
+		VALUE_PROVIDERS_MAP.put("bond", StringValueProvider.INST);
 		EXPRESSION_PROVIDERS_MAP = new HashMap<>();
 		EXPRESSION_PROVIDERS_MAP.put("languages", "code");
 		EXPRESSION_PROVIDERS_MAP.put("categories", "code");
@@ -181,7 +183,9 @@ public class OrderDAO {
 
 			String sortDataField = searchRequest.getSortDataField();
 			if ((sortDataField != null) && !sortDataField.isEmpty()) {
-				if (sortDesc) {
+				if("AMOUNT".equals(sortDataField.toUpperCase())) {
+					criteria.orderBy(builder.desc(order.get("incomingAmount")), builder.desc(order.get("outcomingAmount")), builder.asc(order.get("status")));
+				} else if (sortDesc) {
 					criteria.orderBy(builder.desc(order.get(sortDataField)), builder.asc(order.get("status")));
 				} else {
 					criteria.orderBy(builder.asc(order.get(sortDataField)), builder.asc(order.get("status")));

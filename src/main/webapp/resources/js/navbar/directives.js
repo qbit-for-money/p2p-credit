@@ -69,16 +69,25 @@ navbarModule.directive('uiDropdown', function($compile, $timeout) {
 			onEnter: '&onEnter',
 			inputValue: '=inputValue',
 			elementId: '=elementId',
-			isDropdownInput: '=isDropdownInput'
+			isPercent: '=isPercent',
+			isDropdownInput: '=isDropdownInput',
+			static: '=static'
 		},
 		link: function(scope, element, attrs) {
 			//scope.bSelectedItem = scope.selectedItem;
 			scope.inputText = "";
 			var html = '';
 			html += '<div class="input-group" id="{{elementId}}"><input type="number" min="0" class="form-control" ng-model="inputValue" ng-change="onChangeInput()" placeholder="{{placeholder}}">';
-			html += '<div class="input-group-btn ui-dropdown-button"><button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="li-item">Action</span> <b class="caret"></b></button>';
+			if (scope.isPercent) {
+				html += '<div class="input-group-btn"><button type="button" class="btn btn-default" ng-disabled="true"><span class="li-item" style="color: black;">%</span></button>';
+			} else if (scope.static) {
+				html += '<div class="input-group-btn"><button type="button" class="btn btn-default" ng-disabled="true"><span class="li-item" style="color: black;">' + scope.static + '</span></button>';
+			} else {
+				html += '<div class="input-group-btn ui-dropdown-button"><button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="li-item">Action</span> <b class="caret"></b></button>';
 
-			html += '<ul class="dropdown-menu dropdown-menu-left" style="right: 0; left: auto;"><li ng-repeat="item in items"><a tabindex="-1" data-ng-click="selectVal(item)" style="cursor:pointer">{{item}}</a></li><li ng-hide="!isDropdownInput"><input type="text" class="dropdown-input" placeholder=" Other.." ng-model="inputText"/></li></ul></div>';
+				html += '<ul class="dropdown-menu dropdown-menu-left" style="right: 0; left: auto;"><li ng-repeat="item in items"><a tabindex="-1" data-ng-click="selectVal(item)" style="cursor:pointer">{{item}}</a></li><li ng-hide="!isDropdownInput"><input type="text" class="dropdown-input" placeholder=" Other.." ng-model="inputText"/></li></ul></div>';
+			}
+
 			element.append($compile(html)(scope));
 
 			if (scope.isDropdownInput === true) {
@@ -123,12 +132,6 @@ navbarModule.directive('uiDropdown', function($compile, $timeout) {
 					scope.onChangeInput();
 				});
 
-				if (scope.doSelect) {
-					scope.doSelect({
-						selectedVal: item
-					});
-				}
-
 			};
 
 			scope.selectVal(scope.selectedItem);
@@ -163,7 +166,7 @@ navbarModule.directive('dropdown', function($compile, $timeout) {
 					break;
 				}
 			}
-			
+
 			scope.selectVal = function(item) {
 				$('button.dropdown-toggle', element).html('<b class="caret"></b> ' + item.name);
 				$timeout(function() {

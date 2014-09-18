@@ -48,6 +48,11 @@ and (min-width : 992px) {
 	}*/
 }
 
+#video-container iframe {
+	//height: 200px !important;
+	//position: relative;
+}
+
 #user-google img {
 	position: relative; 
 	height: 32px; 

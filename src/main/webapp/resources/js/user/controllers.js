@@ -49,8 +49,13 @@ userModule.controller("UserController", function($scope, $rootScope, usersResour
 			$scope.keyType = "user";
 		}
 	});
+	//angular.element(document).ready(function() {
+		//$timeout(function() {
+			$("#user-chat-form").removeClass("invisible");
+		//}, 500);
+	//});
 	angular.element("#user-form").removeClass("invisible");
-	angular.element("#user-chat-form").removeClass("invisible");
+	
 
 	$rootScope.isGoogleAuth = function() {
 		return $rootScope.currentUserAltId && ($rootScope.currentUserAltId.indexOf("@") !== -1);

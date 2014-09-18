@@ -61,20 +61,20 @@ userProfileModule.directive("linksList", function() {
 			scope.newLink.title = "";
 			scope.newLink.link = "";
 			if (scope.type === "phone") {
-				scope.itemPlaceholder = "Phone";
-				scope.title = "Phones";
+				scope.itemPlaceholder = "Телефон";
+				scope.title = "Телефоны";
 			}
 			if (scope.type === "social-link") {
-				scope.itemPlaceholder = "Link";
-				scope.title = "Social Networks";
+				scope.itemPlaceholder = "Ссылка";
+				scope.title = "Социальные сети";
 			}
 			if (scope.type === "video") {
-				scope.title = "YouTube videos";
-				scope.itemPlaceholder = "YouTube Link";
+				scope.title = "YouTube видео";
+				scope.itemPlaceholder = "YouTube видео";
 			}
 			if (scope.type === "name") {
-				scope.title = "Names";
-				scope.itemPlaceholder = "Link";
+				scope.title = "Имена";
+				scope.itemPlaceholder = "Ссылка";
 			}
 
 			scope.editItems = function() {

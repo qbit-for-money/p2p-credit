@@ -209,12 +209,13 @@ function formatDownloadedOrders(orders) {
 		}
 		//orders[i].id = orders[i].order.id;
 		orders[i].approvedResponseId = orders[i].order.approvedResponseId;
-		orders[i].duration = orders[i].order.duration + " " + ((orders[i].order.durationType === "HOUR") ? "hours" : "days");
+		orders[i].duration = orders[i].order.duration + " " + ((orders[i].order.durationType === "HOUR") ? "часов" : "дней");
 		orders[i].endDate = orders[i].order.bookingDeadline;
 		orders[i].creationDate = orders[i].order.creationDate;
 		orders[i].userId = orders[i].order.userId;
 		orders[i].partnerId = orders[i].order.partnerId;
 		orders[i].id = orders[i].order.id;
+		orders[i].description = orders[i].order.description;
 		
 		if((orders[i].order.incomingCurrency !== "%") && (orders[i].order.outcomingCurrency !== "%")) {
 			orders[i].type = "EXCHANGE";

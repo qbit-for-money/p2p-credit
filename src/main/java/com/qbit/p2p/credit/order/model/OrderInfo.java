@@ -52,10 +52,10 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 	@Column(nullable = false)
 	private String userId;
 	private OrderStatus status;
-	@Column(precision = 10, scale = 6)
+	@Column(precision = 16, scale = 6)
 	private BigDecimal incomingAmount;
 	private String incomingCurrency;
-	@Column(precision = 10, scale = 6)
+	@Column(precision = 16, scale = 6)
 	private BigDecimal outcomingAmount;
 	private String outcomingCurrency;
 	@XmlJavaTypeAdapter(DateAdapter.class)
@@ -80,6 +80,10 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 
 	@OneToOne(cascade = CascadeType.ALL)
 	private Comment comment;
+	
+	@Lob
+	private String description;
+	private boolean bond;
 
 	@Override
 	public String getId() {
@@ -218,14 +222,30 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 		this.comment = comment;
 	}
 
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public boolean isBond() {
+		return bond;
+	}
+
+	public void setBond(boolean bond) {
+		this.bond = bond;
+	}
+
 	public boolean isValid() {
 		return (bookingDeadline != null)
 			&& (duration >= 0)
 			&& (durationType != null)
 			&& (userId != null)
 			&& !userId.isEmpty()
-			&& (categories != null)
-			&& (languages != null)
+			//&& (categories != null)
+			//&& (languages != null)
 			&& (incomingCurrency != null || outcomingCurrency != null)
 			&& (!BigDecimal.ZERO.equals(incomingAmount) || !BigDecimal.ZERO.equals(outcomingAmount));
 	}
@@ -245,6 +265,6 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 
 	@Override
 	public String toString() {
-		return "OrderInfo{" + "id=" + id + ", userId=" + userId + ", status=" + status + ", incomingAmount=" + incomingAmount + ", incomingCurrency=" + incomingCurrency + ", outcomingAmount=" + outcomingAmount + ", outcomingCurrency=" + outcomingCurrency + ", creationDate=" + creationDate + ", bookingDeadline=" + bookingDeadline + ", duration=" + duration + ", durationType=" + durationType + ", categories=" + categories + ", languages=" + languages + ", orderData=" + orderData + ", responses=" + responses + ", partnerId=" + partnerId + ", comment=" + comment + '}';
+		return "OrderInfo{" + "id=" + id + ", userId=" + userId + ", status=" + status + ", incomingAmount=" + incomingAmount + ", incomingCurrency=" + incomingCurrency + ", outcomingAmount=" + outcomingAmount + ", outcomingCurrency=" + outcomingCurrency + ", creationDate=" + creationDate + ", bookingDeadline=" + bookingDeadline + ", duration=" + duration + ", durationType=" + durationType + ", categories=" + categories + ", languages=" + languages + ", orderData=" + orderData + ", responses=" + responses + ", partnerId=" + partnerId + ", comment=" + comment + ", description=" + description + ", bond=" + bond + '}';
 	}
 }

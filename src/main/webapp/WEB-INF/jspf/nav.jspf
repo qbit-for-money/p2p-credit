@@ -24,8 +24,8 @@
 			</ul>
 
 			<%@ include file="user.jspf" %>
-			<form name="userChatForm" id="user-chat-form" class="navbar-form navbar-right " ng-if="isGoogleAuth() || isVKAuth() || isFBAuth()">
-				<div class="form-group">
+			<form name="userChatForm" class="navbar-form navbar-right" ng-if="isGoogleAuth() || isVKAuth() || isFBAuth()">
+				<div class="form-group invisible" id="user-chat-form">
 					<span class="badge" ng-hide="unreadMessagesCount === 0">{{unreadMessagesCount}}</span>
 					<button class="btn btn-default" type="button" ng-click="goToChat()" title="Сообщения">
 						<span class="glyphicon glyphicon-envelope"></span>

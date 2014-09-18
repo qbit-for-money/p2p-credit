@@ -2,7 +2,7 @@
 	<div class="container-fluid">
 		<div class="row ng-hide" ng-show="edit">
 			<div class="hidden-xs col-sm-12 col-md-12">
-				<alert type="'warning'"><h4 style="margin-bottom: 0px;">User photo size should be greater than 400x300 and less than 2000x2000 and have type JPG.</h4></alert>
+				<alert type="'warning'"><h4 style="margin-bottom: 0px;">Размер фото должен быть больше 400x300 и меньше 2000x2000 и иметь расширение JPG.</h4></alert>
 			</div>
 		</div>
 		<div class="row ng-hide" ng-show="showUserPhotoError">
@@ -25,13 +25,13 @@
 							<div class="popover top" id="in-address-popover" style="margin-bottom: 100%" ng-hide="!popoverShow">
 								<div class="arrow"></div>
 								<div class="popover-content">
-									<div class="row col-xs-offset-0">Openness rating: {{ratingOpenness}}	</div>
-									<div class="row col-xs-offset-0">Orders rating: {{ordersRating}}</div>
-									<div class="row col-xs-offset-0">Partners rating: {{partnersRating}}</div>
-									<div class="row col-xs-offset-0">Orders count: {{ordersCount}}</div>
-									<div class="row col-xs-offset-0">Success orders count: {{successOrdersCount}}</div>
-									<div class="row col-xs-offset-0">All orders count: {{allOrdersCount}}</div>
-									<div class="row col-xs-offset-0">All success orders count: {{allSuccessOrdersCount}}</div>
+									<div class="row col-xs-offset-0">Рейтинг открытости: {{ratingOpenness}}	</div>
+									<div class="row col-xs-offset-0">Рейтинг по заявкам: {{ordersRating}}</div>
+									<div class="row col-xs-offset-0">Рейтинг партнеров: {{partnersRating}}</div>
+									<div class="row col-xs-offset-0">Число заявок: {{ordersCount}}</div>
+									<div class="row col-xs-offset-0">Число успешных заявок: {{successOrdersCount}}</div>
+									<div class="row col-xs-offset-0">Число всех заявок: {{allOrdersCount}}</div>
+									<div class="row col-xs-offset-0">Число всех успешных заявок: {{allSuccessOrdersCount}}</div>
 								</div>
 							</div>
 							<div class="progress" ng-click="showStatisticsPopover()" style="cursor: pointer; margin-bottom: 0" ng-hide="edit">
@@ -62,18 +62,18 @@
 					<div class="popover bottom" id="statistics-popover" style="margin-bottom: 100%" ng-hide="!popoverShow">
 						<div class="arrow"></div>
 						<div class="popover-content">
-							<div class="row col-xs-offset-0">Openness rating: {{ratingOpenness}}	</div>
-							<div class="row col-xs-offset-0">Orders rating: {{ordersRating}}</div>
-							<div class="row col-xs-offset-0">Partners rating: {{partnersRating}}</div>
-							<div class="row col-xs-offset-0">Orders count: {{ordersCount}}</div>
-							<div class="row col-xs-offset-0">Success orders count: {{successOrdersCount}}</div>
-							<div class="row col-xs-offset-0">All orders count: {{allOrdersCount}}</div>
-							<div class="row col-xs-offset-0">All success orders count: {{allSuccessOrdersCount}}</div>
+							<div class="row col-xs-offset-0">Рейтинг открытости: {{ratingOpenness}}	</div>
+							<div class="row col-xs-offset-0">Рейтинг по заявкам: {{ordersRating}}</div>
+							<div class="row col-xs-offset-0">Рейтинг партнеров: {{partnersRating}}</div>
+							<div class="row col-xs-offset-0">Число заявок: {{ordersCount}}</div>
+							<div class="row col-xs-offset-0">Число успешных заявок: {{successOrdersCount}}</div>
+							<div class="row col-xs-offset-0">Число всех заявок: {{allOrdersCount}}</div>
+							<div class="row col-xs-offset-0">Число всех успешных заявок: {{allSuccessOrdersCount}}</div>
 						</div>
 					</div>
 					<div class="progress" ng-click="showStatisticsPopover()" style="cursor: pointer;">
 						<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{summaryRating}}" aria-valuemin="0" aria-valuemax="100" ng-style="{width : (summaryRating + '%') }">
-							<span style="color: #d58512; overflow: hidden; white-space: nowrap; padding-left: 3px;"> Rating: {{summaryRating}}</span>
+							<span style="color: #d58512; overflow: hidden; white-space: nowrap; padding-left: 3px;"> Рейтинг: {{summaryRating}}</span>
 						</div>
 					</div>
 				</div>
@@ -82,7 +82,7 @@
 				</div>
 				<div class="col-xs-8 hidden-md hidden-lg" ng-if="editName">
 					<input type="text" id="xsUserName" class="form-control" ng-model="userPropertiesMap
-						['name']" placeholder="Name" maxlength="20" ng-blur="editNameAttribute()" ng-enter-key="editNameAttribute()"/>
+						['name']" placeholder="Имя" maxlength="20" ng-blur="editNameAttribute()" ng-enter-key="editNameAttribute()"/>
 				</div>
 				<div class="col-xs-8 hidden-md hidden-lg" ng-hide="!isCurrentUser" style="margin-top: -3px"><hr></div>
 			</div>
@@ -95,7 +95,7 @@
 
 						<div class="hidden-sm hidden-xs col-md-12" ng-if="editName">
 							<input type="text" id="userName" class="form-control" ng-model="userPropertiesMap
-								['name']" placeholder="Name" maxlength="20" ng-blur="editNameAttribute()" ng-enter-key="editNameAttribute()"/>
+								['name']" placeholder="Имя" maxlength="20" ng-blur="editNameAttribute()" ng-enter-key="editNameAttribute()"/>
 						</div>
 					</div>
 					<div class="row">
@@ -105,8 +105,8 @@
 					<div id="user-attributes" class="row col-xs-offset-0">
 						<div class="container-fluid">
 							<div class="row" ng-hide="!isCurrentUser">
-								<div class="col-xs-4 col-md-3">Зайти с:</div>
-								<div class="col-xs-8 col-md-8">
+								<div class="col-xs-12 col-sm-6 col-md-6">Привязать аккаунт к сервисам:</div>
+								<div class="col-xs-12 col-sm-5 col-md-5">
 									<a href="webapi/oauth2/authenticate" ng-hide="authMap['GOOGLE']"><img height="25" src="resources/img/g2-plus.png"/></a>
 									<a href="webapi/vk-oauth2/authenticate" ng-hide="authMap['VK']"><img height="25" src="resources/img/vk.png"/></a>
 									<a href="webapi/facebook-oauth2/authenticate" ng-hide="authMap['FB']"><img height="28" src="resources/img/facebook.png"/></a>
@@ -115,14 +115,14 @@
 							<div class="row">
 
 								<div class="col-xs-4 col-md-2 title" ng-click="editAttribute('mail')" ng-if="!editMap['mail']" style="cursor:pointer;">
-									Mail: 
+									Почта: 
 								</div>
 								<div class="col-xs-8 col-md-10" ng-click="editAttribute('mail')" ng-if="!editMap['mail']" style="cursor:pointer;">
 									{{userPropertiesMap['mail']}}<div class="profile-like" ng-if='authMap["userIdByAltId"]'><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="authMap['userIdByAltId']" entity-field="'mail'" user-alt-id="currentUserAltId"/></div>
 								</div>
 
 								<div class="hidden-xs col-md-2 title-edit title" ng-if="editMap['mail']">
-									Mail:
+									Почта:
 								</div>
 								<div class="input-group col-xs-12 col-md-9" ng-if="editMap['mail']" ng-click-out="disableEditAttribute('mail')">
 									<input type="email" id="mail" ng-model="userPropertiesMap
@@ -137,14 +137,14 @@
 							<div class="row">
 
 								<div class="col-xs-4 col-md-2 title" ng-click="editAttribute('phone')" ng-if="!editMap['phone']" style="cursor:pointer;">
-									Phone:
+									Телефон:
 								</div>
 								<div class="col-xs-8 col-md-10" ng-click="editAttribute('phone')" ng-if="!editMap['phone']" style="cursor:pointer;">
 									{{userPropertiesMap['phone']}}<div class="profile-like" ng-if='authMap["userIdByAltId"]'><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="authMap['userIdByAltId']" entity-field="'phone'" user-alt-id="currentUserAltId"/></div>
 								</div>
 
 								<div class="hidden-xs col-md-2 title-edit title" ng-if="editMap['phone']">
-									Phone:
+									Телефон:
 								</div>
 								<div class="input-group col-xs-12 col-md-9" ng-if="editMap['phone']" ng-click-out="disableEditAttribute('phone')">
 									<input type="text" id="phone" ng-model="userPropertiesMap
@@ -159,13 +159,13 @@
 							<div class="row">
 
 								<div class="col-xs-4 col-md-2 title" ng-click="editAttribute('languages')" ng-if="!editMap['languages']" style="cursor:pointer;">
-									Languages:
+									Языки:
 								</div>
 								<div class="col-xs-8 col-md-10" ng-click="editAttribute('languages')" ng-if="!editMap['languages']" style="cursor:pointer;">
 									{{userPropertiesMap['languagesStr']}}<div class="profile-like" ng-if='authMap["userIdByAltId"]'><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="authMap['userIdByAltId']" entity-field="'languages'" user-alt-id="currentUserAltId"/></div>
 								</div>
 								<div class="hidden-xs col-md-2 title-edit title" ng-if="editMap['languages']">
-									Languages:
+									Языки:
 								</div>
 								<div class="input-group col-xs-12 col-md-9" ng-if="editMap['languages']" ng-click-out="disableEditAttribute('languages')">
 									<input type="hidden" class="form-control" ui-select2="languageSelect2Options" ng-model="userPropertiesMap
@@ -177,22 +177,22 @@
 									</span>
 								</div>
 							</div>
-							<div class="row">
+							<!--div class="row">
 
 								<div class="col-xs-4 col-md-2 title" ng-click="editAttribute('currencies')" ng-if="!editMap['currencies']" style="cursor:pointer;">
-									Currencies:
+									Валюты:
 								</div>
 								<div class="col-xs-8 col-md-10" ng-click="editAttribute('currencies')" ng-if="!editMap['currencies']" style="cursor:pointer;">
 									{{userPropertiesMap['currenciesStr']}}<div class="profile-like" ng-if='authMap["userIdByAltId"]'><like-buttons entity-type="'user.model.UserPublicProfile'" entity-id="authMap['userIdByAltId']" entity-field="'currensies'" user-alt-id="currentUserAltId"/></div>
 								</div>
 
 								<div class="hidden-xs col-md-2 title-edit title" ng-if="editMap['currencies']">
-									Currencies:
+									Валюты:
 								</div>
 								<div class="input-group col-xs-12 col-md-9" ng-if="editMap['currencies']"  ng-click-out="disableEditAttribute('currencies')">
 									<input type="hidden" class="form-control" ui-select2="currenciesSelect2Options" ng-model="userPropertiesMap
 										['currencies']" id="currencies" data-placeholder="Pick a currency" style="width: 100%" />
-									<!--input type="text" id="currencies" class="form-control input-jqx" ng-model="currencies" ng-change="editCurrencies"/-->
+									
 									<span class="input-group-btn">
 										<button class="btn btn-default" type="button" ng-click="changeVisible('currenciesEnabled')" id="currencies-button">
 											<span class="glyphicon glyphicon-eye-{{userPropertiesMap['currenciesEnabled']}}"></span>
@@ -200,7 +200,7 @@
 									</span>
 
 								</div>
-							</div>	
+							</div-->	
 						</div>
 					</div>
 				</div>
@@ -232,8 +232,8 @@
 								<div class="row">
 									<div class="col-xs-1 col-md-1" ng-if="editMap['passportEnabled']" style="cursor:pointer;"><input type="checkbox" ng-model="userPropertiesMap
 										['passportEnabled']"></div>
-									<div class="col-xs-9 col-md-10" ng-click="editAttribute('passportEnabled')" ng-if="userPropertiesMap['passportEnabled']" style="cursor:pointer;">Ready to show passport</div>
-									<div class="col-xs-9 col-md-10" ng-click="editAttribute('passportEnabled')" ng-if="!userPropertiesMap['passportEnabled']" style="cursor:pointer;">Not ready to show passport</div>
+									<div class="col-xs-9 col-md-10" ng-click="editAttribute('passportEnabled')" ng-if="userPropertiesMap['passportEnabled']" style="cursor:pointer;">Готов показать паспорт</div>
+									<div class="col-xs-9 col-md-10" ng-click="editAttribute('passportEnabled')" ng-if="!userPropertiesMap['passportEnabled']" style="cursor:pointer;">Не готов показать паспорт</div>
 								</div>
 								<div class="row">
 									<div class="col-xs-12 col-md-12"><hr></div>

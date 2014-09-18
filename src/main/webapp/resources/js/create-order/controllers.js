@@ -20,12 +20,13 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 	$scope.scEditor.orderDataInitialized = false;
 	$scope.isCreditInit = true;
 	$scope.isBorrowInit = true;
+	$scope.isBond = false;
 
 	var currenciesMap = {};
 	$scope.orderCreatingMap = {};
 	$scope.orderCreatingMap['orderCategories'] = [];
 
-	$scope.categorySelect2Options = {
+	/*$scope.categorySelect2Options = {
 		allowClear: true,
 		tags: $scope.allCategories,
 		multiple: true,
@@ -40,7 +41,7 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 				return {id: term, text: term};
 			}
 		}
-	};
+	};*/
 
 	function formatResult(item) {
 		$timeout(function() {
@@ -67,21 +68,22 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 			$scope.allCurrenciesWithPercent.push(currency.code);
 		}
 		$scope.allCurrencies.splice(0, 1);
+		$scope.creditInit();
 	});
-	loadCurrentUserLanguages();
+	/*loadCurrentUserLanguages();
 	function loadCurrentUserLanguages() {
 		var userProfileResponse = usersProfileResource.current({});
 		userProfileResponse.$promise.then(function() {
 			$scope.userLanguages = userProfileResponse.languages;
 		});
-	}
+	}*/
 	function initDeadline() {
 		var date = new Date();
 		var newDate = new Date(new Date(date).setMonth(date.getMonth() + 3));
 		$scope.deadline = newDate.toISOString().substring(0, 10);
 	}
 
-	function initCategories() {
+	/*function initCategories() {
 		userProfileService.getAllCategories(function(categories) {
 			for (var i in categories) {
 				$scope.allCategories.push(categories[i].code);
@@ -90,7 +92,7 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 			$scope.creditInit();
 		});
 	}
-	initCategories();
+	initCategories();*/
 
 	$scope.isValidOrder = function() {
 
@@ -121,8 +123,8 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 			&& givingValue && (givingValue !== "") && isNumber(givingValue)
 			&& durationValue && (durationValue !== "")
 			//&& data && (data !== "")
-			&& $scope.orderCreatingMap['orderCategories'] && ($scope.orderCreatingMap['orderCategories'].length !== 0)
-			&& $scope.deadline && ($scope.deadline !== "") && $scope.userLanguages && ($scope.userLanguages.length > 0)) {
+			//&& $scope.orderCreatingMap['orderCategories'] && ($scope.orderCreatingMap['orderCategories'].length !== 0)
+			&& $scope.deadline && ($scope.deadline !== "")) {
 			if ((($scope.currency.selectedGivingCurrency !== "%") && (givingValue <= 0))
 				|| (($scope.currency.selectedTakingCurrency !== "%") && (takingValue <= 0))) {
 				disableCreateOrderButton();
@@ -162,7 +164,7 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 		angular.element(id).addClass("sc-has-success");
 	}
 
-	$scope.increaseDescriptionSize = function() {
+	/*$scope.increaseDescriptionSize = function() {
 		if (CKEDITOR.instances.orderDataEditable.getData() === "") {
 			angular.element("#orderDataEditable").css("min-height", "120px");
 		}
@@ -181,7 +183,7 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 			angular.element("#orderDataEditable").removeClass("sc-has-success");
 			angular.element("#orderDataEditable").addClass("sc-has-error");
 		}
-	};
+	};*/
 
 	$scope.goBack = function() {
 		$window.history.back();
@@ -194,8 +196,8 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 		$scope.givingValue = 10;
 		$scope.durationValue = 10;
 		//CKEDITOR.instances.orderDataEditable.setData(creditInitData);
-		$scope.orderCreatingMap['orderCategories'].splice(0, $scope.orderCreatingMap['orderCategories'].length);
-		$scope.orderCreatingMap['orderCategories'].push($scope.allCategories[3]);
+		//$scope.orderCreatingMap['orderCategories'].splice(0, $scope.orderCreatingMap['orderCategories'].length);
+		//$scope.orderCreatingMap['orderCategories'].push($scope.allCategories[3]);
 		$scope.isCreditInit = true;
 		$scope.isBorrowInit = false;
 		$timeout(function() {
@@ -211,8 +213,8 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 		$scope.givingValue = 1000;
 		$scope.durationValue = 10;
 		//CKEDITOR.instances.orderDataEditable.setData(borrowInitData);
-		$scope.orderCreatingMap['orderCategories'].splice(0, $scope.orderCreatingMap['orderCategories'].length);
-		$scope.orderCreatingMap['orderCategories'].push($scope.allCategories[7]);
+		//$scope.orderCreatingMap['orderCategories'].splice(0, $scope.orderCreatingMap['orderCategories'].length);
+		//$scope.orderCreatingMap['orderCategories'].push($scope.allCategories[7]);
 		$scope.isCreditInit = false;
 		$scope.isBorrowInit = true;
 		$timeout(function() {
@@ -229,8 +231,8 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 		$scope.givingValue = 0.1;
 		$scope.durationValue = 0;
 		//CKEDITOR.instances.orderDataEditable.setData(exchangeInitData);
-		$scope.orderCreatingMap['orderCategories'].splice(0, $scope.orderCreatingMap['orderCategories'].length);
-		$scope.orderCreatingMap['orderCategories'].push($scope.allCategories[4]);
+		//$scope.orderCreatingMap['orderCategories'].splice(0, $scope.orderCreatingMap['orderCategories'].length);
+		//$scope.orderCreatingMap['orderCategories'].push($scope.allCategories[4]);
 		$scope.isCreditInit = true;
 		$scope.isBorrowInit = true;
 		$timeout(function() {
@@ -250,7 +252,7 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 		var durationValue = angular.element("#order-duration input").val();
 		var incomingCurrency = $scope.currency.selectedTakingCurrency;
 		var outcomingCurrency = $scope.currency.selectedGivingCurrency;
-
+console.log($scope.isBond)
 		//orderInfo.orderData = data;
 		orderInfo.bookingDeadline = $scope.deadline;
 		orderInfo.incomingCurrency = incomingCurrency;
@@ -258,21 +260,26 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 		//addItems($scope.userPropertiesMap['currencies'], takingCurrency);
 		orderInfo.outcomingCurrency = outcomingCurrency;
 		orderInfo.outcomingAmount = outcomingAmount;
-		orderInfo.languages = $scope.userLanguages;
+		//orderInfo.languages = $scope.userLanguages;
 
 		orderInfo.duration = durationValue;
-		var durationType = $scope.selectedDurationType;
+		orderInfo.durationType = "DAY";
+		orderInfo.bond = $scope.isBond;
+		orderInfo.description = angular.element("#description").val();
+		/*var durationType = $scope.selectedDurationType;
 		if (durationType === "Hours") {
 			orderInfo.durationType = "HOUR";
 		} else if (durationType === "Days") {
 			orderInfo.durationType = "DAY";
-		}
-		orderInfo.categories = [];
+		}*/
+		/*orderInfo.categories = [];
 		for (var i in $scope.orderCreatingMap['orderCategories']) {
 			orderInfo.categories[i] = {};
 			orderInfo.categories[i].code = $scope.orderCreatingMap['orderCategories'][i];
 			orderInfo.categories[i].type = categoriesMap[$scope.orderCreatingMap['orderCategories'][i]];
-		}
+		}*/
+		
+		console.log(JSON.stringify(orderInfo))
 
 		var orderResponse = ordersResource.create({}, orderInfo);
 		orderResponse.$promise.then(function() {

@@ -3,6 +3,7 @@ var navbarModule = angular.module("navbar");
 navbarModule.controller("NavbarController", function($scope, $location, navbarService) {
 	$scope.isNavbarCollapsed = true;
 	$scope.unreadMessagesCount = 0;
+	$("#user-chat-form").removeClass("invisible");
 	if (typeof String.prototype.startsWith !== 'function') {
 		String.prototype.startsWith = function(str) {
 			return this.indexOf(str) === 0;

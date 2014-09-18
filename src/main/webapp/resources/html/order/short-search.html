@@ -6,15 +6,30 @@
 					<div class="container-fluid">
 						<div class="row hidden-xs">
 							<div class="col-sm-4 col-md-4">
-								<input type="hidden" class="form-control" ui-select2="categorySelect2Options" ng-model="ordersSearchMap
-										['orderCategories']" id="category" data-placeholder="Категории" style="width: 100%" ng-change="isValidOrder()"/>
+								<!--input type="hidden" class="form-control" ui-select2="categorySelect2Options" ng-model="ordersSearchMap
+										['orderCategories']" id="category" data-placeholder="Категории" style="width: 100%" ng-change="isValidOrder()"/-->
+								<!--select ui-select2 ng-model="type" data-placeholder="Тип заявки" ng-required="true" style="width: 100%">
+									<option value="0"></option>
+									<option value="1">Дают</option>
+									<option value="2">Берут</option>
+									<option value="3">Меняют</option>
+								</select-->
+								<dropdown d-class="'max-width'" dropdown-title="" items="types" do-select="selectType"></dropdown>
 							</div>
-							<div class="col-sm-3 col-md-3">								
-								<ui-dropdown on-enter="search()" element-id="'taking-currency'" data-dropdown-data="allCurrencies" preselected-item="selectedTakingCurrency" input-value="takingValue" placeholder="'Взять'"></ui-dropdown>
+							<div class="col-sm-3 col-md-3" ng-if="type === 'Дают' || type === 'Меняют'">
+								<ui-dropdown on-enter="search()" element-id="'giving-currency'" data-dropdown-data="allCurrenciesWithoutPersent" preselected-item="selectedGivingCurrency" input-value="givingValue" placeholder="'Дают'"></ui-dropdown>
 							</div>
-							<div class="col-sm-3 col-md-3">
-								<ui-dropdown on-enter="search()" element-id="'giving-currency'" data-dropdown-data="allCurrencies" preselected-item="selectedGivingCurrency" input-value="givingValue" placeholder="'Дать'"></ui-dropdown>
+							<div class="col-sm-3 col-md-3" ng-if="type === 'Дают'">								
+								<ui-dropdown on-enter="search()" element-id="'taking-currency'" is-percent="true" data-dropdown-data="allCurrencies" preselected-item="selectedTakingCurrency" input-value="takingValue" placeholder="'Берут'"></ui-dropdown>
 							</div>
+							
+							<div class="col-sm-3 col-md-3" ng-if="type === 'Берут' || type === 'Меняют'">
+								<ui-dropdown on-enter="search()" element-id="'taking-currency'" data-dropdown-data="allCurrenciesWithoutPersent" preselected-item="selectedTakingCurrency" input-value="takingValue" placeholder="'Берут'"></ui-dropdown>
+							</div>
+							<div class="col-sm-3 col-md-3" ng-if="type === 'Берут'">								
+								<ui-dropdown on-enter="search()" element-id="'giving-currency'" is-percent="true" data-dropdown-data="allCurrencies" preselected-item="selectedGivingCurrency" input-value="givingValue" placeholder="'Дают'"></ui-dropdown>
+							</div>
+							
 							<div class="col-sm-2 col-md-2">
 								<button class="btn btn-primary max-width" type="button" ng-click="search()"><span class="glyphicon glyphicon-search"></span></button>
 							</div>
@@ -22,10 +37,16 @@
 						<div class="row hidden-sm hidden-md hidden-lg">
 							<div class="clearfix"> 
 								<div class="btn-group inline pull-left" data-toggle="buttons-checkbox"> 
-									<input type="hidden" class="form-control" ui-select2="categorySelect2Options" ng-model="ordersSearchMap
-			  ['orderCategories']" id="category" data-placeholder="Категории" style="width: 100%" ng-change="isValidOrder()"/>
-									<ui-dropdown on-enter="search()" element-id="'taking-currency'" data-dropdown-data="allCurrencies" preselected-item="selectedTakingCurrency" input-value="takingValue" placeholder="'Взять'"></ui-dropdown>
-									<ui-dropdown on-enter="search()" element-id="'giving-currency'" data-dropdown-data="allCurrencies" preselected-item="selectedGivingCurrency" input-value="givingValue" placeholder="'Дать'"></ui-dropdown>
+									<!--input type="hidden" class="form-control" ui-select2="categorySelect2Options" ng-model="ordersSearchMap
+												['orderCategories']" id="category" data-placeholder="Категории" style="width: 100%" ng-change="isValidOrder()"/-->
+									<dropdown d-class="'max-width'" dropdown-title="" items="types" do-select="selectType"></dropdown>
+									<!--ui-dropdown on-enter="search()" element-id="'taking-currency'" data-dropdown-data="allCurrencies" preselected-item="selectedTakingCurrency" input-value="takingValue" placeholder="'Взять'"></ui-dropdown>
+									<ui-dropdown on-enter="search()" element-id="'giving-currency'" data-dropdown-data="allCurrencies" preselected-item="selectedGivingCurrency" input-value="givingValue" placeholder="'Дать'"></ui-dropdown-->
+									
+									<ui-dropdown on-enter="search()" element-id="'giving-currency'" data-dropdown-data="allCurrenciesWithoutPersent" preselected-item="selectedGivingCurrency" input-value="givingValue" placeholder="'Дают'" ng-if="type === 'Дают' || type === 'Меняют'"></ui-dropdown>
+									<ui-dropdown on-enter="search()" element-id="'taking-currency'" data-dropdown-data="allCurrencies" preselected-item="selectedTakingCurrency" input-value="takingValue" placeholder="'Берут'" ng-if="type === 'Дают'"></ui-dropdown>
+									<ui-dropdown on-enter="search()" element-id="'taking-currency'" data-dropdown-data="allCurrenciesWithoutPersent" preselected-item="selectedTakingCurrency" input-value="takingValue" placeholder="'Берут'" ng-if="type === 'Берут' || type === 'Меняют'"></ui-dropdown>
+									<ui-dropdown on-enter="search()" element-id="'giving-currency'" data-dropdown-data="allCurrencies" preselected-item="selectedGivingCurrency" input-value="givingValue" placeholder="'Дают'" ng-if="type === 'Берут'"></ui-dropdown>
 									<button class="btn btn-primary max-width" type="button" ng-click="search()"><span class="glyphicon glyphicon-search"></span></button>
 								</div> 
 							</div> 
