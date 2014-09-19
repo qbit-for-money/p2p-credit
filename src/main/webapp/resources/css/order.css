@@ -95,7 +95,7 @@ and (min-width : 798px) {
 }
 
 .button-lg {
-	height: 8em !important;
+	//height: 8em !important;
 	width: 100% !important;
 }
 

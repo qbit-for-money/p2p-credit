@@ -7,13 +7,13 @@
 			<div class="col-xs-12 col-md-12" ng-hide="isNotCaptcha">
 				<input id="googleRadio" type="radio" ng-model="auth" value="google" ng-change="changeAuthMode()"/>
 				<label for="googleRadio" style="margin-left: 10px;">
-					<a href="{{url}}" ng-if="auth === 'google'">
+					<a href="{{url}}" ng-if="auth === 'google'" style="text-decoration: none;">
 						<img src="resources/img/g2-plus.png" class="img-btn google" alt="Google+"/>
 					</a>
-					<a href="{{vkurl}}" ng-if="auth === 'google'">
+					<a href="{{vkurl}}" ng-if="auth === 'google'" style="text-decoration: none;">
 						<img src="resources/img/vk.png" class="img-btn google" alt="VK" style="max-width: 77px;"/>
 					</a>
-					<a href="{{fburl}}" ng-if="auth === 'google'">
+					<a href="{{fburl}}" ng-if="auth === 'google'" style="text-decoration: none;">
 						<img src="resources/img/facebook.png" class="img-btn google" alt="Facebook" style="max-width: 83px;"/>
 					</a>
 					<img src="resources/img/g2-plus.png" class="img-btn google" alt="Google+"
@@ -26,13 +26,13 @@
 			</div>
 			
 			<div class="col-xs-10 col-md-10 col-xs-offset-1 col-md-offset-1" ng-hide="!isNotCaptcha">
-				<a href="{{url}}" ng-if="auth === 'google'">
+				<a href="{{url}}" ng-if="auth === 'google'" style="text-decoration: none;">
 						<img src="resources/img/g2-plus.png" class="img-btn google" alt="Google+"/>
 					</a>
-				<a href="{{vkurl}}" ng-if="auth === 'google'">
+				<a href="{{vkurl}}" ng-if="auth === 'google'" style="text-decoration: none;">
 						<img src="resources/img/vk.png" class="img-btn google" alt="VK" style="max-width: 77px;"/>
 					</a>
-				<a href="{{fburl}}" ng-if="auth === 'google'">
+				<a href="{{fburl}}" ng-if="auth === 'google'" style="text-decoration: none;">
 						<img src="resources/img/facebook.png" class="img-btn google" style="max-width: 83px;" alt="Facebook"/>
 					</a>
 			</div>

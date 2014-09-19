@@ -452,7 +452,6 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 	}
 
 	function initUserOrdersTable(reload) {
-		console.log("********************* " + userPageNumber)
 		
 		searchRequest.pageNumber = userPageNumber;
 		if(reload) {
@@ -510,7 +509,7 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 			var exp = $interpolate(orderAttrsTemplate);
 			var orderAttrsContent = exp(orderAttrsContext);
 
-			var liTemplate = "<div style='margin-top: -22px;' id='" + orderId + "'>" + tableTemplate + "</div>";
+			var liTemplate = "<div style='' id='" + orderId + "'>" + tableTemplate + "</div>";
 			var responsesCount;
 			if (orders[i].responses && (orders[i].responses.length !== 0)) {
 				responsesCount = orders[i].responses.length;

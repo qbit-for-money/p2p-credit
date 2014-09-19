@@ -3,19 +3,19 @@
 	<div class="container-fluid">
 		<div class="row">
 			<div class="col-xs-12 col-md-12">
-				<textarea rows="4" cols="50" style="max-width: 100%; max-height: 150px;" ng-model="comment" placeholder="Add a comment"> 
+				<textarea rows="4" cols="50" style="max-width: 100%; max-height: 150px;" ng-model="comment" placeholder="Откликнуться с комментарием"> 
 				</textarea>
 			</div>
 		</div>
 		<div class="row" style="padding-top: 15px;">
 			<div class="col-xs-6 col-md-6">
-				<button class="btn btn-success navbar-right" ng-disabled="comment === ''" type="button" ng-click="save(comment)" style="width: 60%">
-					Yes!
+				<button class="btn btn-danger navbar-left" type="button" ng-click="cancel()" style="width: 100%">
+					<span class="glyphicon glyphicon-remove"></span>
 				</button>
 			</div>
 			<div class="col-xs-6 col-md-6">
-				<button class="btn btn-danger navbar-left" type="button" ng-click="cancel()" style="width: 60%">
-					No
+				<button class="btn btn-success navbar-right" ng-disabled="comment === ''" type="button" ng-click="save(comment)" style="width: 100%">
+					<span class="glyphicon glyphicon-send"></span>
 				</button>
 			</div>
 		</div>
