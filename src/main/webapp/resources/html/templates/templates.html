@@ -84,17 +84,17 @@
 	</div>
 </script>
 <script id="userOrderAttrsTmpl" type="text/x-angular-tmpl">
-	<div class="row" style="margin: 5px; font-size: 12px;">
-	<div class="col-xs-4 col-md-4">
-	<div class="container-fluid">
-	<div class="row" ng-hide="'{{take}}' === ''">
-	<div class="col-xs-12 col-md-12">Беру: {{take}}</div>
-	</div>
-	<div class="row" ng-hide="'{{give}}' === ''">
-	<div class="col-xs-12 col-md-12">Даю: {{give}}</div>
-	</div>
+<div class="row" style="margin: 5px; font-size: 12px;">
+	<div class="col-xs-6 col-md-3">
+		<div class="container-fluid">
+			<div class="row" ng-hide="'{{take}}' === ''">
+				<div class="col-xs-12 col-md-12">Беру: {{take}}</div>
+			</div>
+			<div class="row" ng-hide="'{{give}}' === ''">
+				<div class="col-xs-12 col-md-12">Даю: {{give}}</div>
+			</div>
 
-	</div>
+		</div>
 	</div>
 
 	<!--div class="col-xs-4 col-md-4">
@@ -109,104 +109,101 @@
 	</div>
 	</div-->
 
+	<div class="col-xs-6 col-md-3">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-xs-12 col-md-12">Период: {{duration}}</div>
+			</div>
 
-
-	<div class="col-xs-4 col-md-4">
-	<div class="container-fluid">
-	<div class="row">
-	<div class="col-xs-12 col-md-12">Период: {{duration}}</div>
-	</div>
-
-	<div class="row">
-	<div class="col-xs-12 col-md-12">Статус заявки: 
-	<span ng-if="{{orderStatus === "OPENED"}}">Открыта</span>
-	<span ng-if="{{orderStatus === "IN PROCESS"}}">В процессе</span>
-	<span ng-if="{{orderStatus === "SUCCESS"}}">Успешна</span>
-	<span ng-if="{{orderStatus === "NOT SUCCESS"}}">Неуспешна</span>
-	<span ng-if="{{orderStatus === "ARBITRATION"}}">Арбитраж</span>
-	</div>
-	</div>
-	</div>
+			<div class="row">
+				<div class="col-xs-12 col-md-12">Статус заявки: 
+					<span ng-if="{{orderStatus === "OPENED"}}">Открыта</span>
+					<span ng-if="{{orderStatus === "IN PROCESS"}}">В процессе</span>
+					<span ng-if="{{orderStatus === "SUCCESS"}}">Успешна</span>
+					<span ng-if="{{orderStatus === "NOT SUCCESS"}}">Неуспешна</span>
+					<span ng-if="{{orderStatus === "ARBITRATION"}}">Арбитраж</span>
+				</div>
+			</div>
+		</div>
 	</div>
 
-	<div class="col-xs-4 col-md-4">
-	<div class="container-fluid">
-	<div class="row">
-	<div class="col-xs-12 col-md-12">Комментарий: {{categories}}</div>
+	<div class="col-xs-12 col-md-6">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="hidden-xs col-sm-1 hidden-md"></div>
+				<div class="col-xs-12 col-sm-10 col-md-12">Комментарий: {{description}}</div>
+				<div class="hidden-xs col-sm-1 hidden-md"></div>
+			</div>
+		</div>
 	</div>
-	<div class="row">
-	<div class="col-xs-12 col-md-12">{{description}}</div>
-	</div>
-	</div>
-	</div>
-	</div>
+</div>
 </script>
 
 <script id="responsesTmpl" type="text/x-angular-tmpl">
-<li class="list-group-item" id="{{responseId}}">
+	<li class="list-group-item" id="{{responseId}}">
 
 	<div class="row">
-		<div class="col-xs-3 col-sm-2 col-md-1">
-			<div class='jqx-rc-all'>
-				<div style='margin-top: 3px;'>
-					<a href="{{userurl}}"><img height="43" src="{{imgurl}}"/></a>
-				</div>
-			</div>
-		</div>
-		<div class="hidden-xs col-sm-7 col-md-8" ng-if="{{isComment}}">
+	<div class="col-xs-3 col-sm-2 col-md-1">
+	<div class='jqx-rc-all'>
+	<div style='margin-top: 3px;'>
+	<a href="{{userurl}}"><img height="43" src="{{imgurl}}"/></a>
+	</div>
+	</div>
+	</div>
+	<div class="hidden-xs col-sm-7 col-md-8" ng-if="{{isComment}}">
 
-			<div class="container-fluid">
-				<div class="col-xs-12 col-md-12" style="margin: 3px;">
-					Комментарий: {{comment}}
-				</div>
-			</div>
-		</div>
-		<div class="hidden-xs hidden-sm col-md-9" ng-if="{{isAttributes}}">
-			<div class="container-fluid">
-				<div class="col-xs-12 col-sm-3 col-md-3" style="margin: 6px;" id="name">
-					Имя: <span></span>
-				</div>
-				<div class="col-xs-12 col-sm-3 col-md-4" style="margin: 6px;" id="mail">
-					Почта: <span></span>
-				</div>
-				<div class="col-xs-12 col-sm-3 col-md-4" style="margin: 6px;" id="phone">
-					Телефон: <span></span>
-				</div>
-			</div>
-		</div>
-		<div class="col-xs-9 col-sm-10 col-md-2" style="padding: 0">
-			<div class="container-fluid">
-				<div class="col-xs-12 col-md-12" style="margin-top: 3px; padding: 3px">
-					<div class="navbar-right">
-						
-						<button class="btn btn-success" style="float: right;margin-right: 5px;" type="button" ng-hide="{{status === true}}" ng-disabled="{{orderStatus !== 'OPENED'}}" ng-click="approve({{orderId}}, '{{userId}}')">
-							Yes!
-						</button>
-						<button class="btn btn-default" style="float: right;margin-right: 5px;" type="button" ng-click="openChatDialog('{{userId}}')">
-							<span class="glyphicon glyphicon-envelope"></span>
-						</button>
+	<div class="container-fluid">
+	<div class="col-xs-12 col-md-12" style="margin: 3px;">
+	Комментарий: {{comment}}
+	</div>
+	</div>
+	</div>
+	<div class="hidden-xs hidden-sm col-md-9" ng-if="{{isAttributes}}">
+	<div class="container-fluid">
+	<div class="col-xs-12 col-sm-3 col-md-3" style="margin: 6px;" id="name">
+	Имя: <span></span>
+	</div>
+	<div class="col-xs-12 col-sm-3 col-md-4" style="margin: 6px;" id="mail">
+	Почта: <span></span>
+	</div>
+	<div class="col-xs-12 col-sm-3 col-md-4" style="margin: 6px;" id="phone">
+	Телефон: <span></span>
+	</div>
+	</div>
+	</div>
+	<div class="col-xs-9 col-sm-10 col-md-2" style="padding: 0">
+	<div class="container-fluid">
+	<div class="col-xs-12 col-md-12" style="margin-top: 3px; padding: 3px">
+	<div class="navbar-right">
 
-						<bs-dropdown data-menu-type="button" order-id="{{orderId}}" do-function="updateTables()" ng-hide="{{(status !== true)|| (orderStatus === 'SUCCESS') || ((orderStatus === 'IN PROCESS') && (isApprovedResponse == false))}}"></bs-dropdown>
-					</div>
-				</div>
-			</div>
-		</div>
+	<button class="btn btn-success" style="float: right;margin-right: 5px;" type="button" ng-hide="{{status === true}}" ng-disabled="{{orderStatus !== 'OPENED'}}" ng-click="approve({{orderId}}, '{{userId}}')">
+	Yes!
+	</button>
+	<button class="btn btn-default" style="float: right;margin-right: 5px;" type="button" ng-click="openChatDialog('{{userId}}')">
+	<span class="glyphicon glyphicon-envelope"></span>
+	</button>
+
+	<bs-dropdown data-menu-type="button" order-id="{{orderId}}" do-function="updateTables()" ng-hide="{{(status !== true)|| (orderStatus === 'SUCCESS') || ((orderStatus === 'IN PROCESS') && (isApprovedResponse == false))}}"></bs-dropdown>
+	</div>
+	</div>
+	</div>
+	</div>
 	</div>
 	<div class="row">
-		<div class="col-xs-12 hidden-sm hidden-md hidden-lg" style="margin: 3px;" ng-if="{{isComment}}">
-			Комментарий: {{comment}}
-		</div>
-		<div class="col-xs-3 col-sm-3 hidden-md hidden-lg" style="margin: 6px;" id="name" ng-if="{{isAttributes}}">
-			Имя: <span></span>
-		</div>
-		<div class="col-xs-4 col-sm-4 hidden-md hidden-lg" style="margin: 6px;" id="mail" ng-if="{{isAttributes}}">
-			Почта: <span></span>
-		</div>
-		<div class="col-xs-4 col-sm-4 hidden-md hidden-lg" style="margin: 6px;" id="phone" ng-if="{{isAttributes}}">
-			Телефон: <span></span>
-		</div>
+	<div class="col-xs-12 hidden-sm hidden-md hidden-lg" style="margin: 3px;" ng-if="{{isComment}}">
+	Комментарий: {{comment}}
 	</div>
-</li>
+	<div class="col-xs-3 col-sm-3 hidden-md hidden-lg" style="margin: 6px;" id="name" ng-if="{{isAttributes}}">
+	Имя: <span></span>
+	</div>
+	<div class="col-xs-4 col-sm-4 hidden-md hidden-lg" style="margin: 6px;" id="mail" ng-if="{{isAttributes}}">
+	Почта: <span></span>
+	</div>
+	<div class="col-xs-4 col-sm-4 hidden-md hidden-lg" style="margin: 6px;" id="phone" ng-if="{{isAttributes}}">
+	Телефон: <span></span>
+	</div>
+	</div>
+	</li>
 </script>
 
 

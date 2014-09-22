@@ -79,7 +79,7 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 	}*/
 	function initDeadline() {
 		var date = new Date();
-		var newDate = new Date(new Date(date).setMonth(date.getMonth() + 3));
+		var newDate = new Date(new Date(date).setDate(date.getDate() + 10));
 		$scope.deadline = newDate.toISOString().substring(0, 10);
 	}
 
@@ -246,7 +246,6 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 			return;
 		}
 		var orderInfo = {};
-		//var data = CKEDITOR.instances.orderDataEditable.getData();
 		var outcomingAmount = angular.element("#giving-order-currency input").val();
 		var incomingAmount = angular.element("#taking-order-currency input").val();
 		var durationValue = angular.element("#order-duration input").val();

@@ -642,7 +642,6 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 				partnersRating: orders[i].statistics.partnersRating,
 				creationDate: orders[i].creationDate,
 				description: orders[i].description
-
 			};
 			var exp = $interpolate(orderAttrsTemplate);
 			var orderAttrsContent = exp(orderAttrsContext);

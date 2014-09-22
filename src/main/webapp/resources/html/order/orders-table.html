@@ -1,4 +1,4 @@
-<div class="panel panel-default" style="border-width: 0; box-shadow: 0 1px 1px rgba(0,0,0,0);">
+<div class="panel panel-default" style="border-width: 0; box-shadow: 0 1px 1px rgba(0,0,0,0); min-width: 277px;">
 	<div class="panel-body" style="padding-bottom: 0;">
 		<div class="container-fluid">
 			<div class="row">
@@ -80,50 +80,14 @@
 									<div class="col-sm-4 col-md-4" ng-if="type === 'credit' || type === 'borrow'">	
 										<ui-dropdown on-enter="" static="'Дней'" element-id="'order-duration'" on-change-input="onChangeInput()" data-dropdown-data="durationTypes" preselected-item="selectedDurationType" input-value="durationValue" placeholder="'Срок'"></ui-dropdown>
 									</div>
-									<!--input type="checkbox" ng-model="isBond"/-->
 									<div class="hidden-xs col-sm-4 col-md-2" ng-hide="type === 'exchange'" style="margin-top: 5px;"><div class="col-xs-4 col-sm-4 col-md-7">Залог</div><div class="col-xs-3 col-sm-3 col-md-3" style="cursor:pointer;margin-top: 1px;"><input type="checkbox" ng-model="isBond"/></div></div>		
-									<div class="col-xs-5 hidden-sm	hidden-md hidden-lg" ng-hide="type === 'exchange'" style="margin-top: 5px; margin-bottom: 5px;"><div class="col-xs-4 col-sm-4 col-md-7">Залог</div><div class="col-xs-3 col-sm-3 col-md-3" style="cursor:pointer;margin-top: 1px;"><input type="checkbox" ng-model="isBond"/></div></div>
+									<div class="col-xs-6 hidden-sm	hidden-md hidden-lg" ng-hide="type === 'exchange'" style="margin-top: 5px; margin-bottom: 5px;"><div class="col-xs-5 col-sm-4 col-md-7">Залог</div><div class="col-xs-3 col-sm-3 col-md-3" style="cursor:pointer;margin-top: 1px;"><input type="checkbox" ng-model="isBond"/></div></div>
 								</div>
 								<div class="row">
 									<div class="col-xs-12 hidden-sm hidden-md hidden-lg">
 										<button class="btn btn-primary max-width" type="button" ng-click="filterOrdersTable()"><span class="glyphicon glyphicon-search"></span></button>
 									</div>
 								</div>
-								<!--div class="row">
-									<div class="hidden-xs col-sm-4 col-md-4" style="">
-										<dropdown dropdown-title="'Фильтровать:'" items="filterBy" do-select="selectOrdersFilter"></dropdown>
-									</div>
-									<div class="col-xs-12 hidden-sm hidden-md hidden-lg" style="padding-bottom: 10px;z-index: 4;">
-										<dropdown dropdown-title="'Фильтровать:'" d-style="'width: 100%;'" items="filterBy" do-select="selectOrdersFilter"></dropdown>
-									</div>
-									<div class="col-sm-5 col-md-5" style="padding-top: 5px; z-index: 3;" ng-if="filterItem === 'categories'">
-										<input type="hidden" class="form-control" ui-select2="categorySelect2Options" ng-model="ordersSearchMap
-											['orderCategories']" id="category" data-placeholder="Category" style="width: 100%; margin-top: -5px;" ng-change="isValidOrder()"/>
-									</div>
-
-									<div class="col-sm-5 col-md-5" style="padding-top: 5px;" ng-if="(filterItem === 'incomingCurrency') || (filterItem === 'outcomingCurrency')">
-										<dropdown d-class="'max-width'" d-style="'margin-top: -5px;'" items="allCurrenciesDropdown" do-select="selectCurrency"></dropdown>
-									</div>
-									<div class="col-sm-5 col-md-5" style="padding-top: 5px;" ng-if="(filterItem === 'incomingAmount') || (filterItem === 'outcomingAmount')">
-										<input	type="number" id="amount" class="form-control" style="margin-top: -5px;"/>
-									</div>
-									<div class="col-sm-2 col-md-2" style="z-index: 0;">
-										<button class="btn btn-primary max-width" type="button" ng-click="filterOrdersTable()"><span class="glyphicon glyphicon-search"></span></button>
-									</div>
-								</div-->
-								<!--div class="row" style="padding-top: 10px;">
-									<div class="hidden-xs col-sm-12 col-md-6">
-										<dropdown dropdown-title="'Сортировать:'" d-style="'width: 60%;'" items="sortedBy" do-select="sortTable"></dropdown>
-									</div>
-									<div class="col-xs-12 hidden-sm hidden-md hidden-lg">
-										<dropdown dropdown-title="'Сортировать:'" d-style="'width: 100%;'" items="sortedBy" do-select="sortTable"></dropdown>
-									</div>
-									<div class="col-md-4" ng-hide="type === 'exchange'"><div class="col-xs-3 col-md-3" style="cursor:pointer;"><input type="checkbox" ng-model="isBond"></div><div class="col-md-8">Залог</div></div>
-									<div class="col-sm-2 col-md-2">
-										<button class="btn btn-primary max-width" type="button" ng-click="filterOrdersTable()"><span class="glyphicon glyphicon-search"></span></button>
-									</div>
-
-								</div-->
 							</div>
 						</div>
 					</div>
