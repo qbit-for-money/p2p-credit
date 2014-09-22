@@ -251,7 +251,7 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 		var durationValue = angular.element("#order-duration input").val();
 		var incomingCurrency = $scope.currency.selectedTakingCurrency;
 		var outcomingCurrency = $scope.currency.selectedGivingCurrency;
-console.log($scope.isBond)
+//console.log($scope.isBond)
 		//orderInfo.orderData = data;
 		orderInfo.bookingDeadline = $scope.deadline;
 		orderInfo.incomingCurrency = incomingCurrency;
@@ -278,7 +278,7 @@ console.log($scope.isBond)
 			orderInfo.categories[i].type = categoriesMap[$scope.orderCreatingMap['orderCategories'][i]];
 		}*/
 		
-		console.log(JSON.stringify(orderInfo))
+		//console.log(JSON.stringify(orderInfo))
 
 		var orderResponse = ordersResource.create({}, orderInfo);
 		orderResponse.$promise.then(function() {

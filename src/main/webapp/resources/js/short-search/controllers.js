@@ -33,7 +33,7 @@ navbarModule.controller("ShortSearchController", function($scope, $rootScope, us
 			$scope.selectedGivingCurrency = "RUR";
 			$scope.selectedTakingCurrency = "BTC";
 		}
-		console.log($scope.type)
+		//console.log($scope.type)
 	}
 
 	var currenciesMap = {};
@@ -65,7 +65,7 @@ navbarModule.controller("ShortSearchController", function($scope, $rootScope, us
 			currenciesMap[currency.code].id = currency.id;
 			currenciesMap[currency.code].step = currency.maxValue / 10;
 			$scope.allCurrencies.push(currency.code);
-			console.log(currency.id)
+			//console.log(currency.id)
 			if (currency.id !== "PERCENT") {
 				$scope.allCurrenciesWithoutPersent.push(currency.code);
 			}
@@ -89,8 +89,8 @@ navbarModule.controller("ShortSearchController", function($scope, $rootScope, us
 		//console.log("->>>" + angular.element("#taking-currency").find(".li-item").text())
 		//console.log("%% " + angular.element("#giving-currency").find("input").val() + " " + angular.element("#taking-currency").find("input").val())
 		//console.log(JSON.stringify($scope.ordersSearchMap['orderCategories']))
-		console.log($scope.selectedGivingCurrency + " " + $scope.givingValue)
-		console.log($scope.selectedTakingCurrency + " " + $scope.takingValue)
+		//console.log($scope.selectedGivingCurrency + " " + $scope.givingValue)
+		//console.log($scope.selectedTakingCurrency + " " + $scope.takingValue)
 		$rootScope.searchRequest = {};
 		//$rootScope.searchRequest.orderCategories = $scope.ordersSearchMap['orderCategories'];
 		$rootScope.searchRequest.selectedGivingCurrency = angular.element("#giving-currency").find(".li-item").text();
@@ -105,7 +105,7 @@ navbarModule.controller("ShortSearchController", function($scope, $rootScope, us
 			$rootScope.searchRequest.type = "exchange";
 		}
 		
-console.log($rootScope.searchRequest)
+//console.log($rootScope.searchRequest)
 		if (!$rootScope.user || (($rootScope.user.publicKey.indexOf("@") === -1)
 			&& ($rootScope.user.publicKey.indexOf("vk-") === -1) && ($rootScope.user.publicKey.indexOf("fb-") === -1))) {
 			authService.openAuthDialog(false, true, window.context + "#/orders");
@@ -114,7 +114,7 @@ console.log($rootScope.searchRequest)
 		}
 	};
 	
-	$scope.isValidRequest = function() {
+	/*$scope.isValidRequest = function() {
 
 		var givingValue = angular.element("#giving-order-currency input").val();
 		var takingValue = angular.element("#taking-order-currency input").val();
@@ -155,7 +155,7 @@ console.log($rootScope.searchRequest)
 			disableCreateOrderButton();
 		}
 		return $scope.createOrderButtonEnabled;
-	};
+	};*/
 
 	/*function creditInit() {
 	 $scope.takingValue = 1000;
