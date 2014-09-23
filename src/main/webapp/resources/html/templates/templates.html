@@ -84,17 +84,17 @@
 	</div>
 </script>
 <script id="userOrderAttrsTmpl" type="text/x-angular-tmpl">
-<div class="row" style="margin: 5px; font-size: 12px;">
+	<div class="row" style="margin: 5px; font-size: 12px;">
 	<div class="col-xs-6 col-md-3">
-		<div class="container-fluid">
-			<div class="row" ng-hide="'{{take}}' === ''">
-				<div class="col-xs-12 col-md-12">Беру: {{take}}</div>
-			</div>
-			<div class="row" ng-hide="'{{give}}' === ''">
-				<div class="col-xs-12 col-md-12">Даю: {{give}}</div>
-			</div>
+	<div class="container-fluid">
+	<div class="row" ng-hide="'{{take}}' === ''">
+	<div class="col-xs-12 col-md-12">Беру: {{take}}</div>
+	</div>
+	<div class="row" ng-hide="'{{give}}' === ''">
+	<div class="col-xs-12 col-md-12">Даю: {{give}}</div>
+	</div>
 
-		</div>
+	</div>
 	</div>
 
 	<!--div class="col-xs-4 col-md-4">
@@ -110,33 +110,33 @@
 	</div-->
 
 	<div class="col-xs-6 col-md-3">
-		<div class="container-fluid">
-			<div class="row">
-				<div class="col-xs-12 col-md-12">Период: {{duration}}</div>
-			</div>
+	<div class="container-fluid">
+	<div class="row">
+	<div class="col-xs-12 col-md-12">Период: {{duration}}</div>
+	</div>
 
-			<div class="row">
-				<div class="col-xs-12 col-md-12">Статус заявки: 
-					<span ng-if="{{orderStatus === "OPENED"}}">Открыта</span>
-					<span ng-if="{{orderStatus === "IN PROCESS"}}">В процессе</span>
-					<span ng-if="{{orderStatus === "SUCCESS"}}">Успешна</span>
-					<span ng-if="{{orderStatus === "NOT SUCCESS"}}">Неуспешна</span>
-					<span ng-if="{{orderStatus === "ARBITRATION"}}">Арбитраж</span>
-				</div>
-			</div>
-		</div>
+	<div class="row">
+	<div class="col-xs-12 col-md-12">Статус заявки: 
+	<span ng-if="{{orderStatus === "OPENED"}}">Открыта</span>
+	<span ng-if="{{orderStatus === "IN PROCESS"}}">В процессе</span>
+	<span ng-if="{{orderStatus === "SUCCESS"}}">Успешна</span>
+	<span ng-if="{{orderStatus === "NOT SUCCESS"}}">Неуспешна</span>
+	<span ng-if="{{orderStatus === "ARBITRATION"}}">Арбитраж</span>
+	</div>
+	</div>
+	</div>
 	</div>
 
 	<div class="col-xs-12 col-md-6">
-		<div class="container-fluid">
-			<div class="row">
-				<div class="hidden-xs col-sm-1 hidden-md"></div>
-				<div class="col-xs-12 col-sm-10 col-md-12">Комментарий: {{description}}</div>
-				<div class="hidden-xs col-sm-1 hidden-md"></div>
-			</div>
-		</div>
+	<div class="container-fluid">
+	<div class="row">
+	<div class="hidden-xs col-sm-1 hidden-md"></div>
+	<div class="col-xs-12 col-sm-10 col-md-12">Комментарий: {{description}}</div>
+	<div class="hidden-xs col-sm-1 hidden-md"></div>
 	</div>
-</div>
+	</div>
+	</div>
+	</div>
 </script>
 
 <script id="responsesTmpl" type="text/x-angular-tmpl">
@@ -177,7 +177,7 @@
 	<div class="navbar-right">
 
 	<button class="btn btn-success" style="float: right;margin-right: 5px;" type="button" ng-hide="{{status === true}}" ng-disabled="{{orderStatus !== 'OPENED'}}" ng-click="approve({{orderId}}, '{{userId}}')">
-	Yes!
+	<span style="font-size: 10px;">Принять</span>
 	</button>
 	<button class="btn btn-default" style="float: right;margin-right: 5px;" type="button" ng-click="openChatDialog('{{userId}}')">
 	<span class="glyphicon glyphicon-envelope"></span>
@@ -208,67 +208,67 @@
 
 
 <script id="ordersTableTmpl" type="text/x-angular-tmpl">
-	<div class="table-row panel panel-default" style="border-radius: 0;">
+<div class="table-row panel panel-default" style="border-radius: 0;">
 	<div>
-	<div class="panel-body" style="padding-top: 0;padding-bottom: 0;">
-	<div class="container-fluid">
-	<div class="row" id="tabs">
-	<ul class="nav nav-tabs" role="tablist" id="order-tab" style="background-color: rgb(245, 252, 250);">
-	<li class="active"><a href="#order-attrs{{orderId}}" data-toggle="tab">
-	<span ng-if="{{type === 'GIVE'}}">Даю</span>
-	<span ng-if="{{type === 'TAKE'}}">Беру</span>
-	<span ng-if="{{type === 'EXCHANGE'}}">Меняю</span>
+		<div class="panel-body" style="padding-top: 0;padding-bottom: 0;">
+			<div class="container-fluid">
+				<div class="row" id="tabs">
+					<ul class="nav nav-tabs" role="tablist" id="order-tab" style="background-color: rgb(245, 252, 250);">
+						<li class="active"><a href="#order-attrs{{orderId}}" data-toggle="tab">
+								<span ng-if="{{type === 'GIVE'}}">Даю</span>
+								<span ng-if="{{type === 'TAKE'}}">Беру</span>
+								<span ng-if="{{type === 'EXCHANGE'}}">Меняю</span>
 
-	</a></li>
-	<!--li><a href="#order-description{{orderId}}" data-toggle="tab">Description</a></li-->
-	</ul>
-	<div id="tab-content" class="tab-content">
-	<div class="order-attrs tab-pane active" id="order-attrs{{orderId}}">
-	<div class="table-status-button" ng-hide="{{isUserOrder === true}}" style="margin-right: -37px;">
-	<div class="row">
-	<div class='container-fluid' >
-	<div class='col-xs-12 col-md-12' style='margin-right: 25px;'>
-	<div class="col-xs-3 col-md-3">
-	<button class="btn btn-default" type="button" ng-click="openChatDialog('{{userId}}')">
-	<span class="glyphicon glyphicon-envelope"></span>
-	</button>
-	</div>
+							</a></li>
+						<!--li><a href="#order-description{{orderId}}" data-toggle="tab">Description</a></li-->
+					</ul>
+					<div id="tab-content" class="tab-content">
+						<div class="order-attrs tab-pane active" id="order-attrs{{orderId}}">
+							<div class="table-status-button" ng-hide="{{isUserOrder === true}}" style="margin-right: -37px;">
+								<div class="row">
+									<div class='container-fluid' >
+										<div class='col-xs-12 col-md-12' style='margin-right: 25px;'>
+											<div class="col-xs-3 col-md-3">
+												<button class="btn btn-default" type="button" ng-click="openChatDialog('{{userId}}')">
+													<span class="glyphicon glyphicon-envelope"></span>
+												</button>
+											</div>
 
-	<div class="btn-group col-xs-8 col-md-8" ng-hide="false">
-	<button class="btn btn-success" type="button" ng-click="addResponse({{orderId}})" style="width: 60%" ng-disabled="{{disabled === true}}">
-	Yes!
-	</button>
+											<div class="btn-group col-xs-8 col-md-8" ng-hide="false">
+												<button class="btn btn-success" type="button" ng-click="addResponse({{orderId}})" style="width: 60%" ng-disabled="{{disabled === true}}">
+													<span style="font-size: 10px">Откликнуться</span>
+												</button>
 
-	<button class="btn btn-success" type="button" ng-click="openCommentDialog({{orderId}})"  ng-disabled="{{disabled === true}}">
-	<span class="glyphicon glyphicon-cloud"></span>
-	</button>
-	</div>
+												<button class="btn btn-success" type="button" ng-click="openCommentDialog({{orderId}})"  ng-disabled="{{disabled === true}}">
+													<span class="glyphicon glyphicon-cloud"></span>
+												</button>
+											</div>
 
-	</div>
-	</div>
-	</div>
-	</div>
-	<div class="table-status-button">
-	<div class="row">
-	<div class="container-fluid">
-	<div class="col-xs-12 col-md-12">	
-	<bs-dropdown data-menu-type="button" order-id={{orderId}} do-function="updateTables()" ng-hide="{{(status !== true)|| (orderStatus === 'SUCCESS')}}"></bs-dropdown>
-	</div>
-	</div>
-	</div>
-	</div>
-	{{orderAttributes}}
-	</div>
-	</div>	
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="table-status-button">
+								<div class="row">
+									<div class="container-fluid">
+										<div class="col-xs-12 col-md-12">	
+											<bs-dropdown data-menu-type="button" order-id={{orderId}} do-function="updateTables()" ng-hide="{{(status !== true)|| (orderStatus === 'SUCCESS')}}"></bs-dropdown>
+										</div>
+									</div>
+								</div>
+							</div>
+							{{orderAttributes}}
+						</div>
+					</div>	
 
-	</div>
+				</div>
 
 
+			</div>
+		</div>
 	</div>
-	</div>
-	</div>
-	</div>
-	</div>
+</div>
+</div>
 </script>
 
 <script id="orderAttrsTmpl" type="text/x-angular-tmpl">
@@ -373,152 +373,6 @@
 	</div>
 	</div>
 	</div-->
-	</div>
-</script>
-
-<script id="userOrdersTableDetailTmpl" type="text/x-angular-tmpl">
-	<ul style="margin-left: 30px;">
-	<li>Free description</li>
-	<li>Responses list</li>
-	</ul>
-	<div class="order-description container-fluid">
-	<div style="position: absolute; top: 10px; right: 49px; height: 18px;">
-	<div class="row">
-	<div class="container-fluid">
-	<div class="col-xs-12 col-md-12">	
-	<bs-dropdown data-menu-type="button" order-id={{orderId}} do-function="updateTables()" ng-hide="{{(status !== true)|| (orderStatus === 'SUCCESS')}}"></bs-dropdown>
-	</div>
-	</div>
-	</div>
-	</div>
-	<div class="row" style="margin: 5px;">
-	<div class="col-xs-12 col-md-12">
-	{{freeDescription}}
-	</div>
-	</div>
-	</div>
-	<div class="responses-list container-fluid">
-	<div style="position: absolute; top: 10px; right: 49px; height: 18px;">
-	<div class="row">
-	<div class="container-fluid">
-	<div class="col-xs-12 col-md-12">	
-	<bs-dropdown data-menu-type="button" order-id={{orderId}} do-function="updateTables()" ng-hide="{{(status !== true)||(orderStatus === 'SUCCESS')}}"></bs-dropdown>
-	</div>
-	</div>
-	</div>
-	</div>
-	<div class="row" style="margin: 1px;">
-	<div class="col-xs-12 col-md-12">
-
-	<div class="dropdown open" style="weight: 100%">
-	<ul class="list-group" id="responses-list">
-	#responses-list
-	</ul>
-
-	</div>
-	</div>
-	</div>
-	</div>
-</script>
-<script id="ordersTableDetailTmpl" type="text/x-angular-tmpl">
-	<ul style='margin-left: 30px;'>
-	<li class='title'>Profile</li>
-	<li>Free description</li>
-	</ul>
-	<div class='information container-fluid'>
-	<div style='position: absolute; top: 10px; right: 4px; height: 18px;' ng-hide="{{isUserOrder === true}}">
-	<div class="row">
-	<div class='container-fluid' >
-	<div class='col-xs-12 col-md-12'>
-	<div class="col-xs-3 col-md-3">
-	<button class="btn btn-default" type="button" ng-click="">
-	Chat <span class="glyphicon glyphicon-pencil"></span>
-	</button>
-	</div>
-
-	<div class="btn-group col-xs-8 col-md-8" style="padding-left: 35px;" ng-hide="false">
-	<button class="btn btn-success" type="button" ng-click="addResponse({{orderId}})" style="width: 60%" ng-disabled="{{disabled === true}}">
-	Yes!
-	</button>
-
-	<button class="btn btn-success" type="button" ng-click="openCommentDialog({{orderId}})"  ng-disabled="{{disabled === true}}">
-	<span class="glyphicon glyphicon-cloud"></span>
-	</button>
-	</div>
-
-	</div>
-	</div>
-	</div>
-	</div>
-	<div class="col-xs-3 col-md-3">
-	<div class='jqx-rc-all' style='margin: 10px;'>
-	<div style='margin-top: 10px;'>
-	<a href="{{userurl}}"><img height="173" src="{{imgurl}}"/></a>
-	</div>
-	</div>
-	</div>
-	<div class="col-xs-3 col-md-3">
-	<div class='container-fluid'>
-	<div class='col-xs-12 col-md-12' style='margin: 10px;'>
-	<b>Name: </b>{{name}}
-	</div>
-	</div>
-	<div class='container-fluid'>
-	<div class='col-xs-12 col-md-12' style='margin: 10px;'>
-	<b>Mail: </b>{{mail}}
-	</div>
-	</div>
-	<div class='container-fluid'>
-	<div class='col-xs-12 col-md-12' style='margin: 10px;'>
-	<b>Phone: </b>{{phone}}
-	</div>
-	</div>
-	</div>
-	<div class="col-xs-6 col-md-6">
-	<div class='container-fluid'>
-	<div class='col-xs-12 col-md-12' style='margin: 10px;'>
-	<b>Languages: </b>{{languages}}
-	</div>
-	</div>
-	<div class='container-fluid'>
-	<div class='col-xs-12 col-md-12' style='margin: 10px;'>
-	<b>Currencies: </b>{{currencies}}
-	</div>
-	</div>
-
-	</div>
-	</div>
-	</div>
-	<div class='order-description container-fluid'>
-	<div style='position: absolute; top: 10px; right: 4px; height: 18px;' ng-hide="{{isUserOrder === true}}">
-	<div class="row">
-	<div class='container-fluid' >
-	<div class='col-xs-12 col-md-12'>
-	<div class="col-xs-3 col-md-3">
-	<button class="btn btn-default" type="button" ng-click="">
-	Chat <span class="glyphicon glyphicon-pencil"></span>
-	</button>
-	</div>
-
-	<div class="btn-group col-xs-8 col-md-8" style="padding-left: 35px;" ng-hide="false">
-	<button class="btn btn-success" type="button" ng-click="addResponse({{orderId}})" style="width: 60%" ng-disabled="{{disabled === true}}">
-	Yes!
-	</button>
-
-	<button class="btn btn-success" type="button" ng-click="openCommentDialog({{orderId}})"  ng-disabled="{{disabled === true}}">
-	<span class="glyphicon glyphicon-cloud"></span>
-	</button>
-	</div>
-
-	</div>
-	</div>
-	</div>
-	</div>
-	<div class="row" style="margin: 5px;">
-	<div class="col-xs-12 col-md-12">
-	{{freeDescription}}
-	</div>
-	</div>
 	</div>
 </script>
 

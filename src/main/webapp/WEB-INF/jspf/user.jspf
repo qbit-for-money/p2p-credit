@@ -2,7 +2,7 @@
 <form name="userForm" id="user-form" class="navbar-form navbar-right invisible" ng-controller="UserController">
 	<div class="form-group">
 		<div class="input-group" style="width: 20em;" ng-if="isGoogleAuth() || isVKAuth() || isFBAuth()">
-			<input type="text" class="form-control" ng-model="currentUserAltId" ng-readonly="true"/>
+			<input type="text" class="form-control" ng-model="userName" ng-readonly="true"/>
 			<span class="input-group-btn">
 				<button class="btn btn-default" type="button" ng-click="logout()" title="Logout">
 					<span class="glyphicon {{logoutButton}}"></span>

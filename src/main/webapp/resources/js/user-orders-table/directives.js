@@ -12,13 +12,13 @@ orderModule.directive('bsDropdown', function($compile, $modal, ordersResource) {
 		link: function(scope, element, attrs) {
 			scope.items = [{
 					id: 0,
-					name: "Success"
+					name: "Успешна"
 				}, {
 					id: 1,
-					name: "Not success"
+					name: "Не успешна"
 				}, {
 					id: 2,
-					name: "Arbitration"
+					name: "Арбитраж"
 				}];
 			scope.selectedItem = 0;
 			var html = '';
@@ -55,8 +55,14 @@ orderModule.directive('bsDropdown', function($compile, $modal, ordersResource) {
 
 			scope.openCommentDialog = function() {
 				var status = scope.items[scope.selectedItem].name.toUpperCase();
-				if (status === "NOT SUCCESS") {
+				if (status === "Не успешна") {
 					status = "NOT_SUCCESS";
+				}
+				if (status === "Успешна") {
+					status = "SUCCESS";
+				}
+				if (status === "Арбитраж") {
+					status = "ARBITRATION";
 				}
 
 				var modalInstance = $modal.open({

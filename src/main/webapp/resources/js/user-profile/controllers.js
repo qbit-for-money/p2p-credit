@@ -612,7 +612,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		userPhotoRequest.endPoint.x = resultX2;
 		userPhotoRequest.startPoint.y = resultY1;
 		userPhotoRequest.endPoint.y = resultY2;
-		var data = $scope.imageSrc.replace(/^data:image\/(png|jpg|jpeg);base64,/, "");
+		var data = $scope.imageSrc.replace(/^data:image\/(jpg|jpeg);base64,/, "");
 		userPhotoRequest.imageString = data;
 		var userPhotoResponse = photosResource.setUserPhoto({}, userPhotoRequest);
 		userPhotoResponse.$promise.then(function() {

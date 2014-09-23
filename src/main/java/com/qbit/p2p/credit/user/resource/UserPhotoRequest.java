@@ -5,6 +5,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import com.qbit.commons.model.Point2;
+import javax.xml.bind.annotation.XmlElement;
 
 /**
  *
@@ -17,7 +18,9 @@ public class UserPhotoRequest implements Serializable {
 	public static final int MAX_STRING_LENGTH = 1000000;
 	public static final Point2 MAX_SIZE = new Point2(1000, 1000);
 	public static final Point2 MIN_SIZE = new Point2(100, 100);
+	@XmlElement
 	private Point2 startPoint;
+	@XmlElement
 	private Point2 endPoint;
 	private String imageString;
 

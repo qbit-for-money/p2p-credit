@@ -62,20 +62,26 @@
 									</div>
 								</div>
 								<div class="row" style="margin-top: 10px;">
-									<div class="col-sm-4 col-md-3" ng-if="type === 'borrow' || type === 'exchange'">
-										<ui-dropdown element-id="'giving-currency'" data-dropdown-data="allCurrenciesWithoutPersent" preselected-item="selectedGivingCurrency" input-value="givingValue" placeholder="'Дают'"></ui-dropdown>
+									<div class="col-sm-4 col-md-3" ng-if="type === 'borrow'">
+										<ui-dropdown element-id="'giving-currency'" data-dropdown-data="allCurrenciesWithoutPersent" preselected-item="selectedGivingCurrency" input-value="givingValue" placeholder="'Сумма'"></ui-dropdown>
 									</div>
 									<div class="col-sm-4 col-md-3" ng-if="type === 'borrow'">								
-										<ui-dropdown element-id="'taking-currency'" is-percent="true" data-dropdown-data="allCurrencies" preselected-item="selectedTakingCurrency" input-value="takingValue" placeholder="'Берут'"></ui-dropdown>
+										<ui-dropdown element-id="'taking-currency'" is-percent="true" data-dropdown-data="allCurrencies" preselected-item="selectedTakingCurrency" input-value="takingValue" placeholder="'Возврат'"></ui-dropdown>
 									</div>
 
-									<div class="col-sm-4 col-md-3" ng-if="type === 'credit' || type === 'exchange'">
-										<ui-dropdown element-id="'taking-currency'" data-dropdown-data="allCurrenciesWithoutPersent" preselected-item="selectedTakingCurrency" input-value="takingValue" placeholder="'Берут'"></ui-dropdown>
+									<div class="col-sm-4 col-md-3" ng-if="type === 'credit'">
+										<ui-dropdown element-id="'taking-currency'" data-dropdown-data="allCurrenciesWithoutPersent" preselected-item="selectedTakingCurrency" input-value="takingValue" placeholder="'Сумма'"></ui-dropdown>
 									</div>
 									<div class="col-sm-4 col-md-3" ng-if="type === 'credit'">								
-										<ui-dropdown element-id="'giving-currency'" is-percent="true" data-dropdown-data="allCurrencies" preselected-item="selectedGivingCurrency" input-value="givingValue" placeholder="'Дают'"></ui-dropdown>
+										<ui-dropdown element-id="'giving-currency'" is-percent="true" data-dropdown-data="allCurrencies" preselected-item="selectedGivingCurrency" input-value="givingValue" placeholder="'Возврат'"></ui-dropdown>
 									</div>
 									
+									<div class="col-sm-4 col-md-3" ng-if="type === 'exchange'">
+										<ui-dropdown element-id="'taking-currency'" data-dropdown-data="allCurrenciesWithoutPersent" preselected-item="selectedTakingCurrency" input-value="takingValue" placeholder="'Берут'"></ui-dropdown>
+									</div>
+									<div class="col-sm-4 col-md-3" ng-if="type === 'exchange'">
+										<ui-dropdown element-id="'giving-currency'" data-dropdown-data="allCurrenciesWithoutPersent" preselected-item="selectedGivingCurrency" input-value="givingValue" placeholder="'Дают'"></ui-dropdown>
+									</div>
 									
 									<div class="col-sm-4 col-md-4" ng-if="type === 'credit' || type === 'borrow'">	
 										<ui-dropdown on-enter="" static="'Дней'" element-id="'order-duration'" on-change-input="onChangeInput()" data-dropdown-data="durationTypes" preselected-item="selectedDurationType" input-value="durationValue" placeholder="'Срок'"></ui-dropdown>

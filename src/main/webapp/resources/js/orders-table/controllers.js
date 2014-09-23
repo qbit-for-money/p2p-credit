@@ -68,7 +68,7 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 			//loadOnScroll = true;
 			ordersTableFilterInit();
 		}
-	}
+	};
 
 	$scope.selectType = function(selectedItem) {
 		$scope.type = selectedItem;
@@ -82,9 +82,14 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 			$scope.selectedGivingCurrency = "RUR";
 			$scope.selectedTakingCurrency = "BTC";
 		}
-		loadOnScroll = true;
+		$timeout(function() {
+			angular.element("#giving-currency").find("input").text($scope.selectedGivingCurrency);
+			angular.element("#taking-currency").find("input").text($scope.selectedTakingCurrency);
+			loadOnScroll = true;
+		});
+
 		console.log($scope.type)
-	}
+	};
 	/*$scope.editIsUserTable = function() {
 	 //$(document).scrollTop();
 	 //$('html').animate({scrollTop: 0},'slow');
@@ -160,23 +165,23 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 			//$rootScope.searchRequest.duration = 10;
 			console.log("> " + JSON.stringify($rootScope.searchRequest))
 			$scope.selectType($rootScope.searchRequest.type);
-			if($rootScope.searchRequest.givingValue) {
+			if ($rootScope.searchRequest.givingValue) {
 				$scope.givingValue = parseFloat($rootScope.searchRequest.givingValue);
 			}
-			if($rootScope.searchRequest.takingValue) {
+			if ($rootScope.searchRequest.takingValue) {
 				$scope.takingValue = parseFloat($rootScope.searchRequest.takingValue);
 			}
-			
+
 			$scope.selectedGivingCurrency = $rootScope.searchRequest.selectedGivingCurrency;
 			$scope.selectedTakingCurrency = $rootScope.searchRequest.selectedTakingCurrency;
-			if($rootScope.searchRequest.duration) {
+			if ($rootScope.searchRequest.duration) {
 				$scope.durationValue = parseInt($rootScope.searchRequest.duration);
 			}
-			if($rootScope.searchRequest.isBond) {
+			if ($rootScope.searchRequest.isBond) {
 				$scope.isBond = $rootScope.searchRequest.isBond;
 			}
-			
-			
+
+
 			//angular.element("#order-duration").find("input").val($rootScope.searchRequest.duration);
 		} else {
 			//$scope.givingValue = "1234";
@@ -187,7 +192,7 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 		$timeout(function() {
 			$scope.filterOrdersTable();
 		}, 700);
-		
+
 	}
 
 	$scope.sortTable = function(selectedItem) {
@@ -470,12 +475,12 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 	}
 
 	function initUserOrdersTable(reload) {
-		
+
 		searchRequest.pageNumber = userPageNumber;
-		if(reload) {
+		if (reload) {
 			userPageNumber += 1;
 		}
-		
+
 		var orderResponse = ordersResource.search({}, searchRequest);
 
 		orderResponse.$promise.then(function() {
@@ -767,12 +772,12 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 		if (loadOnScroll === false) {
 			return;
 		}
-		
+
 
 		$timeout(function() {
 			if (loadOnScroll === false) {
-			return;
-		}
+				return;
+			}
 			loadOnScroll = false;
 			pageNumber += 1;
 			initOrdersTable(true);
@@ -794,7 +799,7 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 			initUserOrdersTable(true);
 		}, 700);
 	}
-	
+
 	$scope.goToOrderCreating = function() {
 		$rootScope.searchRequest = {};
 		$rootScope.searchRequest.selectedGivingCurrency = angular.element("#giving-currency").find(".li-item").text();
@@ -803,9 +808,9 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 		$rootScope.searchRequest.takingValue = angular.element("#taking-currency").find("input").val();
 		$rootScope.searchRequest.duration = angular.element("#order-duration").find("input").val();
 		$rootScope.searchRequest.isBond = $scope.isBond;
-		if($rootScope.searchRequest.selectedGivingCurrency === "%") {
+		if ($rootScope.searchRequest.selectedGivingCurrency === "%") {
 			$rootScope.searchRequest.type = "credit";
-		} else if($rootScope.searchRequest.selectedTakingCurrency === "%") {
+		} else if ($rootScope.searchRequest.selectedTakingCurrency === "%") {
 			$rootScope.searchRequest.type = "borrow";
 		} else {
 			$rootScope.searchRequest.type = "exchange";
@@ -813,12 +818,12 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 		console.log(JSON.stringify($rootScope.searchRequest))
 		navbarService.goToOrderCreating();
 	};
-	
+
 	$scope.$on("$destroy", function() {
 		console.log("DESTROY")
 		angular.element(window).unbind('scroll');
 	});
-	
+
 });
 
 orderModule.controller("CommentDialogController", function($scope, addResponse, orderId, $modalInstance) {

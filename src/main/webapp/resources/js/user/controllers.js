@@ -1,10 +1,12 @@
 var userModule = angular.module("user");
 
-userModule.controller("UserController", function($scope, $rootScope, usersResource, authService, $location, phone, location) {
+userModule.controller("UserController", function($scope, $rootScope, usersResource, authService, $location, phone, location, usersProfileResource) {
 
 	$scope.keyType = "user";
 	$scope.logoutButton = "";
 	$rootScope.isPhone = phone.isPhone();
+	
+	
 
 	function supportsHtml5Storage() {
 		try {
@@ -38,6 +40,15 @@ userModule.controller("UserController", function($scope, $rootScope, usersResour
 				|| (currentUserAltId.userId.indexOf("vk-") !== -1)
 				|| (currentUserAltId.userId.indexOf("fb-") !== -1)) {
 				$scope.keyType = "envelope";
+				var userProfileResponse = usersProfileResource.getShortById({id: currentUserAltId.userId});
+				userProfileResponse.$promise.then(function() {
+					var name = userProfileResponse.name;
+					if(name && (name !== null) && (name !== "")) {
+						$scope.userName = name;
+					} else {
+						$scope.userName = currentUserAltId.userId;
+					}
+				});
 			} else {
 				$scope.keyType = "user";
 			}
@@ -48,7 +59,7 @@ userModule.controller("UserController", function($scope, $rootScope, usersResour
 	});
 	//angular.element(document).ready(function() {
 	//$timeout(function() {
-	$("#user-chat-form").removeClass("invisible");
+	angular.element("#user-chat-form").removeClass("invisible");
 	//}, 500);
 	//});
 	angular.element("#user-form").removeClass("invisible");

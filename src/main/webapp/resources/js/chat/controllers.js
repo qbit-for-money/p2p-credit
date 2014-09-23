@@ -17,7 +17,7 @@ chatModule.controller("ChatDialogController", function($scope, $rootScope, partn
 			angular.element(".chat-dialog").find(".modal-dialog").css("height", "70%");
 		}
 		angular.element("#chat-history").scroll(function() {
-			console.log("SCROLL: " + angular.element("#chat-history").scrollTop() + " " + angular.element("#chat-history").height() + " " + angular.element("#chat-history").parent().height())
+			//console.log("SCROLL: " + angular.element("#chat-history").scrollTop() + " " + angular.element("#chat-history").height() + " " + angular.element("#chat-history").parent().height())
 			if (angular.element("#chat-history").scrollTop() === 0) {
 				$timeout(function() {
 					if ((pageNumber > 30) || (messagesCount <= pageNumber * 15)) {
@@ -133,9 +133,10 @@ chatModule.controller("ChatDialogController", function($scope, $rootScope, partn
 		response.$promise.then(function() {
 			//console.log(JSON.stringify(response.messages))
 			response.messages = response.messages.reverse();
-			for (var i in response.messages) {
-				response.messages[i].creationDate = formatDate(response.messages[i].creationDate);
-				$scope.messageHistory.push(response.messages[i]);
+			var messages = response.messages;
+			for (var i in messages) {
+				messages[i].creationDate = formatDate(messages[i].creationDate);
+				$scope.messageHistory.push(messages[i]);
 			}
 			if (callback) {
 				callback();
@@ -217,18 +218,31 @@ chatModule.controller("ChatController", function($scope, $rootScope, chatService
 				lastMessages[i].userImgUrl = window.context + "webapi/photos/" + lastMessages[i].userId;
 				lastMessages[i].url = window.context + "#/users/" + linkId;
 				lastMessages[i].name = linkId;
+				//setUserName(lastMessages[i]);
 				lastMessages[i].creationDate = formatDate(lastMessages[i].creationDate);
 
 				if (lastMessages[i].message.length > 50) {
 					var message = lastMessages[i].message.substring(0, 50);
 					lastMessages[i].message = message + "..."
 				}
-				//$scope.lastMessages.unshift(lastMessages[i]);
 			}
 			$scope.lastMessages.splice(0, $scope.lastMessages.length);
 			$scope.lastMessages = lastMessages;
 			console.log(JSON.stringify($scope.lastMessages))
-
+			
+			
+			for (var i in lastMessages) {
+				
+			}
+		});
+	}
+	
+	function setUserName(message) {
+		var userId = message.partnerId;
+		var userProfileResponse = usersProfileResource.getShortById({'id': userId});
+		userProfileResponse.$promise.then(function() {
+			var name = (userProfileResponse.name) ? userProfileResponse.name : userId;
+			message.name = name;
 		});
 	}
 

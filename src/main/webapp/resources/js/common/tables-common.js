@@ -180,6 +180,24 @@ function formatDownloadedOrders(orders) {
 		if (orders[i].order.status === "IN_PROCESS") {
 			orders[i].order.status = "IN PROCESS";
 		}
+		
+		/*
+		 if (orders[i].order.status === "OPENED") {
+			orders[i].order.status = "Открыта";
+		}
+		if (orders[i].order.status === "IN_PROCESS") {
+			orders[i].order.status = "В процессе";
+		}
+		if (orders[i].order.status === "NOT_SUCCESS") {
+			orders[i].order.status = "Не успешна";
+		}
+		if (orders[i].order.status === "SUCCESS") {
+			orders[i].order.status = "Успешна";
+		}
+		if (orders[i].order.status === "ARBITRATION") {
+			orders[i].order.status = "Арбитраж";
+		}
+		 */
 
 
 		if (orders[i].userCurrencies && !orders[i].userCurrencies.length !== 0) {
