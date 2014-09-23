@@ -6,6 +6,7 @@ chatModule.factory("messagesResource", function($resource) {
 		getMessagesByPartnerId: {method: "GET", url: window.context + "webapi/messages/by-partner"},
 		getLaterThan: {method: "GET", url: window.context + "webapi/messages/later-than"},
 		getPartnersLastMessages: {method: "GET", url: window.context + "webapi/messages/partners-last-messages"},
-		sendMessage: {method: "PUT", url: window.context + "webapi/messages"}
+		sendMessage: {method: "PUT", url: window.context + "webapi/messages"},
+		sendMessageForAdmin: {method: "PUT", url: window.context + "webapi/messages/admin-message"}
 	});
 });

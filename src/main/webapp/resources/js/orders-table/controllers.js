@@ -1,12 +1,12 @@
 var orderModule = angular.module("order");
 
-orderModule.controller("OrdersController", function($scope, $rootScope, ordersResource, responsesResource, usersResource, userProfileService, usersProfileResource, userService, $interpolate, $compile, $modal, $timeout, chatService) {
+orderModule.controller("OrdersController", function($scope, $rootScope, ordersResource, responsesResource, usersResource, userProfileService, usersProfileResource, userService, $interpolate, $compile, $modal, $timeout, chatService, navbarService) {
 	$scope.isUserTable = false;
 	$scope.ordersCount;
 	$scope.userOrdersCount;
 	var pageNumber = 0;
 	var userPageNumber = 0;
-	var loadOnScroll = true;
+	var loadOnScroll = false;
 	var searchRequest = {};
 	searchRequest.filterItems = [];
 	$scope.emptyList = false;
@@ -157,19 +157,37 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 	function initFilter() {
 		$scope.sortTable({item: {fieldTitle: "amount"}});
 		if ($rootScope.searchRequest) {
+			//$rootScope.searchRequest.duration = 10;
 			console.log("> " + JSON.stringify($rootScope.searchRequest))
 			$scope.selectType($rootScope.searchRequest.type);
-			$scope.givingValue = parseInt($rootScope.searchRequest.givingValue);
-			$scope.takingValue = parseInt($rootScope.searchRequest.takingValue);
+			if($rootScope.searchRequest.givingValue) {
+				$scope.givingValue = parseFloat($rootScope.searchRequest.givingValue);
+			}
+			if($rootScope.searchRequest.takingValue) {
+				$scope.takingValue = parseFloat($rootScope.searchRequest.takingValue);
+			}
+			
 			$scope.selectedGivingCurrency = $rootScope.searchRequest.selectedGivingCurrency;
 			$scope.selectedTakingCurrency = $rootScope.searchRequest.selectedTakingCurrency;
+			if($rootScope.searchRequest.duration) {
+				$scope.durationValue = parseInt($rootScope.searchRequest.duration);
+			}
+			if($rootScope.searchRequest.isBond) {
+				$scope.isBond = $rootScope.searchRequest.isBond;
+			}
+			
+			
+			//angular.element("#order-duration").find("input").val($rootScope.searchRequest.duration);
 		} else {
-			$scope.givingValue = "1234";
-			$scope.takingValue = "24";
+			//$scope.givingValue = "1234";
+			//$scope.takingValue = "24";
 			$scope.selectType("borrow");
 
 		}
-		$scope.filterOrdersTable();
+		$timeout(function() {
+			$scope.filterOrdersTable();
+		}, 700);
+		
 	}
 
 	$scope.sortTable = function(selectedItem) {
@@ -749,9 +767,13 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 		if (loadOnScroll === false) {
 			return;
 		}
-		loadOnScroll = false;
+		
 
 		$timeout(function() {
+			if (loadOnScroll === false) {
+			return;
+		}
+			loadOnScroll = false;
 			pageNumber += 1;
 			initOrdersTable(true);
 		}, 700);
@@ -772,6 +794,31 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 			initUserOrdersTable(true);
 		}, 700);
 	}
+	
+	$scope.goToOrderCreating = function() {
+		$rootScope.searchRequest = {};
+		$rootScope.searchRequest.selectedGivingCurrency = angular.element("#giving-currency").find(".li-item").text();
+		$rootScope.searchRequest.givingValue = angular.element("#giving-currency").find("input").val();
+		$rootScope.searchRequest.selectedTakingCurrency = angular.element("#taking-currency").find(".li-item").text();
+		$rootScope.searchRequest.takingValue = angular.element("#taking-currency").find("input").val();
+		$rootScope.searchRequest.duration = angular.element("#order-duration").find("input").val();
+		$rootScope.searchRequest.isBond = $scope.isBond;
+		if($rootScope.searchRequest.selectedGivingCurrency === "%") {
+			$rootScope.searchRequest.type = "credit";
+		} else if($rootScope.searchRequest.selectedTakingCurrency === "%") {
+			$rootScope.searchRequest.type = "borrow";
+		} else {
+			$rootScope.searchRequest.type = "exchange";
+		}
+		console.log(JSON.stringify($rootScope.searchRequest))
+		navbarService.goToOrderCreating();
+	};
+	
+	$scope.$on("$destroy", function() {
+		console.log("DESTROY")
+		angular.element(window).unbind('scroll');
+	});
+	
 });
 
 orderModule.controller("CommentDialogController", function($scope, addResponse, orderId, $modalInstance) {

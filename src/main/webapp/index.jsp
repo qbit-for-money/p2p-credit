@@ -19,6 +19,23 @@
 		<link rel="stylesheet" type="text/css" href="resources/css/user.css">
 		<link rel="stylesheet" type="text/css" href="resources/css/chat.css">
 	</head>
+	<script>
+		(function(i, s, o, g, r, a, m) {
+			i['GoogleAnalyticsObject'] = r;
+			i[r] = i[r] || function() {
+				(i[r].q = i[r].q || []).push(arguments)
+			}, i[r].l = 1 * new Date();
+			a = s.createElement(o),
+				m = s.getElementsByTagName(o)[0];
+			a.async = 1;
+			a.src = g;
+			m.parentNode.insertBefore(a, m)
+		})(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+		ga('create', 'UA-55041829-1', 'auto');
+		ga('send', 'pageview');
+
+	</script>
 	<body class="default">
 		<!--div class="container" ng-if="user === null" ng-controller="AuthDialogOpeningController">
 		</div-->
@@ -105,7 +122,7 @@
 		<div ng-include src="'resources/html/templates/templates.html'"></div>
 
 		<script type="text/javascript" src="resources/js/common/tables-common.js"></script>
-		
+
 		<script type="text/javascript" src="resources/js/chat/controllers.js"></script>
 		<script type="text/javascript" src="resources/js/chat/services.js"></script>
 		<script type="text/javascript" src="resources/js/chat/resources.js"></script>

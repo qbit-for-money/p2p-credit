@@ -59,8 +59,8 @@
 							Беру:
 						</div>
 
-						<div class="col-xs-8 col-md-9">
-							<ui-dropdown on-enter="" is-dropdown-input="true" element-id="'taking-order-currency'" on-change-input="isValidOrder()" data-dropdown-data="allCurrencies" preselected-item="currency.selectedTakingCurrency" input-value="takingValue" placeholder="'Take'"></ui-dropdown>
+						<div class="col-xs-8 col-md-9" ng-if="currency.selectedTakingCurrency">
+							<ui-dropdown on-enter="" is-dropdown-input="true" element-id="'taking-order-currency'" on-change-input="isValidOrder()" data-dropdown-data="allCurrencies" preselected-item="currency.selectedTakingCurrency" input-value="takingValue" placeholder="'Беру'"></ui-dropdown>
 						</div>
 
 					</div>	
@@ -68,16 +68,16 @@
 						<div class="col-xs-4 col-md-3 title-edit">
 							Даю:
 						</div>
-						<div class="col-xs-8 col-md-9">
-							<ui-dropdown on-enter="" is-percent="true" is-dropdown-input="true" element-id="'giving-order-currency'" on-change-input="isValidOrder()" data-dropdown-data="allCurrenciesWithPercent" preselected-item="currency.selectedGivingCurrency" input-value="givingValue" placeholder="'Give'"></ui-dropdown>
+						<div class="col-xs-8 col-md-9" ng-if="currency.selectedGivingCurrency">
+							<ui-dropdown on-enter="" is-percent="true" is-dropdown-input="true" element-id="'giving-order-currency'" on-change-input="isValidOrder()" data-dropdown-data="allCurrenciesWithPercent" preselected-item="currency.selectedGivingCurrency" input-value="givingValue" placeholder="'Даю'"></ui-dropdown>
 						</div>
 					</div>
 					<div class="row" ng-if="!isCreditInit || (isBorrowInit && isCreditInit)">
 						<div class="col-xs-4 col-md-3 title-edit">
 							Даю:
 						</div>
-						<div class="col-xs-8 col-md-9">
-							<ui-dropdown on-enter="" is-dropdown-input="true" element-id="'giving-order-currency'" on-change-input="isValidOrder()" data-dropdown-data="allCurrencies" preselected-item="currency.selectedGivingCurrency" input-value="givingValue" placeholder="'Give'"></ui-dropdown>
+						<div class="col-xs-8 col-md-9" ng-if="currency.selectedGivingCurrency">
+							<ui-dropdown on-enter="" is-dropdown-input="true" element-id="'giving-order-currency'" on-change-input="isValidOrder()" data-dropdown-data="allCurrencies" preselected-item="currency.selectedGivingCurrency" input-value="givingValue" placeholder="'Даю'"></ui-dropdown>
 						</div>
 					</div>
 
@@ -87,8 +87,8 @@
 							Беру:
 						</div>
 
-						<div class="col-xs-8 col-md-9">
-							<ui-dropdown on-enter="" static="'%'" is-dropdown-input="true" element-id="'taking-order-currency'" on-change-input="isValidOrder()" data-dropdown-data="allCurrenciesWithPercent" preselected-item="currency.selectedTakingCurrency" input-value="takingValue" placeholder="'Take'"></ui-dropdown>
+						<div class="col-xs-8 col-md-9" ng-if="currency.selectedTakingCurrency">
+							<ui-dropdown on-enter="" static="'%'" is-dropdown-input="true" element-id="'taking-order-currency'" on-change-input="isValidOrder()" data-dropdown-data="allCurrenciesWithPercent" preselected-item="currency.selectedTakingCurrency" input-value="takingValue" placeholder="'Беру'"></ui-dropdown>
 						</div>
 					</div>
 					<div class="row" ng-hide="isBorrowInit && isCreditInit">
@@ -96,7 +96,7 @@
 							Срок:
 						</div>
 						<div class="col-xs-8 col-md-9">
-							<ui-dropdown on-enter="" static="'Дней'" element-id="'order-duration'" on-change-input="isValidOrder()" data-dropdown-data="durationTypes" preselected-item="selectedDurationType" input-value="durationValue" placeholder="'Duration'"></ui-dropdown>
+							<ui-dropdown on-enter="" static="'Дней'" element-id="'order-duration'" on-change-input="isValidOrder()" data-dropdown-data="durationTypes" preselected-item="selectedDurationType" input-value="durationValue" placeholder="'Срок'"></ui-dropdown>
 						</div>
 					</div>
 					<div class="row" ng-hide="isBorrowInit && isCreditInit">
@@ -116,15 +116,6 @@
 							</textarea>
 						</div>
 					</div>
-					<!--div class="row">
-						<div class="col-xs-4 col-md-3 title-edit">
-							Description:
-						</div>
-						<div class="col-xs-8 col-md-9">
-							<div id="orderDataEditable"  contenteditable="true" ng-blur="decreaseDescriptionSize()" ng-focus="increaseDescriptionSize()" placeholder="Description">
-							</div>
-						</div>
-					</div-->
 
 
 					<div class="row" style="margin-top: 30px;">

@@ -16,18 +16,18 @@
 								</select-->
 								<dropdown d-class="'max-width'" dropdown-title="" items="types" do-select="selectType"></dropdown>
 							</div>
-							<div class="col-sm-3 col-md-3" ng-if="type === 'Дают' || type === 'Меняют'">
-								<ui-dropdown on-enter="search()" element-id="'giving-currency'" data-dropdown-data="allCurrenciesWithoutPersent" preselected-item="selectedGivingCurrency" input-value="givingValue" placeholder="'Дают'"></ui-dropdown>
+							<div class="col-sm-3 col-md-3" ng-if="type === 'Взять' || type === 'Обменять'">
+								<ui-dropdown on-enter="search()" element-id="'giving-currency'" data-dropdown-data="allCurrenciesWithoutPersent" preselected-item="selectedGivingCurrency" input-value="givingValue" placeholder="'Взять'"></ui-dropdown>
 							</div>
-							<div class="col-sm-3 col-md-3" ng-if="type === 'Дают'">								
-								<ui-dropdown on-enter="search()" element-id="'taking-currency'" is-percent="true" data-dropdown-data="allCurrencies" preselected-item="selectedTakingCurrency" input-value="takingValue" placeholder="'Берут'"></ui-dropdown>
+							<div class="col-sm-3 col-md-3" ng-if="type === 'Взять'">								
+								<ui-dropdown on-enter="search()" element-id="'taking-currency'" is-percent="true" data-dropdown-data="allCurrencies" preselected-item="selectedTakingCurrency" input-value="takingValue" placeholder="'Дать'"></ui-dropdown>
 							</div>
 							
-							<div class="col-sm-3 col-md-3" ng-if="type === 'Берут' || type === 'Меняют'">
-								<ui-dropdown on-enter="search()" element-id="'taking-currency'" data-dropdown-data="allCurrenciesWithoutPersent" preselected-item="selectedTakingCurrency" input-value="takingValue" placeholder="'Берут'"></ui-dropdown>
+							<div class="col-sm-3 col-md-3" ng-if="type === 'Дать' || type === 'Обменять'">
+								<ui-dropdown on-enter="search()" element-id="'taking-currency'" data-dropdown-data="allCurrenciesWithoutPersent" preselected-item="selectedTakingCurrency" input-value="takingValue" placeholder="'Дать'"></ui-dropdown>
 							</div>
-							<div class="col-sm-3 col-md-3" ng-if="type === 'Берут'">								
-								<ui-dropdown on-enter="search()" element-id="'giving-currency'" is-percent="true" data-dropdown-data="allCurrencies" preselected-item="selectedGivingCurrency" input-value="givingValue" placeholder="'Дают'"></ui-dropdown>
+							<div class="col-sm-3 col-md-3" ng-if="type === 'Дать'">								
+								<ui-dropdown on-enter="search()" element-id="'giving-currency'" is-percent="true" data-dropdown-data="allCurrencies" preselected-item="selectedGivingCurrency" input-value="givingValue" placeholder="'Взять'"></ui-dropdown>
 							</div>
 							
 							<div class="col-sm-2 col-md-2">
@@ -43,10 +43,10 @@
 									<!--ui-dropdown on-enter="search()" element-id="'taking-currency'" data-dropdown-data="allCurrencies" preselected-item="selectedTakingCurrency" input-value="takingValue" placeholder="'Взять'"></ui-dropdown>
 									<ui-dropdown on-enter="search()" element-id="'giving-currency'" data-dropdown-data="allCurrencies" preselected-item="selectedGivingCurrency" input-value="givingValue" placeholder="'Дать'"></ui-dropdown-->
 									
-									<ui-dropdown on-enter="search()" on-change-input="isValidRequest()" element-id="'giving-currency'" data-dropdown-data="allCurrenciesWithoutPersent" preselected-item="selectedGivingCurrency" input-value="givingValue" placeholder="'Дают'" ng-if="type === 'Дают' || type === 'Меняют'"></ui-dropdown>
-									<ui-dropdown on-enter="search()" on-change-input="isValidRequest()" element-id="'taking-currency'" data-dropdown-data="allCurrencies" preselected-item="selectedTakingCurrency" input-value="takingValue" placeholder="'Берут'" ng-if="type === 'Дают'"></ui-dropdown>
-									<ui-dropdown on-enter="search()" on-change-input="isValidRequest()" element-id="'taking-currency'" data-dropdown-data="allCurrenciesWithoutPersent" preselected-item="selectedTakingCurrency" input-value="takingValue" placeholder="'Берут'" ng-if="type === 'Берут' || type === 'Меняют'"></ui-dropdown>
-									<ui-dropdown on-enter="search()" on-change-input="isValidRequest()" element-id="'giving-currency'" data-dropdown-data="allCurrencies" preselected-item="selectedGivingCurrency" input-value="givingValue" placeholder="'Дают'" ng-if="type === 'Берут'"></ui-dropdown>
+									<ui-dropdown on-enter="search()" on-change-input="isValidRequest()" element-id="'giving-currency'" data-dropdown-data="allCurrenciesWithoutPersent" preselected-item="selectedGivingCurrency" input-value="givingValue" placeholder="'Взять'" ng-if="type === 'Взять' || type === 'Обменять'"></ui-dropdown>
+									<ui-dropdown on-enter="search()" on-change-input="isValidRequest()" element-id="'taking-currency'" data-dropdown-data="allCurrencies" preselected-item="selectedTakingCurrency" input-value="takingValue" placeholder="'Дать'" ng-if="type === 'Взять'"></ui-dropdown>
+									<ui-dropdown on-enter="search()" on-change-input="isValidRequest()" element-id="'taking-currency'" data-dropdown-data="allCurrenciesWithoutPersent" preselected-item="selectedTakingCurrency" input-value="takingValue" placeholder="'Дать'" ng-if="type === 'Дать' || type === 'Обменять'"></ui-dropdown>
+									<ui-dropdown on-enter="search()" on-change-input="isValidRequest()" element-id="'giving-currency'" data-dropdown-data="allCurrencies" preselected-item="selectedGivingCurrency" input-value="givingValue" placeholder="'Взять'" ng-if="type === 'Дать'"></ui-dropdown>
 									<button class="btn btn-primary max-width" type="button" ng-click="search()"><span class="glyphicon glyphicon-search"></span></button>
 								</div> 
 							</div> 

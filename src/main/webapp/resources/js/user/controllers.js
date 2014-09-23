@@ -18,9 +18,6 @@ userModule.controller("UserController", function($scope, $rootScope, usersResour
 		usersResource.setUserLocation({}, location);
 	});
 
-
-
-
 	if (supportsHtml5Storage()) {
 		var localStorage = window.localStorage;
 		var machineId = localStorage.getItem("MACHINE_ID");
@@ -50,12 +47,12 @@ userModule.controller("UserController", function($scope, $rootScope, usersResour
 		}
 	});
 	//angular.element(document).ready(function() {
-		//$timeout(function() {
-			$("#user-chat-form").removeClass("invisible");
-		//}, 500);
+	//$timeout(function() {
+	$("#user-chat-form").removeClass("invisible");
+	//}, 500);
 	//});
 	angular.element("#user-form").removeClass("invisible");
-	
+
 
 	$rootScope.isGoogleAuth = function() {
 		return $rootScope.currentUserAltId && ($rootScope.currentUserAltId.indexOf("@") !== -1);

@@ -47,6 +47,20 @@ public class MessageDAO {
 		});
 	}
 	
+	public Message createMessageForAdmin(final Message message) {
+		if (message == null) {
+			throw new IllegalArgumentException("Message is not valid.");
+		}
+		return invokeInTransaction(entityManagerFactory, new TrCallable<Message>() {
+
+			@Override
+			public Message call(EntityManager entityManager) {
+				message.setCreationDate(new Date());
+				return entityManager.merge(message);
+			}
+		});
+	}
+	
 	public List<Message> findAll(int pageNumber, int pageSize) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {

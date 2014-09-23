@@ -34,6 +34,8 @@ import javax.ws.rs.core.MediaType;
 @Singleton
 public class MessagesResource {
 	
+	private final String ADMIN_ID = "ADMIN";
+	
 	@Context
 	private HttpServletRequest request;
 	
@@ -47,6 +49,17 @@ public class MessagesResource {
 		String userId = AuthFilter.getUserId(request);
 		message.setUserId(userId);
 		return messageDAO.create(message);
+	}
+	
+	@PUT
+	@Path("admin-message")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Message createMessageForAdmin(Message message) {
+		String userId = AuthFilter.getUserId(request);
+		message.setPartnerId(ADMIN_ID);
+		message.setUserId(userId);
+		return messageDAO.createMessageForAdmin(message);
 	}
 	
 	@GET

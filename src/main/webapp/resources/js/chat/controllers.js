@@ -386,11 +386,9 @@ chatModule.controller("ChatController", function($scope, $rootScope, chatService
 		}
 		usersSecondsInWaitingTimerId = $interval(loadUsersLastMessages, 4000);
 		$scope.partnerId = "";
-		//$('#chat-history').scroll(function() {});
 	}
 
 	function loadMessages(partnerId, scrollLoad) {
-		console.log("M_FIRST_PAGE: " + pageNumber)
 		var messagesResponse = messagesResource.getMessagesByPartnerId({partnerId: partnerId, firstPage: pageNumber, pageSize: 15});
 		pageNumber += 1;
 		messagesResponse.$promise.then(function() {

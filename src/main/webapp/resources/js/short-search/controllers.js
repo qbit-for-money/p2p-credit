@@ -12,13 +12,13 @@ navbarModule.controller("ShortSearchController", function($scope, $rootScope, us
 
 	$scope.types = [{
 			id: 0,
-			name: "Дают"
+			name: "Взять"
 		}, {
 			id: 1,
-			name: "Берут"
+			name: "Дать"
 		}, {
 			id: 2,
-			name: "Меняют"
+			name: "Обменять"
 		}];
 
 	$scope.selectType = function(selectedItem) {
@@ -105,7 +105,7 @@ navbarModule.controller("ShortSearchController", function($scope, $rootScope, us
 			$rootScope.searchRequest.type = "exchange";
 		}
 		
-//console.log($rootScope.searchRequest)
+console.log($rootScope.searchRequest)
 		if (!$rootScope.user || (($rootScope.user.publicKey.indexOf("@") === -1)
 			&& ($rootScope.user.publicKey.indexOf("vk-") === -1) && ($rootScope.user.publicKey.indexOf("fb-") === -1))) {
 			authService.openAuthDialog(false, true, window.context + "#/orders");

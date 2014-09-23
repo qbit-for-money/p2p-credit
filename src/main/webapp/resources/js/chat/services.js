@@ -34,8 +34,13 @@ chatModule.factory("chatService", function($modal, messagesResource, $interval) 
 			var messageRequest = {};
 			messageRequest.partnerId = partnerId;
 			messageRequest.message = message;
-			console.log("SEND: " + JSON.stringify(messageRequest))
 			var messageResponse = messagesResource.sendMessage({}, messageRequest);
-		},
+		}, 
+		sendMessageForAdmin: function(message) {
+			var messageRequest = {};
+			messageRequest.message = message;
+			console.log("SEND: " + JSON.stringify(messageRequest))
+			var messageResponse = messagesResource.sendMessageForAdmin({}, messageRequest);
+		}
 	};
 });

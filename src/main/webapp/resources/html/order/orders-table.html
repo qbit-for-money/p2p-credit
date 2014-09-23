@@ -109,7 +109,10 @@
 				<div class="hidden-xs col-sm-1 col-md-1"></div>
 				<div class="col-xs-12 col-sm-10 col-md-10">
 					<div style="background-color: rgb(250, 250, 250); min-height: 100px; margin-top: -19px; border: 1px solid #ddd; border-top-width: 0;" ng-hide="!emptyList">
-						<div style="width: 100%;text-align: center; padding-top: 40px;">Список пуст</div>
+						<div style="width: 100%;text-align: center; padding-top: 40px;">Нет заявок, соответствующих Вашему запросу. Создайте заявку:</div>
+						<div style="width: 100%;text-align: center; padding-top: 10px; padding-bottom: 10px;">
+							<button class="btn btn-success" style="width: 20%" type="button" ng-click="goToOrderCreating()"><span class="glyphicon glyphicon-search"></span></button>
+						</div>
 					</div>
 					<div id="orders-table">
 					</div>
