@@ -6,6 +6,7 @@ navbarModule.controller("NavbarController", function($scope, $location, navbarSe
 	$scope.message = "";
 	$scope.send = function(message) {
 		chatService.sendMessageForAdmin(message);
+		$scope.message = "";
 	};
 	
 	$('.sliding-panel').tabSlideOut({
@@ -16,10 +17,12 @@ navbarModule.controller("NavbarController", function($scope, $location, navbarSe
 		tabLocation: 'right',
 		speed: 300,
 		action: 'click',
-		topPos: '80%',
+		topPos: '15%',
 		fixedPosition: true
 	});
 	$("#user-chat-form").removeClass("invisible");
+	$("#message-to-admin").removeClass("invisible");
+	
 	if (typeof String.prototype.startsWith !== 'function') {
 		String.prototype.startsWith = function(str) {
 			return this.indexOf(str) === 0;

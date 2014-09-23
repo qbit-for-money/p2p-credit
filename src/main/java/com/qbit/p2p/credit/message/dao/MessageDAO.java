@@ -56,6 +56,7 @@ public class MessageDAO {
 			@Override
 			public Message call(EntityManager entityManager) {
 				message.setCreationDate(new Date());
+				System.out.println("%%% " + message);
 				return entityManager.merge(message);
 			}
 		});
