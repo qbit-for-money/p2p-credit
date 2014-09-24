@@ -514,6 +514,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 					userProfileResponse.$promise.then(function() {
 						$timeout(function() {
 							$scope.$apply(function() {
+								$rootScope.userName = userMainAttributes.name;
 								$scope.disabledEditButton = false;
 							});
 						});

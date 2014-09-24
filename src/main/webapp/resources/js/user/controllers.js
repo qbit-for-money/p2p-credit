@@ -44,9 +44,9 @@ userModule.controller("UserController", function($scope, $rootScope, usersResour
 				userProfileResponse.$promise.then(function() {
 					var name = userProfileResponse.name;
 					if(name && (name !== null) && (name !== "")) {
-						$scope.userName = name;
+						$rootScope.userName = name;
 					} else {
-						$scope.userName = currentUserAltId.userId;
+						$rootScope.userName = currentUserAltId.userId;
 					}
 				});
 			} else {
