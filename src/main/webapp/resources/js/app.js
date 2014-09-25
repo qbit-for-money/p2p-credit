@@ -38,7 +38,7 @@ angular.module("main").config(function($httpProvider) {
 					} else {
 						window.location = url;
 					}
-				}, 200);
+				}, 1000);
 			}
 			return response || $q.when(response);
 		},
@@ -90,5 +90,5 @@ function isSessionURL(url) {
 
 function goToFirstPage(state) {
 	//console.log(state)
-	//window.location.href = window.context;
+	window.location.href = window.context;
 }

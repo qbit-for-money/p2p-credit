@@ -43,30 +43,16 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 
 	$scope.isBond = false;
 
-	/*function blockRequest() {
-	 $scope.isBlocked = true;
-	 }
-	 
-	 function unblockRequest() {
-	 $scope.isBlocked = false;
-	 }*/
-
-	console.log($rootScope.searchRequest)
 	$scope.selectOrdersOwn = function(ordersOwn) {
 		if (!loadOnScroll || ($scope.allCurrencies.length === 0)) {
 			return;
 		}
-		console.log("OWN")
-		//loadOnScroll = false;
-		//$scope.isBlocked = true;
 		if (ordersOwn.item.id === 1) {
 			$scope.isUserTable = true;
-			//loadOnScroll = true;
 			searchRequest.filterItems.splice(1, searchRequest.filterItems.length);
 			userOrdersTableFilterInit();
 		} else {
 			$scope.isUserTable = false;
-			//loadOnScroll = true;
 			ordersTableFilterInit();
 		}
 	};
@@ -88,71 +74,16 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 			angular.element("#taking-currency").find("input").text($scope.selectedTakingCurrency);
 			loadOnScroll = true;
 		});
-
-		console.log($scope.type)
 	};
-	/*$scope.editIsUserTable = function() {
-	 //$(document).scrollTop();
-	 //$('html').animate({scrollTop: 0},'slow');
-	 window.scrollTo(0, 0);
-	 if (!$scope.isUserTable) {
-	 $scope.isUserTable = true;
-	 userPageNumber = 0;
-	 loadOnScroll = true;
-	 } else {
-	 $scope.isUserTable = false;
-	 pageNumber = 0;
-	 loadOnScroll = true;
-	 }
-	 };*/
-
-
-
-	/*$scope.selectOrdersFilter = function(selectedItem) {
-	 $scope.filterItem = selectedItem.item.fieldTitle;
-	 };*/
 
 	$scope.filterOrdersTable = function() {
 		if (!loadOnScroll) {
 			return;
 		}
-
 		ordersTableFilterInit();
 		loadOnScroll = false;
 		pageNumber = 0;
 		userPageNumber = 0;
-		/*if ($scope.filterItem === "categories" && $scope.ordersSearchMap.orderCategories && $scope.ordersSearchMap.orderCategories.length !== 0) {
-		 var filterItem = {};
-		 filterItem.filterOperator = "1";
-		 filterItem.filterDataField = "categories";
-		 filterItem.filterCondition = "IS_MEMBER";
-		 var cateroiesStr = "";
-		 for (var i in $scope.ordersSearchMap.orderCategories) {
-		 cateroiesStr += $scope.ordersSearchMap.orderCategories[i] + ", ";
-		 }
-		 filterItem.filterValue = cateroiesStr;
-		 searchRequest.filterItems[1] = filterItem;
-		 } else if (($scope.filterItem === "incomingCurrency") || ($scope.filterItem === "outcomingCurrency")) {
-		 var filterItem = {};
-		 filterItem.filterOperator = "1";
-		 filterItem.filterDataField = $scope.filterItem;
-		 filterItem.filterCondition = "EQUAL";
-		 filterItem.filterValue = $scope.selectedCurrency;
-		 searchRequest.filterItems[1] = filterItem;
-		 } else if (($scope.filterItem === "incomingAmount") || ($scope.filterItem === "outcomingAmount")) {
-		 var filterItem = {};
-		 filterItem.filterOperator = "1";
-		 filterItem.filterDataField = $scope.filterItem;
-		 filterItem.filterCondition = "GREATER_THAN";
-		 var val = angular.element("#amount").val();
-		 filterItem.filterValue = (val) ? val : 0;
-		 searchRequest.filterItems[1] = filterItem;
-		 } else {
-		 searchRequest.filterItems.splice(1, searchRequest.filterItems.length);
-		 }*/
-
-		console.log(JSON.stringify(searchRequest))
-
 		if (!$scope.isUserTable) {
 			initOrdersTable();
 		} else {
@@ -163,8 +94,6 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 	function initFilter() {
 		$scope.sortTable({item: {fieldTitle: "amount"}});
 		if ($rootScope.searchRequest) {
-			//$rootScope.searchRequest.duration = 10;
-			console.log("> " + JSON.stringify($rootScope.searchRequest))
 			$scope.selectType($rootScope.searchRequest.type);
 			if ($rootScope.searchRequest.givingValue) {
 				$scope.givingValue = parseFloat($rootScope.searchRequest.givingValue);
@@ -181,17 +110,12 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 			if ($rootScope.searchRequest.isBond) {
 				$scope.isBond = $rootScope.searchRequest.isBond;
 			}
-
-
-			//angular.element("#order-duration").find("input").val($rootScope.searchRequest.duration);
 		} else {
 			var givingCurrencyFromStorage = window.localStorage.getItem("GIVING_CURRENCY");
 			var takingCurrencyFromStorage = window.localStorage.getItem("TAKING_CURRENCY");
 			var givingValueFromStorage = window.localStorage.getItem("GIVING_VALUE");
 			var takingValueFromStorage = window.localStorage.getItem("TAKING_VALUE");
 			var type = window.localStorage.getItem("TYPE");
-			console.log("REQ: " + givingCurrencyFromStorage + " " + givingValueFromStorage + " " + takingCurrencyFromStorage
-				+ " " + takingValueFromStorage + " " + type)
 			if (type !== null) {
 				$scope.selectType(type);
 				window.localStorage.removeItem("TYPE");
@@ -222,8 +146,6 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 			} else {
 				$scope.takingValue = "";
 			}
-			
-
 		}
 		$timeout(function() {
 			$scope.filterOrdersTable();
@@ -232,21 +154,9 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 	}
 
 	$scope.sortTable = function(selectedItem) {
-		console.log("SORT")
 		loadOnScroll = true;
-		/*if (!loadOnScroll) {
-		 return;
-		 }*/
-		//loadOnScroll = false;
-		// pageNumber = 0;
-		//userPageNumber = 0;
 		searchRequest.sortDataField = selectedItem.item.fieldTitle;
 		searchRequest.sortOrder = "DESC";
-		// if (!$scope.isUserTable) {
-		//ordersTableFilterInit();
-		// } else {
-		//userOrdersTableFilterInit();
-		// }
 	};
 
 	/*$scope.sortUserOrdersTable = function(selectedItem) {
