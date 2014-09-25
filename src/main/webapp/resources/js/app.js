@@ -26,22 +26,35 @@ angular.module("main").config(function($httpProvider) {
 			return $injector.get('SessionInterceptor');
 		}
 	]);
-})
-	.factory('SessionInterceptor', function($q, $window, $rootScope) {
-		return {
-			responseError: function(response) {
-				if (isSessionURL(response.config.url)) {
-					$rootScope.$broadcast({
-						401: goToFirstPage(401),
-						403: goToFirstPage(403),
-						419: goToFirstPage(419),
-						440: goToFirstPage(440)
-					}[response.status], response);
-				}
-				return $q.reject(response);
+}).factory('SessionInterceptor', function($q, $window, $rootScope, $timeout, $location) {
+	return {
+		response: function(response) {
+			var url = window.localStorage.getItem("URL");
+			if ((url !== null) && $rootScope.currentUserAltId) {
+				window.localStorage.removeItem("URL");
+				$timeout(function() {
+					if("profile" === url) {
+						window.location = window.context + "#/users/" + $rootScope.currentUserAltId;
+					} else {
+						window.location = url;
+					}
+				}, 200);
 			}
-		};
-	}).config(function($routeProvider, $locationProvider) {
+			return response || $q.when(response);
+		},
+		responseError: function(response) {
+			if (isSessionURL(response.config.url)) {
+				$rootScope.$broadcast({
+					401: goToFirstPage(401),
+					403: goToFirstPage(403),
+					419: goToFirstPage(419),
+					440: goToFirstPage(440)
+				}[response.status], response);
+			}
+			return $q.reject(response);
+		}
+	};
+}).config(function($routeProvider, $locationProvider) {
 	$routeProvider.when("/", {
 		templateUrl: "resources/html/order/order-init.html",
 		controller: "OrderInitController"

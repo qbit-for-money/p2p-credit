@@ -5,33 +5,21 @@ userModule.controller("UserController", function($scope, $rootScope, usersResour
 	$scope.keyType = "user";
 	$scope.logoutButton = "";
 	$rootScope.isPhone = phone.isPhone();
-	
-	
-
-	function supportsHtml5Storage() {
-		try {
-			return 'localStorage' in window && window['localStorage'] !== null;
-		} catch (e) {
-			return false;
-		}
-	}
 
 	location.getLocation(function(location) {
 		usersResource.setUserLocation({}, location);
 	});
 
-	if (supportsHtml5Storage()) {
-		var localStorage = window.localStorage;
-		var machineId = localStorage.getItem("MACHINE_ID");
-		if (!machineId) {
-			var generatedId = Math.floor(Math.random() * 100000000000);
-			localStorage.setItem("MACHINE_ID", generatedId);
-			machineId = localStorage.getItem("MACHINE_ID");
-		}
-		var machineIdRequest = {};
-		machineIdRequest.machineId = machineId;
-		usersResource.setMachineId({}, machineIdRequest);
+	var localStorage = window.localStorage;
+	var machineId = localStorage.getItem("MACHINE_ID");
+	if (!machineId) {
+		var generatedId = Math.floor(Math.random() * 100000000000);
+		localStorage.setItem("MACHINE_ID", generatedId);
+		machineId = localStorage.getItem("MACHINE_ID");
 	}
+	var machineIdRequest = {};
+	machineIdRequest.machineId = machineId;
+	usersResource.setMachineId({}, machineIdRequest);
 
 	var currentUserAltId = usersResource.currentAltId({});
 	currentUserAltId.$promise.then(function() {
@@ -43,7 +31,7 @@ userModule.controller("UserController", function($scope, $rootScope, usersResour
 				var userProfileResponse = usersProfileResource.getShortById({id: currentUserAltId.userId});
 				userProfileResponse.$promise.then(function() {
 					var name = userProfileResponse.name;
-					if(name && (name !== null) && (name !== "")) {
+					if (name && (name !== null) && (name !== "")) {
 						$rootScope.userName = name;
 					} else {
 						$rootScope.userName = currentUserAltId.userId;

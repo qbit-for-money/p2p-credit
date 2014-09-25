@@ -18,9 +18,15 @@
 
 			<ul class="nav navbar-nav" style="cursor: pointer">
 				<!--li ng-class="{ active: isActive('/')}" title="Create order"><a href="#"><span class="glyphicon glyphicon-th"></span></a></li-->
-				<li title="Создать заявку" ng-class="{ active: isActive('/create-order')}"><a ng-click="goToOrderCreating()"><span class="glyphicon glyphicon-shopping-cart"></span></a></li>
-				<li title="Поиск заявок" ng-class="{ active: isActive('/orders')}"><a ng-click="goToOrders()"><span class="glyphicon glyphicon-search"></span></a></li>
-				<li title="Профиль" ng-class="{ active: isActive('/users')}"><a ng-click="goToProfile()"><span class="glyphicon glyphicon-user"></span></a></li>
+				<li title="Создать заявку" ng-class="{ active: isActive('/create-order')}"><a ng-click="goToOrderCreating()">
+					<img src="resources/img/small_create_grey.png" style="margin-top: -5px; height: 13px;" alt="Создать заявку"/>
+					</a></li>
+					<li title="Поиск заявок" ng-class="{ active: isActive('/orders')}"><a ng-click="goToOrders()">
+						<img src="resources/img/small_search_grey.png" style="margin-top: -5px; height: 13px;" alt="Поиск заявок"/>
+						</a></li>
+						<li title="Профиль" ng-class="{ active: isActive('/users')}"><a ng-click="goToProfile()">
+							<img src="resources/img/small_account_grey.png" style="margin-top: -5px; height: 13px;" alt="Профиль"/>
+							</a></li>
 			</ul>
 
 			<%@ include file="user.jspf" %>

@@ -121,21 +121,7 @@ orderModule.controller("CreateOrderController", function($scope, $rootScope, $ti
 		} else {
 			$scope.exchangeInit(true);
 		}
-		//});
-		//});
-
-	}
-
-	function formatResult(item) {
-		$timeout(function() {
-			angular.element("span[type='CREDIT']").parent().addClass("credit-row");
-			angular.element("span[type='BORROW']").parent().addClass("borrow-row");
-			angular.element("span[type='EXCHANGE']").parent().addClass("exchange-row");
-		});
-		if (!item.id) {
-			return item.text;
-		}
-		return "<span type='" + categoriesMap[item.text] + "'>" + item.text + "</span>";
+		$rootScope.searchRequest = undefined;
 	}
 
 	initDeadline();

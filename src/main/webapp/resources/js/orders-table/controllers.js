@@ -50,6 +50,7 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 	 function unblockRequest() {
 	 $scope.isBlocked = false;
 	 }*/
+
 	console.log($rootScope.searchRequest)
 	$scope.selectOrdersOwn = function(ordersOwn) {
 		if (!loadOnScroll || ($scope.allCurrencies.length === 0)) {
@@ -184,9 +185,44 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 
 			//angular.element("#order-duration").find("input").val($rootScope.searchRequest.duration);
 		} else {
-			//$scope.givingValue = "1234";
-			//$scope.takingValue = "24";
-			$scope.selectType("borrow");
+			var givingCurrencyFromStorage = window.localStorage.getItem("GIVING_CURRENCY");
+			var takingCurrencyFromStorage = window.localStorage.getItem("TAKING_CURRENCY");
+			var givingValueFromStorage = window.localStorage.getItem("GIVING_VALUE");
+			var takingValueFromStorage = window.localStorage.getItem("TAKING_VALUE");
+			var type = window.localStorage.getItem("TYPE");
+			console.log("REQ: " + givingCurrencyFromStorage + " " + givingValueFromStorage + " " + takingCurrencyFromStorage
+				+ " " + takingValueFromStorage + " " + type)
+			if (type !== null) {
+				$scope.selectType(type);
+				window.localStorage.removeItem("TYPE");
+			} else {
+				$scope.type = "borrow";
+			}
+			if (givingCurrencyFromStorage !== null) {
+				$scope.selectedGivingCurrency = givingCurrencyFromStorage;
+				window.localStorage.removeItem("GIVING_CURRENCY");
+			} else {
+				$scope.selectedGivingCurrency = "RUR";
+			}
+			if (givingCurrencyFromStorage !== null) {
+				$scope.selectedTakingCurrency = takingCurrencyFromStorage;
+				window.localStorage.removeItem("TAKING_CURRENCY");
+			} else {
+				$scope.selectedTakingCurrency = "%";
+			}
+			if (givingValueFromStorage !== null) {
+				$scope.givingValue = parseFloat(givingValueFromStorage);
+				window.localStorage.removeItem("GIVING_VALUE");
+			} else {
+				$scope.givingValue = "";
+			}
+			if (takingValueFromStorage !== null) {
+				$scope.takingValue = parseFloat(takingValueFromStorage);
+				window.localStorage.removeItem("TAKING_VALUE");
+			} else {
+				$scope.takingValue = "";
+			}
+			
 
 		}
 		$timeout(function() {

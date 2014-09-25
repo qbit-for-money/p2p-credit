@@ -3,6 +3,7 @@ var navbarModule = angular.module("navbar");
 navbarModule.factory("navbarService", function($rootScope, authService) {
 	function goToProfile() {
 		if (isCaptchaAuth()) {
+			window.localStorage.setItem("URL", "profile");
 			authService.openAuthDialog(false, true, "profile");
 		} else {
 			window.location.href = window.context + "#/users/" + $rootScope.currentUserAltId;
@@ -11,7 +12,8 @@ navbarModule.factory("navbarService", function($rootScope, authService) {
 	
 	function goToOrderCreating() {
 		if (isCaptchaAuth()) {
-			authService.openAuthDialog(false, true, window.context + "#/create-order");
+			window.localStorage.setItem("URL", window.context + "#/create-order");
+			authService.openAuthDialog(false, true);
 		} else {
 			window.location.href = window.context + "#/create-order";
 		}
@@ -19,7 +21,8 @@ navbarModule.factory("navbarService", function($rootScope, authService) {
 	
 	function goToOrders() {
 		if (isCaptchaAuth()) {
-			authService.openAuthDialog(false, true, window.context + "#/orders");
+			window.localStorage.setItem("URL", window.context + "#/orders");
+			authService.openAuthDialog(false, true);
 		} else {
 			window.location.href = window.context + "#/orders";
 		}
