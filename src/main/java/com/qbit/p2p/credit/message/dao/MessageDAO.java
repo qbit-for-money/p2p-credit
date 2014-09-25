@@ -198,11 +198,12 @@ public class MessageDAO {
 			CriteriaQuery<Tuple> criteria = builder.createQuery(Tuple.class);
 			Root<Message> message = criteria.from(Message.class);
 			criteria.multiselect(message.<String>get("userId"), message.<String>get("partnerId"));
-			//criteria.select(message.<String>get("partnerId"));
 			Predicate fromUserPredicate = builder.equal(message.<String>get("userId"), userId);
 			Predicate toUserPredicate = builder.equal(message.<String>get("partnerId"), userId);
 			
-			criteria.where(builder.or(fromUserPredicate, toUserPredicate));
+			Predicate notAdminPartner = builder.notEqual(message.<String>get("partnerId"), "ADMIN");
+			
+			criteria.where(builder.and(builder.or(fromUserPredicate, toUserPredicate), notAdminPartner));
 			criteria.orderBy(builder.desc(message.get("creationDate")));
 			TypedQuery<Tuple> query = entityManager.createQuery(criteria);
 			//query.setFirstResult(pageNumber);
@@ -236,7 +237,9 @@ public class MessageDAO {
 			criteria.select(builder.countDistinct(message.<String>get("partnerId")));			
 			Predicate fromUserPredicate = builder.equal(message.<String>get("userId"), userId);
 			Predicate toUserPredicate = builder.equal(message.<String>get("partnerId"), userId);			
-			criteria.where(builder.or(fromUserPredicate, toUserPredicate));	
+			Predicate notAdminPartner = builder.notEqual(message.<String>get("partnerId"), "ADMIN");
+			
+			criteria.where(builder.and(builder.or(fromUserPredicate, toUserPredicate), notAdminPartner));	
 
 			return (Long) entityManager.createQuery(criteria).getSingleResult();
 		} finally {

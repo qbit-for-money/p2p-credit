@@ -47,7 +47,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 	$scope.userPropertiesMap['currencies'] = [];
 	$scope.userPropertiesMap['languages'] = [];
 	$scope.languagesMap = {};
-	$scope.additionAttrsHidden = true;
+	$scope.additionAttrsHidden = false;
 	$scope.likesCount = {};
 	$scope.currenciesSelect2Options = {
 		allowClear: true,
@@ -82,48 +82,58 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 	var userByAltId = usersResource.byAltId({id: $scope.userPublicKeyFromPath});
 
 	userByAltId.$promise.then(function() {
-		$timeout(function() {
-			$scope.$apply(function() {
+		//$timeout(function() {
+			//$scope.$apply(function() {
 				$scope.authMap["userIdByAltId"] = userByAltId.publicKey;
-			});
-		});
-	});
-	$scope.currentUser.$promise.then(function() {
-		if (!$scope.currentUser.publicKey) {
-			authService.openAuthDialog(true, false, "/users/" + $scope.userPublicKeyFromPath);
-		}
-		var currentUserAltId = usersResource.currentAltId({});
-		currentUserAltId.$promise.then(function() {
-			if ($scope.userPublicKeyFromPath === currentUserAltId.userId) {
-				if (($scope.currentUser.publicKey.indexOf("@") === -1) && ($scope.currentUser.publicKey.indexOf("vk-") === -1) && ($scope.currentUser.publicKey.indexOf("fb-") === -1)) {
-					window.location.href = window.context;
-				} else {
-					$scope.isCurrentUser = true;
-					$scope.userPropertiesMap['isCurrentUser'] = true;
-					userProfileResponse = usersProfileResource.current({});
-					$scope.currentUserAltId = currentUserAltId.userId;
-					$scope.authMap["userIdByAltId"] = currentUserAltId.userId;
-					hideAuthServices();
-					reloadAllCurrencies();
-					reloadData();
-				}
-			} else {
-				angular.element("#personalEditable").addClass("invisible");
-				$scope.isCurrentUser = false;
-				if (($scope.currentUser.publicKey.indexOf("@") === -1) && ($scope.currentUser.publicKey.indexOf("vk-") === -1) && ($scope.currentUser.publicKey.indexOf("fb-") === -1)) {
-					$scope.isCaptchaUser = true;
-				}
-				$scope.userPropertiesMap['isCurrentUser'] = false;
-				$scope.authMap["userIdByAltId"] = userByAltId.publicKey;
-				console.log("ALT1: " + $scope.userPublicKeyFromPath + " " + $scope.authMap["userIdByAltId"])
-				userProfileResponse = usersProfileResource.getById({'id': $scope.authMap["userIdByAltId"]});
-				hideAuthServices();
-				reloadAllCurrencies();
-				reloadData();
-			}
+			//});
 
-		});
+
+
+
+
+
+
+
+
+			$scope.currentUser.$promise.then(function() {
+				if (!$scope.currentUser.publicKey) {
+					authService.openAuthDialog(true, false, "/users/" + $scope.userPublicKeyFromPath);
+				}
+				var currentUserAltId = usersResource.currentAltId({});
+				currentUserAltId.$promise.then(function() {
+					if ($scope.userPublicKeyFromPath === currentUserAltId.userId) {
+						if (($scope.currentUser.publicKey.indexOf("@") === -1) && ($scope.currentUser.publicKey.indexOf("vk-") === -1) && ($scope.currentUser.publicKey.indexOf("fb-") === -1)) {
+							window.location.href = window.context;
+						} else {
+							$scope.isCurrentUser = true;
+							$scope.userPropertiesMap['isCurrentUser'] = true;
+							userProfileResponse = usersProfileResource.current({});
+							$scope.currentUserAltId = currentUserAltId.userId;
+							$scope.authMap["userIdByAltId"] = currentUserAltId.userId;
+							hideAuthServices();
+							reloadAllCurrencies();
+							reloadData();
+						}
+					} else {
+						angular.element("#personalEditable").addClass("invisible");
+						$scope.isCurrentUser = false;
+						if (($scope.currentUser.publicKey.indexOf("@") === -1) && ($scope.currentUser.publicKey.indexOf("vk-") === -1) && ($scope.currentUser.publicKey.indexOf("fb-") === -1)) {
+							$scope.isCaptchaUser = true;
+						}
+						$scope.userPropertiesMap['isCurrentUser'] = false;
+						$scope.authMap["userIdByAltId"] = userByAltId.publicKey;
+						console.log("ALT1: " + $scope.userPublicKeyFromPath + " " + $scope.authMap["userIdByAltId"])
+						userProfileResponse = usersProfileResource.getById({'id': $scope.authMap["userIdByAltId"]});
+						hideAuthServices();
+						reloadAllCurrencies();
+						reloadData();
+					}
+
+				});
+			});
+		//});
 	});
+
 	function hideAuthServices() {
 		if ($scope.currentUserAltId.indexOf("@") !== -1) {
 			$scope.authMap["GOOGLE"] = true;
@@ -640,7 +650,7 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 			}, 100);
 		});
 	};
-	
+
 	$scope.changeAdditionAttrsVisible = function() {
 		if ($scope.additionAttrsHidden === false) {
 			$scope.additionAttrsHidden = true;

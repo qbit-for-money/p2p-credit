@@ -70,6 +70,6 @@ public class LikesResource {
 	}
 	
 	private boolean isNotCaptcha(String userId) {
-		return (userId != null) && !userId.isEmpty() && (userId.contains("vk-") || userId.contains("@"));
+		return (userId != null) && !userId.isEmpty() && (userId.contains("vk-") || userId.contains("@") || userId.contains("fb-"));
 	}
 }

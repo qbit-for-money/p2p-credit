@@ -23,10 +23,10 @@
 		</div>
 		<div class="container-fluid">
 			<div class="row last-message" ng-repeat="userValue in lastMessages" ng-click="openDialog(userValue.linkId)">
-				<div class="col-xs-1 col-md-1">
-					<a href="{{userValue.url}}"><img height="33" src="{{userValue.imgUrl}}"/></a>
+				<div class="col-xs-2 col-md-1">
+					<a href="{{userValue.url}}"><img height="53" src="{{userValue.imgUrl}}"/></a>
 				</div>
-				<div class="col-xs-3 col-md-3">
+				<div class="col-xs-6 col-md-3">
 					<div class="container-fluid">
 						<div class="row">
 							<div class="col-xs-12 col-md-12">
@@ -34,19 +34,26 @@
 							</div>
 						</div>
 						<div class="row" style="">
-							<div class="col-xs-12 col-md-12" style="color: silver;">
+							<div class="hidden-xs hidden-sm col-md-12" style="color: silver;">
 								{{userValue.creationDate}}
 							</div>
 						</div>
 					</div>
 				</div>
-				<div class="col-xs-7 col-md-7">
+				<div class="col-xs-10 col-md-7">
 					<div class="container-fluid">
 						<div class="row">
+							<div class="col-xs-1 hidden-md"></div>
+							<div class="col-xs-10 hidden-md" style="color: silver;">
+								{{userValue.creationDate}}
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-1 hidden-md"></div>
 							<div class="col-xs-2 col-md-2">
 								<img height="33" src="{{userValue.userImgUrl}}"/>
 							</div>
-							<div class="col-xs-10 col-md-10">
+							<div class="col-xs-8 col-md-10">
 								{{userValue.message}}
 							</div>
 						</div>

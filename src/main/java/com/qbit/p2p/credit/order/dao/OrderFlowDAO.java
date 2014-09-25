@@ -220,7 +220,17 @@ public class OrderFlowDAO {
 						builder.equal(root.get("status"), OrderStatus.OPENED),
 						builder.isNull(root.get("partnerId")));
 				update.where(predicate);
-				return entityManager.createQuery(update).executeUpdate();
+				int status = entityManager.createQuery(update).executeUpdate();
+				if(status != 0) {
+					scheduler.putTask(new Runnable() {
+
+						@Override
+						public void run() {
+							statisticsService.recalculateUserOrdersStatistics(userId);
+						}
+					}, "recalculateUserOrdersStatistics", userId);
+				}
+				return status;
 			}
 		});
 	}

@@ -89,6 +89,6 @@ function isSessionURL(url) {
 }
 
 function goToFirstPage(state) {
-	//console.log(state)
-	window.location.href = window.context;
+	console.log(state)
+	//window.location.href = window.context;
 }

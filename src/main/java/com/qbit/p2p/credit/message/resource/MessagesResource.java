@@ -109,7 +109,6 @@ public class MessagesResource {
 		}
 		String userId = AuthFilter.getUserId(request);
 		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
-		//DateValueProvider provider = DateValueProvider.INST;
 		Date creationDate = null;
 		try {
 			creationDate = dateFormat.parse(creationDateString);

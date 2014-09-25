@@ -54,7 +54,7 @@ orderModule.directive('bsDropdown', function($compile, $modal, ordersResource) {
 			};
 
 			scope.openCommentDialog = function() {
-				var status = scope.items[scope.selectedItem].name.toUpperCase();
+				var status = scope.items[scope.selectedItem].name;
 				if (status === "Не успешна") {
 					status = "NOT_SUCCESS";
 				}

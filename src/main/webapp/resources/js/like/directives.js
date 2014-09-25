@@ -8,7 +8,8 @@ likeModule.directive("likeButtons", function($compile, likesResource, usersResou
 		},
 		link: function(scope, element, attrs) {
 			scope.userPublicKeyFromPath = $location.$$path.replace("/users/", "");
-			scope.isCurrentUser = true;
+			//scope.isCurrentUser = true;
+			//scope.isCaptchaUser = false;
 			$timeout(function() {
 				if (!scope.userAltId || (scope.userPublicKeyFromPath === scope.userAltId)) {
 
@@ -19,15 +20,16 @@ likeModule.directive("likeButtons", function($compile, likesResource, usersResou
 				} else {
 					scope.$apply(function() {
 						scope.isCurrentUser = false;
-						if (($rootScope.user.publicKey.indexOf("@") === -1) && ($rootScope.user.publicKey.indexOf("vk-") === -1)) {
+						if (($rootScope.user.publicKey.indexOf("@") === -1) && ($rootScope.user.publicKey.indexOf("vk-") === -1) && ($rootScope.user.publicKey.indexOf("fb-") === -1)) {
 							scope.isCaptchaUser = true;
 						} else {
 							scope.isCaptchaUser = false;
 						}
 					});
 				}
+				console.log("^^^ " + scope.userAltId + " " + scope.userPublicKeyFromPath + " " + scope.isCurrentUser + scope.isCaptchaUser + " " + $rootScope.user.publicKey)
 			});
-
+			
 
 
 			scope.alreadyVotedUser = function() {
@@ -84,7 +86,6 @@ likeModule.directive("likeButtons", function($compile, likesResource, usersResou
 								callback();
 							}
 						});
-
 					}
 				});
 			}

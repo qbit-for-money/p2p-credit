@@ -56,6 +56,7 @@ public class ResponsesResource {
 	public int approveRespond(RespondApprovalRequest respondRequest) {
 		String userId = AuthFilter.getUserId(request);
 		Comment comment = new Comment(userId, respondRequest.getComment());
+		System.out.println("!!! APPROVE: " + respondRequest);
 		return orderFlowDAO.approveRespond(respondRequest.getOrderId(), userId, respondRequest.getPartnerId(), comment);
 	}
 }
