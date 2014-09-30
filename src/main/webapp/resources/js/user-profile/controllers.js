@@ -453,6 +453,9 @@ userProfileModule.controller("UserProfileController", function($scope, $rootScop
 		}
 	};
 	$scope.updateProfile = function() {
+		if (!$scope.isCurrentUser) {
+			return;
+		}
 		var userMainAttributes = {};
 		userMainAttributes.userId = $scope.currentUser.publicKey;
 		userMainAttributes.name = $scope.userPropertiesMap['name'];

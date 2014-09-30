@@ -1,19 +1,15 @@
 package com.qbit.p2p.credit.message.resource;
 
 import com.qbit.commons.auth.AuthFilter;
+import com.qbit.commons.xss.util.XSSRequestFilter;
 import com.qbit.p2p.credit.message.dao.MessageDAO;
 import com.qbit.p2p.credit.message.model.Message;
-import com.qbit.p2p.credit.order.dao.meta.DateValueProvider;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.AbstractList;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
@@ -46,6 +42,11 @@ public class MessagesResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Message create(Message message) {
+		if(message == null) {
+			return null;
+		}
+		message.setMessage(XSSRequestFilter.stripXSS(message.getMessage()));
+		message.setPartnerId(XSSRequestFilter.stripXSS(message.getPartnerId()));
 		String userId = AuthFilter.getUserId(request);
 		message.setUserId(userId);
 		return messageDAO.create(message);
@@ -56,6 +57,10 @@ public class MessagesResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Message createMessageForAdmin(Message message) {
+		if(message == null) {
+			return null;
+		}
+		message.setMessage(XSSRequestFilter.stripXSS(message.getMessage()));
 		String userId = AuthFilter.getUserId(request);
 		message.setPartnerId(ADMIN_ID);
 		message.setUserId(userId);

@@ -2,6 +2,7 @@ package com.qbit.p2p.credit.order.resource;
 
 import com.qbit.p2p.credit.order.model.SearchRequest;
 import com.qbit.commons.auth.AuthFilter;
+import com.qbit.commons.xss.util.XSSRequestFilter;
 import com.qbit.p2p.credit.order.dao.OrderDAO;
 import com.qbit.p2p.credit.order.dao.OrderFlowDAO;
 import com.qbit.p2p.credit.order.model.Comment;
@@ -59,6 +60,13 @@ public class OrdersResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public OrderInfo create(OrderInfo order) {
+		if(order == null) {
+			return null;
+		}
+		order.setDescription(XSSRequestFilter.stripXSS(order.getDescription()));
+		order.setOrderData(XSSRequestFilter.stripXSS(order.getOrderData()));
+		order.setUserId(XSSRequestFilter.stripXSS(order.getUserId()));
+		//
 		final String userId = AuthFilter.getUserId(request);
 		order.setUserId(userId);
 		System.out.println("@@ " + order);

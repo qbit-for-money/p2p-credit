@@ -1,6 +1,7 @@
 package com.qbit.p2p.credit.material.resource;
 
 import com.qbit.commons.auth.AuthFilter;
+import com.qbit.commons.xss.util.XSSRequestFilter;
 import com.qbit.p2p.credit.material.dao.MaterialDAO;
 import com.qbit.p2p.credit.material.model.Material;
 import java.util.List;
@@ -39,6 +40,11 @@ public class MaterialsResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Material create(Material material) {
+		if(material == null) {
+			return null;
+		}
+		material.setDescription(XSSRequestFilter.stripXSS(material.getDescription()));
+		material.setTitle(XSSRequestFilter.stripXSS(material.getTitle()));
 		String userId = AuthFilter.getUserId(request);
 		material.setUserId(userId);
 		return materialDAO.create(material);

@@ -2,10 +2,14 @@ package com.qbit.p2p.credit.user.resource;
 
 import com.qbit.commons.auth.AuthFilter;
 import com.qbit.commons.user.UserDAO;
+import com.qbit.commons.xss.util.XSSRequestFilter;
 import com.qbit.p2p.credit.user.dao.UserProfileDAO;
 import com.qbit.p2p.credit.statistics.service.StatisticsService;
+import com.qbit.p2p.credit.user.model.DataLink;
+import com.qbit.p2p.credit.user.model.Language;
 import com.qbit.p2p.credit.user.model.ShortProfile;
 import com.qbit.p2p.credit.user.model.UserPublicProfile;
+import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
@@ -28,7 +32,7 @@ public class UserProfilesResource {
 
 	@Context
 	private HttpServletRequest request;
-	
+
 	@Inject
 	UserDAO userDAO;
 	@Inject
@@ -69,10 +73,10 @@ public class UserProfilesResource {
 		if (!profile.isPersonalDataEnabled()) {
 			profile.setPersonalData(null);
 		}
-		if(!profile.isLanguagesEnabled()) {
+		if (!profile.isLanguagesEnabled()) {
 			profile.setLanguages(null);
 		}
-		if(profile.isCurrenciesEnabled()) {
+		if (profile.isCurrenciesEnabled()) {
 			profile.setCurrencies(null);
 		}
 		return profile;
@@ -97,7 +101,7 @@ public class UserProfilesResource {
 		return new UsersPublicProfilesWrapper(userProfileDAO.findAll(
 				sortDataField, sortDesc, pagenum * limit, limit), userProfileDAO.length());
 	}
-	
+
 	@POST
 	@Path("current")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -107,9 +111,21 @@ public class UserProfilesResource {
 		if ((userProfile == null) || !userId.equals(userProfile.getUserId())) {
 			throw new IllegalArgumentException();
 		}
-		UserPublicProfile newProfile = userProfileDAO.updateUserMainAttributes(userProfile);		
+		userProfile.setName(XSSRequestFilter.stripXSS(userProfile.getName()));
+		userProfile.setMail(XSSRequestFilter.stripXSS(userProfile.getMail()));
+		userProfile.setPhone(XSSRequestFilter.stripXSS(userProfile.getPhone()));
+		List<Language> languages = userProfile.getLanguages();
+		if ((languages != null) && !languages.isEmpty()) {
+			for (Language language : languages) {
+				String code = language.getCode();
+				if (!code.equals(XSSRequestFilter.stripXSS(code))) {
+					return null;
+				}
+			}
+		}
+		UserPublicProfile newProfile = userProfileDAO.updateUserMainAttributes(userProfile);
 		statisticsService.recalculateOpenessRating(userId);
-		
+
 		return newProfile;
 	}
 
@@ -122,12 +138,19 @@ public class UserProfilesResource {
 		if ((userProfile == null) || !userId.equals(userProfile.getUserId())) {
 			throw new IllegalArgumentException();
 		}
-		UserPublicProfile newProfile = userProfileDAO.updateUserSocialLinks(userId, userProfile.getSocialLinks());
+		List<DataLink> links = userProfile.getSocialLinks();
+		if (links != null) {
+			for (DataLink link : links) {
+				link.setLink(XSSRequestFilter.stripXSS(link.getLink()));
+				link.setTitle(XSSRequestFilter.stripXSS(link.getTitle()));
+			}
+		}
+		UserPublicProfile newProfile = userProfileDAO.updateUserSocialLinks(userId, links);
 		statisticsService.recalculateOpenessRating(userId);
-		
+
 		return newProfile;
 	}
-	
+
 	@POST
 	@Path("current/video")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -137,12 +160,19 @@ public class UserProfilesResource {
 		if ((userProfile == null) || !userId.equals(userProfile.getUserId())) {
 			throw new IllegalArgumentException();
 		}
+		List<DataLink> videos = userProfile.getVideos();
+		if (videos != null) {
+			for (DataLink video : videos) {
+				video.setLink(XSSRequestFilter.stripXSS(video.getLink()));
+				video.setTitle(XSSRequestFilter.stripXSS(video.getTitle()));
+			}
+		}
 		UserPublicProfile newProfile = userProfileDAO.updateUserVideos(userId, userProfile.getVideos());
 		statisticsService.recalculateOpenessRating(userId);
-		
+
 		return newProfile;
 	}
-	
+
 	@POST
 	@Path("current/passport")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -154,7 +184,7 @@ public class UserProfilesResource {
 		}
 		UserPublicProfile newProfile = userProfileDAO.updatePassportEnabled(userId, userProfile.isPassportEnabled());
 		statisticsService.recalculateOpenessRating(userId);
-		
+
 		return newProfile;
 	}
 }
