@@ -20,60 +20,6 @@ navbarModule.controller("ShortSearchController", function($scope, $rootScope, us
 			name: "Обменять"
 		}];
 
-
-	/*var givingCurrencyFromStorage = window.localStorage.getItem("GIVING_CURRENCY");
-	var takingCurrencyFromStorage = window.localStorage.getItem("TAKING_CURRENCY");
-	var givingValueFromStorage = window.localStorage.getItem("GIVING_VALUE");
-	var takingValueFromStorage = window.localStorage.getItem("TAKING_VALUE");
-	var type = window.localStorage.getItem("TYPE");
-
-	if (givingCurrencyFromStorage !== null) {
-		$scope.selectedGivingCurrency = givingCurrencyFromStorage;
-		//window.localStorage.removeItem("GIVING_CURRENCY");
-	} else {
-		$scope.selectedGivingCurrency = "RUR";
-	}
-	if (givingCurrencyFromStorage !== null) {
-		$scope.selectedTakingCurrency = takingCurrencyFromStorage;
-		//window.localStorage.removeItem("TAKING_CURRENCY");
-	} else {
-		$scope.selectedTakingCurrency = "%";
-	}
-	if (givingValueFromStorage !== null) {
-		$scope.givingValue = parseFloat(givingValueFromStorage);
-		//window.localStorage.removeItem("GIVING_VALUE");
-	} else {
-		$scope.givingValue = "";
-	}
-	if (takingValueFromStorage !== null) {
-		$scope.takingValue = parseFloat(takingValueFromStorage);
-		//window.localStorage.removeItem("TAKING_VALUE");
-	} else {
-		$scope.takingValue = "";
-	}
-	if (type !== null) {
-		//$timeout(function() {
-			//$scope.$apply(function() {
-				$scope.type = type;
-				for(var i in $scope.types) {
-					if($scope.types[i].name === $scope.type) {
-						$scope.selectedItem = $scope.types[i].id;
-					}
-				}
-		//	});
-		//});
-		//window.localStorage.removeItem("TYPE");
-	} else {
-		$scope.type = "Взять";
-	}
-
-	console.log(givingCurrencyFromStorage);
-	console.log(takingCurrencyFromStorage);
-	console.log(givingValueFromStorage);
-	console.log(takingValueFromStorage);
-	console.log(type);*/
-
-
 	$scope.selectType = function(selectedItem) {
 		$scope.type = selectedItem.item.name;
 		if ($scope.type === "Взять") {
@@ -86,12 +32,6 @@ navbarModule.controller("ShortSearchController", function($scope, $rootScope, us
 			$scope.selectedGivingCurrency = "RUR";
 			$scope.selectedTakingCurrency = "BTC";
 		}
-		/*if(givingCurrencyFromStorage) {
-			$scope.selectedGivingCurrency = givingCurrencyFromStorage;
-		}
-		if(takingCurrencyFromStorage) {
-			$scope.selectedTakingCurrency = takingCurrencyFromStorage;
-		}*/
 	};
 
 	var currenciesMap = {};
@@ -135,10 +75,8 @@ navbarModule.controller("ShortSearchController", function($scope, $rootScope, us
 			$rootScope.searchRequest.type = "exchange";
 		}
 
-		console.log($rootScope.searchRequest)
 		if (!$rootScope.user || (($rootScope.user.publicKey.indexOf("@") === -1)
 			&& ($rootScope.user.publicKey.indexOf("vk-") === -1) && ($rootScope.user.publicKey.indexOf("fb-") === -1))) {
-			//$rootScope.url = window.context + "#/orders";
 
 			window.localStorage.setItem("GIVING_CURRENCY", $rootScope.searchRequest.selectedGivingCurrency);
 			window.localStorage.setItem("TAKING_CURRENCY", $rootScope.searchRequest.selectedTakingCurrency);

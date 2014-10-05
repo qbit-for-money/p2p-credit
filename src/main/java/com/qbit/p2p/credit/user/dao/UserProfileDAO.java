@@ -50,8 +50,6 @@ public class UserProfileDAO {
 	public UserPublicProfile find(String id) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {
-			//TypedQuery<UserInfo> q = entityManager.createQuery("SELECT u FROM UserInfo u JOIN u WHERE :userId MEMBER OF u.additionalIds", UserInfo.class);
-			//System.out.println(q.getResultList());
 			return DAOUtil.find(entityManagerFactory.createEntityManager(),
 					UserPublicProfile.class, id, null);
 		} finally {
@@ -174,8 +172,6 @@ public class UserProfileDAO {
 			@Override
 			public UserPublicProfile call(EntityManager entityManager) {
 				UserPublicProfile userPublicProfile = entityManager.find(UserPublicProfile.class, userProfile.getUserId());
-				//TypedQuery<UserInfo> q = entityManager.createQuery("SELECT u FROM UserInfo u JOIN u WHERE :userId MEMBER OF u.additionalIds", UserInfo.class);
-			//System.out.println("** " + q.getResultList());
 				if (userPublicProfile == null) {
 					return null;
 				}

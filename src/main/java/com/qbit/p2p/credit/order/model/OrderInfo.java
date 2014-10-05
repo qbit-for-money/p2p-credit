@@ -247,7 +247,8 @@ public class OrderInfo implements Identifiable<String>, Serializable {
 			//&& (categories != null)
 			//&& (languages != null)
 			&& (incomingCurrency != null || outcomingCurrency != null)
-			&& (!BigDecimal.ZERO.equals(incomingAmount) || !BigDecimal.ZERO.equals(outcomingAmount));
+			&& ("PERCENT".equals(incomingCurrency) ? (incomingAmount.compareTo(BigDecimal.ZERO) >= 0) : (incomingAmount.compareTo(BigDecimal.ZERO) > 0))
+			&& ("PERCENT".equals(outcomingCurrency) ? (outcomingAmount.compareTo(BigDecimal.ZERO) >= 0) : (outcomingAmount.compareTo(BigDecimal.ZERO) > 0));
 	}
 	
 	public boolean isContainsRespond(String userId) {

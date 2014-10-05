@@ -36,11 +36,7 @@
 						<div class="row hidden-sm hidden-md hidden-lg">
 							<div class="clearfix"> 
 								<div class="btn-group inline pull-left" style="width: 100%;" data-toggle="buttons-checkbox"> 
-									<!--input type="hidden" class="form-control" ui-select2="categorySelect2Options" ng-model="ordersSearchMap
-												['orderCategories']" id="category" data-placeholder="Категории" style="width: 100%" ng-change="isValidOrder()"/-->
 									<dropdown d-class="'max-width'" dropdown-title="" items="types" do-select="selectType"></dropdown>
-									<!--ui-dropdown on-enter="search()" element-id="'taking-currency'" data-dropdown-data="allCurrencies" preselected-item="selectedTakingCurrency" input-value="takingValue" placeholder="'Взять'"></ui-dropdown>
-									<ui-dropdown on-enter="search()" element-id="'giving-currency'" data-dropdown-data="allCurrencies" preselected-item="selectedGivingCurrency" input-value="givingValue" placeholder="'Дать'"></ui-dropdown-->
 									<ui-dropdown on-enter="search()" element-id="'giving-currency-min'" data-dropdown-data="allCurrenciesWithoutPersent" preselected-item="selectedGivingCurrency" input-value="givingValue" placeholder="'Сумма'" ng-if="type === 'Взять'"></ui-dropdown>
 									<ui-dropdown on-enter="search()" element-id="'taking-currency-min'" is-percent="true" data-dropdown-data="allCurrencies" preselected-item="selectedTakingCurrency" input-value="takingValue" placeholder="'Возврат'" ng-if="type === 'Взять'"></ui-dropdown>
 									

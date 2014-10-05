@@ -66,10 +66,8 @@ public class OrdersResource {
 		order.setDescription(XSSRequestFilter.stripXSS(order.getDescription()));
 		order.setOrderData(XSSRequestFilter.stripXSS(order.getOrderData()));
 		order.setUserId(XSSRequestFilter.stripXSS(order.getUserId()));
-		//
 		final String userId = AuthFilter.getUserId(request);
 		order.setUserId(userId);
-		System.out.println("@@ " + order);
 		if (!order.isValid()) {
 			return null;
 		}
@@ -88,7 +86,6 @@ public class OrdersResource {
 	@Path("{id}/status")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public int changeOrderStatus(OrderChangeStatusRequest statusRequest) {
-		System.out.println("!! " + statusRequest);
 		if ((statusRequest == null) || (statusRequest.getOrderId() == null) || statusRequest.getOrderId().isEmpty()) {
 			return 0;
 		}

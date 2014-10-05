@@ -25,10 +25,6 @@ and (min-width : 798px) {
 .auth-dialog {
 }
 
-/*.auth-dialog div.noReg {
-	margin-left: 12px;
-}*/
-
 .auth-dialog img.img-btn {
 	cursor: pointer;
 	width: 100%;

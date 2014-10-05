@@ -29,11 +29,7 @@ navbarModule.directive('ngClickOut', ['$parse', function($parse) {
 		return function(scope, element, attr) {
 			var fn = $parse(attr['ngClickOut']);
 			element.bind("mouseout", function(event) {
-				//console.log("OUT " + $(element).find("button").attr("id"));
-				//var buttonId = $(element).find("button").attr("id");
-				console.log("& " + $(element).find("button").attr("id"))
 				$(document).bind("click", function(event) {
-					//console.log("CLICK " + this);
 					event = event || window.event;
 					var el = event.target || event.srcElement;
 					console.log(el.id + " " + $(element).find("button").attr("id"));
@@ -46,22 +42,10 @@ navbarModule.directive('ngClickOut', ['$parse', function($parse) {
 		};
 	}]);
 
-/*navbarModule.directive('ngBlur', ['$parse', function($parse) {
- return function(scope, element, attr) {
- //var fn = $parse(attr['ngBlur']);
- //element.bind('blur', function(event) {
- //scope.$apply(function() {
- //fn(scope, {$event: event});
- //});
- //});
- };
- }]);*/
-
 navbarModule.directive('uiDropdown', function($compile, $timeout) {
 	return {
 		restrict: 'E',
 		scope: {
-			//doSelect: '&selectVal',
 			onChangeInput: '&onChangeInput',
 			items: '=dropdownData',
 			selectedItem: '=preselectedItem',
@@ -74,7 +58,6 @@ navbarModule.directive('uiDropdown', function($compile, $timeout) {
 			static: '=static'
 		},
 		link: function(scope, element, attrs) {
-			//scope.bSelectedItem = scope.selectedItem;
 			scope.inputText = "";
 			var html = '';
 			html += '<div class="input-group" id="{{elementId}}"><input type="number" min="0" class="form-control" ng-model="inputValue" ng-change="onChangeInput()" placeholder="{{placeholder}}">';
@@ -85,7 +68,7 @@ navbarModule.directive('uiDropdown', function($compile, $timeout) {
 			} else {
 				html += '<div class="input-group-btn ui-dropdown-button"><button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="li-item">Action</span> <b class="caret"></b></button>';
 
-				html += '<ul class="dropdown-menu dropdown-menu-left" style="right: 0; left: auto;"><li ng-repeat="item in items"><a tabindex="-1" data-ng-click="selectVal(item)" style="cursor:pointer">{{item}}</a></li><li ng-hide="!isDropdownInput"><input type="text" class="dropdown-input" placeholder=" Other.." ng-model="inputText"/></li></ul></div>';
+				html += '<ul class="dropdown-menu dropdown-menu-left" style="right: 0; left: auto;"><li ng-repeat="item in items"><a tabindex="-1" data-ng-click="selectVal(item)" style="cursor:pointer">{{item}}</a></li><li ng-hide="!isDropdownInput"><input type="text" class="dropdown-input" placeholder=" Другой.." ng-model="inputText"/></li></ul></div>';
 			}
 
 			element.append($compile(html)(scope));
@@ -96,9 +79,6 @@ navbarModule.directive('uiDropdown', function($compile, $timeout) {
 				});
 
 				angular.element(element).find('.dropdown-input').on("blur", function(e) {
-
-
-
 					$timeout(function() {
 						scope.$apply(function() {
 							scope.selectedItem = scope.inputText;
@@ -111,7 +91,6 @@ navbarModule.directive('uiDropdown', function($compile, $timeout) {
 					});
 				});
 			}
-
 
 			scope.selectVal = function(item) {
 				if (!angular.element(scope.elementId + " .input-text").is(":focus")) {

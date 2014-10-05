@@ -45,10 +45,10 @@ angular.module("main").config(function($httpProvider) {
 		responseError: function(response) {
 			if (isSessionURL(response.config.url)) {
 				$rootScope.$broadcast({
-					401: goToFirstPage(401),
-					403: goToFirstPage(403),
-					419: goToFirstPage(419),
-					440: goToFirstPage(440)
+					401: goToFirstPage(),
+					403: goToFirstPage(),
+					419: goToFirstPage(),
+					440: goToFirstPage()
 				}[response.status], response);
 			}
 			return $q.reject(response);
@@ -88,7 +88,6 @@ function isSessionURL(url) {
 	return true;
 }
 
-function goToFirstPage(state) {
-	console.log(state)
-	//window.location.href = window.context;
+function goToFirstPage() {
+	window.location.href = window.context;
 }

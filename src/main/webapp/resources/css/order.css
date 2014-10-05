@@ -2,8 +2,6 @@
 @media only screen 
 and (max-width : 797px) {
 	.credit {
-		//max-height: 140px; 
-		//width: 50px;
 		font-size: 14px;
 		max-height: 50px !important;
 		padding: 1px 1px;
@@ -95,7 +93,6 @@ and (min-width : 798px) {
 }
 
 .button-lg {
-	//height: 8em !important;
 	width: 100% !important;
 }
 
@@ -108,10 +105,6 @@ and (min-width : 798px) {
 	padding-bottom: 30px;
 }
 
-/*.select2-search-choice {
-	background-image: linear-gradient(to top, #DFF2FF 20%, #DAF8FF 50%, #DAF0FF 52%, #DDF4FF 100%) !important;
-}*/
-
 .select2-search-choice {
 	-webkit-border-radius: 0 !important;
 	-moz-border-radius: 0 !important;
@@ -121,33 +114,9 @@ and (min-width : 798px) {
 	-webkit-box-shadow: none !important;
 	-moz-box-shadow: none !important;
 	box-shadow: none !important;
-	//background-color: #428bca !important;
 	background-image: none !important;
-	//color: #fff !important;
-	//border: 1px solid #428bca !important;
 	font-size: 85% !important;
 }
-
-/*.select2-search-choice-close {
-	display: block !important;
-	width: 12px !important;
-	height: 13px !important;
-	position: absolute !important;
-	right: 3px !important;
-	top: 4px !important;
-	font-size: 1px !important;
-	outline: none !important;
-}*/
-
-.ui-dropdown-button {
-
-	//overflow: hidden;
-	//line-height: 30px;
-	//white-space: nowrap;
-}
-/*.ui-dropdown-button button {
-	max-width: 130px;
-}*/
 
 #taking-currency .ui-dropdown-button button {
 	max-width: 130px;
@@ -223,10 +192,6 @@ span.center {
 }
 #select2-drop .exchange-row:hover {
 	background-color: #3875d7;
-}
-
-.table-row {
-
 }
 
 .table-status-button {

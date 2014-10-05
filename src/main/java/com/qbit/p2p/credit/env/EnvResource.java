@@ -24,8 +24,6 @@ public class EnvResource {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Env get() {
-		//System.out.println("## COUNT: " + likeDAO.getAdditionalIdCount("aleksashka6666@gmail.com"));
-		//System.out.println("() " + userDAO.getAdditionalIdCount("aleksashka6666@gmail.com") + "() " + userDAO.findFromAllIds("aleksashka6666@gmail.com"));
 		return env;
 	}
 }

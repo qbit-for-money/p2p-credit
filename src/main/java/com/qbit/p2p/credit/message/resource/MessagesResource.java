@@ -86,10 +86,8 @@ public class MessagesResource {
 		List<String> partnersIds = messageDAO.findPartnersIds(userId);
 		for(String partnerId : partnersIds) {
 			List<Message> m = messageDAO.findByUserIdAndPartnerId(userId, partnerId, 0, 1);
-			System.out.println(m + " : " + partnersIds.size());
 			messages.add(m.get(0)); 
 		}
-		//List<Message> messages = messageDAO.findPartnersLastMessages(userId, firstPage, pageSize);
 		long length = messageDAO.getLengthByPartnersIds(userId);
 		return new MessagesWrapper(messages, length);
 	}
@@ -122,7 +120,6 @@ public class MessagesResource {
 		}
 		
 		creationDate.setTime(creationDate.getTime() + 1000);
-		System.out.println("## LATER: " + creationDateString + " : " + creationDate + " : " + partnerId);
 		return new MessagesWrapper(messageDAO.findLaterThan(userId, partnerId, creationDate));
 	}
 }

@@ -39,7 +39,6 @@ chatModule.factory("chatService", function($modal, messagesResource, $interval) 
 		sendMessageForAdmin: function(message) {
 			var messageRequest = {};
 			messageRequest.message = message;
-			console.log("SEND: " + JSON.stringify(messageRequest))
 			var messageResponse = messagesResource.sendMessageForAdmin({}, messageRequest);
 		}
 	};

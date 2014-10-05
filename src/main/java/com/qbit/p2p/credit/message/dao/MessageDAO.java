@@ -37,7 +37,6 @@ public class MessageDAO {
 			public Message call(EntityManager entityManager) {
 				UserInfo user = entityManager.find(UserInfo.class, message.getUserId());
 				UserInfo partner = entityManager.find(UserInfo.class, message.getPartnerId());
-				System.out.println("@@ " + message + " : " + user + " : " + partner);
 				if ((user == null) || (partner == null)) {
 					return null;
 				}
@@ -56,7 +55,6 @@ public class MessageDAO {
 			@Override
 			public Message call(EntityManager entityManager) {
 				message.setCreationDate(new Date());
-				System.out.println("%%% " + message);
 				return entityManager.merge(message);
 			}
 		});
@@ -206,8 +204,6 @@ public class MessageDAO {
 			criteria.where(builder.and(builder.or(fromUserPredicate, toUserPredicate), notAdminPartner));
 			criteria.orderBy(builder.desc(message.get("creationDate")));
 			TypedQuery<Tuple> query = entityManager.createQuery(criteria);
-			//query.setFirstResult(pageNumber);
-			//query.setMaxResults(pageSize);
 			List<Tuple> ids = query.getResultList();
 			List<String> partnersIds = new ArrayList<>();
 			for(Tuple id : ids) {
@@ -221,7 +217,6 @@ public class MessageDAO {
 					partnersIds.add(tupleUserId);
 				}
 			}
-			System.out.println("%%%: " + partnersIds);
 			return partnersIds;
 		} finally {
 			entityManager.close();
@@ -246,32 +241,4 @@ public class MessageDAO {
 			entityManager.close();
 		}
 	}
-	
-	/*public List<Message> findPartnersLastMessages(String userId) {
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		try {
-			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-			CriteriaQuery<Message> criteria = builder.createQuery(Message.class);
-			Root<Message> message = criteria.from(Message.class);
-			criteria.select(message);
-			
-			Predicate fromUserPredicate = builder.equal(message.<String>get("userId"), userId);
-			Predicate toPartnerPredicate = builder.equal(message.<String>get("partnerId"), partnerId);
-			
-			Predicate fromPartnerPredicate = builder.equal(message.<String>get("userId"), partnerId);
-			Predicate toUserPredicate = builder.equal(message.<String>get("partnerId"), userId);
-			
-			Predicate fromUserToPartner = builder.and(fromUserPredicate, toPartnerPredicate);
-			Predicate fromPartnerrToUser = builder.and(fromPartnerPredicate, toUserPredicate);
-			criteria.where(builder.or(fromUserToPartner, fromPartnerrToUser));
-			criteria.orderBy(builder.desc(message.get("creationDate")));
-			TypedQuery<Message> query = entityManager.createQuery(criteria);
-			query.setFirstResult(pageNumber * pageSize);
-			query.setMaxResults(pageSize);
-			List<Message> m = query.getResultList();
-			return m;
-		} finally {
-			entityManager.close();
-		}
-	}*/
 }

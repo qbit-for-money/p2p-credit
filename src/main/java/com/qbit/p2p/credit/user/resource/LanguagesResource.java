@@ -26,11 +26,4 @@ public class LanguagesResource {
 	public LanguagesWrapper getAll() {
 		return new LanguagesWrapper(languageDAO.findAll());
 	}
-
-	/*@PUT
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Language create(Language language) {
-		return languageDAO.create(language.getCode());
-	}*/
 }

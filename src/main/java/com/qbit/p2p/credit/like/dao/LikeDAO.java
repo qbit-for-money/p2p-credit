@@ -104,13 +104,8 @@ public class LikeDAO {
 			Root<UserInfo> user = criteria.from(UserInfo.class);
 
 			criteria.select(builder.countDistinct(user));
-			//Expression<String> userIdExpression = user.get("publicKey");
-			//Predicate publicKeyPredicate = builder.equal(userIdExpression, publicKey);
-			//criteria.where(publicKeyPredicate);
-			//long publicKeyCount = (Long) entityManager.createQuery(criteria).getSingleResult();
 			Expression<Collection> idsExpression = user.get("additionalIds");
 			Predicate containsIdsPredicate = builder.isMember(publicKey, idsExpression);
-			//Predicate predicate = builder.or(publicKeyPredicate, containsIdsPredicate);
 			criteria.where(containsIdsPredicate);
 			long idsCount = (Long) entityManager.createQuery(criteria).getSingleResult();
 			return idsCount;

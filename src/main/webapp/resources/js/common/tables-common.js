@@ -1,117 +1,3 @@
-var cellclassname = function(row, column, value, data) {
-	if (data.takingCurrency && data.givingCurrency) {
-		return "exchange-row";
-	} else if (data.takingCurrency) {
-		return "credit-row";
-	} else if (data.givingCurrency) {
-		return "borrow-row";
-	}
-};
-function getSource(path, id) {
-	var source =
-		{
-			dataType: "json",
-			dataFields: [
-				{name: "categories", type: "string"},
-				{name: "title", type: "string"},
-				{name: "languages", type: "string"},
-				{name: "takingCurrency", type: "string"},
-				{name: "givingCurrency", type: "string"},
-				{name: "duration", type: "string"},
-				{name: "reward", type: "string"},
-				{name: "responsesCount", type: "number"},
-				{name: "responses", type: "string"},
-				{name: "status", type: "string"},
-				{name: "summaryRating", type: "number"},
-				{name: "opennessRating", type: "number"},
-				{name: "ordersSumValue", type: "string"},
-				{name: "successValue", type: "string"},
-				{name: "partnersRating", type: "number"},
-				{name: "endDate", type: "date"},
-				{name: "userName", type: "string"},
-				{name: "userMail", type: "string"},
-				{name: "userPhone", type: "string"},
-				{name: "userCurrencies", type: "string"},
-				{name: "userLanguages", type: "string"},
-				{name: "userPublicKey", type: "string"},
-				{name: "orderData", type: "string"},
-				{name: "id", type: "string"},
-				//{name: "responseId", type: "string"}, 
-				{name: "approvedResponseId", type: "string"}
-			],
-			beforeprocessing: function(data) {
-				source.totalrecords = data.length;
-			},
-			sort: function() {
-				angular.element(id).jqxGrid('updatebounddata');
-			},
-			filter: function() {
-				angular.element(id).jqxGrid('updatebounddata');
-			},
-			root: "orders",
-			type: "POST",
-			url: window.context + path
-		};
-	return source;
-}
-
-function getAdapterFields(allCurrencies) {
-	return {
-		contentType: 'application/json; charset=utf-8',
-		formatData: function(data) {
-			var newData = {};
-			newData.filterItems = [];
-			for (var i = 0; i < data.filterscount; i++) {
-
-				if (!isInt(data["filtervalue" + i]) && isNumberField(data["filterdatafield" + i])) {
-					continue;
-				}
-				if (((data["filterdatafield" + i] === "partnersRating") || (data["filterdatafield" + i] === "responsesCount")) && (data["filtervalue" + i] === '0')) {
-					continue;
-				}
-
-				newData.filterItems[i] = {};
-				var operator = data[data["filterdatafield" + i] + "operator"];
-				if (operator) {
-					if (operator === "and") {
-						newData.filterItems[i].filterOperator = 1;
-					}
-				}
-				if (data["filtervalue" + i] === "NOT SUCCESS") {
-					data["filtervalue" + i] = "NOT_SUCCESS";
-				}
-				if (data["filtervalue" + i] === "IN PROCESS") {
-					data["filtervalue" + i] = "IN_PROCESS";
-				}
-
-				newData.filterItems[i].filterDataField = data["filterdatafield" + i];
-				newData.filterItems[i].filterCondition = data["filtercondition" + i];
-				newData.filterItems[i].filterValue = data["filtervalue" + i];
-				if (data["filterdatafield" + i] === "endDate") {
-					var date = new Date(data["filtervalue" + i]);
-					var monthNames = ["January", "February", "March", "April", "May", "June",
-						"July", "August", "September", "October", "November", "December"];
-					newData.filterItems[i].filterValue = monthNames[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear();
-				}
-				if ((data["filterdatafield" + i] === "givingCurrency") || (data["filterdatafield" + i] === "takingCurrency")) {
-					newData.filterItems[i].filterValue = allCurrencies[data["filtervalue" + i]];
-				}
-
-				if (isNumberField(data["filterdatafield" + i])) {
-					newData.filterItems[i].filterCondition = "GREATER_THAN_OR_EQUAL";
-				}
-			}
-			newData.sortOrder = data.sortorder;
-			newData.pageNumber = data.pagenum;
-			newData.pageSize = data.pagesize;
-			newData.recordstartindex = data.recordstartindex;
-			newData.recordendindex = data.recordendindex;
-			newData.sortDataField = data.sortdatafield;
-			return JSON.stringify(newData);
-		}
-	};
-}
-
 function isInt(str) {
 	var n = ~~Number(str);
 	return String(n) === str && n >= 0;
@@ -172,33 +58,12 @@ function formatDownloadedOrders(orders) {
 			orders[i].give = givingCurrenciesStr;
 		}
 		
-
-		//orders[i].ordersSumValue = orders[i].ordersSumValue + " : " + orders[i].successTransactionsSum;
 		if (orders[i].order.status === "NOT_SUCCESS") {
 			orders[i].order.status = "NOT SUCCESS";
 		}
 		if (orders[i].order.status === "IN_PROCESS") {
 			orders[i].order.status = "IN PROCESS";
 		}
-		
-		/*
-		 if (orders[i].order.status === "OPENED") {
-			orders[i].order.status = "Открыта";
-		}
-		if (orders[i].order.status === "IN_PROCESS") {
-			orders[i].order.status = "В процессе";
-		}
-		if (orders[i].order.status === "NOT_SUCCESS") {
-			orders[i].order.status = "Не успешна";
-		}
-		if (orders[i].order.status === "SUCCESS") {
-			orders[i].order.status = "Успешна";
-		}
-		if (orders[i].order.status === "ARBITRATION") {
-			orders[i].order.status = "Арбитраж";
-		}
-		 */
-
 
 		if (orders[i].userCurrencies && !orders[i].userCurrencies.length !== 0) {
 			var userCurrenciesStr = "";
@@ -225,7 +90,6 @@ function formatDownloadedOrders(orders) {
 		} else {
 			orders[i].responsesCount = 0;
 		}
-		//orders[i].id = orders[i].order.id;
 		orders[i].approvedResponseId = orders[i].order.approvedResponseId;
 		orders[i].duration = orders[i].order.duration + " " + ((orders[i].order.durationType === "HOUR") ? "часов" : "дней");
 		orders[i].endDate = orders[i].order.bookingDeadline;
@@ -242,8 +106,6 @@ function formatDownloadedOrders(orders) {
 		} else {
 			orders[i].type = "TAKE";
 		}
-		console.log(orders[i].order.incomingCurrency + " : " + (orders[i].order.incomingCurrency === "%") + " = " + orders[i].order.outcomingCurrency + " : " +(orders[i].order.outcomingCurrency === "%") + " "  + orders[i].type);
-		
 		orders[i].order = undefined;
 	}
 	return orders;

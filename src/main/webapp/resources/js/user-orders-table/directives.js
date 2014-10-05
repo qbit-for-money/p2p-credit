@@ -95,7 +95,6 @@ orderModule.directive('bsDropdown', function($compile, $modal, ordersResource) {
 				response.orderId = orderId;
 				response.status = status;
 				response.comment = comment;
-				console.log(JSON.stringify(response))
 				var orderResponse = ordersResource.changeStatus({id : orderId}, response);
 				orderResponse.$promise.then(function() {
 					scope.doFunction();

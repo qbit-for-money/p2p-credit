@@ -18,12 +18,8 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 	$scope.allCurrenciesWithoutPersent = [];
 	$scope.selectedCurrency;
 	$scope.isBlocked = false;
-	//$scope.givingValue = "";
-	$scope.sortedBy = [/*{
-	 id: 0,
-	 name: "Проценты",
-	 fieldTitle: "percent"
-	 }, */{
+	$scope.sortedBy = [
+		{
 			id: 0,
 			name: "Сумма",
 			fieldTitle: "amount"
@@ -32,7 +28,6 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 			name: "Срок",
 			fieldTitle: "duration"
 		}];
-	//incomingAmount outcomingAmount
 	$scope.ordersOwn = [{
 			id: 0,
 			name: "Все"
@@ -159,28 +154,6 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 		searchRequest.sortOrder = "DESC";
 	};
 
-	/*$scope.sortUserOrdersTable = function(selectedItem) {
-	 searchRequest.sortDataField = selectedItem.item.fieldTitle;
-	 searchRequest.sortOrder = "ASC";
-	 userOrdersTableFilterInit();
-	 };*/
-
-	/*$scope.categorySelect2Options = {
-	 allowClear: true,
-	 tags: $scope.allCategories,
-	 multiple: true,
-	 'simple_tags': true,
-	 maximumSelectionSize: 20,
-	 maximumInputLength: 20,
-	 createSearchChoice: function(term, data) {
-	 if ($(data).filter(function() {
-	 return this.text.localeCompare(term) === 0;
-	 }).length === 0) {
-	 return {id: term, text: term};
-	 }
-	 }
-	 };*/
-
 	userProfileService.getAllCurrencies(function(currencies) {
 		$scope.allCurrenciesDropdown = [];
 		for (var i in currencies) {
@@ -193,28 +166,11 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 			if (currency.id !== "PERCENT") {
 				$scope.allCurrenciesWithoutPersent.push(currency.code);
 			}
-			/*if (i !== 0) {
-			 $scope.allCurrenciesDropdown[i - 1] = {};
-			 $scope.allCurrenciesDropdown[i - 1].id = parseInt(i - 1);
-			 $scope.allCurrenciesDropdown[i - 1].name = currencies[i].code;
-			 }*/
 		}
 		$timeout(function() {
 			initFilter();
 		});
 	});
-
-	/*userProfileService.getAllCategories(function(categories) {
-	 $scope.allCategories.splice(0, $scope.allCategories.length);
-	 
-	 for (var i in categories) {
-	 $scope.allCategories.push(categories[i].code);
-	 }
-	 });*/
-
-	/*$scope.selectCurrency = function(selectedItem) {
-	 $scope.selectedCurrency = currenciesMap[selectedItem.item.name].id;
-	 };*/
 
 	$scope.selectOutcomingCurrency = function(item) {
 		console.log("OUT: " + JSON.stringify(item))
@@ -226,11 +182,7 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 
 	function ordersTableFilterInit() {
 		searchRequest.filterItems.splice(0, searchRequest.filterItems.length);
-		//console.log(">> " + $scope.givingValue + " " + $scope.takingValue)
-		console.log(">>" + angular.element("#giving-currency").find(".li-item").text())
-		console.log(">>>" + angular.element("#taking-currency").find(".li-item").text())
 		pageNumber = 0;
-		//searchRequest.filterItems = [];
 		var filterItem = {};
 		filterItem.filterOperator = "1";
 		filterItem.filterDataField = "status";
@@ -246,18 +198,6 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 		bondFilterItem.filterCondition = "EQUAL";
 		bondFilterItem.filterValue = $scope.isBond;
 		searchRequest.filterItems[1] = bondFilterItem;
-
-		/*var borowFilterItem = {};
-		 borowFilterItem.filterOperator = "1";
-		 borowFilterItem.filterDataField = "incomingCurrency";
-		 borowFilterItem.filterCondition = "EQUAL";
-		 borowFilterItem.filterValue = "PERCENT";
-		 
-		 var creditFilterItem = {};
-		 creditFilterItem.filterOperator = "1";
-		 creditFilterItem.filterDataField = "outcomingCurrency";
-		 creditFilterItem.filterCondition = "EQUAL";
-		 creditFilterItem.filterValue = "PERCENT";*/
 
 		var durationFilterItem = {};
 		durationFilterItem.filterOperator = "1";
@@ -305,8 +245,6 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 		outcomingAmountFilterItem.filterValue = (outcomingAmount !== "") ? outcomingAmount : 0;
 
 		if (($scope.type === "borrow") || ($scope.type === "exchange")) {
-			//incomingAmount = (incomingAmount && incomingAmount !== "") ? incomingAmount : 100;
-			//outcomingAmount = (outcomingAmount && outcomingAmount !== "") ? outcomingAmount : 0;
 			incomingAmountFilterItem.filterCondition = "LESS_THAN_OR_EQUAL";
 			outcomingAmountFilterItem.filterCondition = "GREATER_THAN_OR_EQUAL";
 			incomingAmountFilterItem.filterValue = incomingAmount;
@@ -318,55 +256,18 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 			outcomingAmountFilterItem.filterValue = (outcomingAmount !== "") ? outcomingAmount : 100;
 		}
 
-		console.log("TYPE: " + $scope.type)
-		console.log("INCOMING: " + incomingAmount + " " + incomingCurrencyFilterItem.filterValue + " " + incomingAmountFilterItem.filterCondition)
-		console.log("OUTCOMING: " + outcomingAmount + " " + outcomingCurrencyFilterItem.filterValue + " " + outcomingAmountFilterItem.filterCondition)
 		if (incomingAmount && (incomingAmount !== "")) {
 			searchRequest.filterItems.push(incomingAmountFilterItem);
 		}
 		if (outcomingAmount && (outcomingAmount !== "")) {
 			searchRequest.filterItems.push(outcomingAmountFilterItem);
 		}
-
-		/*if ($scope.type === "borrow") {
-		 searchRequest.filterItems[1] = outcomingCurrencyFilterItem;
-		 
-		 var outcomingCurrencyFilterItem = {};
-		 outcomingCurrencyFilterItem.filterOperator = "1";
-		 outcomingCurrencyFilterItem.filterDataField = "outcomingCurrency";
-		 outcomingCurrencyFilterItem.filterCondition = "EQUAL";
-		 outcomingCurrencyFilterItem.filterValue = $scope.selectedGivingCurrency;
-		 } else if ($scope.type === "credit") {
-		 searchRequest.filterItems[1] = creditFilterItem;
-		 
-		 var incomingCurrencyFilterItem = {};
-		 incomingCurrencyFilterItem.filterOperator = "1";
-		 incomingCurrencyFilterItem.filterDataField = "outcomingCurrency";
-		 incomingCurrencyFilterItem.filterCondition = "EQUAL";
-		 incomingCurrencyFilterItem.filterValue = $scope.selectedTakingCurrency;
-		 
-		 
-		 //$scope.selectedGivingCurrency = "%";
-		 //$scope.selectedTakingCurrency = "RUR";
-		 //giving-currency
-		 } else {
-		 var notCreditFilterItem = creditFilterItem;
-		 notCreditFilterItem.filterCondition = "NOT_EQUAL";
-		 var notBorrowFilterItem = creditFilterItem;
-		 notBorrowFilterItem.filterCondition = "NOT_EQUAL";
-		 searchRequest.filterItems[1] = notCreditFilterItem;
-		 searchRequest.filterItems[2] = notBorrowFilterItem;
-		 }*/
-
-		//initOrdersTable();
 	}
 
 	function userOrdersTableFilterInit() {
-		//userPageNumber = 0;
 		var userResponse = usersResource.current({});
 		userResponse.$promise.then(function() {
 			userPageNumber = 0;
-			//searchRequest.filterItems = [];
 			var filterItem = {};
 			filterItem.filterOperator = "1";
 			filterItem.filterDataField = "userId";
@@ -431,7 +332,6 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 
 		orderResponse.$promise.then(function() {
 			$scope.userOrdersCount = orderResponse.length;
-			console.log("USER PAGE NUMBER: " + userPageNumber)
 			var orders = formatDownloadedOrders(orderResponse.orderWrappers);
 			var tabsdiv = angular.element("#user-orders-table");
 			if (!reload) {
@@ -462,7 +362,6 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 		}
 
 		for (var i in orders) {
-			console.log(JSON.stringify(orders[i]))
 			var orderId = orders[i].id;
 			var orderAttrsContext = {
 				orderId: orderId,
@@ -554,8 +453,6 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 		var orderResponse = ordersResource.search({}, searchRequest);
 		orderResponse.$promise.then(function() {
 			$scope.ordersCount = orderResponse.length;
-
-			console.log("PAGE NUMBER: " + pageNumber)
 			var orders = formatDownloadedOrders(orderResponse.orderWrappers);
 			var tabsdiv = angular.element("#orders-table");
 			if (!reload) {
@@ -588,10 +485,8 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 		for (var i in orders) {
 
 			var orderId = orders[i].id;
-			console.log(orders[i].status)
 			var imgurl = window.context + "webapi/photos/" + orders[i].userId;
 			var userurl = window.context + "#/users/" + orders[i].userId;
-			console.log(orders[i].creationDate);
 			var orderAttrsContext = {
 				orderId: orderId,
 				imgurl: imgurl,
@@ -700,7 +595,6 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 	angular.element(window).scroll(function() {
 		if (angular.element(window).scrollTop()
 			>= (angular.element(document).height() - angular.element(window).height()) * 0.75) {
-			console.log("USER: " + $scope.isUserTable)
 			if ($scope.isUserTable) {
 				loadUserData();
 			} else {
@@ -710,8 +604,6 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 	});
 
 	function loadData() {
-		console.log("LOAD DATA")
-
 		if ((pageNumber > 30) || (($scope.ordersCount) && ($scope.ordersCount <= pageNumber * 10))) {
 			return;
 		}
@@ -731,8 +623,6 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 	}
 
 	function loadUserData() {
-		console.log("LOAD USER DATA")
-
 		if ((userPageNumber > 30) || (($scope.userOrdersCount) && ($scope.userOrdersCount <= userPageNumber * 10))) {
 			return;
 		}
@@ -761,12 +651,10 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 		} else {
 			$rootScope.searchRequest.type = "exchange";
 		}
-		console.log(JSON.stringify($rootScope.searchRequest))
 		navbarService.goToOrderCreating();
 	};
 
 	$scope.$on("$destroy", function() {
-		console.log("DESTROY")
 		angular.element(window).unbind('scroll');
 	});
 

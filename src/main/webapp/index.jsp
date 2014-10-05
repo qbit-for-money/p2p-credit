@@ -38,8 +38,6 @@
 
 	</script>
 	<body class="default">
-		<!--div class="container" ng-if="user === null" ng-controller="AuthDialogOpeningController">
-		</div-->
 		<div class="wrapper">
 			<%@ include file="WEB-INF/jspf/nav.jspf" %>
 			<div class="container">		

@@ -67,9 +67,6 @@
 		<div id="messages-go-back" ng-click="goToLastMessages()">
 			<div style="width: 100%;"><span style="padding-left: 5px;">Назад</span></div>
 		</div>
-		<!--div style="height: 25px; border: 1px solid #ddd; border-top-width: 0;" ng-hide="messageHistory && messageHistory.length !== 0">
-			
-		</div-->
 		<div class="row" style="margin-right: 0; margin-left: 0; ">
 			<div class="panel panel-default" id="chat-history" style="border-top-left-radius: 0; border-top-right-radius: 0; border-top-width: 0;">
 				<div class="panel-body">
@@ -94,15 +91,6 @@
 										{{messageValue.message}}
 									</div>
 								</div>
-
-								<!--div class="col-xs-3 col-md-3">
-									<img height="53" src="{{partnerImgUrl}}"/>
-								</div>
-								<ul class="dropdown" style="right: 0; left: auto;">
-									<li ng-repeat="messageValue in messageHistory">
-										<div>{{messageValue.message}}</div>
-									</li>
-								</ul-->
 							</div>
 							<div class="col-xs-3 col-md-3" style="color: silver;">
 								{{messageValue.creationDate}}

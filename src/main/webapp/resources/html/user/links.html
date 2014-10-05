@@ -1,13 +1,9 @@
-<div class="row" ng-click="editItems()" style="cursor:pointer;"> <!--ng-hide="(edited === false) && (!links || links.length === 0)"-->
+<div class="row" ng-click="editItems()" style="cursor:pointer;">
 	<div class="col-xs-7 col-md-3" style="margin-top: 3px;cursor:pointer;">{{title}}</div>
 </div>
-<div class="row"><!-- ng-hide="(edited === false) && (!links || links.length === 0)"-->
+<div class="row">
 	<div class="col-xs-12 col-md-12"><hr></div>
 </div>
-<!--iframe width="560" height="315" 
-            ng-src="{{ youtubeURL }}" 
-            frameborder="0" allowfullscreen>
-    </iframe-->
 <div id="user-links" class="row">
 	<div class="col-xs-1 col-md-1"></div>
 	<div class="col-xs-12 col-md-12">
@@ -21,14 +17,11 @@
 									<div class="container-fluid">
 										<div class="row">
 											<div class="col-xs-12 col-md-12" title="{{linkItem.title}}" ng-hide="edited">
-												<!--embed width="100%" height="60%" embed-src="{{linkItem.link}}" style="max-height: 120px;"-->
 												<p style="text-align:center" id="video-container" class="h_iframe">
-													<!--a ng-href="{{linkItem.link}}"><img class="ratio" src="http://www.turn.com/sites/default/files/video_icon_0.png"/></a-->
 													<iframe class="hidden-sm hidden-xs" style="position: relative;" width="100%" height="150px" embed-src="{{linkItem.link}}" frameborder="0" allowfullscreen></iframe>
 												</p>
 											</div>
 											<div class="col-xs-9 col-md-10" title="{{linkItem.title}}" ng-hide="!edited">
-												<!--embed width="100%" height="60%" embed-src="{{linkItem.link}}" style="max-height: 120px;"-->
 												<p style="text-align:center" id="video-container" class="h_iframe">
 													<img class="ratio" src="http://www.turn.com/sites/default/files/video_icon_0.png"/>
 													<iframe class="hidden-sm hidden-xs" style="position: relative;" width="100%" height="120px" embed-src="{{linkItem.link}}" frameborder="0" allowfullscreen></iframe>
@@ -40,13 +33,6 @@
 												</button>
 											</div>
 										</div>
-										<!--div class="row">
-											<div class="col-xs-3 col-md-1 navbar-right" ng-hide="edited !== true">
-												<button class="btn btn-default" type="button" ng-click="removeLink(linkItem.id)">
-													<span class="glyphicon glyphicon-remove"></span>
-												</button>
-											</div>
-										</div-->
 									</div>
 								</div>
 							</div>
@@ -89,69 +75,6 @@
 						</div>
 					</div>
 				</div>
-
-
-
-
-				<!--div class="row" ng-repeat="linkItem in links" ng-hide="type === 'video'">
-					<div class="col-xs-4 col-md-4" ng-hide="!(type === 'social-link' && linkItem.title && !linkItem.edited)">
-						<div class="container-fluid">
-							<div class="row">
-								<div class="col-xs-4 col-md-4 link-item"><a href="{{linkItem.link}}">{{linkItem.title}}</a></div>
-							</div>
-						</div>
-					</div>
-
-					<div class="col-xs-4 col-md-4" ng-hide="!(((type === 'social-link') || (type === 'name')) && !linkItem.title && !linkItem.edited)">
-						<div class="container-fluid">
-							<div class="row">
-								<div class="col-xs-4 col-md-4 link-item"><a href="{{linkItem.link}}">{{linkItem.link}}</a></div>
-							</div>
-						</div>
-					</div>
-
-					<div class="col-xs-12 col-md-8" ng-hide="!(type === 'phone' && linkItem.title && !linkItem.edited)">
-						<div class="container-fluid">
-							<div class="row">
-								<div class="col-xs-5 col-md-6 link-item title-item">{{linkItem.title}}</div><div class="col-xs-7 col-md-6">{{linkItem.link}}</div>
-							</div>
-						</div>
-					</div>
-					<div class="col-xs-8 col-md-8" ng-hide="!(type === 'phone' && !linkItem.title && !linkItem.edited)">
-						<div class="container-fluid">
-							<div class="row">
-								<div class="col-xs-6 col-md-6"></div><div class="col-xs-6 col-md-6 link-item">{{linkItem.link}}</div>
-							</div>
-						</div>
-					</div>
-
-
-					<div class="col-xs-4 col-md-4"  ng-hide="!((linkItem.edited === true) && (edited === true) && (type !== 'name'))">
-						<input type="text"  class="form-control" placeholder="Title" ng-model="linkItem.title"/>
-					</div>
-					<div class="col-xs-8 col-md-8"  ng-hide="!((linkItem.edited === true) && (edited === true) && (type === 'name'))" ng-class="{'has-success': isValidItem(linkItem, true), 'has-error': !isValidItem(linkItem, true)}">
-						<input type="text" id="{{linkItem.id}}"  class="form-control" placeholder="{{itemPlaceholder}}" ng-model="linkItem.link"/>
-					</div>
-					<div class="col-xs-4 col-md-4" ng-hide="type !== 'name'"></div>
-
-					<div class="col-xs-1 col-md-1" ng-hide="edited === false">
-						<div class="navbar-right">
-				<!--button class="btn btn-default" type="button" ng-click="editLink(linkItem.id)" ng-hide="type === 'video'">
-					<span class="glyphicon glyphicon-pencil"></span>
-				</button-->
-
-
-
-
-
-
-				<!--button class="btn btn-default" type="button" style="float: right;" ng-click="removeLink(linkItem.id)" ng-hide="type === 'video'">
-					<span class="glyphicon glyphicon-remove"></span>
-				</button>
-			</div>
-
-		</div>
-	</div-->
 
 				<div class="row" ng-hide="edited === false || links.length > 7">
 					<div class="col-xs-12 col-sm-6 col-md-6" ng-hide="(type === 'video') || (type === 'name')" style="padding-bottom: 3px;">

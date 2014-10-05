@@ -50,7 +50,6 @@ orderModule.controller("UserOrdersController", function($scope, $rootScope, $int
 					orderStatus: datarecord.status,
 					status: (datarecord.approvedResponseId) ? true : false,
 					isApprovedResponse: (datarecord.approvedResponseId === datarecord.responses[i].id) ? true : false
-							//openCommentDialog: openCommentDialog
 				};
 				var responseContent = responsesExp(responsesContext);
 				responsesContent += responseContent;
