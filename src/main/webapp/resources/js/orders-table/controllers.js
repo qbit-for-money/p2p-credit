@@ -322,12 +322,12 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 	}
 
 	function initUserOrdersTable(reload) {
-
-		searchRequest.pageNumber = userPageNumber;
+		console.log(userPageNumber)
+		
 		if (reload) {
 			userPageNumber += 1;
 		}
-
+		searchRequest.pageNumber = userPageNumber;
 		var orderResponse = ordersResource.search({}, searchRequest);
 
 		orderResponse.$promise.then(function() {
