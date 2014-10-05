@@ -322,8 +322,6 @@ orderModule.controller("OrdersController", function($scope, $rootScope, ordersRe
 	}
 
 	function initUserOrdersTable(reload) {
-		console.log(userPageNumber)
-		
 		if (reload) {
 			userPageNumber += 1;
 		}
